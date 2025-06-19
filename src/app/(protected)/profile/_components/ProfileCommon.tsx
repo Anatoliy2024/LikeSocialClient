@@ -10,12 +10,10 @@ import ProfileBlock from "../ProfileBlock/ProfileBlock"
 import PostsBlock from "../../../../components/PostsBlock/PostsBlock"
 import { RootState } from "@/store/store"
 import {
-  createUserPostThunk,
-  delUserPostsThunk,
   getUserPostsByIdThunk,
   getUserPostsThunk,
 } from "@/store/thunks/userPostThunk"
-import { createRoomPostThunk } from "@/store/thunks/roomPostThunk"
+
 // import ProfileBlock from "./ProfileBlock/ProfileBlock"
 // import PostsBlock from "./PostsBlock/PostsBlock"
 

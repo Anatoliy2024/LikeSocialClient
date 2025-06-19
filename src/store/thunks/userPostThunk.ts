@@ -2,7 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { userPostType } from "../slices/userPostsSlice"
-import { postAPI, voiceAPI } from "@/api/api"
+import { postAPI } from "@/api/api"
 
 export const createUserPostThunk = createAsyncThunk(
   "post/createPost",

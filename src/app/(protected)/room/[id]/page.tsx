@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { RootState } from "@/store/store"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { getRoomPostsThunk } from "@/store/thunks/roomPostThunk"
-import Post from "@/components/post/Post"
+
 import PostsBlock from "../../../../components/PostsBlock/PostsBlock"
 import {
   addFriendsToRoomThunk,

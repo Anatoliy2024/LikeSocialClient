@@ -3,7 +3,6 @@ import { createSlice } from "@reduxjs/toolkit"
 import {
   createUserCommentThunk,
   createUserPostThunk,
-  createVoiceThunk,
   delUserPostsThunk,
   getUserPostsByIdThunk,
   getUserPostsThunk,
