@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root {
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -23,4 +23,71 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+} */
+body {
+  font-size: 1.3rem;
+}
+.no-scroll {
+  overflow: hidden;
+}
+.containerMain {
+  color: #1e1e1e;
+  /* height: 100%;
+  width: 100%; */
+  min-height: 100vh;
+  /* margin: 0 auto; */
+  display: grid;
+  grid-template-areas:
+    "h h"
+    "n c";
+  /* "f f"; */
+  grid-template-rows: 60px 1fr 60px;
+  grid-template-columns: 2fr 10fr;
+  /* gap: 10px; */
+}
+.content {
+  grid-area: c;
+  background-color: #896cf1;
+}
+
+/* ::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+} */
+
+/* styles/globals.scss или _globals.scss */
+/* В globals.scss или styles/globals.css */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  /* background: transparent; */
+  background: rgb(238, 230, 255);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 255, 0.4);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 100, 255, 0.7);
 }

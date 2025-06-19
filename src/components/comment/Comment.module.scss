@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  .userInfoBlock {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    // width: 150px;
+    .blockImg {
+      width: 40px;
+      border-radius: 50%;
+
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .blockName {
+    }
+  }
+
+  .blockContent {
+  }
+  .blockData {
+  }
+}

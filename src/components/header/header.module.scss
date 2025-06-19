@@ -1,0 +1,74 @@
+.wrapper {
+  height: 60px;
+  // height: min(60px, 30vh);
+  background-color: #b687fe;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  color: #030032;
+  grid-area: h;
+  user-select: none;
+
+  .logoWrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    img {
+      width: 40px;
+    }
+  }
+
+  .blockAuth {
+    display: flex;
+    gap: 10px;
+    div {
+      padding: 10px;
+      background-color: #9451f8;
+      border-radius: 10px;
+      cursor: pointer;
+      &:hover {
+        background-color: #8536fc;
+      }
+    }
+  }
+
+  .profileWrapper {
+    position: relative;
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      img {
+        width: 50px;
+        border-radius: 30px;
+      }
+    }
+
+    .menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 10;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      button {
+        cursor: pointer;
+        &:hover {
+          background-color: #8536fc;
+        }
+      }
+    }
+  }
+
+  /* Показываем меню при наведении */
+  .profileWrapper:hover .menu {
+    display: flex;
+  }
+}

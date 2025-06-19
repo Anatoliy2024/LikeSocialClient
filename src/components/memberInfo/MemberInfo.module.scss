@@ -1,0 +1,21 @@
+.wrapper {
+  width: 60px;
+  position: relative;
+  .blockImg {
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .removeBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #ff4d4f;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      color: #ff0000;
+    }
+  }
+}

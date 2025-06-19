@@ -1,0 +1,91 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.556);
+  z-index: 100;
+
+  .container {
+    background: #453e98;
+    width: 70vw;
+    min-height: 60vh;
+
+    border-radius: 20px;
+    padding: 20px;
+    color: rgb(223, 205, 255);
+
+    .contentWrapper {
+      max-height: 90vh; // ограничим максимальную высоту
+      overflow-y: auto; // включим вертикальный скролл при необходимости
+      &::-webkit-scrollbar-track {
+        border-radius: 20px;
+      }
+      padding: 10px;
+      .genresBlock {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: rgb(159, 217, 255);
+      }
+      .headerModule {
+        display: flex;
+        justify-content: space-between;
+      }
+      .imageStarsBlock {
+        display: flex;
+        gap: 25px;
+
+        .blockImg {
+        }
+        .starsBlock {
+        }
+        .othersStars {
+          max-height: 370px;
+          width: 200px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          .otherStars {
+            color: #2d2958;
+
+            padding: 10px;
+            background: #6e6ee1;
+            border-radius: 20px;
+            .userInfo {
+              color: #d1b9f1;
+              display: flex;
+              gap: 10px;
+              border-radius: 20px;
+              background: #465bc2;
+              .blockImg {
+                overflow: hidden;
+                border-radius: 50%;
+              }
+            }
+          }
+        }
+      }
+      .commentsBlock {
+        color: #c0a2e6;
+        .createCommentsBlock {
+          textarea {
+            border: 1px solid rgb(149, 72, 191);
+            padding: 5px;
+            border-radius: 10px;
+            width: 100%;
+            height: 120px;
+            resize: none;
+          }
+        }
+        .showCommentsBlock {
+        }
+      }
+    }
+  }
+}

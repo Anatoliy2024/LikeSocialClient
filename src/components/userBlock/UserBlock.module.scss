@@ -1,0 +1,34 @@
+.wrapper {
+  background: #6766d0;
+  display: flex;
+  gap: 30px;
+  padding: 10px;
+  justify-content: space-between;
+  .imgNameBlock {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    .imgBlock {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #eee;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+
+  .infoBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+  }
+}

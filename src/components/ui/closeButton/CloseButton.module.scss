@@ -1,0 +1,25 @@
+.closeButton {
+  background-color: transparent;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  color: #666;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #ff4d4d;
+    border-color: #ff4d4d;
+    color: white;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.5);
+  }
+}

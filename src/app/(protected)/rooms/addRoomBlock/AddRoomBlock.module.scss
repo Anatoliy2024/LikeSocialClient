@@ -1,0 +1,45 @@
+.wrapper {
+  position: fixed;
+  min-width: 100vw;
+  min-height: 100vh;
+  background: #00000081;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .container {
+    min-width: 70vw;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(111, 31, 154);
+    border-radius: 20px;
+    color: rgb(229, 189, 189);
+    form {
+      p {
+        color: red;
+      }
+      input {
+        border: 1px solid rgb(76, 17, 107);
+        padding: 5px;
+        border-radius: 10px;
+        width: 100%;
+      }
+      textarea {
+        border: 1px solid rgb(76, 17, 107);
+        padding: 5px;
+        border-radius: 10px;
+        width: 100%;
+        height: 120px;
+        resize: none;
+      }
+      .buttonBlock {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+      }
+    }
+  }
+}

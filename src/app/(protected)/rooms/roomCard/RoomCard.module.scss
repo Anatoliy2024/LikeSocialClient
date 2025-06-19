@@ -1,0 +1,29 @@
+.wrapper {
+  // display: flex;
+  // gap: 20px;
+  // padding: 10px;
+  // background-color: rgba(0, 0, 0, 0.478);
+  // color: rgb(226, 202, 202);
+  // border-radius: 20px;
+  // align-items: center;
+  // cursor: pointer;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.478);
+  border-radius: 20px;
+  cursor: pointer;
+  color: rgb(226, 202, 202);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .mainInfo {
+    display: flex;
+    gap: 20px;
+
+    align-items: center;
+    .blockImg {
+      background-color: rgb(0, 0, 0);
+      border-radius: 50%;
+      overflow: hidden;
+    }
+  }
+}

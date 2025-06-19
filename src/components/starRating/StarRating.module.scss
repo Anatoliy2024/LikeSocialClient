@@ -1,0 +1,23 @@
+.stars {
+  display: flex;
+  gap: 5px;
+}
+
+.input {
+  display: none;
+}
+
+.star {
+  cursor: pointer;
+}
+
+.starSymbol {
+  color: #ccc;
+  font-size: 36px;
+  transition: color 0.3s ease;
+  user-select: none;
+}
+
+.active {
+  color: gold;
+}

@@ -1,0 +1,55 @@
+.wrapper {
+  background: #00000058;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: beige;
+  .formContainer {
+    background: rgb(95, 80, 206);
+    border-radius: 20px;
+    width: max(60%, 400px);
+    height: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+
+    .form {
+      gap: 10px;
+      display: flex;
+      flex-direction: column;
+
+      input {
+        border: 1px solid rgb(62, 111, 255);
+      }
+      .buttonBlock {
+        display: flex;
+        justify-content: space-around;
+
+        button {
+          cursor: pointer;
+        }
+      }
+      p {
+        color: red;
+      }
+      // .infoContainer {
+      //   position: relative;
+      // }
+      // p {
+      //   position: absolute;
+      //   min-width: 200px;
+      //   right: 100%;
+      //   top: -50%;
+      //   transform: translateY(50%);
+      //   color: red;
+      // }
+    }
+  }
+}

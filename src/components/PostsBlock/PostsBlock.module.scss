@@ -1,0 +1,10 @@
+.wrapper {
+  h2 {
+    text-align: center;
+  }
+  .containerPosts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}

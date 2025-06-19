@@ -1,0 +1,74 @@
+.wrapper {
+  background: #4b4ab1;
+  border-radius: 20px;
+  padding: 20px;
+  color: rgb(247, 241, 255);
+  position: relative;
+  cursor: pointer;
+  .blockHeaderPost {
+    display: flex;
+    justify-content: space-between;
+  }
+  .imageStarsContainer {
+    display: flex;
+    gap: 20px;
+    .blockImg {
+      height: 200px;
+      width: 200px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    .blockStars {
+      & > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+  }
+  .genresBlock {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    color: rgb(159, 217, 255);
+  }
+  .blockAuthorName {
+    color: rgb(205, 113, 254);
+  }
+  .contentPost {
+    border: 1px solid rgb(130, 93, 216);
+    border-radius: 20px;
+    padding: 10px;
+  }
+  .dataTimeAndStars {
+    color: #8b97ff;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    .starCommentBlock {
+      display: flex;
+      gap: 30px;
+      & > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      // & > div {
+      //   border-radius: 50%;
+      //   cursor: pointer;
+      //   width: 40px;
+      //   height: 40px;
+      //   border-radius: 50%;
+      //   display: flex;
+      //   align-items: center;
+      //   justify-content: center;
+      //   transition: background 0.2s ease;
+      // }
+
+      // & > div:hover {
+      //   color: #4b4ab1;
+      //   background: #8b97ff;
+      // }
+    }
+  }
+}

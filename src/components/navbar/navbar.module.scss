@@ -1,0 +1,13 @@
+.wrapper {
+  // height: 60px;
+  background-color: #f3e8ff;
+  grid-area: n;
+  padding: 10px;
+  user-select: none;
+  div {
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
+}

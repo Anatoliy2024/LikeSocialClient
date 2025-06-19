@@ -1,0 +1,41 @@
+.wrapper {
+  background: #4d316f;
+  border-radius: 20px;
+  padding: 10px;
+  color: antiquewhite;
+  h2 {
+    text-align: center;
+  }
+
+  .containerUser {
+    display: flex;
+
+    justify-content: space-between;
+    .imgNameContainer {
+      display: flex;
+      align-items: center;
+
+      align-items: center;
+      gap: 20px;
+      cursor: pointer;
+      .containerImg {
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100px;
+        height: 100px;
+        img {
+          object-fit: cover;
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+  .buttonContainer {
+    display: flex;
+    align-items: center;
+  }
+}
