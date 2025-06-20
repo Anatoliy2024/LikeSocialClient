@@ -1,7 +1,7 @@
 import { headers } from "next/headers"
 
 export async function serverAuthAPI() {
-  const incomingHeaders = headers()
+  const incomingHeaders = await headers()
   const cookie = incomingHeaders.get("cookie") || "" // <- получишь refreshToken тут
   console.log("refresh cooke", cookie)
 
