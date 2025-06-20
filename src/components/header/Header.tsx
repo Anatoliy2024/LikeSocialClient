@@ -16,7 +16,7 @@ export default function Header({
   avatar,
   logoutFn,
 }: HeaderData) {
-  console.log("avatar", avatar)
+  // console.log("avatar", avatar)
   return (
     <div className={style.wrapper}>
       <div className={style.logoWrapper}>

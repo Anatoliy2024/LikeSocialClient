@@ -71,7 +71,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   return (
     <div>
       <ProfileBlock profileData={cleanedProfileData} />
-      <PostsBlock posts={posts} userId={userId} isProfile />
+      {/* <PostsBlock posts={posts} userId={userId} isProfile /> */}
     </div>
   )
 }

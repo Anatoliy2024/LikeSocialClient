@@ -1,9 +1,20 @@
 import axios from "axios"
 
+// const baseURL = process.env.NEXT_PUBLIC_API_URL
+//   ? process.env.NEXT_PUBLIC_API_URL + "/api/"
+//   : "http://localhost:5000/api/"
+
+// const instance = axios.create({
+//   baseURL,
+//   withCredentials: true, // важно: чтобы кука с refreshToken передавалась
+// })
 const instance = axios.create({
   baseURL:
-    process.env.NEXT_PUBLIC_API_URL + "/api/" || "http://localhost:5000/api/",
-  withCredentials: true, // важно: чтобы кука с refreshToken передавалась
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.NODE_ENV === "development"
+      ? "http://localhost:5000/api/"
+      : "https://likesocial.onrender.com/api/"),
+  withCredentials: true,
 })
 
 // 👉 Добавляем accessToken в заголовок перед каждым запросом
