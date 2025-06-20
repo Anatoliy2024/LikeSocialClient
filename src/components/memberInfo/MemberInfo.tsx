@@ -14,7 +14,7 @@ export const MemberInfo = ({
   avatar: string
   id: string
   delMember?: (id: string) => void
-  owner: string | null
+  owner: string
   isOwner: boolean
 }) => {
   console.log("MemberInfo owner", owner)

@@ -1,7 +1,8 @@
 import { formatData } from "@/utils/formatData"
 import Image from "next/image"
 import style from "./Comment.module.scss"
-export const Comment = ({ data }) => {
+import { userCommentType } from "@/store/slices/roomPostsSlice"
+export const Comment = ({ data }: { data: userCommentType }) => {
   console.log("data Comment", data)
   const { userId, text, createdAt } = data
   const { username, avatar } = userId

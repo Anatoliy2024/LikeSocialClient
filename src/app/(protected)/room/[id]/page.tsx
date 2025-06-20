@@ -11,6 +11,7 @@ import {
   addFriendsToRoomThunk,
   delFriendFromRoomThunk,
   getMembersFromRoomThunk,
+  RoomMemberType,
 } from "@/store/thunks/roomsThunk"
 import { MemberInfo } from "@/components/memberInfo/MemberInfo"
 import ButtonMenu from "@/components/ui/button/Button"
@@ -26,9 +27,13 @@ const Room = () => {
   const friends = useAppSelector((state: RootState) => state.users.friends)
   const posts = useAppSelector((state: RootState) => state.roomPost.posts)
   const dispatch = useAppDispatch()
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
 
-  const isOwner = userId === owner?._id
+  const isOwner =
+    typeof owner === "object" &&
+    owner !== null &&
+    " _id" in owner &&
+    userId === (owner as RoomMemberType)._id
   const handleAddMembersFromRoom = () => {
     setAddFriendsToRoom(true)
   }
@@ -43,7 +48,7 @@ const Room = () => {
     })
   }
 
-  const delMember = (userId) => {
+  const delMember = (userId: string) => {
     // console.log("members", members)
     // console.log("delMember", id)
 
@@ -83,11 +88,11 @@ const Room = () => {
           {members.map((member) => (
             <MemberInfo
               key={member._id}
-              id={member._id}
-              name={member.username}
+              id={member._id as string}
+              name={member.userName}
               avatar={member.avatar}
               delMember={delMember}
-              owner={owner._id}
+              owner={(owner as RoomMemberType)._id || ""}
               isOwner={isOwner}
             />
           ))}
@@ -102,23 +107,6 @@ const Room = () => {
       </div>
       <PostsBlock posts={posts} userId={userId} isProfile={false} />
     </>
-    // <div className={style.wrapper}>
-    //   {posts?.length > 0
-    //     ? posts.map((post) => (
-    //         <Post
-    //           key={post._id}
-    //           title={post.title}
-    //           content={post.content}
-    //           stars={post.stars}
-    //           ratings={post.ratings}
-    //           createdAt={post.createdAt}
-    //           id={post._id}
-    //           imagePost={post.imagePost}
-    //           userId={userId}
-    //         />
-    //       ))
-    //     : "Постов пока нет"}
-    // </div>
   )
 }
 export default Room

@@ -9,16 +9,42 @@ import { createUserPostThunk } from "@/store/thunks/userPostThunk"
 import { createRoomPostThunk } from "@/store/thunks/roomPostThunk"
 
 // import { useParams } from "next/navigation"
+// type FormCreatePost = {
+//   title: string
+//   //   avatar:string
+//   content: string
+//   stars: number
+//   ratings: { [key: string]: string }
+//   acting: string
+//   specialEffects: string
+//   story: string
+//   genres: { [key: string]: string }
+// }
+
+// type PostRatings = {
+//   stars: number
+//   acting: number
+//   specialEffects: number
+//   story: number
+// }
+
+// type PostFormDataToSend = {
+//   title: string
+//   content: string
+//   roomId: string | null
+//   ratings: PostRatings
+//   genres: string[]
+// }
 type FormCreatePost = {
   title: string
-  //   avatar:string
   content: string
+  roomId: string | null
+
+  genres: string[]
   stars: number
-  ratings: { [key: string]: string }
-  acting: string
-  specialEffects: string
-  story: string
-  genres: { [key: string]: string }
+  acting: number
+  specialEffects: number
+  story: number
 }
 
 const CreatePost = ({
@@ -40,13 +66,13 @@ const CreatePost = ({
   const dispatch = useAppDispatch()
   // const { id } = useParams()
 
-  const handleSave = (dataForm) => {
+  const handleSave = (dataForm: FormCreatePost) => {
     console.log("dataForm", dataForm)
     try {
       const dataToSend = {
         title: dataForm.title,
         content: dataForm.content,
-        roomId: roomId ? roomId : null,
+        roomId: roomId ? roomId : undefined,
         ratings: {
           stars: dataForm.stars,
           acting: dataForm.acting,
@@ -177,17 +203,25 @@ const CreatePost = ({
 
           <div>
             <span>Звёзды:</span>
-            <StarRating name="stars" setValue={setValue} watch={watch} />
+            <StarRating<FormCreatePost, "stars">
+              name="stars"
+              setValue={setValue}
+              watch={watch}
+            />
           </div>
           <div>
             <span>Актерская игра:</span>
 
-            <StarRating name="acting" setValue={setValue} watch={watch} />
+            <StarRating<FormCreatePost, "acting">
+              name="acting"
+              setValue={setValue}
+              watch={watch}
+            />
           </div>
 
           <div>
             <span>Спецэффекты :</span>
-            <StarRating
+            <StarRating<FormCreatePost, "specialEffects">
               name="specialEffects"
               setValue={setValue}
               watch={watch}
@@ -196,7 +230,11 @@ const CreatePost = ({
 
           <div>
             <span>Сюжет:</span>
-            <StarRating name="story" setValue={setValue} watch={watch} />
+            <StarRating<FormCreatePost, "story">
+              name="story"
+              setValue={setValue}
+              watch={watch}
+            />
           </div>
 
           <div>

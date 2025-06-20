@@ -37,7 +37,7 @@ type userCommentType = {
   _id: string
   userId: {
     _id?: string
-    userName: string
+    username: string
     avatar: string
   }
   text: string

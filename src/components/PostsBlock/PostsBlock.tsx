@@ -10,7 +10,16 @@ import Post from "@/components/post/Post"
 import { useParams, useRouter, usePathname } from "next/navigation"
 import PostModal from "@/components/postModal/PostModal"
 import { useSearchParams } from "next/navigation"
-const PostsBlock = ({ posts, userId, isProfile }) => {
+import { userPostType } from "@/store/slices/userPostsSlice"
+const PostsBlock = ({
+  posts,
+  userId,
+  isProfile,
+}: {
+  posts: userPostType[]
+  userId: string
+  isProfile: boolean
+}) => {
   const [activeCreateNewPost, setActiveCreateNewPost] = useState(false)
   const playerId = useAppSelector((state: RootState) => state.auth.userId)
   const pathname = usePathname()
@@ -108,8 +117,7 @@ const PostsBlock = ({ posts, userId, isProfile }) => {
                       key={post._id}
                       title={post.title}
                       content={post.content}
-                      authorName={post?.authorName}
-                      stars={post.stars}
+                      authorName={post?.authorName || ""}
                       ratings={post.ratings}
                       createdAt={post.createdAt}
                       id={post._id}
@@ -130,7 +138,7 @@ const PostsBlock = ({ posts, userId, isProfile }) => {
       {selectedPost && (
         <PostModal
           post={selectedPost}
-          playerId={playerId}
+          playerId={playerId as string}
           onClose={() => {
             closeModal()
           }}

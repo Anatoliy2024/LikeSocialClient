@@ -55,7 +55,7 @@ export default function Rooms() {
               <RoomCard
                 key={room._id}
                 data={room}
-                userId={userId}
+                userId={userId as string}
                 delRoom={delRoom}
                 leaveRoom={leaveRoom}
               />

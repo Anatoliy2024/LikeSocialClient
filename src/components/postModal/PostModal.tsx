@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form"
 import StarRating from "../starRating/StarRating"
 
 import { voiceAPI } from "@/api/api"
+import { userPostType } from "@/store/slices/userPostsSlice"
 
 export type RatingFormValues = {
   stars: number
@@ -22,9 +23,27 @@ export type RatingFormValues = {
   story: number
 }
 
-const PostModal = ({ post, onClose, playerId }) => {
+export type VotesType = {
+  userId: { _id: string; username: string; avatar: string }
+  postId: string
+  roomId: string | null
+  ratings: RatingFormValues
+  createdAt: string
+  _id: string
+}
+
+const PostModal = ({
+  post,
+  onClose,
+  playerId,
+}: {
+  post: userPostType
+  onClose: () => void
+  playerId: string
+}) => {
+  console.log("post", post)
   const dispatch = useAppDispatch()
-  const [votes, setVotes] = useState([])
+  const [votes, setVotes] = useState<VotesType[]>([])
   const [isEditing, setIsEditing] = useState(false)
   const myVoice = votes.find((v) => v.userId._id === playerId)
   useEffect(() => {
@@ -82,7 +101,12 @@ const PostModal = ({ post, onClose, playerId }) => {
     },
   })
 
-  const handleVoteSubmit = async (values) => {
+  const handleVoteSubmit = async (values: {
+    stars: number | undefined
+    acting: number | undefined
+    specialEffects: number | undefined
+    story: number | undefined
+  }) => {
     try {
       const dataToSend = {
         postId,

@@ -3,8 +3,19 @@ import style from "./RoomCard.module.scss"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import ButtonMenu from "@/components/ui/button/Button"
+import { RoomType } from "@/store/thunks/roomsThunk"
 
-export const RoomCard = ({ data, userId, delRoom, leaveRoom }) => {
+export const RoomCard = ({
+  data,
+  userId,
+  delRoom,
+  leaveRoom,
+}: {
+  data: RoomType
+  userId: string
+  delRoom: (_id: string) => void
+  leaveRoom: (_id: string) => void
+}) => {
   const {
     name,
     description,
@@ -21,6 +32,7 @@ export const RoomCard = ({ data, userId, delRoom, leaveRoom }) => {
     router.push(`/room/${roomId}`)
     console.log("`/room/${roomId}`")
   }
+  if (!_id) return <div>нет id</div>
 
   return (
     <div className={style.wrapper}>

@@ -15,7 +15,20 @@ type FormProfileInfo = {
   city: string
   relationshipStatus: string
 }
-const ProfileBlock = ({ profileData }) => {
+type profileDataType = {
+  address: { country: string; city: string }
+  age: string
+  isMyProfile: boolean
+  name: string
+  profileError: null | string
+  profileLoading: boolean
+  relationshipStatus: string
+  status: string
+  sureName: string
+}
+
+const ProfileBlock = ({ profileData }: { profileData: profileDataType }) => {
+  console.log("profileData", profileData)
   const dispatch = useAppDispatch()
   const [isEdit, setIsEdit] = useState(false)
   const {
@@ -31,7 +44,7 @@ const ProfileBlock = ({ profileData }) => {
     setIsEdit(false)
   }
 
-  const handleSave = (dataForm) => {
+  const handleSave = (dataForm: FormProfileInfo) => {
     console.log("dataForm", dataForm)
 
     const dataToSend = {
@@ -43,8 +56,8 @@ const ProfileBlock = ({ profileData }) => {
         relationshipStatus:
           dataForm.relationshipStatus || profileData.relationshipStatus,
         address: {
-          country: dataForm.country || profileData.country,
-          city: dataForm.city || profileData.city,
+          country: dataForm.country || profileData.address.country,
+          city: dataForm.city || profileData.address.city,
         },
       },
     }

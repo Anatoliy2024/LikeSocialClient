@@ -17,12 +17,13 @@ type PostType = {
   title: string
   content: string | null
   authorName: string | null
-  stars: number
+
   imagePost: string
   ratings: {
     acting: number
     specialEffects: number
     story: number
+    stars: number
   }
   createdAt: string
   id: string
@@ -38,7 +39,7 @@ type PostType = {
 const Post = ({
   title,
   content,
-  stars,
+
   ratings,
   createdAt,
   id,
@@ -130,7 +131,7 @@ const Post = ({
           <div className={style.blockStars}>
             <div>
               <div>Общая оценка: </div>
-              <StarRatingView value={stars} />
+              <StarRatingView value={ratings.stars} />
             </div>
             <div>
               <div>Экшен: </div>
