@@ -1,9 +1,12 @@
 // app/(protected)/layout.tsx
-
+"use client"
 // import { serverAuthAPI } from "@/api/serverApi"
 // import { redirect } from "next/navigation"
-
-export default async function ProtectedLayout({
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { authAPI } from "@/api/api"
+// import { authAPI } from "@/api/userApi"
+export default function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode
@@ -23,6 +26,20 @@ export default async function ProtectedLayout({
 
   //   redirect("/verify")
   // }
+  const router = useRouter()
+
+  useEffect(() => {
+    authAPI
+      .me()
+      .then((user) => {
+        if (!user.isVerified) {
+          router.push("/verify")
+        }
+      })
+      .catch(() => {
+        router.push("/register")
+      })
+  }, [router])
 
   return <>{children}</>
 }
