@@ -29,6 +29,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   const posts = useAppSelector((state: RootState) => state.userPost.posts)
 
   useEffect(() => {
+    if (!isAuth) return
     if (isAuth) {
       if (isMyProfilePage) {
         dispatch(getMyProfileThunk())
@@ -47,6 +48,9 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   //   if (!profileData.profile) {
   //     return <div>Профиль не найден</div>
   //   }
+  if (!profileData || !profileData.address) {
+    return <div>Загрузка профиля...</div>
+  }
 
   const cleanedProfileData = {
     ...profileData,
@@ -56,8 +60,8 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
     age: profileData.age ?? "",
     relationshipStatus: profileData.relationshipStatus ?? "",
     address: {
-      country: profileData.address.country ?? "",
-      city: profileData.address.city ?? "",
+      country: profileData.address?.country ?? "",
+      city: profileData.address?.city ?? "",
     },
     profileError: profileData.profileError, // если нужно
     isMyProfile: profileData.isMyProfile,
