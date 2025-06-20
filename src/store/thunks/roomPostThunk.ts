@@ -25,7 +25,7 @@ export const createRoomPostThunk = createAsyncThunk(
 
 export const getRoomPostsThunk = createAsyncThunk(
   "post/getPosts",
-  async (roomId, thunkAPI) => {
+  async (roomId: string, thunkAPI) => {
     try {
       const data = await roomPostAPI.getRoomPosts(roomId)
       return data
@@ -59,7 +59,7 @@ export const delRoomPostsThunk = createAsyncThunk(
 )
 export const createRoomCommentThunk = createAsyncThunk(
   "post/createRoomComment",
-  async ({ postId, roomId, comment }, thunkAPI) => {
+  async ({ postId, roomId, comment }: Record<string, string>, thunkAPI) => {
     try {
       const data = await roomPostAPI.createRoomComment(postId, roomId, comment)
       return data

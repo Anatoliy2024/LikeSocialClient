@@ -16,16 +16,30 @@ export type RatingType = {
 export type roomPostType = {
   _id: string
   authorId: string
-  roomId: string | null
+  imagePost: string
+  // roomId: string | null
   title: string
   content: string | null
-  stars: number
+  votesCount: number
   ratings: RatingType
-  comments: any[]
-  votes: any[]
+  comments: userCommentType[]
+  genres: string[]
   showOnProfile: boolean
   createdAt: string
   updatedAt: string
+  roomId?: string
+  authorName?: string
+}
+
+type userCommentType = {
+  _id: string
+  userId: {
+    _id?: string
+    userName: string
+    avatar: string
+  }
+  text: string
+  createdAt: string
 }
 
 type roomPostState = {
@@ -107,27 +121,6 @@ const roomPostSlice = createSlice({
         state.loading = false
         state.error = action.error.message || "Ошибка при создании комментария"
       })
-    // .addCase(createRoomVoiceThunk.pending, (state) => {
-    //   state.loading = true
-    //   state.error = null
-    // })
-    // .addCase(createRoomVoiceThunk.fulfilled, (state, action) => {
-    //   console.log("createRoomVoiceThunk", action.payload)
-    //   state.loading = false
-    //   const updatedPost = action.payload
-    //   // console.log("createUserCommentThunk", action.payload)
-    //   state.posts = state.posts.map((post) =>
-    //     post._id === updatedPost._id ? updatedPost : post
-    //   )
-    //   //  action.payload
-    //   // state.rooms = state.rooms.map((room) =>
-    //   //   room._id === updatedRoom.room._id ? updatedRoom.room : room
-    //   // )
-    // })
-    // .addCase(createRoomVoiceThunk.rejected, (state, action) => {
-    //   state.loading = false
-    //   state.error = action.error.message || "Ошибка при создании голоса"
-    // })
   },
 })
 

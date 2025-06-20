@@ -10,13 +10,15 @@ import {
   requestFriendThunk,
 } from "../thunks/usersThunk"
 
+import { UserType } from "../thunks/usersThunk"
+
 const initialState = {
-  users: [],
+  users: [] as UserType[],
   loading: false,
   error: null as string | null,
-  friendRequests: [] as any[],
-  friends: [] as any[],
-  sentFriendRequests: [] as any[],
+  friendRequests: [] as UserType[],
+  friends: [] as UserType[],
+  sentFriendRequests: [] as UserType[],
 }
 
 const usersSlice = createSlice({

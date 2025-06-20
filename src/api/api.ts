@@ -1,4 +1,7 @@
+import { userPostType } from "@/store/slices/userPostsSlice"
 import instance from "./instance"
+import { roomPostType } from "@/store/slices/roomPostsSlice"
+import { ProfileType } from "@/store/thunks/profileThunk"
 
 export const authAPI = {
   // getMyInfo() {
@@ -29,7 +32,7 @@ export const authAPI = {
       .then((response) => {
         const data = response.data
         localStorage.setItem("accessToken", data.accessToken) // ⬅️ сохраняем
-        debugger
+
         return data
       })
     // .then((response) => response.data)
@@ -56,7 +59,7 @@ export const userAPI = {
   getUserInfo(id: string) {
     return instance.get(`user/${id}`).then((response) => response.data)
   },
-  updateMyProfile(data) {
+  updateMyProfile(data: { userInfo: ProfileType }) {
     return instance.put("user/myProfileInfo", data).then((res) => res.data)
   },
   //users
@@ -95,7 +98,7 @@ export const userAPI = {
 }
 
 export const postAPI = {
-  createUserPost(data: string) {
+  createUserPost(data: Partial<userPostType>) {
     return instance
       .post("userPosts/create", data)
       .then((response) => response.data)
@@ -123,17 +126,17 @@ export const postAPI = {
   // },
 }
 export const roomPostAPI = {
-  createRoomPost(data) {
+  createRoomPost(data: Partial<roomPostType>) {
     return instance
       .post("roomPosts/create", data)
       .then((response) => response.data)
   },
-  getRoomPosts(roomId) {
+  getRoomPosts(roomId: string) {
     //?page=1&limit=10
     //  .get(`roomPosts/${roomId}`, { params })
     return instance.get(`roomPosts/${roomId}`).then((response) => response.data)
   },
-  delRoomPost(postId, roomId) {
+  delRoomPost(postId: string, roomId: string) {
     // /post/:postId
     return instance
       .delete(`roomPosts/post/${postId}?roomId=${roomId}`)
@@ -160,7 +163,7 @@ export const roomAPI = {
   getRooms() {
     return instance.get(`room/getRooms`).then((response) => response.data)
   },
-  getMembersFromRoom(roomId) {
+  getMembersFromRoom(roomId: string) {
     return instance
       .get(`room/getMembers/${roomId}`)
       .then((response) => response.data)
@@ -190,12 +193,12 @@ export const roomAPI = {
 }
 
 export const voiceAPI = {
-  createVoice(data) {
+  createVoice(data: Record<string, string | null | Record<string, number>>) {
     return instance
       .post(`posts/${data.postId}/voices`, data)
       .then((response) => response.data)
   },
-  getVoice(postId) {
+  getVoice(postId: string) {
     return instance
       .get(`posts/${postId}/voices`)
       .then((response) => response.data)

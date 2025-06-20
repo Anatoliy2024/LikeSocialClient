@@ -7,31 +7,13 @@ import { translatorGenres } from "@/utils/translatorGenres"
 import { useEffect, useState } from "react"
 import ButtonMenu from "../ui/button/Button"
 import { useAppDispatch } from "@/store/hooks"
-import {
-  createUserCommentThunk,
-  createVoiceThunk,
-} from "@/store/thunks/userPostThunk"
-import {
-  createRoomCommentThunk,
-  createRoomVoiceThunk,
-} from "@/store/thunks/roomPostThunk"
+import { createUserCommentThunk } from "@/store/thunks/userPostThunk"
+import { createRoomCommentThunk } from "@/store/thunks/roomPostThunk"
 import { Comment } from "../comment/Comment"
 import { useForm } from "react-hook-form"
 import StarRating from "../starRating/StarRating"
-import axios from "axios"
-import { voiceAPI } from "@/api/api"
 
-// voiceAPI
-// createVoice(data) {
-//     return instance
-//       .post(`posts/${data.postId}/voices`, data)
-//       .then((response) => response.data)
-//   },
-// getVoice(postId) {
-//   return instance
-//     .get(`posts/${postId}/voices`)
-//     .then((response) => response.data)
-// },
+import { voiceAPI } from "@/api/api"
 
 const PostModal = ({ post, onClose, playerId }) => {
   const dispatch = useAppDispatch()

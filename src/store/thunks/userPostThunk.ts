@@ -60,7 +60,7 @@ export const getUserPostsByIdThunk = createAsyncThunk(
 
 export const delUserPostsThunk = createAsyncThunk(
   "post/delPosts",
-  async (postId, thunkAPI) => {
+  async (postId: string, thunkAPI) => {
     try {
       const data = await postAPI.delUserPost(postId)
       return data
@@ -77,7 +77,10 @@ export const delUserPostsThunk = createAsyncThunk(
 )
 export const createUserCommentThunk = createAsyncThunk(
   "post/createUserComment",
-  async ({ postId, comment }, thunkAPI) => {
+  async (
+    { postId, comment }: { postId: string; comment: string },
+    thunkAPI
+  ) => {
     try {
       const data = await postAPI.createUserComment(postId, comment)
       return data
@@ -92,37 +95,3 @@ export const createUserCommentThunk = createAsyncThunk(
     }
   }
 )
-// export const createVoiceThunk = createAsyncThunk(
-//   "post/createVoice",
-//   async (dataInfo, thunkAPI) => {
-//     try {
-//       const data = await voiceAPI.createVoice(dataInfo)
-//       return data
-//     } catch (error: unknown) {
-//       // Проверка, является ли ошибка ошибкой Axios
-//       if (axios.isAxiosError(error) && error.response?.data?.message) {
-//         return thunkAPI.rejectWithValue(error.response.data.message)
-//       }
-
-//       // если это вообще не ошибка axios или нет message
-//       return thunkAPI.rejectWithValue("Ошибка при создании коммента")
-//     }
-//   }
-// )
-// export const deleteUserCommentThunk = createAsyncThunk(
-//   "post/deleteUserComment",
-//   async ({ postId, userId }, thunkAPI) => {
-//     try {
-//       const data = await postAPI.createUserComment(postId,userId)
-//       return data
-//     } catch (error: unknown) {
-//       // Проверка, является ли ошибка ошибкой Axios
-//       if (axios.isAxiosError(error) && error.response?.data?.message) {
-//         return thunkAPI.rejectWithValue(error.response.data.message)
-//       }
-
-//       // если это вообще не ошибка axios или нет message
-//       return thunkAPI.rejectWithValue("Ошибка при создании коммента")
-//     }
-//   }
-// )

@@ -10,9 +10,25 @@ type DelFriends = {
   userId: string
   roomId: string
 }
+export type OwnerType = string | RoomMemberType | null
+export type RoomType = {
+  name: string
+  description: string
+  members: RoomMemberType[]
+  owner: OwnerType
+  imageRoom: string
+  createdAt: string
+  updatedAt: string
+  _id?: string
+}
+export type RoomMemberType = {
+  _id?: string
+  userName: string
+  avatar: string
+}
 
 export const createRoomThunk = createAsyncThunk<
-  any[], // тип данных, которые вернутся — массив пользователей
+  RoomType[], // тип данных, которые вернутся — массив пользователей
   FormValuesAddRooms, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("rooms/create", async ({ name, description }, thunkAPI) => {
@@ -30,7 +46,7 @@ export const createRoomThunk = createAsyncThunk<
   }
 })
 export const getRoomsThunk = createAsyncThunk<
-  any[], // тип данных, которые вернутся — массив пользователей
+  RoomType[], // тип данных, которые вернутся — массив пользователей
   void, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("rooms/getRooms", async (_, thunkAPI) => {
@@ -49,7 +65,7 @@ export const getRoomsThunk = createAsyncThunk<
 })
 export const getMembersFromRoomThunk = createAsyncThunk<
   {
-    members: any[]
+    members: RoomMemberType[]
     owner: string // ← добавлено
   }, // тип данных, которые вернутся — массив пользователей
   string, // параметр тип данных которые отправляю
@@ -70,7 +86,7 @@ export const getMembersFromRoomThunk = createAsyncThunk<
 })
 
 export const addFriendsToRoomThunk = createAsyncThunk<
-  any[], // тип данных, которые вернутся — массив пользователей
+  RoomType, // тип данных, которые вернутся — массив пользователей
   AddFriends, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("rooms/addFriendsToRoomThunk", async ({ users, roomId }, thunkAPI) => {
@@ -88,7 +104,7 @@ export const addFriendsToRoomThunk = createAsyncThunk<
   }
 })
 export const delFriendFromRoomThunk = createAsyncThunk<
-  any[], // тип данных, которые вернутся — массив пользователей
+  RoomType, // тип данных, которые вернутся — массив пользователей
   DelFriends, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("rooms/delFriendFromRoom", async ({ userId, roomId }, thunkAPI) => {
@@ -107,7 +123,7 @@ export const delFriendFromRoomThunk = createAsyncThunk<
   }
 })
 export const delRoomThunk = createAsyncThunk<
-  any[], // тип данных, которые вернутся — массив пользователей
+  RoomType[], // тип данных, которые вернутся — массив пользователей
   string, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("rooms/delRoom", async (roomId, thunkAPI) => {
@@ -125,7 +141,7 @@ export const delRoomThunk = createAsyncThunk<
   }
 })
 export const leaveRoomThunk = createAsyncThunk<
-  any[], // тип данных, которые вернутся — массив пользователей
+  RoomType[], // тип данных, которые вернутся — массив пользователей
   string, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("rooms/leaveRoom", async (roomId, thunkAPI) => {

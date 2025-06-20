@@ -2,7 +2,7 @@ import { userAPI } from "@/api/api"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 
-type ProfileType = {
+export type ProfileType = {
   name: string
   sureName: string
   status: string
@@ -54,7 +54,7 @@ export const changeMyProfileThunk = createAsyncThunk<
   { rejectValue: string }
 >("profile/changeMyProfile", async (myProfileInfo, thunkAPI) => {
   try {
-    console.log("profile/changeMyProfile myProfileInfo", myProfileInfo)
+    // console.log("profile/changeMyProfile myProfileInfo", myProfileInfo)
     const data = await userAPI.updateMyProfile(myProfileInfo)
     console.log("profile/changeMyProfile data", data)
     return data

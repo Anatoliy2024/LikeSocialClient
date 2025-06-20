@@ -12,23 +12,36 @@ export type RatingType = {
   acting: number
   specialEffects: number
   story: number
+  stars: number
 }
 
 export type userPostType = {
   _id: string
   authorId: string
   imagePost: string
-  authorName: string
   // roomId: string | null
   title: string
   content: string | null
-  stars: number
+  votesCount: number
   ratings: RatingType
-  comments: any[]
-  votes: any[]
+  comments: userCommentType[]
+  genres: string[]
   showOnProfile: boolean
   createdAt: string
   updatedAt: string
+  roomId?: string
+  authorName?: string
+}
+
+type userCommentType = {
+  _id: string
+  userId: {
+    _id?: string
+    userName: string
+    avatar: string
+  }
+  text: string
+  createdAt: string
 }
 
 type userPostState = {
