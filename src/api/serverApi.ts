@@ -6,6 +6,9 @@ const url =
     ? "http://localhost:5000/api/"
     : "https://likesocial.onrender.com/api/")
 
+console.log("API_URL:", process.env.API_URL)
+console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL)
+
 export const serverAuthAPI = {
   async check() {
     const cookieStore = await cookies() // ✅ await нужен в новой версии
