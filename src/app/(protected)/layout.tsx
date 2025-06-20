@@ -20,12 +20,15 @@ export default async function ProtectedLayout({
   //   })
   console.log("res serverAuthAPI", res)
   if (!res.ok) {
+    console.log("/register")
     redirect("/register") // если не авторизован
   }
 
   const user = await res.json()
 
   if (!user.isVerified) {
+    console.log("/verify")
+
     redirect("/verify")
   }
 
