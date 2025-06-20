@@ -12,7 +12,7 @@ export const RoomCard = ({ data, userId, delRoom, leaveRoom }) => {
     owner,
     imageRoom,
     createdAt,
-    updatedAt,
+
     _id,
   } = data
   const isOwner = owner === userId

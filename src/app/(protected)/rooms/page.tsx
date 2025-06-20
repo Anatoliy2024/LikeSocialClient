@@ -31,7 +31,7 @@ export default function Rooms() {
 
   useEffect(() => {
     dispatch(getRoomsThunk())
-  }, [isAuth])
+  }, [isAuth, dispatch])
   return (
     <div className={style.wrapper}>
       {/* <input

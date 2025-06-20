@@ -10,6 +10,7 @@ import {
   cancelRequestFriendThunk,
   delFriendThunk,
 } from "@/store/thunks/usersThunk"
+import Image from "next/image"
 
 type FriendsListProps = {
   type: "friendRequests" | "friends" | "sentFriendRequests" // ограничим, чтобы был ключ из users
@@ -43,7 +44,7 @@ const FriendsList = ({ type }: FriendsListProps) => {
   // Берём нужный массив из users по ключу type
   const list = useAppSelector(
     (state: RootState) => state.users[type]
-  ) as Array<{ _id: string; username: string; avatar?: string }>
+  ) as Array<{ _id: string; username: string; avatar: string }>
 
   const handleLinkUser = (userId: string) => {
     router.push(`/profile/${userId}`)
@@ -62,7 +63,7 @@ const FriendsList = ({ type }: FriendsListProps) => {
               onClick={() => handleLinkUser(user._id)}
             >
               <div className={style.containerImg}>
-                <img
+                <Image
                   src={user.avatar}
                   alt={user.username}
                   width={100}
