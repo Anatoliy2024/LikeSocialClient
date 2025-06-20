@@ -18,7 +18,7 @@ export default async function ProtectedLayout({
   //     credentials: "include", // чтобы отправлять cookie (refreshToken)
   //     cache: "no-store", // чтобы всегда свежие данные
   //   })
-  console.log("res", res)
+  console.log("res serverAuthAPI", res)
   if (!res.ok) {
     redirect("/register") // если не авторизован
   }
