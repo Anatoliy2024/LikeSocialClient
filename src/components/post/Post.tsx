@@ -10,7 +10,8 @@ import { delRoomPostsThunk } from "@/store/thunks/roomPostThunk"
 import { translatorGenres } from "@/utils/translatorGenres"
 import { Comments } from "@/assets/icons/comments"
 import { Star } from "@/assets/icons/star"
-import { useRouter } from "next/navigation"
+import { userCommentType } from "@/store/slices/roomPostsSlice"
+// import { useRouter } from "next/navigation"
 
 type PostType = {
   title: string
@@ -30,7 +31,7 @@ type PostType = {
   roomId: string | null
   genres: string[]
   onClick: () => void
-  comments: any[]
+  comments: userCommentType[]
   votesCount: number
 }
 
@@ -52,7 +53,7 @@ const Post = ({
   votesCount,
 }: PostType) => {
   const dispatch = useAppDispatch()
-  const router = useRouter()
+  // const router = useRouter()
   // const date = new Date(createdAt)
   // const formatted = `${String(date.getDate()).padStart(2, "0")}.${String(
   //   date.getMonth() + 1

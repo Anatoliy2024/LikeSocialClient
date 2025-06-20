@@ -136,7 +136,7 @@ export const roomPostAPI = {
     //  .get(`roomPosts/${roomId}`, { params })
     return instance.get(`roomPosts/${roomId}`).then((response) => response.data)
   },
-  delRoomPost(postId: string, roomId: string) {
+  delRoomPost(postId: string, roomId: string | null) {
     // /post/:postId
     return instance
       .delete(`roomPosts/post/${postId}?roomId=${roomId}`)

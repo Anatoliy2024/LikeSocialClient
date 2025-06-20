@@ -2,6 +2,7 @@ import Link from "next/link"
 import style from "./header.module.scss"
 import ArrowBottom from "@/assets/icons/arrowBottom"
 import ButtonMenu from "../ui/button/Button"
+import Image from "next/image"
 type HeaderData = {
   isAuth: boolean
   username: string | null
@@ -20,7 +21,7 @@ export default function Header({
     <div className={style.wrapper}>
       <div className={style.logoWrapper}>
         <div>
-          <img src="/logo.png" alt="logo" />
+          <Image src="/logo.png" alt="logo" width={40} height={40} />
         </div>
         <div>burger</div>
       </div>
@@ -38,7 +39,12 @@ export default function Header({
         <div className={style.profileWrapper}>
           <div className={style.profile}>
             {username}
-            <img src={avatar ? avatar : "/1.png"} alt="avatar" />
+            <Image
+              src={avatar ? avatar : "/1.png"}
+              alt="avatar"
+              width={50}
+              height={50}
+            />
             <ArrowBottom />
           </div>
           <div className={style.menu}>

@@ -3,7 +3,7 @@ import { Provider } from "react-redux"
 import { store } from "@/store/store"
 // import Header from "@/components/header/Header"
 import Navbar from "@/components/navbar/Navbar"
-import Footer from "@/components/footer/Footer"
+// import Footer from "@/components/footer/Footer"
 import HeaderContainer from "@/components/header/HeaderContainer"
 import AuthProvider from "./AuthProvider"
 

@@ -54,13 +54,13 @@ const Room = () => {
       dispatch(getRoomPostsThunk(id))
       dispatch(getMembersFromRoomThunk(id))
     }
-  }, [isAuth])
+  }, [isAuth, dispatch, id])
 
   useEffect(() => {
     if (addFriendsToRoom) {
       dispatch(getUserRelationsThunk("friends"))
     }
-  }, [addFriendsToRoom])
+  }, [addFriendsToRoom, dispatch])
 
   console.log("owner", owner)
   if (typeof id !== "string") return <div>Неверный ID</div>

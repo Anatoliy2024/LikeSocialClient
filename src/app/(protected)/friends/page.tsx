@@ -17,7 +17,7 @@ export default function Friends() {
       dispatch(getUserRelationsThunk("requests"))
       dispatch(getUserRelationsThunk("sent"))
     }
-  }, [isAuth])
+  }, [isAuth, dispatch])
 
   return (
     <div className={style.wrapper}>

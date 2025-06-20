@@ -15,6 +15,13 @@ import StarRating from "../starRating/StarRating"
 
 import { voiceAPI } from "@/api/api"
 
+export type RatingFormValues = {
+  stars: number
+  acting: number
+  specialEffects: number
+  story: number
+}
+
 const PostModal = ({ post, onClose, playerId }) => {
   const dispatch = useAppDispatch()
   const [votes, setVotes] = useState([])
@@ -66,7 +73,7 @@ const PostModal = ({ post, onClose, playerId }) => {
     }
   }
   // ------- Голосование -------
-  const { handleSubmit, setValue, watch, reset } = useForm({
+  const { handleSubmit, setValue, watch, reset } = useForm<RatingFormValues>({
     defaultValues: {
       stars: 0,
       acting: 0,

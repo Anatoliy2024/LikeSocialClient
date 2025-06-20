@@ -3,13 +3,22 @@ import { useState } from "react"
 import { UseFormSetValue, UseFormWatch } from "react-hook-form"
 import style from "./StarRating.module.scss"
 
+type RatingFormValues = {
+  stars: number
+  acting: number
+  specialEffects: number
+  story: number
+}
+
 type Props = {
-  name: string
-  setValue: UseFormSetValue<any>
-  watch: UseFormWatch<any>
+  name: keyof RatingFormValues
+  setValue: UseFormSetValue<RatingFormValues>
+  watch: UseFormWatch<RatingFormValues>
 }
 
 const StarRating = ({ name, setValue, watch }: Props) => {
+  console.log("setValue", setValue)
+  console.log("watch", watch)
   const [hovered, setHovered] = useState(0)
   const selected = watch(name) || 0
 

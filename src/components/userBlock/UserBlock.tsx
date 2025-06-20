@@ -8,6 +8,7 @@ import ButtonMenu from "../ui/button/Button"
 import style from "./UserBlock.module.scss"
 import { useAppDispatch } from "@/store/hooks"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 type StatusType = "friend" | "incoming" | "outgoing" | "none"
 
@@ -53,7 +54,7 @@ const UserBlock = ({ avatar, userName, id, status }: UserBlockProps) => {
     <div className={style.wrapper}>
       <div className={style.imgNameBlock} onClick={() => handleLinkUser(id)}>
         <div className={style.imgBlock}>
-          <img src={avatar} alt="Avatar" />
+          <Image src={avatar} alt="Avatar" width={150} height={150} />
         </div>
         <div>{userName}</div>
       </div>

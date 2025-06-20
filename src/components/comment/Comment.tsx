@@ -3,7 +3,7 @@ import Image from "next/image"
 import style from "./Comment.module.scss"
 export const Comment = ({ data }) => {
   console.log("data Comment", data)
-  const { userId, text, createdAt, _id } = data
+  const { userId, text, createdAt } = data
   const { username, avatar } = userId
 
   return (

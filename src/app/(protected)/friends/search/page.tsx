@@ -25,7 +25,7 @@ export default function SearchFriends() {
       dispatch(getAllUsersThunk())
       dispatch(getMyFriendsIdThunk())
     }
-  }, [isAuth])
+  }, [isAuth, dispatch])
   // console.log("friends", friends)
   // console.log("friendRequests", friendRequests)
   // console.log("sentFriendRequests", sentFriendRequests)

@@ -42,7 +42,10 @@ export const getRoomPostsThunk = createAsyncThunk(
 )
 export const delRoomPostsThunk = createAsyncThunk(
   "post/delPosts",
-  async ({ postId, roomId }: { postId: string; roomId: string }, thunkAPI) => {
+  async (
+    { postId, roomId }: { postId: string; roomId: string | null },
+    thunkAPI
+  ) => {
     try {
       const data = await roomPostAPI.delRoomPost(postId, roomId)
       return data
