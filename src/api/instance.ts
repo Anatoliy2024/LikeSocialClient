@@ -1,7 +1,8 @@
 import axios from "axios"
 
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL + "/api/" || "http://localhost:5000/api/",
   withCredentials: true, // важно: чтобы кука с refreshToken передавалась
 })
 
