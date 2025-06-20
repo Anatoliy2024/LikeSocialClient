@@ -2,20 +2,30 @@ import { useForm, Controller } from "react-hook-form"
 import { MemberInfo } from "@/components/memberInfo/MemberInfo"
 import style from "./AddMembersToRoom.module.scss"
 import ButtonMenu from "@/components/ui/button/Button"
+import { RoomMemberType } from "@/store/thunks/roomsThunk"
+import { UserType } from "@/store/thunks/usersThunk"
 
+type FormData = {
+  selected: string[]
+}
 export const AddMembersToRoom = ({
   members,
   handleCloseAddMembersFromRoom,
   friends,
   onSubmitMembers, // <- функция для обработки выбранных участников
+}: {
+  members: RoomMemberType[]
+  handleCloseAddMembersFromRoom: () => void
+  friends: UserType[]
+  onSubmitMembers: (members: string[]) => void
 }) => {
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<FormData>({
     defaultValues: {
       selected: [], // массив id выбранных друзей
     },
   })
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: FormData) => {
     // data.selected будет массивом id выбранных друзей
     onSubmitMembers(data.selected)
   }
