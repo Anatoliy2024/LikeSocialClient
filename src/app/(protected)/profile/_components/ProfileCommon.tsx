@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   getMyProfileThunk,
@@ -71,7 +71,9 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   return (
     <div>
       <ProfileBlock profileData={cleanedProfileData} />
-      <PostsBlock posts={posts} userId={userId} isProfile />
+      <Suspense fallback={<div>Загрузка...</div>}>
+        <PostsBlock posts={posts} userId={userId} isProfile />
+      </Suspense>
     </div>
   )
 }

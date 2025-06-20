@@ -1,7 +1,7 @@
 "use client"
 import { useParams } from "next/navigation"
 import style from "./RoomPage.module.scss"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { RootState } from "@/store/store"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { getRoomPostsThunk } from "@/store/thunks/roomPostThunk"
@@ -105,7 +105,9 @@ const Room = () => {
           </div>
         )}
       </div>
-      <PostsBlock posts={posts} userId={userId} isProfile={false} />
+      <Suspense fallback={<div>Загрузка...</div>}>
+        <PostsBlock posts={posts} userId={userId} isProfile={false} />
+      </Suspense>
     </>
   )
 }
