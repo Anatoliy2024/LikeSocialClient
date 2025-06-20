@@ -17,7 +17,7 @@ export const serverAuthAPI = {
     //   .getAll()
     //   .map((c) => `${c.name}=${c.value}`)
     //   .join("; ")
-
+    console.log("Отправляем cookie:", cookieString)
     return await fetch(`${url}auth/check`, {
       method: "GET",
       headers: {
