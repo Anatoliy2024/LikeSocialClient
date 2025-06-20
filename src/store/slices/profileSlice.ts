@@ -6,7 +6,7 @@ import {
   getUserProfileThunk,
 } from "../thunks/profileThunk"
 
-type profileState = {
+export type profileState = {
   name: string | null
   sureName: string | null
   status: string | null

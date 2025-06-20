@@ -11,6 +11,7 @@ export type RatingType = {
   acting: number
   specialEffects: number
   story: number
+  stars: number
 }
 
 export type roomPostType = {

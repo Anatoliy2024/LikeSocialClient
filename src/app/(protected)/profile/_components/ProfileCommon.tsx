@@ -48,9 +48,25 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   //     return <div>Профиль не найден</div>
   //   }
 
+  const cleanedProfileData = {
+    ...profileData,
+    name: profileData.name ?? "",
+    sureName: profileData.sureName ?? "",
+    status: profileData.status ?? "",
+    age: profileData.age ?? "",
+    relationshipStatus: profileData.relationshipStatus ?? "",
+    address: {
+      country: profileData.address.country ?? "",
+      city: profileData.address.city ?? "",
+    },
+    profileError: profileData.profileError, // если нужно
+    isMyProfile: profileData.isMyProfile,
+    profileLoading: profileData.profileLoading,
+  }
+
   return (
     <div>
-      <ProfileBlock profileData={profileData} />
+      <ProfileBlock profileData={cleanedProfileData} />
       <PostsBlock posts={posts} userId={userId} isProfile />
     </div>
   )

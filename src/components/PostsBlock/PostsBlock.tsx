@@ -17,7 +17,7 @@ const PostsBlock = ({
   isProfile,
 }: {
   posts: userPostType[]
-  userId: string
+  userId: string | undefined
   isProfile: boolean
 }) => {
   const [activeCreateNewPost, setActiveCreateNewPost] = useState(false)

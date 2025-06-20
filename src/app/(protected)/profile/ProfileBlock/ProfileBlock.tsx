@@ -27,6 +27,25 @@ type profileDataType = {
   sureName: string
 }
 
+// type profileDataType = Omit<
+//   profileState,
+//   | "address"
+//   | "name"
+//   | "sureName"
+//   | "status"
+//   | "age"
+//   | "relationshipStatus"
+//   | "profileError"
+// > & {
+//   address: { country: string; city: string }
+//   name: string
+//   sureName: string
+//   status: string
+//   age: string
+//   relationshipStatus: string
+//   profileError: string | null
+// }
+
 const ProfileBlock = ({ profileData }: { profileData: profileDataType }) => {
   console.log("profileData", profileData)
   const dispatch = useAppDispatch()
