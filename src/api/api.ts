@@ -206,6 +206,6 @@ export const voiceAPI = {
 }
 export const serverAPI = {
   statusServer() {
-    return instance.get("serverStatus").then((response) => response.data)
+    return instance.get("server/serverStatus").then((response) => response.data)
   },
 }
