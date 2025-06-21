@@ -4,6 +4,8 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import ButtonMenu from "@/components/ui/button/Button"
 import { RoomType } from "@/store/thunks/roomsThunk"
+import { useAppSelector } from "@/store/hooks"
+import { RootState } from "@/store/store"
 
 export const RoomCard = ({
   data,
@@ -26,6 +28,8 @@ export const RoomCard = ({
 
     _id,
   } = data
+  const loading = useAppSelector((state: RootState) => state.rooms.loading)
+
   const isOwner = owner === userId
   const router = useRouter()
   const handleLinkUser = (roomId: string) => {
@@ -66,6 +70,8 @@ export const RoomCard = ({
       </div>
       <div>
         <ButtonMenu
+          disabled={loading}
+          loading={loading}
           onClick={() => {
             if (isOwner) {
               delRoom(_id)

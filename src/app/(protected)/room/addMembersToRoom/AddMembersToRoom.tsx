@@ -4,6 +4,8 @@ import style from "./AddMembersToRoom.module.scss"
 import ButtonMenu from "@/components/ui/button/Button"
 import { RoomMemberType } from "@/store/thunks/roomsThunk"
 import { UserType } from "@/store/thunks/usersThunk"
+import { useAppSelector } from "@/store/hooks"
+import { RootState } from "@/store/store"
 
 type FormData = {
   selected: string[]
@@ -19,6 +21,8 @@ export const AddMembersToRoom = ({
   friends: UserType[]
   onSubmitMembers: (members: string[]) => void
 }) => {
+  const loading = useAppSelector((state: RootState) => state.rooms.loading)
+
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: {
       selected: [], // массив id выбранных друзей
@@ -71,10 +75,12 @@ export const AddMembersToRoom = ({
         </div>
 
         <div className={style.buttons}>
+          <ButtonMenu type="submit" disabled={loading} loading={loading}>
+            Добавить
+          </ButtonMenu>
           <ButtonMenu type="button" onClick={handleCloseAddMembersFromRoom}>
             Отмена
           </ButtonMenu>
-          <ButtonMenu type="submit">Добавить</ButtonMenu>
         </div>
       </div>
     </form>

@@ -41,34 +41,12 @@ const Register = () => {
     }
   }
 
-  // const handleRegister = async (
-  //   dispatch: AppDispatch,
-  //   router: ReturnType<typeof useRouter>,
-  //   username: string,
-  //   email: string,
-  //   password: string
-  // ) => {
-  //   try {
-  //     await dispatch(
-  //       registerThunk({
-  //         username,
-  //         email,
-  //         password,
-  //       })
-  //     ).unwrap() // если авторизация прошла успешно — не будет ошибки
-  //     router.push("/verify") // переход
-  //   } catch (err) {
-  //     console.error("Ошибка регистрации:", err)
-  //     // можно показать уведомление об ошибке
-  //   }
-  // }
-
   return (
     <div className={style.wrapper}>
       <div className={style.formContainer}>
         <div>Register</div>
         <div>{loading ? "loading" : "pending"}</div>
-        <div>{error}</div>
+
         <form onSubmit={handleSubmit(onSubmit)} className={style.form}>
           <div className={style.infoContainer}>
             <input
@@ -88,17 +66,6 @@ const Register = () => {
             />
             {errors.username && <p>{errors.username?.message as string}</p>}
             <label htmlFor="login">Login</label>
-
-            {/* <input
-              type="text"
-              name=""
-              id="login"
-              value={data.username}
-              onChange={(e) => {
-                setData({ ...data, username: e.target.value })
-              }}
-            />
-            <label htmlFor="login">Login</label> */}
           </div>
           <div className={style.infoContainer}>
             <input
@@ -115,15 +82,6 @@ const Register = () => {
             />
             {errors.email && <p>{errors.email?.message as string}</p>}
             <label htmlFor="email">email</label>
-            {/* <input
-              type="text"
-              name=""
-              id="email"
-              value={data.email}
-              onChange={(e) => {
-                setData({ ...data, email: e.target.value })
-              }}
-            /> */}
           </div>
           <div className={style.infoContainer}>
             <input
@@ -139,38 +97,10 @@ const Register = () => {
             />
             {errors.password && <p>{errors.password?.message as string}</p>}
 
-            {/* <input
-              type="text"
-              name=""
-              id="password"
-              value={data.password}
-              onChange={(e) => {
-                setData({ ...data, password: e.target.value })
-              }}
-            /> */}
-            {/*Изменит type="password"  */}
             <label htmlFor="password">Password</label>
           </div>
           <div className={style.buttonBlock}>
-            <ButtonMenu
-              type="submit"
-              onClick={() => {
-                // handleRegister(
-                //   dispatch,
-                //   router,
-                //   data.username,
-                //   data.email,
-                //   data.password
-                // )
-                // dispatch(
-                //   registerThunk({
-                //     username: data.username,
-                //     email: data.email,
-                //     password: data.password,
-                //   })
-                // )
-              }}
-            >
+            <ButtonMenu type="submit" disabled={loading} loading={loading}>
               Register
             </ButtonMenu>
             <Link href="/">
@@ -178,83 +108,9 @@ const Register = () => {
             </Link>
           </div>
         </form>
+        <div>{error}</div>
       </div>
     </div>
   )
-  // return (
-  //   <div className={style.wrapper}>
-  //     <div className={style.formContainer}>
-  //       <div>Register</div>
-  //       <div>{loading ? "loading" : "pending"}</div>
-  //       <div>{error}</div>
-  //       <div className={style.form}>
-  //
-  //         <div>
-  //           <input
-  //             type="text"
-  //             name=""
-  //             id="login"
-  //             value={data.username}
-  //             onChange={(e) => {
-  //               setData({ ...data, username: e.target.value })
-  //             }}
-  //           />
-  //           <label htmlFor="login">Login</label>
-  //         </div>
-  //         <div>
-  //           <input
-  //             type="text"
-  //             name=""
-  //             id="email"
-  //             value={data.email}
-  //             onChange={(e) => {
-  //               setData({ ...data, email: e.target.value })
-  //             }}
-  //           />
-  //           <label htmlFor="login">email</label>
-  //         </div>
-  //         <div>
-  //           <input
-  //             type="text"
-  //             name=""
-  //             id="password"
-  //             value={data.password}
-  //             onChange={(e) => {
-  //               setData({ ...data, password: e.target.value })
-  //             }}
-  //           />
-  //           {/*Изменит type="password"  */}
-  //           <label htmlFor="login">Password</label>
-  //         </div>
-  //         <div className={style.buttonBlock}>
-  //           <ButtonMenu
-  //             onClick={() => {
-  //               handleRegister(
-  //                 dispatch,
-  //                 router,
-
-  //                 data.username,
-  //                 data.email,
-  //                 data.password
-  //               )
-  //               // dispatch(
-  //               //   registerThunk({
-  //               //     username: data.username,
-  //               //     email: data.email,
-  //               //     password: data.password,
-  //               //   })
-  //               // )
-  //             }}
-  //           >
-  //             Register
-  //           </ButtonMenu>
-  //           <Link href="/">
-  //             <ButtonMenu>cancel</ButtonMenu>
-  //           </Link>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </div>
-  // )
 }
 export default Register

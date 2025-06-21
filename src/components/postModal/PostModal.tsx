@@ -15,6 +15,7 @@ import StarRating from "../starRating/StarRating"
 
 import { voiceAPI } from "@/api/api"
 import { userPostType } from "@/store/slices/userPostsSlice"
+// import { RootState } from '@/store/store'
 
 export type RatingFormValues = {
   stars: number
@@ -42,7 +43,12 @@ const PostModal = ({
   playerId: string
 }) => {
   console.log("post", post)
+  const [loading, setLoading] = useState(false)
   const dispatch = useAppDispatch()
+  // const loading = useAppSelector(
+  //   (state: RootState) => state.profile.profileLoading
+  // )
+
   const [votes, setVotes] = useState<VotesType[]>([])
   const [isEditing, setIsEditing] = useState(false)
   const myVoice = votes.find((v) => v.userId._id === playerId)
@@ -77,18 +83,23 @@ const PostModal = ({
   const [comment, setComment] = useState("")
 
   const handleSendComment = async () => {
+    setLoading(true)
     try {
       if (roomId) {
-        dispatch(createRoomCommentThunk({ postId, roomId, comment })).unwrap()
+        await dispatch(
+          createRoomCommentThunk({ postId, roomId, comment })
+        ).unwrap()
         //пост комнаты  postId comment roomId отчистить  comment
       } else {
-        dispatch(createUserCommentThunk({ postId, comment })).unwrap()
+        await dispatch(createUserCommentThunk({ postId, comment })).unwrap()
 
         //обычный пост  postId comment отчистить  comment
       }
       setComment("") // Очистка textarea после успешной отправки
     } catch (err) {
       console.log("Ошибка при отправке комментария:", err)
+    } finally {
+      setLoading(false)
     }
   }
   // ------- Голосование -------
@@ -241,7 +252,13 @@ const PostModal = ({
                       />
                     </div>
 
-                    <ButtonMenu type="submit">Проголосовать</ButtonMenu>
+                    <ButtonMenu
+                      type="submit"
+                      disabled={loading}
+                      loading={loading}
+                    >
+                      Проголосовать
+                    </ButtonMenu>
                   </form>
                 )}
               </div>

@@ -31,25 +31,6 @@ const Auth = () => {
   // }
   const router = useRouter()
 
-  // const handleLogin = async (
-  //   dispatch: AppDispatch,
-  //   router: ReturnType<typeof useRouter>,
-  //   username: string,
-  //   password: string
-  // ) => {
-  //   try {
-  //     await dispatch(
-  //       authThunk({
-  //         username,
-  //         password,
-  //       })
-  //     ).unwrap() // если авторизация прошла успешно — не будет ошибки
-  //     router.push("/profile") // переход
-  //   } catch (err) {
-  //     console.error("Ошибка авторизации:", err)
-  //     // можно показать уведомление об ошибке
-  //   }
-  // }
   const onSubmit = async (data: FormValues) => {
     console.log(data) // данные формы
     // await handleRegister(dispatch, router, data.username, data.email, data.password)
@@ -66,7 +47,6 @@ const Auth = () => {
       <div className={style.formContainer}>
         <div>Auth</div>
         <div>{loading ? "loading" : "pending"}</div>
-        <div>{error}</div>
         <form onSubmit={handleSubmit(onSubmit)} className={style.form}>
           <div>
             <input
@@ -86,17 +66,6 @@ const Auth = () => {
             />
             {errors.username && <p>{errors.username?.message as string}</p>}
             <label htmlFor="login">Login</label>
-
-            {/* <input
-              type="text"
-              name=""
-              id="login"
-              value={data.username}
-              onChange={(e) => {
-                setData({ ...data, username: e.target.value })
-              }}
-            />
-            <label htmlFor="login">Login</label> */}
           </div>
 
           <div>
@@ -113,34 +82,9 @@ const Auth = () => {
             />
             {errors.password && <p>{errors.password?.message as string}</p>}
             <label htmlFor="password">Password</label>
-
-            {/* <input
-              type="text"
-              name=""
-              id="password"
-              value={data.password}
-              onChange={(e) => {
-                setData({ ...data, password: e.target.value })
-              }}
-            />
-            {/*Изменит type="password"  */}
-            {/* <label htmlFor="login">Password</label>  */}
           </div>
           <div className={style.buttonBlock}>
-            <ButtonMenu
-              type="submit"
-              // onClick={
-              //   () => {
-              //     handleLogin(dispatch, router, data.username, data.password)
-              //   }
-              // dispatch(
-              //   authThunk({
-              //     username: data.username,
-              //     password: data.password,
-              //   })
-              // )
-              // }
-            >
+            <ButtonMenu disabled={loading} loading={loading} type="submit">
               Authorization
             </ButtonMenu>
             <Link href="/">
@@ -148,6 +92,7 @@ const Auth = () => {
             </Link>
           </div>
         </form>
+        <div>{error}</div>
       </div>
     </div>
   )

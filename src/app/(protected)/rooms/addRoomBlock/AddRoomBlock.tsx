@@ -2,7 +2,8 @@ import ButtonMenu from "@/components/ui/button/Button"
 import style from "./AddRoomBlock.module.scss"
 import { useForm } from "react-hook-form"
 import { createRoomThunk } from "@/store/thunks/roomsThunk"
-import { useAppDispatch } from "@/store/hooks"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import { RootState } from "@/store/store"
 
 export type FormValuesAddRooms = {
   name: string
@@ -20,7 +21,7 @@ export const AddRoomBlock = ({
     formState: { errors },
   } = useForm<FormValuesAddRooms>()
   const dispatch = useAppDispatch()
-
+  const loading = useAppSelector((state: RootState) => state.rooms.loading)
   const onSubmit = async (data: FormValuesAddRooms) => {
     console.log(data) // данные формы
     // await handleRegister(dispatch, router, data.username, data.email, data.password)
@@ -69,7 +70,9 @@ export const AddRoomBlock = ({
           </div>
 
           <div className={style.buttonBlock}>
-            <ButtonMenu type="submit">Создать комнату</ButtonMenu>
+            <ButtonMenu type="submit" disabled={loading} loading={loading}>
+              Создать комнату
+            </ButtonMenu>
             <ButtonMenu onClick={handleCloseBlock}>Отмена</ButtonMenu>
           </div>
         </form>

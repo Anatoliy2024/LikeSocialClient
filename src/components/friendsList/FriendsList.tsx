@@ -17,6 +17,8 @@ type FriendsListProps = {
 }
 
 const FriendsList = ({ type }: FriendsListProps) => {
+  const loading = useAppSelector((state: RootState) => state.users.loading)
+
   const router = useRouter()
   const dispatch = useAppDispatch()
   const title = {
@@ -74,6 +76,8 @@ const FriendsList = ({ type }: FriendsListProps) => {
             </div>
             <div className={style.buttonContainer}>
               <ButtonMenu
+                disabled={loading}
+                loading={loading}
                 onClick={() => {
                   handleClick(type, user._id)
                 }}

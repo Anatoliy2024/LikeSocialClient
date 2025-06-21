@@ -40,7 +40,7 @@ const Verify = () => {
       <div className={style.formContainer}>
         <div>Verify</div>
         <div>{loading ? "loading" : "pending"}</div>
-        <div>{error}</div>
+
         <div className={style.form}>
           <div>
             <input
@@ -57,6 +57,8 @@ const Verify = () => {
 
           <div className={style.buttonBlock}>
             <ButtonMenu
+              disabled={loading}
+              loading={loading}
               onClick={() => {
                 handleVerify(
                   dispatch,
@@ -64,13 +66,6 @@ const Verify = () => {
                   userName as string,
                   passwordVerify
                 )
-                // dispatch(
-                //   registerThunk({
-                //     username: data.username,
-                //     email: data.email,
-                //     password: data.password,
-                //   })
-                // )
               }}
             >
               verify
@@ -80,6 +75,7 @@ const Verify = () => {
             </Link>
           </div>
         </div>
+        <div>{error}</div>
       </div>
     </div>
   )

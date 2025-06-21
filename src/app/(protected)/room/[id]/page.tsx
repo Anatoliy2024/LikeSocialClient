@@ -24,6 +24,7 @@ const Room = () => {
   const userId = useAppSelector((state: RootState) => state.auth.userId)
   const members = useAppSelector((state: RootState) => state.rooms.members)
   const owner = useAppSelector((state: RootState) => state.rooms.owner)
+  const loading = useAppSelector((state: RootState) => state.rooms.loading)
   const friends = useAppSelector((state: RootState) => state.users.friends)
   const posts = useAppSelector((state: RootState) => state.roomPost.posts)
   const dispatch = useAppDispatch()
@@ -99,7 +100,11 @@ const Room = () => {
         </div>
         {isOwner && (
           <div>
-            <ButtonMenu onClick={handleAddMembersFromRoom}>
+            <ButtonMenu
+              disabled={loading}
+              loading={loading}
+              onClick={handleAddMembersFromRoom}
+            >
               Добавить участника
             </ButtonMenu>
           </div>

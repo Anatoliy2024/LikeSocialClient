@@ -2,9 +2,10 @@
 import { useState } from "react"
 import style from "./ProfileBlock.module.scss"
 import { useForm } from "react-hook-form"
-import { useAppDispatch } from "@/store/hooks"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { changeMyProfileThunk } from "@/store/thunks/profileThunk"
 import ButtonMenu from "@/components/ui/button/Button"
+import { RootState } from "@/store/store"
 
 type FormProfileInfo = {
   name: string
@@ -49,6 +50,10 @@ type profileDataType = {
 const ProfileBlock = ({ profileData }: { profileData: profileDataType }) => {
   console.log("profileData", profileData)
   const dispatch = useAppDispatch()
+  const loading = useAppSelector(
+    (state: RootState) => state.profile.profileLoading
+  )
+
   const [isEdit, setIsEdit] = useState(false)
   const {
     register,
@@ -177,7 +182,9 @@ const ProfileBlock = ({ profileData }: { profileData: profileDataType }) => {
             )} */}
           </div>
           <div>
-            <ButtonMenu type="submit">Сохранить</ButtonMenu>
+            <ButtonMenu disabled={loading} loading={loading} type="submit">
+              Сохранить
+            </ButtonMenu>
             <ButtonMenu type="button" onClick={handleCancel}>
               Отмена
             </ButtonMenu>

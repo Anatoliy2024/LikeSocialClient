@@ -4,9 +4,10 @@ import ButtonMenu from "../ui/button/Button"
 import style from "./CreatePost.module.scss"
 
 import StarRating from "../starRating/StarRating"
-import { useAppDispatch } from "@/store/hooks"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { createUserPostThunk } from "@/store/thunks/userPostThunk"
 import { createRoomPostThunk } from "@/store/thunks/roomPostThunk"
+import { RootState } from "@/store/store"
 
 // import { useParams } from "next/navigation"
 // type FormCreatePost = {
@@ -65,6 +66,7 @@ const CreatePost = ({
   } = useForm<FormCreatePost>()
   const dispatch = useAppDispatch()
   // const { id } = useParams()
+  const loading = useAppSelector((state: RootState) => state.userPost.loading)
 
   const handleSave = (dataForm: FormCreatePost) => {
     console.log("dataForm", dataForm)
@@ -238,7 +240,9 @@ const CreatePost = ({
           </div>
 
           <div>
-            <ButtonMenu type="submit">Опубликовать</ButtonMenu>
+            <ButtonMenu type="submit" disabled={loading} loading={loading}>
+              Опубликовать
+            </ButtonMenu>
             <ButtonMenu onClick={() => hiddenBlock()}>Отмена</ButtonMenu>
           </div>
         </form>
