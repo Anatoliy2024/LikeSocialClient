@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import axios from "axios"
 
-export const useTikServer = () => {
+export const useTikServer = (server: boolean) => {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
@@ -28,8 +28,11 @@ export const useTikServer = () => {
     }
 
     // стартуем первый пинг
-    timeoutId = setTimeout(tik, getRandomDelay())
-    tik() // 🔹 сразу запускаем первый запрос
+    // timeoutId = setTimeout(tik, getRandomDelay())
+    if (server) {
+      tik()
+    }
+    // tik() // 🔹 сразу запускаем первый запрос
 
     return () => clearTimeout(timeoutId)
   }, [])
