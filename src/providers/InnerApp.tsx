@@ -6,11 +6,12 @@ import Navbar from "@/components/navbar/Navbar"
 import HeaderContainer from "@/components/header/HeaderContainer"
 import AuthProvider from "./AuthProvider"
 import { ServerType } from "@/store/slices/serverSlice"
+import { useTikServer } from "@/utils/useTikServer"
 
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch()
   const server = useAppSelector((state) => state.server) as ServerType
-
+  useTikServer()
   useEffect(() => {
     dispatch(getStatusServerThunk())
   }, [dispatch])
