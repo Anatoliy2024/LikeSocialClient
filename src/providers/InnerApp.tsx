@@ -19,7 +19,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
     return <div>Сервер просыпается, пожалуйста подождите...</div>
   }
 
-  if (!server?.statusServer) {
+  if (server?.error) {
     return <div>Сервер не отвечает...</div>
   }
 
