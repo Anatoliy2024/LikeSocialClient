@@ -1,24 +1,24 @@
-import { headers } from "next/headers"
+// import { headers } from "next/headers"
 
-export const serverAuthAPI = {
-  async check() {
-    const incomingHeaders = await headers()
-    const cookie = incomingHeaders.get("cookie") || "" // <- получишь refreshToken тут
-    console.log("refresh cooke", cookie)
+// export const serverAuthAPI = {
+//   async check() {
+//     const incomingHeaders = await headers()
+//     const cookie = incomingHeaders.get("cookie") || "" // <- получишь refreshToken тут
+//     console.log("refresh cooke", cookie)
 
-    const res = await fetch(`${process.env.API_URL}/auth/check`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        cookie, // <- передаёшь куки на бэкенд
-      },
-      credentials: "include",
-      cache: "no-store",
-    })
+//     const res = await fetch(`${process.env.API_URL}/auth/check`, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//         cookie, // <- передаёшь куки на бэкенд
+//       },
+//       credentials: "include",
+//       cache: "no-store",
+//     })
 
-    return res
-  },
-}
+//     return res
+//   },
+// }
 
 // import { cookies } from "next/headers"
 

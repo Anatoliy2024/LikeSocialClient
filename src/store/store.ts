@@ -9,6 +9,7 @@ import userPostThunks from "./slices/userPostsSlice"
 import roomPostThunks from "./slices/roomPostsSlice"
 import usersThunks from "./slices/usersSlice"
 import roomsThunks from "./slices/roomsSlice"
+import serverThunks from "./slices/serverSlice"
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
     roomPost: roomPostThunks,
     users: usersThunks,
     rooms: roomsThunks,
+    server: serverThunks,
     // добавь другие редьюсеры здесь
   },
 })
