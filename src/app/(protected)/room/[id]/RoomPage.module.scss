@@ -1,6 +1,20 @@
 .containerMembers {
   text-align: center;
   padding: 10px;
+  .blockRoomMainInfo {
+    display: flex;
+    gap: 20px;
+    .blockAvatarRoom {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgb(0, 4, 82);
+      overflow: hidden;
+    }
+  }
   .membersBlock {
     display: flex;
     gap: 10px;

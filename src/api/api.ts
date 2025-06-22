@@ -163,9 +163,9 @@ export const roomAPI = {
   getRooms() {
     return instance.get(`room/getRooms`).then((response) => response.data)
   },
-  getMembersFromRoom(roomId: string) {
+  getRoomById(roomId: string) {
     return instance
-      .get(`room/getMembers/${roomId}`)
+      .get(`room/getRoomById/${roomId}`)
       .then((response) => response.data)
   },
   addFriendsToRoom(users: string[], roomId: string) {
@@ -208,4 +208,71 @@ export const serverAPI = {
   statusServer() {
     return instance.get("server/serverStatus").then((response) => response.data)
   },
+}
+
+export const fileAPI = {
+  uploadUserAvatar(file: File) {
+    const formData = new FormData()
+    formData.append("image", file)
+
+    return instance
+      .post("/file/uploadUserAvatar", formData)
+      .then((res) => res.data)
+  },
+  uploadRoomAvatar(file: File, roomId: string) {
+    const formData = new FormData()
+    formData.append("image", file)
+    formData.append("roomId", roomId) // передаём roomId в FormData
+    return instance
+      .post("/file/uploadRoomAvatar", formData)
+      .then((res) => res.data)
+  },
+  uploadRoomPostAvatar(file: File, postId: string) {
+    const formData = new FormData()
+    formData.append("image", file)
+    formData.append("postId", postId) // передаём roomId в FormData
+    return instance
+      .post("/file/uploadRoomPostAvatar", formData)
+      .then((res) => res.data)
+  },
+  uploadUserPostAvatar(file: File, postId: string) {
+    const formData = new FormData()
+    formData.append("image", file)
+    formData.append("postId", postId) // передаём roomId в FormData
+    return instance
+      .post("/file/uploadUserPostAvatar", formData)
+      .then((res) => res.data)
+  },
+  // uploadUserPostImage({ file, postId }: { file: File; postId: string }) {
+  //   const formData = new FormData()
+  //   formData.append("image", file)
+  //   formData.append("postId", postId)
+
+  //   return instance.post("/api/file/upload-user-post", formData).then(res => res.data)
+  // }
+
+  // changeAvatar({
+  //   file,
+  //   userId,
+  //   roomId,
+  //   postRoomId,
+  //   postUserId
+  // }: {
+  //   file: File
+  //   userId?: string
+  //   roomId?: string
+  //   postRoomId?: string
+  //   postUserId?: string
+  // }) {
+  //   const formData = new FormData()
+  //   formData.append("image", file)
+
+  //   if (userId) formData.append("userId", userId)
+  //   if (roomId) formData.append("roomId", roomId)
+  //   if (postUserId) formData.append("postUserId", postUserId)
+  //   if (postRoomId) formData.append("postRoomId", postRoomId)
+  //   return instance
+  //     .post("/api/file/upload", formData)
+  //     .then((response) => response.data)
+  // },
 }

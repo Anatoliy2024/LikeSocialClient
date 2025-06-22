@@ -3,10 +3,11 @@ import { createSlice } from "@reduxjs/toolkit"
 
 import {
   addFriendsToRoomThunk,
+  changeAvatarRoomThunk,
   createRoomThunk,
   delFriendFromRoomThunk,
   delRoomThunk,
-  getMembersFromRoomThunk,
+  getRoomByIdThunk,
   getRoomsThunk,
   leaveRoomThunk,
   OwnerType,
@@ -18,6 +19,7 @@ const initialState = {
   rooms: [] as RoomType[],
   members: [] as RoomMemberType[],
   owner: null as OwnerType,
+  room: null as null | RoomType,
   loading: false,
   error: null as string | null,
 }
@@ -54,16 +56,17 @@ const roomsSlice = createSlice({
         state.error = action.error.message || "Ошибка при получении комнат"
       })
 
-      .addCase(getMembersFromRoomThunk.pending, (state) => {
+      .addCase(getRoomByIdThunk.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(getMembersFromRoomThunk.fulfilled, (state, action) => {
+      .addCase(getRoomByIdThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.members = action.payload.members
-        state.owner = action.payload.owner
+        state.room = action.payload
+        // state.members = action.payload.members
+        // state.owner = action.payload.owner
       })
-      .addCase(getMembersFromRoomThunk.rejected, (state, action) => {
+      .addCase(getRoomByIdThunk.rejected, (state, action) => {
         state.loading = false
         state.error =
           action.error.message || "Ошибка при получении участников комнаты"
@@ -144,6 +147,23 @@ const roomsSlice = createSlice({
       .addCase(leaveRoomThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка при выходе из комнаты"
+      })
+      .addCase(changeAvatarRoomThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(changeAvatarRoomThunk.fulfilled, (state, action) => {
+        state.loading = false
+
+        if (state.room) {
+          state.room.avatar = action.payload.avatar
+          state.room.avatarPublicId = action.payload.avatarPublicId
+        }
+      })
+      .addCase(changeAvatarRoomThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error =
+          action.error.message || "Ошибка при смене аватарки комнаты"
       })
   },
 })

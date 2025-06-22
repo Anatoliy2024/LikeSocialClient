@@ -2,7 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { roomPostType } from "../slices/roomPostsSlice"
-import { roomPostAPI } from "@/api/api"
+import { fileAPI, roomPostAPI } from "@/api/api"
 
 export const createRoomPostThunk = createAsyncThunk(
   "post/createPost",
@@ -74,6 +74,26 @@ export const createRoomCommentThunk = createAsyncThunk(
 
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Ошибка при создании коммента")
+    }
+  }
+)
+
+export const uploadRoomPostAvatarThunk = createAsyncThunk(
+  "post/uploadRoomPostAvatar",
+  async ({ file, postId }: { file: File; postId: string }, thunkAPI) => {
+    try {
+      const data = await fileAPI.uploadRoomPostAvatar(file, postId)
+      return data
+    } catch (error: unknown) {
+      // Проверка, является ли ошибка ошибкой Axios
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+
+      // если это вообще не ошибка axios или нет message
+      return thunkAPI.rejectWithValue(
+        "Ошибка при изменении аватарки room поста"
+      )
     }
   }
 )

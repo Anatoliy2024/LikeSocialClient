@@ -6,7 +6,7 @@ import Image from "next/image"
 type HeaderData = {
   isAuth: boolean
   username: string | null
-  avatar: string | null | undefined
+  avatar: string
   logoutFn: () => void
 }
 

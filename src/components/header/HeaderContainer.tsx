@@ -9,7 +9,7 @@ import { logoutThunk } from "@/store/thunks/authThunk"
 const HeaderContainer = () => {
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const username = useAppSelector((state: RootState) => state.auth.username)
-  const avatar = useAppSelector((state: RootState) => state.auth.avatar)
+  const avatar = useAppSelector((state: RootState) => state.profile.avatar)
   const dispatch = useAppDispatch()
   const router = useRouter()
   const logoutButton = () => {

@@ -9,21 +9,33 @@ import { getRoomPostsThunk } from "@/store/thunks/roomPostThunk"
 import PostsBlock from "../../../../components/PostsBlock/PostsBlock"
 import {
   addFriendsToRoomThunk,
+  changeAvatarRoomThunk,
   delFriendFromRoomThunk,
-  getMembersFromRoomThunk,
+  getRoomByIdThunk,
   RoomMemberType,
 } from "@/store/thunks/roomsThunk"
 import { MemberInfo } from "@/components/memberInfo/MemberInfo"
 import ButtonMenu from "@/components/ui/button/Button"
 import { AddMembersToRoom } from "../addMembersToRoom/AddMembersToRoom"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
+import Image from "next/image"
+import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
 
 const Room = () => {
   const [addFriendsToRoom, setAddFriendsToRoom] = useState(false)
+  const [changeAvatarModal, setChangeAvatarModal] = useState(false)
+
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
-  const members = useAppSelector((state: RootState) => state.rooms.members)
-  const owner = useAppSelector((state: RootState) => state.rooms.owner)
+
+  const room = useAppSelector((state: RootState) => state.rooms.room)
+  // const members = useAppSelector((state: RootState) => state.rooms.room?.members)
+
+  // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)
+  // const avatar = useAppSelector((state: RootState) => state.rooms.room?.avatar)
+  // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)
+  // const members = useAppSelector((state: RootState) => state.rooms.members)
+  // const owner = useAppSelector((state: RootState) => state.rooms.owner)
   const loading = useAppSelector((state: RootState) => state.rooms.loading)
   const friends = useAppSelector((state: RootState) => state.users.friends)
   const posts = useAppSelector((state: RootState) => state.roomPost.posts)
@@ -31,10 +43,10 @@ const Room = () => {
   const { id } = useParams<{ id: string }>()
 
   const isOwner =
-    typeof owner === "object" &&
-    owner !== null &&
-    " _id" in owner &&
-    userId === (owner as RoomMemberType)._id
+    typeof room?.owner === "object" &&
+    room?.owner !== null &&
+    " _id" in room?.owner &&
+    userId === (room?.owner as RoomMemberType)._id
   const handleAddMembersFromRoom = () => {
     setAddFriendsToRoom(true)
   }
@@ -57,8 +69,9 @@ const Room = () => {
   }
   useEffect(() => {
     if (isAuth) {
+      console.log("roomId", id)
       dispatch(getRoomPostsThunk(id))
-      dispatch(getMembersFromRoomThunk(id))
+      dispatch(getRoomByIdThunk(id))
     }
   }, [isAuth, dispatch, id])
 
@@ -68,32 +81,72 @@ const Room = () => {
     }
   }, [addFriendsToRoom, dispatch])
 
-  console.log("owner", owner)
+  console.log("owner", room?.owner)
   if (typeof id !== "string") return <div>Неверный ID</div>
   if (!userId) return <div>Юзер не найден</div>
 
-  console.log("posts", posts)
+  const handleRoomAvatarUpload = async (file: File, id?: string) => {
+    if (!id) return
+    await dispatch(changeAvatarRoomThunk({ file, roomId: id })).unwrap()
+  }
+
+  const handleCloseModal = () => {
+    setChangeAvatarModal(false)
+  }
+  const handleOpenModal = () => {
+    setChangeAvatarModal(true)
+  }
+
+  // console.log("posts", posts)
   return (
     <>
       {addFriendsToRoom && (
         <AddMembersToRoom
-          members={members}
+          members={room?.members as []}
           friends={friends}
           handleCloseAddMembersFromRoom={handleCloseAddMembersFromRoom}
           onSubmitMembers={onSubmitMembers}
         />
       )}
+      {changeAvatarModal && (
+        <ChangeAvatarModal
+          handleCloseModal={handleCloseModal}
+          loading={loading}
+          onUpload={handleRoomAvatarUpload}
+          roomId={id}
+        />
+      )}
       <div className={style.containerMembers}>
+        <div className={style.blockRoomMainInfo}>
+          <div className={style.blockAvatarRoom} onClick={handleOpenModal}>
+            <Image
+              src={room?.avatar || ""}
+              alt="roomAvatar"
+              width={200}
+              height={200}
+            />
+          </div>
+          <div>
+            <div>
+              <span>Название комнаты:</span>
+              <span>{room?.name}</span>
+            </div>
+            <div>
+              <span>Описание комнаты:</span>
+              <span>{room?.description}</span>
+            </div>
+          </div>
+        </div>
         <h3>Участники</h3>
         <div className={style.membersBlock}>
-          {members.map((member) => (
+          {room?.members.map((member) => (
             <MemberInfo
               key={member._id}
               id={member._id as string}
-              name={member.userName}
+              name={member.username}
               avatar={member.avatar}
               delMember={delMember}
-              owner={(owner as RoomMemberType)._id || ""}
+              owner={(room?.owner as RoomMemberType)._id || ""}
               isOwner={isOwner}
             />
           ))}

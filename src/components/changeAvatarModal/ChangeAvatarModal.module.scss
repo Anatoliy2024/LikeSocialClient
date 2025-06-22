@@ -1,0 +1,32 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #00000072;
+  z-index: 100;
+}
+.container {
+  color: white;
+  background-color: rgb(58, 55, 174);
+  border-radius: 20px;
+  padding: 20px;
+  width: 50vw;
+  height: 50vh;
+  .preview {
+    width: 200px;
+    height: 200px;
+
+    border-radius: 50%;
+
+    // display: block;
+    // border: 2px solid #ccc;
+  }
+  input {
+    border: 1px solid red;
+  }
+}

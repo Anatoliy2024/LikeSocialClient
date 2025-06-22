@@ -21,7 +21,9 @@ const PostsBlock = ({
   isProfile: boolean
 }) => {
   const [activeCreateNewPost, setActiveCreateNewPost] = useState(false)
+
   const playerId = useAppSelector((state: RootState) => state.auth.userId)
+
   const pathname = usePathname()
   const { id } = useParams<{ id: string }>()
 

@@ -6,6 +6,7 @@ import {
   delUserPostsThunk,
   getUserPostsByIdThunk,
   getUserPostsThunk,
+  uploadUserPostAvatarThunk,
 } from "../thunks/userPostThunk"
 
 export type RatingType = {
@@ -136,27 +137,24 @@ const userPostSlice = createSlice({
         state.loading = false
         state.error = action.error.message || "Ошибка при создании комментария"
       })
-    // .addCase(createVoiceThunk.pending, (state) => {
-    //   state.loading = true
-    //   state.error = null
-    // })
-    // .addCase(createVoiceThunk.fulfilled, (state, action) => {
-    //   console.log("createVoiceThunk", action.payload)
-    //   state.loading = false
-    //   const updatedPost = action.payload
-    //   // console.log("createUserCommentThunk", action.payload)
-    //   state.posts = state.posts.map((post) =>
-    //     post._id === updatedPost._id ? updatedPost : post
-    //   )
-    //   //  action.payload
-    //   // state.rooms = state.rooms.map((room) =>
-    //   //   room._id === updatedRoom.room._id ? updatedRoom.room : room
-    //   // )
-    // })
-    // .addCase(createVoiceThunk.rejected, (state, action) => {
-    //   state.loading = false
-    //   state.error = action.error.message || "Ошибка при создании голоса"
-    // })
+      .addCase(uploadUserPostAvatarThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(uploadUserPostAvatarThunk.fulfilled, (state, action) => {
+        console.log("createUserCommentThunk", action.payload)
+        state.loading = false
+        const updatedPost = action.payload
+        // console.log("createUserCommentThunk", action.payload)
+        state.posts = state.posts.map((post) =>
+          post._id === updatedPost._id ? updatedPost : post
+        )
+      })
+      .addCase(uploadUserPostAvatarThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error =
+          action.error.message || "Ошибка при изменении аватарки user пост"
+      })
   },
 })
 

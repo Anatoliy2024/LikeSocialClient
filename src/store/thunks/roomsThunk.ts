@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { FormValuesAddRooms } from "../../app/(protected)/rooms/addRoomBlock/AddRoomBlock"
-import { roomAPI } from "@/api/api"
+import { fileAPI, roomAPI } from "@/api/api"
 type AddFriends = {
   users: string[]
   roomId: string
@@ -16,14 +16,16 @@ export type RoomType = {
   description: string
   members: RoomMemberType[]
   owner: OwnerType
-  imageRoom: string
   createdAt: string
   updatedAt: string
   _id?: string
+  avatar: string
+  avatarPublicId: string
 }
+
 export type RoomMemberType = {
   _id?: string
-  userName: string
+  username: string
   avatar: string
 }
 
@@ -63,16 +65,13 @@ export const getRoomsThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue("Ошибка при создании комнаты")
   }
 })
-export const getMembersFromRoomThunk = createAsyncThunk<
-  {
-    members: RoomMemberType[]
-    owner: string // ← добавлено
-  }, // тип данных, которые вернутся — массив пользователей
+export const getRoomByIdThunk = createAsyncThunk<
+  RoomType, // тип данных, которые вернутся — массив пользователей
   string, // параметр тип данных которые отправляю
   { rejectValue: string }
->("rooms/getMembersFromRoom", async (roomId, thunkAPI) => {
+>("rooms/getRoomById", async (roomId, thunkAPI) => {
   try {
-    const data = await roomAPI.getMembersFromRoom(roomId)
+    const data = await roomAPI.getRoomById(roomId)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -81,7 +80,7 @@ export const getMembersFromRoomThunk = createAsyncThunk<
     }
 
     // если это вообще не ошибка axios или нет message
-    return thunkAPI.rejectWithValue("Ошибка при создании комнаты")
+    return thunkAPI.rejectWithValue("Ошибка при получении данных комнаты")
   }
 })
 
@@ -156,5 +155,24 @@ export const leaveRoomThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue("Ошибка при выходе из комнаты")
+  }
+})
+
+export const changeAvatarRoomThunk = createAsyncThunk<
+  { avatar: string; avatarPublicId: string }, // тип данных, которые вернутся — массив пользователей
+  { file: File; roomId: string }, // параметр тип данных которые отправляю
+  { rejectValue: string }
+>("rooms/changeAvatarRoom", async ({ file, roomId }, thunkAPI) => {
+  try {
+    const data = await fileAPI.uploadRoomAvatar(file, roomId)
+    return data
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue("Ошибка при изменении аватара комнаты")
   }
 })

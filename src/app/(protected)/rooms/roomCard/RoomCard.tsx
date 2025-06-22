@@ -23,7 +23,7 @@ export const RoomCard = ({
     description,
     members,
     owner,
-    imageRoom,
+    avatar,
     createdAt,
 
     _id,
@@ -43,7 +43,7 @@ export const RoomCard = ({
       <div className={style.mainInfo} onClick={() => handleLinkUser(_id)}>
         <div className={style.blockImg}>
           <Image
-            src={imageRoom} // путь к изображению в public
+            src={avatar} // путь к изображению в public
             alt="roomImage"
             width={200}
             height={200}
