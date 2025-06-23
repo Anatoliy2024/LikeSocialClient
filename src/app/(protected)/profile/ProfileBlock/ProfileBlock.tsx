@@ -157,7 +157,9 @@ const ProfileBlock = ({
     setChangeAvatarModal(false)
   }
   const handleOpenModal = () => {
-    setChangeAvatarModal(true)
+    if (isMyProfilePage) {
+      setChangeAvatarModal(true)
+    }
   }
 
   const handleUserAvatarUpload = async (file: File) => {

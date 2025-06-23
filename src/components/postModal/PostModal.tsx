@@ -7,14 +7,21 @@ import { translatorGenres } from "@/utils/translatorGenres"
 import { useEffect, useState } from "react"
 import ButtonMenu from "../ui/button/Button"
 import { useAppDispatch } from "@/store/hooks"
-import { createUserCommentThunk } from "@/store/thunks/userPostThunk"
-import { createRoomCommentThunk } from "@/store/thunks/roomPostThunk"
+import {
+  createUserCommentThunk,
+  uploadUserPostAvatarThunk,
+} from "@/store/thunks/userPostThunk"
+import {
+  createRoomCommentThunk,
+  uploadRoomPostAvatarThunk,
+} from "@/store/thunks/roomPostThunk"
 import { Comment } from "../comment/Comment"
 import { useForm } from "react-hook-form"
 import StarRating from "../starRating/StarRating"
 
 import { voiceAPI } from "@/api/api"
 import { userPostType } from "@/store/slices/userPostsSlice"
+import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
 // import { RootState } from '@/store/store'
 
 export type RatingFormValues = {
@@ -51,6 +58,7 @@ const PostModal = ({
 
   const [votes, setVotes] = useState<VotesType[]>([])
   const [isEditing, setIsEditing] = useState(false)
+  const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const myVoice = votes.find((v) => v.userId._id === playerId)
   useEffect(() => {
     const fetchVoices = async () => {
@@ -72,7 +80,7 @@ const PostModal = ({
     genres,
     title,
     authorName,
-    imagePost,
+    avatar,
     ratings,
     comments,
     content,
@@ -148,197 +156,250 @@ const PostModal = ({
   console.log("playerId", playerId)
   console.log("authorId", authorId)
 
+  // const handleChangeAvatarPost=()=>{
+  //   if(playerId ===authorId){
+  //     if (roomId) {
+  //       uploadRoomPostAvatarThunk()
+  //       //диспатч рум
+
+  //     }
+  //     else{}
+  //   }
+  // }
+
+  const handleCloseModal = () => {
+    setChangeAvatarModal(false)
+  }
+  const handleOpenModal = () => {
+    if (playerId === authorId) {
+      setChangeAvatarModal(true)
+    }
+  }
+
+  const handleAvatarPostUpload = async (
+    file: File,
+    context?: { postId?: string; roomId?: string }
+  ) => {
+    try {
+      if (!context?.postId) return
+      if (context.roomId) {
+        await dispatch(
+          uploadRoomPostAvatarThunk({ file, postId: context.postId })
+        ).unwrap()
+      } else {
+        await dispatch(
+          uploadUserPostAvatarThunk({ file, postId: context.postId })
+        ).unwrap()
+      }
+      handleCloseModal()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
-    <div className={style.wrapper} onClick={() => onClose()}>
-      <div className={style.container} onClick={(e) => e.stopPropagation()}>
-        <div className={style.contentWrapper}>
-          <div className={style.headerModule}>
-            <h2>{title}</h2>
-            <CloseButton onClick={onClose} />
-          </div>
-          {genres.length > 0 ? (
-            <div className={style.genresBlock}>
-              {genres?.map((genre, index) => (
-                <div key={index}>{translatorGenres(genre)}</div>
-              ))}
+    <>
+      {changeAvatarModal && (
+        <ChangeAvatarModal
+          handleCloseModal={handleCloseModal}
+          loading={loading}
+          onUpload={handleAvatarPostUpload}
+          context={{ roomId, postId }}
+        />
+      )}
+      <div className={style.wrapper} onClick={() => onClose()}>
+        <div className={style.container} onClick={(e) => e.stopPropagation()}>
+          <div className={style.contentWrapper}>
+            <div className={style.headerModule}>
+              <h2>{title}</h2>
+              <CloseButton onClick={onClose} />
             </div>
-          ) : null}
-          <div>Автор: {authorName}</div>
-          <div className={style.imageStarsBlock}>
-            <div className={style.blockImg}>
-              <Image src={imagePost} alt="PostImage" width={300} height={300} />
-            </div>
-            <div className={style.starsBlock}>
-              <h4>Оценка автора</h4>
-              <div>
-                <div>Общая: </div>
-                <StarRatingView value={ratings.stars} />
+            {genres.length > 0 ? (
+              <div className={style.genresBlock}>
+                {genres?.map((genre, index) => (
+                  <div key={index}>{translatorGenres(genre)}</div>
+                ))}
               </div>
-              <div>
-                <div>Экшен: </div>
-                <StarRatingView value={ratings.acting} />
+            ) : null}
+            <div>Автор: {authorName}</div>
+            <div className={style.imageStarsBlock}>
+              <div className={style.blockImg} onClick={handleOpenModal}>
+                <Image src={avatar} alt="avatar" width={300} height={300} />
               </div>
-              <div>
-                <div>Спецэффекты: </div>
-                <StarRatingView value={ratings.specialEffects} />
-              </div>
-              <div>
-                <div>Сюжет: </div>
-                <StarRatingView value={ratings.story} />
-              </div>
-            </div>
-            {playerId !== authorId && (
               <div className={style.starsBlock}>
-                {myVoice && !isEditing ? (
-                  <>
-                    <h4>Моя оценка</h4>
-                    <div>
-                      <div>Общая: </div>
-                      <StarRatingView value={myVoice.ratings.stars} />
-                    </div>
-                    <div>
-                      <div>Экшен: </div>
-                      <StarRatingView value={myVoice.ratings.acting} />
-                    </div>
-                    <div>
-                      <div>Спецэффекты: </div>
-                      <StarRatingView value={myVoice.ratings.specialEffects} />
-                    </div>
-                    <div>
-                      <div>Сюжет: </div>
-                      <StarRatingView value={myVoice.ratings.story} />
-                    </div>
-
-                    <ButtonMenu
-                      onClick={() => {
-                        setIsEditing(true)
-                      }}
-                    >
-                      Редактировать
-                    </ButtonMenu>
-                  </>
-                ) : (
-                  <form onSubmit={handleSubmit(handleVoteSubmit)}>
-                    <div>
-                      <span>Звёзды:</span>
-                      <StarRating
-                        name="stars"
-                        setValue={setValue}
-                        watch={watch}
-                      />
-                    </div>
-                    <div>
-                      <span>Актёрская игра:</span>
-                      <StarRating
-                        name="acting"
-                        setValue={setValue}
-                        watch={watch}
-                      />
-                    </div>
-                    <div>
-                      <span>Спецэффекты:</span>
-                      <StarRating
-                        name="specialEffects"
-                        setValue={setValue}
-                        watch={watch}
-                      />
-                    </div>
-                    <div>
-                      <span>Сюжет:</span>
-                      <StarRating
-                        name="story"
-                        setValue={setValue}
-                        watch={watch}
-                      />
-                    </div>
-
-                    <ButtonMenu
-                      type="submit"
-                      disabled={loading}
-                      loading={loading}
-                    >
-                      Проголосовать
-                    </ButtonMenu>
-                  </form>
-                )}
+                <h4>Оценка автора</h4>
+                <div>
+                  <div>Общая: </div>
+                  <StarRatingView value={ratings.stars} />
+                </div>
+                <div>
+                  <div>Экшен: </div>
+                  <StarRatingView value={ratings.acting} />
+                </div>
+                <div>
+                  <div>Спецэффекты: </div>
+                  <StarRatingView value={ratings.specialEffects} />
+                </div>
+                <div>
+                  <div>Сюжет: </div>
+                  <StarRatingView value={ratings.story} />
+                </div>
               </div>
-            )}
-            <div className={style.othersStars}>
-              <h3>Другие оценки:</h3>
-              {votes.filter((voice) => voice.userId._id !== playerId).length > 0
-                ? votes
-                    .filter((voice) => voice.userId._id !== playerId)
-                    .map((v) => (
-                      <div key={v._id} className={style.otherStars}>
-                        <div className={style.userInfo}>
-                          <div className={style.blockImg}>
-                            <Image
-                              src={v.userId.avatar}
-                              alt="avatar"
-                              width={30}
-                              height={30}
-                            />
+              {playerId !== authorId && (
+                <div className={style.starsBlock}>
+                  {myVoice && !isEditing ? (
+                    <>
+                      <h4>Моя оценка</h4>
+                      <div>
+                        <div>Общая: </div>
+                        <StarRatingView value={myVoice.ratings.stars} />
+                      </div>
+                      <div>
+                        <div>Экшен: </div>
+                        <StarRatingView value={myVoice.ratings.acting} />
+                      </div>
+                      <div>
+                        <div>Спецэффекты: </div>
+                        <StarRatingView
+                          value={myVoice.ratings.specialEffects}
+                        />
+                      </div>
+                      <div>
+                        <div>Сюжет: </div>
+                        <StarRatingView value={myVoice.ratings.story} />
+                      </div>
+
+                      <ButtonMenu
+                        onClick={() => {
+                          setIsEditing(true)
+                        }}
+                      >
+                        Редактировать
+                      </ButtonMenu>
+                    </>
+                  ) : (
+                    <form onSubmit={handleSubmit(handleVoteSubmit)}>
+                      <div>
+                        <span>Звёзды:</span>
+                        <StarRating
+                          name="stars"
+                          setValue={setValue}
+                          watch={watch}
+                        />
+                      </div>
+                      <div>
+                        <span>Актёрская игра:</span>
+                        <StarRating
+                          name="acting"
+                          setValue={setValue}
+                          watch={watch}
+                        />
+                      </div>
+                      <div>
+                        <span>Спецэффекты:</span>
+                        <StarRating
+                          name="specialEffects"
+                          setValue={setValue}
+                          watch={watch}
+                        />
+                      </div>
+                      <div>
+                        <span>Сюжет:</span>
+                        <StarRating
+                          name="story"
+                          setValue={setValue}
+                          watch={watch}
+                        />
+                      </div>
+
+                      <ButtonMenu
+                        type="submit"
+                        disabled={loading}
+                        loading={loading}
+                      >
+                        Проголосовать
+                      </ButtonMenu>
+                    </form>
+                  )}
+                </div>
+              )}
+              <div className={style.othersStars}>
+                <h3>Другие оценки:</h3>
+                {votes.filter((voice) => voice.userId._id !== playerId).length >
+                0
+                  ? votes
+                      .filter((voice) => voice.userId._id !== playerId)
+                      .map((v) => (
+                        <div key={v._id} className={style.otherStars}>
+                          <div className={style.userInfo}>
+                            <div className={style.blockImg}>
+                              <Image
+                                src={v.userId.avatar}
+                                alt="avatar"
+                                width={30}
+                                height={30}
+                              />
+                            </div>
+
+                            <div>{v.userId.username}</div>
                           </div>
 
-                          <div>{v.userId.username}</div>
+                          <div>
+                            <div>Общая: </div>
+                            <StarRatingView value={v.ratings.stars} />
+                          </div>
+                          <div>
+                            <div>Экшен: </div>
+                            <StarRatingView value={v.ratings.acting} />
+                          </div>
+                          <div>
+                            <div>Спецэффекты: </div>
+                            <StarRatingView value={v.ratings.specialEffects} />
+                          </div>
+                          <div>
+                            <div>Сюжет: </div>
+                            <StarRatingView value={v.ratings.story} />
+                          </div>
                         </div>
+                      ))
+                  : "Других оценок нет"}
+              </div>
+            </div>
+            <p>{content}</p>
 
-                        <div>
-                          <div>Общая: </div>
-                          <StarRatingView value={v.ratings.stars} />
-                        </div>
-                        <div>
-                          <div>Экшен: </div>
-                          <StarRatingView value={v.ratings.acting} />
-                        </div>
-                        <div>
-                          <div>Спецэффекты: </div>
-                          <StarRatingView value={v.ratings.specialEffects} />
-                        </div>
-                        <div>
-                          <div>Сюжет: </div>
-                          <StarRatingView value={v.ratings.story} />
-                        </div>
-                      </div>
+            <div className={style.commentsBlock}>
+              <div className={style.createCommentsBlock}>
+                <div>Оставить комментарий:</div>
+
+                <textarea
+                  placeholder="Введите комментарий"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+                <ButtonMenu
+                  onClick={() => {
+                    handleSendComment()
+                  }}
+                >
+                  Отправить
+                </ButtonMenu>
+              </div>
+              <div className={style.showCommentsBlock}>
+                <h3>Комментарии:</h3>
+                {comments?.length > 0 ? (
+                  comments
+                    .slice()
+                    .reverse()
+
+                    .map((comment) => (
+                      <Comment key={comment._id} data={comment} />
                     ))
-                : "Других оценок нет"}
+                ) : (
+                  <p>Комментариев нет</p>
+                )}
+              </div>
             </div>
-          </div>
-          <p>{content}</p>
-
-          <div className={style.commentsBlock}>
-            <div className={style.createCommentsBlock}>
-              <div>Оставить комментарий:</div>
-
-              <textarea
-                placeholder="Введите комментарий"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-              <ButtonMenu
-                onClick={() => {
-                  handleSendComment()
-                }}
-              >
-                Отправить
-              </ButtonMenu>
-            </div>
-            <div className={style.showCommentsBlock}>
-              <h3>Комментарии:</h3>
-              {comments?.length > 0 ? (
-                comments
-                  .slice()
-                  .reverse()
-
-                  .map((comment) => (
-                    <Comment key={comment._id} data={comment} />
-                  ))
-              ) : (
-                <p>Комментариев нет</p>
-              )}
-            </div>
-          </div>
-          {/* <div>
+            {/* <div>
           <h3>Оценки:</h3>
           {post.comments?.length > 0 ? (
             post.comments.map((c, i) => <p key={i}>• {c.text}</p>)
@@ -346,9 +407,10 @@ const PostModal = ({
             <p>Комментариев нет</p>
           )}
         </div> */}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

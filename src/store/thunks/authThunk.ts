@@ -7,6 +7,7 @@ type RegisterParams = {
   username: string
   email: string
   password: string
+  inviteKey: string
 }
 type AuthParams = {
   username: string
@@ -30,9 +31,12 @@ interface DecodedToken {
 
 export const registerThunk = createAsyncThunk(
   "auth/register",
-  async ({ username, email, password }: RegisterParams, thunkAPI) => {
+  async (
+    { username, email, password, inviteKey }: RegisterParams,
+    thunkAPI
+  ) => {
     try {
-      const data = await authAPI.register(username, email, password)
+      const data = await authAPI.register(username, email, password, inviteKey)
       console.log(data)
 
       // Распаковываем accessToken

@@ -17,8 +17,8 @@ type PostType = {
   title: string
   content: string | null
   authorName: string | null
-
-  imagePost: string
+  avatar: string
+  avatarPublicId: string
   ratings: {
     acting: number
     specialEffects: number
@@ -44,7 +44,7 @@ const Post = ({
   createdAt,
   id,
   isProfile,
-  imagePost,
+  avatar,
   authorName,
   isMyPost,
   roomId,
@@ -117,9 +117,9 @@ const Post = ({
         )}
         <div className={style.imageStarsContainer}>
           <div className={style.blockImg}>
-            {imagePost && (
+            {avatar && (
               <Image
-                src={imagePost}
+                src={avatar}
                 alt="postImage"
                 width={200}
                 height={200}

@@ -19,7 +19,7 @@ export type RatingType = {
 export type userPostType = {
   _id: string
   authorId: string
-  imagePost: string
+  imagePost?: string
   // roomId: string | null
   title: string
   content: string | null
@@ -32,6 +32,8 @@ export type userPostType = {
   updatedAt: string
   roomId?: string
   authorName?: string
+  avatar: string
+  avatarPublicId: string
 }
 
 type userCommentType = {

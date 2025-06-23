@@ -16,7 +16,6 @@ const HeaderContainer = () => {
     dispatch(logoutThunk())
     router.push("/")
     localStorage.removeItem("accessToken")
-    document.cookie = "refreshToken=; Max-Age=0"
   }
 
   return (

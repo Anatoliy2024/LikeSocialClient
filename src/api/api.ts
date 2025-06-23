@@ -7,12 +7,18 @@ export const authAPI = {
   // getMyInfo() {
   //   return instance.get("auth/me").then((response) => response.data)
   // },
-  register(username: string, email: string, password: string) {
+  register(
+    username: string,
+    email: string,
+    password: string,
+    inviteKey: string
+  ) {
     return instance
       .post("auth/register", {
         username: username,
         email: email,
         password: password,
+        inviteKey: inviteKey,
       })
 
       .then((response) => {

@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation"
 import style from "./RoomPage.module.scss"
 import { Suspense, useEffect, useState } from "react"
-import { RootState } from "@/store/store"
+
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { getRoomPostsThunk } from "@/store/thunks/roomPostThunk"
 
@@ -25,10 +25,10 @@ const Room = () => {
   const [addFriendsToRoom, setAddFriendsToRoom] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
 
-  const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
-  const userId = useAppSelector((state: RootState) => state.auth.userId)
+  const isAuth = useAppSelector((state) => state.auth.isAuth)
+  const userId = useAppSelector((state) => state.auth.userId)
 
-  const room = useAppSelector((state: RootState) => state.rooms.room)
+  const room = useAppSelector((state) => state.rooms.room)
   // const members = useAppSelector((state: RootState) => state.rooms.room?.members)
 
   // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)
@@ -36,16 +36,16 @@ const Room = () => {
   // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)
   // const members = useAppSelector((state: RootState) => state.rooms.members)
   // const owner = useAppSelector((state: RootState) => state.rooms.owner)
-  const loading = useAppSelector((state: RootState) => state.rooms.loading)
-  const friends = useAppSelector((state: RootState) => state.users.friends)
-  const posts = useAppSelector((state: RootState) => state.roomPost.posts)
+  const loading = useAppSelector((state) => state.rooms.loading)
+  const friends = useAppSelector((state) => state.users.friends)
+  const posts = useAppSelector((state) => state.roomPost.posts)
   const dispatch = useAppDispatch()
   const { id } = useParams<{ id: string }>()
 
   const isOwner =
     typeof room?.owner === "object" &&
     room?.owner !== null &&
-    " _id" in room?.owner &&
+    "_id" in room?.owner &&
     userId === (room?.owner as RoomMemberType)._id
   const handleAddMembersFromRoom = () => {
     setAddFriendsToRoom(true)
@@ -85,16 +85,23 @@ const Room = () => {
   if (typeof id !== "string") return <div>Неверный ID</div>
   if (!userId) return <div>Юзер не найден</div>
 
-  const handleRoomAvatarUpload = async (file: File, id?: string) => {
-    if (!id) return
-    await dispatch(changeAvatarRoomThunk({ file, roomId: id })).unwrap()
+  const handleRoomAvatarUpload = async (
+    file: File,
+    context?: { roomId?: string }
+  ) => {
+    if (!context?.roomId) return
+    await dispatch(
+      changeAvatarRoomThunk({ file, roomId: context.roomId })
+    ).unwrap()
   }
 
   const handleCloseModal = () => {
     setChangeAvatarModal(false)
   }
   const handleOpenModal = () => {
-    setChangeAvatarModal(true)
+    if (isOwner) {
+      setChangeAvatarModal(true)
+    }
   }
 
   // console.log("posts", posts)
@@ -113,7 +120,7 @@ const Room = () => {
           handleCloseModal={handleCloseModal}
           loading={loading}
           onUpload={handleRoomAvatarUpload}
-          roomId={id}
+          context={{ roomId: id }}
         />
       )}
       <div className={style.containerMembers}>

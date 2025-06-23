@@ -11,15 +11,20 @@ export const ChangeAvatarModal = ({
   handleCloseModal,
   onUpload,
   loading,
-  roomId,
+  context,
 }: {
   handleCloseModal: () => void
-  onUpload: (file: File, roomId?: string) => Promise<void>
+  onUpload: (
+    file: File,
+    context?: { roomId?: string; postId?: string }
+  ) => Promise<void>
   loading: boolean
-  roomId?: string
+  context?: { roomId?: string; postId?: string }
 }) => {
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [loadingLocal, setIsLoadingLocal] = useState(false)
+
   // const dispatch = useAppDispatch()
   // const loading = useAppSelector(
   //   (state: RootState) => state.profile.profileLoading
@@ -43,11 +48,14 @@ export const ChangeAvatarModal = ({
   // }
   const handleUpload = async () => {
     if (!file) return
+    setIsLoadingLocal(true)
     try {
-      await onUpload(file, roomId)
+      await onUpload(file, context)
       handleCloseModal()
     } catch (error) {
       console.error("Ошибка загрузки:", error)
+    } finally {
+      setIsLoadingLocal(false)
     }
   }
 
@@ -76,8 +84,8 @@ export const ChangeAvatarModal = ({
           </div>
         )}
         <ButtonMenu
-          loading={loading}
-          disabled={loading}
+          loading={loading ? loading : loadingLocal}
+          disabled={loading ? loading : loadingLocal}
           onClick={() => {
             handleUpload()
           }}

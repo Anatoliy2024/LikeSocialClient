@@ -15,6 +15,7 @@ type FormValues = {
   username: string
   email: string
   password: string
+  inviteKey: string
 }
 
 const Register = () => {
@@ -98,6 +99,18 @@ const Register = () => {
             {errors.password && <p>{errors.password?.message as string}</p>}
 
             <label htmlFor="password">Password</label>
+          </div>
+          <div className={style.infoContainer}>
+            <input
+              id="inviteKey "
+              {...register("inviteKey", {
+                required: "inviteKey  обязателен",
+              })}
+              placeholder="Введите inviteKey"
+            />
+            {errors.inviteKey && <p>{errors.inviteKey?.message as string}</p>}
+
+            <label htmlFor="password">inviteKey</label>
           </div>
           <div className={style.buttonBlock}>
             <ButtonMenu type="submit" disabled={loading} loading={loading}>

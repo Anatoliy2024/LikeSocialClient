@@ -18,7 +18,8 @@ export type RatingType = {
 export type roomPostType = {
   _id: string
   authorId: string
-  imagePost: string
+  avatar: string
+  avatarPublicId: string
   // roomId: string | null
   title: string
   content: string | null

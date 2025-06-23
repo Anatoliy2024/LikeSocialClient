@@ -124,13 +124,14 @@ const PostsBlock = ({
                       createdAt={post.createdAt}
                       id={post._id}
                       isMyPost={isMyPost}
-                      imagePost={post.imagePost}
+                      avatar={post.avatar}
                       isProfile={isProfile}
                       roomId={roomId}
                       genres={post.genres}
                       onClick={() => openPostModal(post._id)}
                       comments={post.comments}
                       votesCount={post.votesCount}
+                      avatarPublicId={post.avatarPublicId}
                     />
                   )
                 })
