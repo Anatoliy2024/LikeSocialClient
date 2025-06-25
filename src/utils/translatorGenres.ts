@@ -1,14 +1,14 @@
 const genres: Record<string, string> = {
   drama: "Драма",
   comedy: "Комедия",
-  action: "Экшен",
+  action: "Боевик",
   thriller: "Триллер",
   fantasy: "Фантастика",
   sciFi: "Н.Фантастика",
   horror: "Ужасы",
   romance: "Романтика",
   adventure: "Приключения",
-  mystery: "Мистика",
+  mystery: "Детектив",
 }
 
 export const translatorGenres = (genre: string): string => {
