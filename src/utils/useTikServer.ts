@@ -1,5 +1,6 @@
 import { useEffect } from "react"
-import axios from "axios"
+
+import { serverAPI } from "@/api/api"
 
 export const useTikServer = (server: boolean) => {
   useEffect(() => {
@@ -14,8 +15,10 @@ export const useTikServer = (server: boolean) => {
 
     const tik = async () => {
       try {
-        const res = await axios.get("/api/tik")
-        console.log("tik success", res.data)
+        const res = await serverAPI.getTik()
+        console.log("tik success", res)
+        // const res = await axios.get("/api/tik")
+        // console.log("tik success", res.data)
       } catch (err: unknown) {
         if (err instanceof Error) {
           console.warn("tik failed:", err.message)
