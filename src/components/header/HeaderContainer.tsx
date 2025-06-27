@@ -6,7 +6,15 @@ import { RootState } from "@/store/store"
 import { useRouter } from "next/navigation"
 import { logoutThunk } from "@/store/thunks/authThunk"
 
-const HeaderContainer = () => {
+const HeaderContainer = ({
+  handleShowToggleMenu,
+  showButton,
+  menuOpen,
+}: {
+  handleShowToggleMenu: () => void
+  showButton: boolean
+  menuOpen: boolean
+}) => {
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const username = useAppSelector((state: RootState) => state.auth.username)
   const avatar = useAppSelector((state: RootState) => state.profile.avatar)
@@ -24,6 +32,9 @@ const HeaderContainer = () => {
       username={username}
       avatar={avatar}
       logoutFn={logoutButton}
+      handleShowToggleMenu={handleShowToggleMenu}
+      showButton={showButton}
+      menuOpen={menuOpen}
     />
   )
 }

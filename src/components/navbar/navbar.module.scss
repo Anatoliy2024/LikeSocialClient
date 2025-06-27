@@ -11,3 +11,33 @@
     }
   }
 }
+
+.hidden {
+  @media (max-width: 768px) {
+    transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 200px;
+    height: calc(100% - 60px);
+    // background-color: #333;
+    z-index: 1000;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+  }
+}
+
+.overlay {
+  position: fixed;
+  z-index: 999; // меньше чем navbar
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+}

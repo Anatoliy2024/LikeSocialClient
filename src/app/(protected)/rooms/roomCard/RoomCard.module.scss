@@ -18,12 +18,24 @@
   .mainInfo {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
+    @media (max-width: 850px) {
+      justify-content: center;
+    }
 
     align-items: center;
     .blockImg {
       background-color: rgb(0, 0, 0);
       border-radius: 50%;
       overflow: hidden;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      img {
+        object-fit: cover;
+      }
     }
   }
 }

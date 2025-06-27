@@ -8,6 +8,9 @@ type HeaderData = {
   username: string | null
   avatar: string
   logoutFn: () => void
+  handleShowToggleMenu: () => void
+  showButton: boolean
+  menuOpen: boolean
 }
 
 export default function Header({
@@ -15,6 +18,9 @@ export default function Header({
   username,
   avatar,
   logoutFn,
+  handleShowToggleMenu,
+  showButton,
+  menuOpen,
 }: HeaderData) {
   // console.log("avatar", avatar)
   return (
@@ -23,7 +29,17 @@ export default function Header({
         <div>
           <Image src="/logo.png" alt="logo" width={40} height={40} />
         </div>
-        <div>burger</div>
+        {showButton && (
+          <button
+            onClick={handleShowToggleMenu}
+            className={`${style.hamburger} ${menuOpen ? style.open : ""}`}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        )}
+        {/* {showButton && <button onClick={handleShowToggleMenu}>☰</button>} */}
       </div>
       {!isAuth && (
         <div className={style.blockAuth}>

@@ -10,6 +10,10 @@
   grid-area: h;
   user-select: none;
 
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
   .logoWrapper {
     display: flex;
     align-items: center;
@@ -71,4 +75,36 @@
   .profileWrapper:hover .menu {
     display: flex;
   }
+}
+
+.hamburger {
+  width: 30px;
+  height: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 1100;
+  background: none;
+  border: none;
+}
+
+.hamburger span {
+  height: 3px;
+  background-color: black;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
 }

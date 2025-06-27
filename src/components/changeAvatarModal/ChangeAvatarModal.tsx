@@ -68,6 +68,16 @@ export const ChangeAvatarModal = ({
     }
   }, [previewUrl])
 
+  useEffect(() => {
+    // при монтировании — запрещаем прокрутку
+    document.body.style.overflow = "hidden"
+
+    // при размонтировании — возвращаем как было
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [])
+
   return (
     <div className={style.wrapper} onClick={handleCloseModal}>
       <div className={style.container} onClick={(e) => e.stopPropagation()}>
@@ -83,23 +93,25 @@ export const ChangeAvatarModal = ({
             />
           </div>
         )}
-        <ButtonMenu
-          loading={loading ? loading : loadingLocal}
-          disabled={loading ? loading : loadingLocal}
-          onClick={() => {
-            handleUpload()
-          }}
-        >
-          Загрузить
-        </ButtonMenu>
+        <div className={style.buttonBlock}>
+          <ButtonMenu
+            loading={loading ? loading : loadingLocal}
+            disabled={loading ? loading : loadingLocal}
+            onClick={() => {
+              handleUpload()
+            }}
+          >
+            Загрузить
+          </ButtonMenu>
 
-        <ButtonMenu
-          onClick={() => {
-            handleCloseModal()
-          }}
-        >
-          Закрыть
-        </ButtonMenu>
+          <ButtonMenu
+            onClick={() => {
+              handleCloseModal()
+            }}
+          >
+            Закрыть
+          </ButtonMenu>
+        </div>
       </div>
     </div>
   )

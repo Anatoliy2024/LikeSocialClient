@@ -12,6 +12,10 @@
   .imageStarsContainer {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
+    @media (max-width: 850px) {
+      justify-content: center;
+    }
     .blockImg {
       height: 200px;
       width: 200px;
@@ -39,6 +43,13 @@
     border: 1px solid rgb(130, 93, 216);
     border-radius: 20px;
     padding: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 3 строки */
+    -webkit-box-orient: vertical;
+
+    line-clamp: 3;
+    overflow: hidden;
+    line-height: 1.7;
   }
   .dataTimeAndStars {
     color: #8b97ff;

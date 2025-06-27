@@ -17,6 +17,20 @@
   padding: 20px;
   width: 50vw;
   height: 50vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  @media (max-width: 850px) {
+    min-width: 90vw;
+    min-height: 80vh;
+    margin: 10px;
+    padding: 10px;
+    input {
+      max-width: 100%;
+    }
+  }
   .preview {
     width: 200px;
     height: 200px;
@@ -25,6 +39,10 @@
 
     // display: block;
     // border: 2px solid #ccc;
+  }
+  .buttonBlock {
+    display: flex;
+    gap: 20px;
   }
   input {
     border: 1px solid red;

@@ -8,34 +8,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { createUserPostThunk } from "@/store/thunks/userPostThunk"
 import { createRoomPostThunk } from "@/store/thunks/roomPostThunk"
 import { RootState } from "@/store/store"
+import { useEffect } from "react"
 
-// import { useParams } from "next/navigation"
-// type FormCreatePost = {
-//   title: string
-//   //   avatar:string
-//   content: string
-//   stars: number
-//   ratings: { [key: string]: string }
-//   acting: string
-//   specialEffects: string
-//   story: string
-//   genres: { [key: string]: string }
-// }
-
-// type PostRatings = {
-//   stars: number
-//   acting: number
-//   specialEffects: number
-//   story: number
-// }
-
-// type PostFormDataToSend = {
-//   title: string
-//   content: string
-//   roomId: string | null
-//   ratings: PostRatings
-//   genres: string[]
-// }
 type FormCreatePost = {
   title: string
   content: string
@@ -94,28 +68,21 @@ const CreatePost = ({
       console.error("Ошибка публикации поста:", err)
       // можно показать уведомление об ошибке
     }
-    // const dataToSend = {
-    //   userInfo: {
-    //     name: dataForm.name,
-    //     sureName: dataForm.sureName,
-    //     status: dataForm.status,
-    //     age: dataForm.age,
-    //     relationshipStatus: dataForm.relationshipStatus,
-    //     address: {
-    //       country: dataForm.country,
-    //       city: dataForm.city,
-    //     },
-    //   },
-    // }
-
-    // dispatch(changeMyProfileThunk(dataToSend))
-    // // здесь можно собрать данные и отправить на сервер
-    // setIsEdit(false)
   }
 
+  useEffect(() => {
+    // при монтировании — запрещаем прокрутку
+    document.body.style.overflow = "hidden"
+
+    // при размонтировании — возвращаем как было
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [])
+
   return (
-    <div className={style.wrapper}>
-      <div className={style.container}>
+    <div className={style.wrapper} onClick={() => hiddenBlock()}>
+      <div className={style.container} onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit(handleSave)} className={style.ratingForm}>
           <div>
             <label htmlFor="title">Заголовок:</label>
@@ -252,11 +219,3 @@ const CreatePost = ({
 }
 
 export default CreatePost
-
-// title
-// content
-// stars
-// ratings
-// acting
-// specialEffects
-// story

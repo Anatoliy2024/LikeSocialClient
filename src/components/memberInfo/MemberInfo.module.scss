@@ -1,9 +1,26 @@
 .wrapper {
-  width: 60px;
+  width: 90px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   .blockImg {
     border-radius: 50%;
     overflow: hidden;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      object-fit: cover;
+    }
+  }
+  .blockName {
+    overflow: hidden;
+    // width: 100%; // добавь %, чтобы заняло всю ширину wrapper
+    // text-align: left; // выравнивание текста по левому краю
+    // align-self: stretch; // чтобы элемент растянулся по ширине
   }
   .removeBtn {
     background: transparent;

@@ -12,8 +12,18 @@
 
   .container {
     background: #453e98;
-    width: 70vw;
+    width: 80vw;
     min-height: 60vh;
+    @media (max-width: 1250px) {
+      min-width: 90vw;
+      min-height: 80vh;
+      margin: 10px;
+      // padding: 10px;
+      padding: 10px;
+      .imageStarsBlock {
+        justify-content: center;
+      }
+    }
 
     border-radius: 20px;
     padding: 20px;
@@ -22,6 +32,11 @@
     .contentWrapper {
       max-height: 90vh; // ограничим максимальную высоту
       overflow-y: auto; // включим вертикальный скролл при необходимости
+
+      @media (max-width: 1250px) {
+        // padding: 10px;
+      }
+
       &::-webkit-scrollbar-track {
         border-radius: 20px;
       }
@@ -39,7 +54,8 @@
       .imageStarsBlock {
         display: flex;
         gap: 25px;
-
+        flex-wrap: wrap;
+        padding-bottom: 20px;
         .blockImg {
         }
         .starsBlock {

@@ -11,12 +11,20 @@
   color: rgb(195, 195, 205);
   z-index: 5;
   .container {
-    width: 70vw;
-    height: 60vh;
+    min-width: 70vw;
+    min-height: 60vh;
     background: rgb(50, 46, 81);
     border-radius: 20px;
     padding: 20px;
+
+    @media (max-width: 850px) {
+      min-width: 90vw;
+      min-height: 80vh;
+    }
+
     .list {
+      display: flex;
+      flex-wrap: wrap;
       .member {
         .checkboxLabel {
           display: flex;

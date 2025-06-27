@@ -4,6 +4,10 @@
   .blockRoomMainInfo {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
+    @media (max-width: 850px) {
+      justify-content: center;
+    }
     .blockAvatarRoom {
       display: flex;
       align-items: center;

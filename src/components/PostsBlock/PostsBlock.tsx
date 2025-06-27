@@ -79,7 +79,7 @@ const PostsBlock = ({
   return (
     <>
       <div className={style.wrapper}>
-        <h2>PostsBlock</h2>
+        {/* <h2>PostsBlock</h2> */}
 
         {isMyPost && (
           <ButtonMenu

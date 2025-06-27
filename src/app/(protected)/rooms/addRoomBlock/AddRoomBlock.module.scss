@@ -17,6 +17,12 @@
     background: rgb(111, 31, 154);
     border-radius: 20px;
     color: rgb(229, 189, 189);
+    @media (max-width: 850px) {
+      min-width: 90vw;
+      min-height: 80vh;
+      margin: 0 10px;
+      padding: 0 10px;
+    }
     form {
       p {
         color: red;

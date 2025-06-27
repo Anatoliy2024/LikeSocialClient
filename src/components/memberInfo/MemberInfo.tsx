@@ -26,7 +26,7 @@ export const MemberInfo = ({
       <div className={style.blockImg}>
         <Image src={avatar} alt="AvatarImage" width={60} height={60} />
       </div>
-      <div>{name}</div>
+      <div className={style.blockName}>{name}</div>
       {isDeleteMember && (
         <CloseButton
           onClick={() => {
@@ -35,8 +35,8 @@ export const MemberInfo = ({
           title="delete member"
           style={{
             position: "absolute",
-            top: "-10px",
-            right: "-10px",
+            top: "-6px",
+            right: "3px",
             width: "20px",
             height: "20px",
             fontSize: "14px",

@@ -1,9 +1,11 @@
+"use client"
 import ButtonMenu from "@/components/ui/button/Button"
 import style from "./AddRoomBlock.module.scss"
 import { useForm } from "react-hook-form"
 import { createRoomThunk } from "@/store/thunks/roomsThunk"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
+import { useEffect } from "react"
 
 export type FormValuesAddRooms = {
   name: string
@@ -34,10 +36,19 @@ export const AddRoomBlock = ({
       // можно показать уведомление об ошибке
     }
   }
+  useEffect(() => {
+    // при монтировании — запрещаем прокрутку
+    document.body.style.overflow = "hidden"
+
+    // при размонтировании — возвращаем как было
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [])
 
   return (
-    <div className={style.wrapper}>
-      <div className={style.container}>
+    <div className={style.wrapper} onClick={handleCloseBlock}>
+      <div className={style.container} onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <div>

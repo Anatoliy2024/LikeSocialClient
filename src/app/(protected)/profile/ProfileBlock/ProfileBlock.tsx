@@ -176,7 +176,7 @@ const ProfileBlock = ({
         />
       )}
       <div className={style.wrapper}>
-        <h2>ProfileBlock</h2>
+        {/* <h2>ProfileBlock</h2> */}
         <div className={style.profileContainer}>
           <div className={style.blockImg} onClick={handleOpenModal}>
             <Image
