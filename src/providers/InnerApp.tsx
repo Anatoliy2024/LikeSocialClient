@@ -28,6 +28,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
     // Установить состояние сразу при монтировании
     setMenuOpen(mediaQuery.matches)
+    setShowButton(!mediaQuery.matches)
 
     mediaQuery.addEventListener("change", handleChange)
     return () => mediaQuery.removeEventListener("change", handleChange)
