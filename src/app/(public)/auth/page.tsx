@@ -88,7 +88,7 @@ const Auth = () => {
               Authorization
             </ButtonMenu>
             <Link href="/">
-              <ButtonMenu>cancel</ButtonMenu>
+              <ButtonMenu>Cancel</ButtonMenu>
             </Link>
           </div>
         </form>

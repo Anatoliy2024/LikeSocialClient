@@ -71,7 +71,7 @@ const Verify = () => {
               verify
             </ButtonMenu>
             <Link href="/">
-              <ButtonMenu>cancel</ButtonMenu>
+              <ButtonMenu>Cancel</ButtonMenu>
             </Link>
           </div>
         </div>

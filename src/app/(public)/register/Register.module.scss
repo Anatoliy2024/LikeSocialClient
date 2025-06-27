@@ -19,7 +19,10 @@
     justify-content: center;
     flex-direction: column;
     gap: 30px;
-
+    @media (max-width: 850px) {
+      min-width: 90vw;
+      min-height: 80vh;
+    }
     .form {
       gap: 10px;
       display: flex;

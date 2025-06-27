@@ -82,7 +82,7 @@ const Register = () => {
               placeholder="Введите email"
             />
             {errors.email && <p>{errors.email?.message as string}</p>}
-            <label htmlFor="email">email</label>
+            <label htmlFor="email">Email</label>
           </div>
           <div className={style.infoContainer}>
             <input
@@ -110,14 +110,14 @@ const Register = () => {
             />
             {errors.inviteKey && <p>{errors.inviteKey?.message as string}</p>}
 
-            <label htmlFor="password">inviteKey</label>
+            <label htmlFor="password">InviteKey</label>
           </div>
           <div className={style.buttonBlock}>
             <ButtonMenu type="submit" disabled={loading} loading={loading}>
               Register
             </ButtonMenu>
             <Link href="/">
-              <ButtonMenu>cancel</ButtonMenu>
+              <ButtonMenu>Cancel</ButtonMenu>
             </Link>
           </div>
         </form>
