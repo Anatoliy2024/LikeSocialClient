@@ -30,7 +30,7 @@ export default function Header({
           <Image src="/logo.png" alt="logo" width={40} height={40} />
         </div>
         {showButton && (
-          <button
+          <div
             onClick={handleShowToggleMenu}
             className={`${style.hamburger} ${
               menuOpen ? style.hamburgerOpen : ""
@@ -39,7 +39,7 @@ export default function Header({
             <span></span>
             <span></span>
             <span></span>
-          </button>
+          </div>
         )}
         {/* {showButton && <button onClick={handleShowToggleMenu}>☰</button>} */}
       </div>

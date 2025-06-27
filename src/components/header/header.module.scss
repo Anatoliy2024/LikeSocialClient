@@ -21,6 +21,34 @@
     img {
       width: 40px;
     }
+
+    .hamburger {
+      width: 30px;
+      height: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      z-index: 1100;
+      background: none;
+      border: none;
+      span {
+        height: 3px;
+        background-color: black;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+    }
+    .hamburgerOpen span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+    .hamburgerOpen span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburgerOpen span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
   }
 
   .blockAuth {
@@ -77,34 +105,21 @@
   }
 }
 
-.hamburger {
-  width: 30px;
-  height: 20px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-  z-index: 1100;
-  background: none;
-  border: none;
-}
+// .hamburger span {
+//   height: 3px;
+//   background-color: black;
+//   border-radius: 2px;
+//   transition: all 0.3s ease;
+// }
 
-.hamburger span {
-  height: 3px;
-  background-color: black;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
+// .hamburgerOpen span:nth-child(1) {
+//   transform: rotate(45deg) translate(6px, 6px);
+// }
 
-.hamburgerOpen span:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 6px);
-}
+// .hamburgerOpen span:nth-child(2) {
+//   opacity: 0;
+// }
 
-.hamburgerOpen span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburgerOpen span:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -6px);
-}
+// .hamburgerOpen span:nth-child(3) {
+//   transform: rotate(-45deg) translate(6px, -6px);
+// }
