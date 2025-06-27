@@ -16,6 +16,7 @@
     min-height: 60vh;
     min-width: 60vw;
     border-radius: 20px;
+    color: rgb(178, 210, 210);
 
     @media (max-width: 1250px) {
       min-width: 90vw;
@@ -28,7 +29,6 @@
     // align-items: center;
     // justify-content: center;
     // flex-direction: column;
-    color: rgb(178, 210, 210);
     .ratingForm {
       // display: flex;
       // flex-direction: column;
