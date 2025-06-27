@@ -32,7 +32,9 @@ export default function Header({
         {showButton && (
           <button
             onClick={handleShowToggleMenu}
-            className={`${style.hamburger} ${menuOpen ? style.open : ""}`}
+            className={`${style.hamburger} ${
+              menuOpen ? style.hamburgerOpen : ""
+            }`}
           >
             <span></span>
             <span></span>
