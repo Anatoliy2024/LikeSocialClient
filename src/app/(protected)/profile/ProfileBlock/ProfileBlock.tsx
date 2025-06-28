@@ -186,11 +186,11 @@ const ProfileBlock = ({
               height={300}
             />
           </div>
-          <div>
+          <div className={style.infoBlock}>
             {isEdit ? (
               <form onSubmit={handleSubmit(handleSave)} className={style.form}>
                 <div>
-                  <label htmlFor="login">Имя</label>
+                  <label htmlFor="login">Имя:</label>
                   <input
                     id="name"
                     {...register("name")}
@@ -200,7 +200,7 @@ const ProfileBlock = ({
                   {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
                 </div>
                 <div>
-                  <label htmlFor="login">Фамилия</label>
+                  <label htmlFor="login">Фамилия:</label>
                   <input
                     id="sureName"
                     {...register("sureName")}
@@ -213,7 +213,7 @@ const ProfileBlock = ({
                 </div>
 
                 <div>
-                  <label htmlFor="login">Статус</label>
+                  <label htmlFor="login">Статус:</label>
                   <input
                     id="status"
                     {...register("status")}
@@ -223,7 +223,7 @@ const ProfileBlock = ({
                   {/* Статус:{profileData.status && <div>{profileData.status}</div>} */}
                 </div>
                 <div>
-                  <label>Дата рождения</label>
+                  <label>Дата рождения:</label>
                   <input type="date" {...register("birthDate")} />
 
                   {/* <label htmlFor="login">Возраст</label>
@@ -238,7 +238,7 @@ const ProfileBlock = ({
                   {/* Возраст:{profileData.age && <div>{profileData.age}</div>} */}
                 </div>
                 <div>
-                  <label htmlFor="login">Страна</label>
+                  <label htmlFor="login">Страна:</label>
                   <input
                     id="country"
                     {...register("country")}
@@ -253,7 +253,7 @@ const ProfileBlock = ({
             )} */}
                 </div>
                 <div>
-                  <label htmlFor="login">Город</label>
+                  <label htmlFor="login">Город:</label>
                   <input
                     id="city"
                     {...register("city")}
@@ -267,7 +267,7 @@ const ProfileBlock = ({
                 </div>
 
                 <div>
-                  <label htmlFor="login">Статус отношений</label>
+                  <label htmlFor="login">Статус отношений:</label>
                   <input
                     id="relationshipStatus"
                     {...register("relationshipStatus")}

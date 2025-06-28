@@ -22,5 +22,29 @@
         object-fit: cover;
       }
     }
+    .infoBlock {
+      & > div {
+        display: flex;
+        gap: 10px;
+        span:first-child {
+          color: rgb(213, 189, 251);
+        }
+      }
+    }
+    .form {
+      & > div {
+        display: flex;
+        gap: 10px;
+        label {
+          color: rgb(213, 189, 251);
+        }
+        input {
+          border-left: 1px solid rgb(213, 189, 251);
+          // border-right: 1px solid rgb(213, 189, 251);
+          padding-left: 10px;
+          border-radius: 10px;
+        }
+      }
+    }
   }
 }
