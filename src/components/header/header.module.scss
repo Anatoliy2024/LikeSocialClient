@@ -18,8 +18,10 @@
     display: flex;
     align-items: center;
     gap: 20px;
+
     img {
       width: 40px;
+      height: 40px;
     }
 
     .hamburger {
@@ -71,9 +73,14 @@
       display: flex;
       align-items: center;
       gap: 20px;
-      img {
+      .avatarBlock {
         width: 50px;
-        border-radius: 30px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        img {
+          object-fit: cover;
+        }
       }
     }
 

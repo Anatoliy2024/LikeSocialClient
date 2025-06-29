@@ -17,7 +17,9 @@ const HeaderContainer = ({
 }) => {
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const username = useAppSelector((state: RootState) => state.auth.username)
-  const avatar = useAppSelector((state: RootState) => state.profile.avatar)
+  const avatar = useAppSelector((state: RootState) => state.auth.avatar)
+  // const avatar = useAppSelector((state: RootState) => state.profile.avatar)
+
   const dispatch = useAppDispatch()
   const router = useRouter()
   const logoutButton = () => {
@@ -30,7 +32,7 @@ const HeaderContainer = ({
     <Header
       isAuth={isAuth}
       username={username}
-      avatar={avatar}
+      avatar={avatar ? avatar : ""}
       logoutFn={logoutButton}
       handleShowToggleMenu={handleShowToggleMenu}
       showButton={showButton}

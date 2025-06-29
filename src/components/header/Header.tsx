@@ -57,12 +57,14 @@ export default function Header({
         <div className={style.profileWrapper}>
           <div className={style.profile}>
             {username}
-            <Image
-              src={avatar ? avatar : "/1.png"}
-              alt="avatar"
-              width={50}
-              height={50}
-            />
+            <div className={style.avatarBlock}>
+              <Image
+                src={avatar ? avatar : "/1.png"}
+                alt="avatar"
+                width={50}
+                height={50}
+              />
+            </div>
             <ArrowBottom />
           </div>
           <div className={style.menu}>
