@@ -1,0 +1,176 @@
+import { createSlice } from "@reduxjs/toolkit"
+import {
+  createUserMovieThunk,
+  fetchMyWantToSeeMoviesThunk,
+  fetchMyWatchedMoviesThunk,
+  fetchPublicWantToSeeMoviesThunk,
+  fetchPublicWatchedMoviesThunk,
+  watchedUserMovieThunk,
+} from "../thunks/userMoviesThunk"
+
+export type UserMovieType = {
+  _id: string
+  title: string
+  genres: string[]
+  avatar: string
+  content?: string
+  status: "wantToSee" | "watched"
+  addedAt: string
+}
+
+type userMoviesSliceType = {
+  myMovies: {
+    wantToSee: UserMovieType[]
+    watched: UserMovieType[]
+  }
+  publicMovies: {
+    wantToSee: UserMovieType[]
+    watched: UserMovieType[]
+  }
+  loading: boolean
+  error: string | null
+}
+const initialState: userMoviesSliceType = {
+  myMovies: {
+    wantToSee: [],
+    watched: [],
+  },
+  publicMovies: {
+    wantToSee: [],
+    watched: [],
+  },
+  loading: false,
+  error: null,
+}
+
+const userMoviesSlice = createSlice({
+  name: "userMovies",
+  initialState,
+  reducers: {
+    clearUserMoviesError: (state) => {
+      state.error = null
+    },
+    clearPublicMovies: (state) => {
+      state.publicMovies.wantToSee = []
+      state.publicMovies.watched = []
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(createUserMovieThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(createUserMovieThunk.fulfilled, (state, action) => {
+        state.myMovies.wantToSee = action.payload.userMovies
+        state.loading = false
+      })
+      .addCase(createUserMovieThunk.rejected, (state, action) => {
+        state.error =
+          action.error.message || "Ошибка при создании поста хочу посмотреть"
+
+        state.loading = false
+      })
+
+      .addCase(watchedUserMovieThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      .addCase(watchedUserMovieThunk.fulfilled, (state, action) => {
+        // state.items = action.payload
+        const updatedUserMovies = action.payload.userMovies
+        state.myMovies.wantToSee = state.myMovies.wantToSee.filter(
+          (userMovie) => userMovie._id !== updatedUserMovies._id
+        )
+        state.loading = false
+      })
+      .addCase(watchedUserMovieThunk.rejected, (state, action) => {
+        state.error =
+          action.error.message ||
+          "Ошибка при изменении поста хочу посмотреть на просмотрено"
+
+        state.loading = false
+      })
+
+      .addCase(fetchMyWantToSeeMoviesThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      .addCase(fetchMyWantToSeeMoviesThunk.fulfilled, (state, action) => {
+        // state.items = action.payload
+        const updatedUserMovies = action.payload.userMovies
+        console.log("updatedUserMovies", updatedUserMovies)
+        state.myMovies.wantToSee = updatedUserMovies
+        state.loading = false
+      })
+      .addCase(fetchMyWantToSeeMoviesThunk.rejected, (state, action) => {
+        state.error =
+          action.error.message ||
+          "Ошибка при получении моих постов хочу посмотреть"
+
+        state.loading = false
+      })
+
+      .addCase(fetchMyWatchedMoviesThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      .addCase(fetchMyWatchedMoviesThunk.fulfilled, (state, action) => {
+        // state.items = action.payload
+        const updatedUserMovies = action.payload.userMovies
+        state.myMovies.watched = updatedUserMovies
+        state.loading = false
+      })
+      .addCase(fetchMyWatchedMoviesThunk.rejected, (state, action) => {
+        state.error =
+          action.error.message ||
+          "Ошибка при получении моих постов просмотрено "
+
+        state.loading = false
+      })
+
+      .addCase(fetchPublicWantToSeeMoviesThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      .addCase(fetchPublicWantToSeeMoviesThunk.fulfilled, (state, action) => {
+        // state.items = action.payload
+        const updatedUserMovies = action.payload.userMovies
+        state.publicMovies.wantToSee = updatedUserMovies
+        state.loading = false
+      })
+      .addCase(fetchPublicWantToSeeMoviesThunk.rejected, (state, action) => {
+        state.error =
+          action.error.message ||
+          "Ошибка при получении  постов юзера хочу посмотреть"
+
+        state.loading = false
+      })
+
+      .addCase(fetchPublicWatchedMoviesThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+
+      .addCase(fetchPublicWatchedMoviesThunk.fulfilled, (state, action) => {
+        // state.items = action.payload
+        const updatedUserMovies = action.payload.userMovies
+        state.publicMovies.watched = updatedUserMovies
+        state.loading = false
+      })
+      .addCase(fetchPublicWatchedMoviesThunk.rejected, (state, action) => {
+        state.error =
+          action.error.message ||
+          "Ошибка при получении  постов юзера просмотрено"
+
+        state.loading = false
+      })
+  },
+})
+export const { clearUserMoviesError, clearPublicMovies } =
+  userMoviesSlice.actions
+export default userMoviesSlice.reducer

@@ -81,8 +81,14 @@ const CreatePost = ({
   }, [])
 
   return (
-    <div className={style.wrapper} onClick={() => hiddenBlock()}>
-      <div className={style.container} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={style.wrapper}
+      // onClick={() => hiddenBlock()}
+    >
+      <div
+        className={style.container}
+        //  onClick={(e) => e.stopPropagation()}
+      >
         <form onSubmit={handleSubmit(handleSave)} className={style.ratingForm}>
           <div>
             <label htmlFor="title">Заголовок:</label>

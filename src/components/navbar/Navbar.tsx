@@ -34,7 +34,7 @@ export default function Navbar({
       <Link href="/friends" onClick={handleLinkClick}>
         <div>Friends</div>
       </Link>
-      <Link href="/wantToSee" onClick={handleLinkClick}>
+      <Link href="/userMovie" onClick={handleLinkClick}>
         <div>Want To See</div>
       </Link>
     </div>

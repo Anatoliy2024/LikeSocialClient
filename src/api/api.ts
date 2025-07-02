@@ -225,7 +225,7 @@ export const fileAPI = {
     formData.append("image", file)
 
     return instance
-      .post("/file/uploadUserAvatar", formData)
+      .post("file/uploadUserAvatar", formData)
       .then((res) => res.data)
   },
   uploadRoomAvatar(file: File, roomId: string) {
@@ -233,7 +233,7 @@ export const fileAPI = {
     formData.append("image", file)
     formData.append("roomId", roomId) // передаём roomId в FormData
     return instance
-      .post("/file/uploadRoomAvatar", formData)
+      .post("file/uploadRoomAvatar", formData)
       .then((res) => res.data)
   },
   uploadRoomPostAvatar(file: File, postId: string) {
@@ -241,7 +241,7 @@ export const fileAPI = {
     formData.append("image", file)
     formData.append("postId", postId) // передаём roomId в FormData
     return instance
-      .post("/file/uploadRoomPostAvatar", formData)
+      .post("file/uploadRoomPostAvatar", formData)
       .then((res) => res.data)
   },
   uploadUserPostAvatar(file: File, postId: string) {
@@ -249,7 +249,7 @@ export const fileAPI = {
     formData.append("image", file)
     formData.append("postId", postId) // передаём roomId в FormData
     return instance
-      .post("/file/uploadUserPostAvatar", formData)
+      .post("file/uploadUserPostAvatar", formData)
       .then((res) => res.data)
   },
   // uploadUserPostImage({ file, postId }: { file: File; postId: string }) {
@@ -284,4 +284,37 @@ export const fileAPI = {
   //     .post("/api/file/upload", formData)
   //     .then((response) => response.data)
   // },
+}
+export const userMovieAPI = {
+  createUserMovie(data) {
+    return instance
+      .post("/user-movie/create-user-movie", data)
+      .then((res) => res.data)
+  },
+
+  watchedUserMovie(userMovieId) {
+    return instance
+      .post("/user-movie/watched-user-movie", { userMovieId })
+      .then((res) => res.data)
+  },
+
+  getMyWantToSeeMovies() {
+    return instance.get("/user-movie/my/want-to-see").then((res) => res.data)
+  },
+
+  getMyWatchedMovies() {
+    return instance.get("/user-movie/my/watched").then((res) => res.data)
+  },
+
+  getPublicWantToSeeMovies(userId) {
+    return instance
+      .get(`/user-movie/${userId}/public/want-to-see`)
+      .then((res) => res.data)
+  },
+
+  getPublicWatchedMovies(userId) {
+    return instance
+      .get(`/user-movie/${userId}/public/watched`)
+      .then((res) => res.data)
+  },
 }

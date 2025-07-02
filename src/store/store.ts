@@ -5,22 +5,24 @@ import { configureStore } from "@reduxjs/toolkit"
 // import exampleReducer from "./slices/exampleSlice"
 import authReducer from "./slices/authSlice"
 import profileReducer from "./slices/profileSlice"
-import userPostThunks from "./slices/userPostsSlice"
-import roomPostThunks from "./slices/roomPostsSlice"
-import usersThunks from "./slices/usersSlice"
-import roomsThunks from "./slices/roomsSlice"
-import serverThunks from "./slices/serverSlice"
+import userPost from "./slices/userPostsSlice"
+import roomPost from "./slices/roomPostsSlice"
+import users from "./slices/usersSlice"
+import rooms from "./slices/roomsSlice"
+import server from "./slices/serverSlice"
+import userMovies from "./slices/userMoviesSlice"
 
 export const store = configureStore({
   reducer: {
     // example: exampleReducer,
     auth: authReducer,
     profile: profileReducer,
-    userPost: userPostThunks,
-    roomPost: roomPostThunks,
-    users: usersThunks,
-    rooms: roomsThunks,
-    server: serverThunks,
+    userPost: userPost,
+    roomPost: roomPost,
+    users: users,
+    rooms: rooms,
+    server: server,
+    userMovies: userMovies,
     // добавь другие редьюсеры здесь
   },
 })
