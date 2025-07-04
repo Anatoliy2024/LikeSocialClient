@@ -2,6 +2,7 @@ import { userPostType } from "@/store/slices/userPostsSlice"
 import instance from "./instance"
 import { roomPostType } from "@/store/slices/roomPostsSlice"
 import { ProfileType } from "@/store/thunks/profileThunk"
+import { createUserMovieType } from "@/store/thunks/userMoviesThunk"
 
 export const authAPI = {
   // getMyInfo() {
@@ -286,7 +287,7 @@ export const fileAPI = {
   // },
 }
 export const userMovieAPI = {
-  createUserMovie(data) {
+  createUserMovie(data: createUserMovieType) {
     return instance
       .post("/user-movie/create-user-movie", data)
       .then((res) => res.data)
