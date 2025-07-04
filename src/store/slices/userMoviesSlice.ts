@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit"
 import {
   createUserMovieThunk,
+  deleteUserMovieThunk,
   fetchMyWantToSeeMoviesThunk,
   fetchMyWatchedMoviesThunk,
   fetchPublicWantToSeeMoviesThunk,
   fetchPublicWatchedMoviesThunk,
-  watchedUserMovieThunk,
+  toggleUserMovieStatusThunk,
 } from "../thunks/userMoviesThunk"
 
 export type UserMovieType = {
@@ -72,20 +73,53 @@ const userMoviesSlice = createSlice({
         state.loading = false
       })
 
-      .addCase(watchedUserMovieThunk.pending, (state) => {
+      .addCase(deleteUserMovieThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(deleteUserMovieThunk.fulfilled, (state, action) => {
+        const updatedUserMovies = action.payload.userMovies
+        const status = action.payload.status
+        console.log("updatedUserMovies", updatedUserMovies)
+        console.log("status*************", status)
+        if (status === "wantToSee") {
+          state.myMovies.wantToSee = updatedUserMovies
+        } else {
+          state.myMovies.watched = updatedUserMovies
+        }
+        state.myMovies.wantToSee = action.payload.userMovies
+        state.loading = false
+      })
+      .addCase(deleteUserMovieThunk.rejected, (state, action) => {
+        state.error = action.error.message || "Ошибка при удалении поста"
+
+        state.loading = false
+      })
+
+      .addCase(toggleUserMovieStatusThunk.pending, (state) => {
         state.loading = true
         state.error = null
       })
 
-      .addCase(watchedUserMovieThunk.fulfilled, (state, action) => {
+      .addCase(toggleUserMovieStatusThunk.fulfilled, (state, action) => {
         // state.items = action.payload
         const updatedUserMovies = action.payload.userMovies
-        state.myMovies.wantToSee = state.myMovies.wantToSee.filter(
-          (userMovie) => userMovie._id !== updatedUserMovies._id
-        )
+        const status = action.payload.status
+        // console.log("updatedUserMovies", updatedUserMovies)
+        // console.log("state.myMovies.wantToSee", state.myMovies.wantToSee)
+        // console.log("updatedUserMovies", updatedUserMovies)
+        // console.log("status", status)
+        if (status === "wantToSee") {
+          state.myMovies.wantToSee = updatedUserMovies
+        } else {
+          state.myMovies.watched = updatedUserMovies
+        }
+        // state.myMovies.wantToSee = state.myMovies.wantToSee.filter(
+        //   (userMovie) => userMovie._id !== updatedUserMovies._id
+        // )
         state.loading = false
       })
-      .addCase(watchedUserMovieThunk.rejected, (state, action) => {
+      .addCase(toggleUserMovieStatusThunk.rejected, (state, action) => {
         state.error =
           action.error.message ||
           "Ошибка при изменении поста хочу посмотреть на просмотрено"

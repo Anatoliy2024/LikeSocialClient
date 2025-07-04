@@ -21,6 +21,7 @@ export type createUserMovieType = {
 type UserMovieResponseType = {
   message: string
   userMovies: UserMovieType[]
+  status?: "wantToSee" | "watched"
 }
 
 // Создать фильм и получить обновлённый список своих фильмов
@@ -49,27 +50,74 @@ export const createUserMovieThunk = createAsyncThunk<
     )
   }
 })
+export const deleteUserMovieThunk = createAsyncThunk<
+  // Тип данных, которые возвращает thunk (например, массив фильмов)
+  UserMovieResponseType,
+  // Тип параметра, который передаётся в thunk
+  { userMovieId: string; status: "wantToSee" | "watched" },
+  // Типы для thunkAPI (опционально)
+  { rejectValue: string }
+>("userMovie/delete", async ({ userMovieId, status }, thunkAPI) => {
+  try {
+    const response = await userMovieAPI.deleteUserMovie(userMovieId, status)
+    // В ответе ожидаем список всех своих фильмов
 
-// Отметить фильм просмотренным
-export const watchedUserMovieThunk = createAsyncThunk(
-  "userMovie/watched",
-  async (userMovieId, thunkAPI) => {
-    try {
-      const updatedMovie = await userMovieAPI.watchedUserMovie(userMovieId)
-      return updatedMovie
-    } catch (error: unknown) {
-      // Проверка, является ли ошибка ошибкой Axios
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        return thunkAPI.rejectWithValue(error.response.data.message)
-      }
-
-      // если это вообще не ошибка axios или нет message
-      return thunkAPI.rejectWithValue(
-        "Ошибка при изменении статуса фильма watchedUserMovieThunk"
-      )
+    return response
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
     }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue(
+      "Ошибка при создании поста в deleteUserMovieThunk"
+    )
   }
-)
+})
+
+// // Отметить фильм просмотренным
+// export const watchedUserMovieThunk = createAsyncThunk<
+//   // Тип данных, которые возвращает thunk (например, массив фильмов)
+//   UserMovieResponseType,
+//   // Тип параметра, который передаётся в thunk
+//   string,
+//   // Типы для thunkAPI (опционально)
+//   { rejectValue: string }
+// >("userMovie/watched", async (userMovieId, thunkAPI) => {
+//   try {
+//     const updatedMovie = await userMovieAPI.watchedUserMovie(userMovieId)
+//     return updatedMovie
+//   } catch (error: unknown) {
+//     // Проверка, является ли ошибка ошибкой Axios
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
+//     }
+
+//     // если это вообще не ошибка axios или нет message
+//     return thunkAPI.rejectWithValue(
+//       "Ошибка при изменении статуса фильма watchedUserMovieThunk"
+//     )
+//   }
+// })
+export const toggleUserMovieStatusThunk = createAsyncThunk<
+  UserMovieResponseType,
+  { userMovieId: string; newStatus: "wantToSee" | "watched" },
+  { rejectValue: string }
+>("userMovie/toggleStatus", async ({ userMovieId, newStatus }, thunkAPI) => {
+  try {
+    const updatedMovie = await userMovieAPI.updateUserMovieStatus(
+      userMovieId,
+      newStatus
+    )
+    return updatedMovie
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+    return thunkAPI.rejectWithValue("Ошибка при изменении статуса фильма")
+  }
+})
 
 // Получить свои фильмы по статусу "wantToSee"
 export const fetchMyWantToSeeMoviesThunk = createAsyncThunk(

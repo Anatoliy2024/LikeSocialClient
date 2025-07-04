@@ -6,11 +6,12 @@ import { translatorGenres } from "@/utils/translatorGenres"
 
 export type MovieCardProps = {
   movie: UserMovieType
+  onClick: () => void
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
+const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
   return (
-    <div className={style.card}>
+    <div className={style.card} onClick={onClick}>
       <div className={style.imgBlock}>
         <Image
           src={movie.avatar}
@@ -22,7 +23,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
       </div>
       <div className={style.content}>
         <h3 className={style.title}>{movie.title}</h3>
-        {movie.genres.length > 0 ? (
+        {movie.genres?.length > 0 ? (
           <div className={style.genresBlockContainer}>
             <div className={style.genresBlockWindow}>
               <div className={style.genresBlockSlider}>

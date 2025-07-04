@@ -1,6 +1,13 @@
+@mixin lineClamp($lines: 3) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .card {
   background-color: #d9c0f4;
-  border-radius: 1rem;
+  border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   transition: transform 0.2s ease;
@@ -10,6 +17,7 @@
   justify-content: center;
   padding: 10px;
   max-width: 400px;
+  // justify-content: space-between;
   &:hover {
     transform: translateY(-4px);
   }
@@ -60,29 +68,33 @@
     flex-direction: column;
     gap: 0.5rem;
     max-width: 100%;
-  }
+    .title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+      max-width: 100%;
+      @include lineClamp(1);
+      // line-height: 1.7;
+    }
 
-  .title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #111827;
-  }
+    .description {
+      max-width: 100%;
 
-  .description {
-    max-width: 100%;
+      border: 1px solid rgb(130, 93, 216);
+      border-radius: 20px;
+      padding: 10px;
+      // display: -webkit-box;
+      // -webkit-line-clamp: 3; /* 3 строки */
+      // -webkit-box-orient: vertical;
 
-    border: 1px solid rgb(130, 93, 216);
-    border-radius: 20px;
-    padding: 10px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* 3 строки */
-    -webkit-box-orient: vertical;
+      // line-clamp: 3;
+      // overflow: hidden;
+      @include lineClamp(3);
 
-    line-clamp: 3;
-    overflow: hidden;
-    line-height: 1.7;
-    // font-size: 0.95rem;
-    // color: #4b5563;
+      line-height: 1.7;
+      // font-size: 0.95rem;
+      // color: #4b5563;
+    }
   }
 
   .status {

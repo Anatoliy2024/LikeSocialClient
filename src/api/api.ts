@@ -292,11 +292,29 @@ export const userMovieAPI = {
       .then((res) => res.data)
   },
 
-  watchedUserMovie(userMovieId) {
+  // , {
+  //   data: { status: "wantToSee" }, // передаём текущий таб
+  // }
+
+  deleteUserMovie(userMovieId: string, status: "wantToSee" | "watched") {
     return instance
-      .post("/user-movie/watched-user-movie", { userMovieId })
+      .delete(`/user-movie/delete/${userMovieId}`, {
+        data: { status }, // ⬅️ обязательно внутри data!
+      })
       .then((res) => res.data)
   },
+
+  updateUserMovieStatus(userMovieId: string, status: "wantToSee" | "watched") {
+    return instance
+      .patch(`/user-movie/update-status/${userMovieId}`, { status })
+      .then((res) => res.data)
+  },
+  // userMovies/update-status/${userMovieId}
+  // watchedUserMovie(userMovieId) {
+  //   return instance
+  //     .post("/user-movie/watched-user-movie", { userMovieId })
+  //     .then((res) => res.data)
+  // },
 
   getMyWantToSeeMovies() {
     return instance.get("/user-movie/my/want-to-see").then((res) => res.data)
@@ -306,13 +324,13 @@ export const userMovieAPI = {
     return instance.get("/user-movie/my/watched").then((res) => res.data)
   },
 
-  getPublicWantToSeeMovies(userId) {
+  getPublicWantToSeeMovies(userId: string) {
     return instance
       .get(`/user-movie/${userId}/public/want-to-see`)
       .then((res) => res.data)
   },
 
-  getPublicWatchedMovies(userId) {
+  getPublicWatchedMovies(userId: string) {
     return instance
       .get(`/user-movie/${userId}/public/watched`)
       .then((res) => res.data)
