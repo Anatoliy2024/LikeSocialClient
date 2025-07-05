@@ -16,10 +16,20 @@ export const ChangeAvatarModal = ({
   handleCloseModal: () => void
   onUpload: (
     file: File,
-    context?: { roomId?: string; postId?: string }
+    context?: {
+      roomId?: string
+      postId?: string
+      userMovieId?: string
+      status?: string
+    }
   ) => Promise<void>
   loading: boolean
-  context?: { roomId?: string; postId?: string }
+  context?: {
+    roomId?: string
+    postId?: string
+    userMovieId?: string
+    status?: string
+  }
 }) => {
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)

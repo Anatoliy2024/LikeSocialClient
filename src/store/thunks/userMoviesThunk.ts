@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 
-import { userMovieAPI } from "@/api/api"
+import { userMovieAPI, fileAPI } from "@/api/api"
 import { UserMovieType } from "../slices/userMoviesSlice"
 export type createUserMovieType = {
   title: string
@@ -75,6 +75,37 @@ export const deleteUserMovieThunk = createAsyncThunk<
     )
   }
 })
+
+export const uploadUserMovieAvatarThunk = createAsyncThunk(
+  "post/uploadRoomPostAvatar",
+  async (
+    {
+      file,
+      userMovieId,
+      status,
+    }: { file: File; userMovieId: string; status: string },
+    thunkAPI
+  ) => {
+    try {
+      const data = await fileAPI.uploadUserMovieAvatar(
+        file,
+        userMovieId,
+        status
+      )
+      return data
+    } catch (error: unknown) {
+      // Проверка, является ли ошибка ошибкой Axios
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+
+      // если это вообще не ошибка axios или нет message
+      return thunkAPI.rejectWithValue("Ошибка при изменении аватарки userMovie")
+    }
+  }
+)
+
+// uploadUserMovieAvatar
 
 // // Отметить фильм просмотренным
 // export const watchedUserMovieThunk = createAsyncThunk<

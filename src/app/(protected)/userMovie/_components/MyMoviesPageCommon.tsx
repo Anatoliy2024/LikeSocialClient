@@ -74,6 +74,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
       <div className={styles.grid}>
         {movies.map((movie) => (
           <MovieCard
+            myMoviesPage={myMoviesPage}
             key={movie._id}
             movie={movie}
             onClick={() => handleShowModalUserMovie(movie)}
@@ -111,6 +112,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
           handleCloseModalUserMovie={handleCloseModalUserMovie}
           selectedMovie={selectedMovie}
           myMoviesPage={myMoviesPage}
+          setSelectedMovie={setSelectedMovie}
         />
       )}
       {isCreateMovieWantToSee && (

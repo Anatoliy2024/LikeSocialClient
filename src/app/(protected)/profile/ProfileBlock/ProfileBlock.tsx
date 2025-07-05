@@ -14,6 +14,7 @@ import { RootState } from "@/store/store"
 import Image from "next/image"
 import { getAgeFromBirthDate } from "@/utils/getAge"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
+import Link from "next/link"
 
 type FormProfileInfo = {
   name: string
@@ -348,6 +349,14 @@ const ProfileBlock = ({
                     <ButtonMenu onClick={handleEditClick}>
                       Редактировать
                     </ButtonMenu>
+                  )}
+                  {!profileData.isMyProfile && (
+                    <Link
+                      href={`/userMovie/${userId}`}
+                      className={style.linkWantToSee}
+                    >
+                      <div>Список желаемого</div>
+                    </Link>
                   )}
                 </div>
               </>

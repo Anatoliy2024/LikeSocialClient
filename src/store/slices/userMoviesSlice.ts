@@ -7,6 +7,7 @@ import {
   fetchPublicWantToSeeMoviesThunk,
   fetchPublicWatchedMoviesThunk,
   toggleUserMovieStatusThunk,
+  uploadUserMovieAvatarThunk,
 } from "../thunks/userMoviesThunk"
 
 export type UserMovieType = {
@@ -202,6 +203,32 @@ const userMoviesSlice = createSlice({
           "Ошибка при получении  постов юзера просмотрено"
 
         state.loading = false
+      })
+
+      .addCase(uploadUserMovieAvatarThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(uploadUserMovieAvatarThunk.fulfilled, (state, action) => {
+        const updateUserMovie = action.payload.userMovie
+        const status = action.payload.status
+        console.log("updateUserMovie", updateUserMovie)
+        if (status === "wantToSee") {
+          state.myMovies.wantToSee = state.myMovies.wantToSee.map((userMovie) =>
+            userMovie._id === updateUserMovie._id ? updateUserMovie : userMovie
+          )
+        } else {
+          state.myMovies.watched = state.myMovies.watched.map((userMovie) =>
+            userMovie._id === updateUserMovie._id ? updateUserMovie : userMovie
+          )
+        }
+
+        state.loading = false
+      })
+      .addCase(uploadUserMovieAvatarThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error =
+          action.error.message || "Ошибка при изменении аватарки room поста"
       })
   },
 })

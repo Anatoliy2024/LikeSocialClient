@@ -253,6 +253,17 @@ export const fileAPI = {
       .post("file/uploadUserPostAvatar", formData)
       .then((res) => res.data)
   },
+
+  uploadUserMovieAvatar(file: File, userMovieId: string, status: string) {
+    const formData = new FormData()
+    formData.append("image", file)
+    formData.append("userMovieId", userMovieId) // передаём roomId в FormData
+    formData.append("status", status) // передаём roomId в FormData
+    return instance
+      .post("file/uploadUserMovieAvatar", formData)
+      .then((res) => res.data)
+  },
+
   // uploadUserPostImage({ file, postId }: { file: File; postId: string }) {
   //   const formData = new FormData()
   //   formData.append("image", file)
@@ -289,7 +300,7 @@ export const fileAPI = {
 export const userMovieAPI = {
   createUserMovie(data: createUserMovieType) {
     return instance
-      .post("/user-movie/create-user-movie", data)
+      .post("user-movie/create-user-movie", data)
       .then((res) => res.data)
   },
 
@@ -299,7 +310,7 @@ export const userMovieAPI = {
 
   deleteUserMovie(userMovieId: string, status: "wantToSee" | "watched") {
     return instance
-      .delete(`/user-movie/delete/${userMovieId}`, {
+      .delete(`user-movie/delete/${userMovieId}`, {
         data: { status }, // ⬅️ обязательно внутри data!
       })
       .then((res) => res.data)
@@ -307,9 +318,10 @@ export const userMovieAPI = {
 
   updateUserMovieStatus(userMovieId: string, status: "wantToSee" | "watched") {
     return instance
-      .patch(`/user-movie/update-status/${userMovieId}`, { status })
+      .patch(`user-movie/update-status/${userMovieId}`, { status })
       .then((res) => res.data)
   },
+
   // userMovies/update-status/${userMovieId}
   // watchedUserMovie(userMovieId) {
   //   return instance
@@ -318,22 +330,22 @@ export const userMovieAPI = {
   // },
 
   getMyWantToSeeMovies() {
-    return instance.get("/user-movie/my/want-to-see").then((res) => res.data)
+    return instance.get("user-movie/my/want-to-see").then((res) => res.data)
   },
 
   getMyWatchedMovies() {
-    return instance.get("/user-movie/my/watched").then((res) => res.data)
+    return instance.get("user-movie/my/watched").then((res) => res.data)
   },
 
   getPublicWantToSeeMovies(userId: string) {
     return instance
-      .get(`/user-movie/${userId}/public/want-to-see`)
+      .get(`user-movie/${userId}/public/want-to-see`)
       .then((res) => res.data)
   },
 
   getPublicWatchedMovies(userId: string) {
     return instance
-      .get(`/user-movie/${userId}/public/watched`)
+      .get(`user-movie/${userId}/public/watched`)
       .then((res) => res.data)
   },
 }
