@@ -51,16 +51,7 @@ export default function ForgotPassword() {
             </Link>
           </div>
         </form>
-        {message && (
-          <p
-            style={{
-              marginTop: 15,
-              color: message.includes("отправлено") ? "green" : "red",
-            }}
-          >
-            {message}
-          </p>
-        )}
+        {message && <p>{message}</p>}
       </div>
     </div>
   )

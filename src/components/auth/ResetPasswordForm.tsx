@@ -6,7 +6,7 @@ import axios from "axios"
 import style from "./Reset-password.module.scss"
 import ButtonMenu from "@/components/ui/button/Button"
 import Link from "next/link"
-
+// import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
 export default function ResetPassword() {
   const searchParams = useSearchParams()
@@ -16,6 +16,8 @@ export default function ResetPassword() {
   const [message, setMessage] = useState("")
   const [userName, setUserName] = useState("")
   const [loading, setLoading] = useState(false)
+  //   const router = useRouter()
+  //   const [timer,setTimer] =useState(10)
   //   const { token } = useParams()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,7 +65,7 @@ export default function ResetPassword() {
           {message && (
             <p>
               {message}
-              {userName && ` (${userName})`}
+              {userName && ` (userName:${userName})`}
             </p>
           )}
         </form>
