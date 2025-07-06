@@ -10,6 +10,8 @@ import { RootState } from "@/store/store"
 
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
+import { clearAuthError } from "@/store/slices/authSlice"
+import { useEffect } from "react"
 
 type FormValues = {
   username: string
@@ -41,6 +43,9 @@ const Register = () => {
       // можно показать уведомление об ошибке
     }
   }
+  useEffect(() => {
+    dispatch(clearAuthError())
+  }, [dispatch])
 
   return (
     <div className={style.wrapper}>
@@ -121,6 +126,7 @@ const Register = () => {
             </Link>
           </div>
         </form>
+        <Link href="/forgot-password">Забыл пароль?</Link>
         <div>{error}</div>
       </div>
     </div>

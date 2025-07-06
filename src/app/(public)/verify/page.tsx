@@ -2,11 +2,12 @@
 import Link from "next/link"
 import style from "./Verify.module.scss"
 import ButtonMenu from "@/components/ui/button/Button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { useRouter } from "next/navigation"
 import { AppDispatch, RootState } from "@/store/store"
 import { verifyThunk } from "@/store/thunks/authThunk"
+import { clearAuthError } from "@/store/slices/authSlice"
 const Verify = () => {
   const [passwordVerify, setPasswordVerify] = useState("")
   const dispatch = useAppDispatch()
@@ -14,6 +15,10 @@ const Verify = () => {
   const error = useAppSelector((state: RootState) => state.auth.authError)
   const router = useRouter()
   const userName = useAppSelector((state: RootState) => state.auth.username)
+
+  useEffect(() => {
+    dispatch(clearAuthError())
+  }, [dispatch])
 
   const handleVerify = async (
     dispatch: AppDispatch,

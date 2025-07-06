@@ -31,31 +31,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // login: (state, action: PayloadAction<AuthAState>) => {
-    //   state.isAuth = true
-    //   state.name = action.payload.name
-    //   state.avatar = action.payload.avatar
-    //   state.userId = action.payload.userId
-    // },
-    // login: (state, action: PayloadAction<test>) => {
-    //   state.isAuth = true
-    //   state.username = action.payload.login
-    //   //   state.avatar = action.payload.avatar
-    //   //   state.userId = action.payload.userId
-    // },
-    // register: (state, action: PayloadAction<test>) => {
-    //   state.isAuth = true
-    //   state.login = action.payload.login
-    //   state.login = action.payload.login
-    //   //   state.avatar = action.payload.avatar
-    //   //   state.userId = action.payload.userId
-    // },
-    // logout: (state) => {
-    //   state.isAuth = false
-    //   state.username = null
-    //   state.avatar = null
-    //   state.userId = null
-    // },
+    clearAuthError: (state) => {
+      state.authError = null
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -149,4 +127,5 @@ const authSlice = createSlice({
 })
 
 // export const { logout } = authSlice.actions
+export const { clearAuthError } = authSlice.actions
 export default authSlice.reducer

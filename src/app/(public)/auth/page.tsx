@@ -10,6 +10,8 @@ import { RootState } from "@/store/store"
 import { authThunk } from "@/store/thunks/authThunk"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
+import { useEffect } from "react"
+import { clearAuthError } from "@/store/slices/authSlice"
 
 type FormValues = {
   username: string
@@ -30,6 +32,9 @@ const Auth = () => {
 
   // }
   const router = useRouter()
+  useEffect(() => {
+    dispatch(clearAuthError())
+  }, [dispatch])
 
   const onSubmit = async (data: FormValues) => {
     console.log(data) // данные формы
@@ -91,6 +96,7 @@ const Auth = () => {
               <ButtonMenu>Cancel</ButtonMenu>
             </Link>
           </div>
+          <Link href="/forgot-password">Забыл пароль?</Link>
         </form>
         <div>{error}</div>
       </div>

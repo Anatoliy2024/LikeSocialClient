@@ -59,6 +59,25 @@ export const authAPI = {
   postLogout() {
     return instance.post("auth/logout").then((response) => response.data)
   },
+  forgotPassword(email: string) {
+    return instance
+      .post("auth/forgot-password", { email })
+      .then((response) => response.data)
+  },
+
+  resetPassword(token: string, password: string) {
+    return instance
+      .post("auth/reset-password", {
+        token,
+        newPassword: password,
+      })
+      .then((response) => response.data)
+  },
+  // const res = await fetch('http://localhost:5000/api/auth/reset-password', {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ token, newPassword: password }),
+  // })
 }
 
 export const userAPI = {
