@@ -55,7 +55,10 @@ const PostsBlock = ({
 
     const postId = searchParams.get("postId")
     // console.log("postId", postId)
-    const selectedPost = posts.find((post) => post._id === postId)
+    // const selectedPost = posts.find((post) => post._id === postId)
+    const selectedPost = Array.isArray(posts)
+      ? posts.find((post) => post._id === postId)
+      : null
     // console.log("selectedPost", selectedPost)
     const isMyPost = !userId || playerId === userId
 
