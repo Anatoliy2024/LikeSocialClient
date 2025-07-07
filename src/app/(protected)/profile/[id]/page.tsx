@@ -3,11 +3,16 @@
 
 import { useParams } from "next/navigation"
 import ProfileCommon from "../_components/ProfileCommon"
+import { Suspense } from "react"
 
 export default function UserProfilePage() {
   const { id } = useParams()
 
   if (typeof id !== "string") return <div>Неверный ID</div>
 
-  return <ProfileCommon userId={id} />
+  return (
+    <Suspense>
+      <ProfileCommon userId={id} />
+    </Suspense>
+  )
 }
