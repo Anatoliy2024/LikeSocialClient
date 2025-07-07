@@ -1,5 +1,5 @@
 // store/slices/postSlice.ts
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import {
   createUserCommentThunk,
   createUserPostThunk,
@@ -51,18 +51,30 @@ type userPostState = {
   posts: userPostType[]
   loading: boolean
   error: string | null
+  page: number
+  limit: number
+  total: number
+  pages: number
 }
 
 const initialState: userPostState = {
   posts: [],
   loading: false,
   error: null,
+  page: 1,
+  limit: 10,
+  total: 0,
+  pages: 0,
 }
 
 const userPostSlice = createSlice({
   name: "roomPost",
   initialState,
-  reducers: {},
+  reducers: {
+    setUserPage: (state, action: PayloadAction<number>) => {
+      state.page = action.payload
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createUserPostThunk.pending, (state) => {
@@ -71,7 +83,13 @@ const userPostSlice = createSlice({
       })
       .addCase(createUserPostThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.posts.unshift(action.payload) // добавим новый пост в начало
+        state.posts = action.payload.posts
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
+
+        // state.posts.unshift(action.payload) // добавим новый пост в начало
       })
       .addCase(createUserPostThunk.rejected, (state, action) => {
         state.loading = false
@@ -85,7 +103,12 @@ const userPostSlice = createSlice({
       .addCase(getUserPostsThunk.fulfilled, (state, action) => {
         console.log("getUserPostsThunk", action.payload)
         state.loading = false
-        state.posts = action.payload
+        // state.posts = action.payload
+        state.posts = action.payload.posts
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(getUserPostsThunk.rejected, (state, action) => {
         state.loading = false
@@ -98,7 +121,13 @@ const userPostSlice = createSlice({
       .addCase(getUserPostsByIdThunk.fulfilled, (state, action) => {
         console.log("getUserPostsByIdThunk", action.payload)
         state.loading = false
-        state.posts = action.payload
+        // state.posts = action.payload
+
+        state.posts = action.payload.posts
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(getUserPostsByIdThunk.rejected, (state, action) => {
         state.loading = false
@@ -112,7 +141,13 @@ const userPostSlice = createSlice({
       .addCase(delUserPostsThunk.fulfilled, (state, action) => {
         console.log("delUserPostsThunk", action.payload)
         state.loading = false
-        state.posts = action.payload
+        // state.posts = action.payload
+
+        state.posts = action.payload.posts
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(delUserPostsThunk.rejected, (state, action) => {
         state.loading = false
@@ -159,5 +194,5 @@ const userPostSlice = createSlice({
       })
   },
 })
-
+export const { setUserPage } = userPostSlice.actions
 export default userPostSlice.reducer

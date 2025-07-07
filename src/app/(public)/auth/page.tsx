@@ -96,7 +96,10 @@ const Auth = () => {
               <ButtonMenu>Cancel</ButtonMenu>
             </Link>
           </div>
-          <Link href="/forgot-password">Забыл пароль?</Link>
+
+          <div className={style.forgotPassword}>
+            <Link href="/forgot-password">Забыли пароль?</Link>
+          </div>
         </form>
         <div>{error}</div>
       </div>

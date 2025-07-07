@@ -34,6 +34,7 @@ type PostType = {
   onClick: () => void
   comments: userCommentType[]
   votesCount: number
+  page: number
 }
 
 const Post = ({
@@ -52,6 +53,7 @@ const Post = ({
   onClick,
   comments,
   votesCount,
+  page,
 }: PostType) => {
   const dispatch = useAppDispatch()
   // const router = useRouter()
@@ -66,9 +68,9 @@ const Post = ({
   const handleDelete = async (postId: string) => {
     try {
       if (isProfile) {
-        dispatch(delUserPostsThunk(postId)).unwrap()
+        dispatch(delUserPostsThunk({ postId, page })).unwrap()
       } else {
-        dispatch(delRoomPostsThunk({ postId, roomId })).unwrap()
+        dispatch(delRoomPostsThunk({ postId, roomId, page })).unwrap()
       }
     } catch (err) {
       console.error("Ошибка удаления поста:", err)
@@ -95,7 +97,12 @@ const Post = ({
           <h3>{title}</h3>
           {isMyPost && (
             <CloseButton
-              onClick={() => handleDelete(id)}
+              onClick={(e) => {
+                if (e) {
+                  e.stopPropagation()
+                }
+                handleDelete(id)
+              }}
               title="Удалить пост"
             />
           )}

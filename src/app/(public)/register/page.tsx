@@ -126,7 +126,9 @@ const Register = () => {
             </Link>
           </div>
         </form>
-        <Link href="/forgot-password">Забыл пароль?</Link>
+        <div className={style.forgotPassword}>
+          <Link href="/forgot-password">Забыли пароль?</Link>
+        </div>
         <div>{error}</div>
       </div>
     </div>

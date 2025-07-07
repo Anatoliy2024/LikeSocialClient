@@ -1,5 +1,5 @@
 // store/slices/postSlice.ts
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import {
   createRoomCommentThunk,
   createRoomPostThunk,
@@ -49,18 +49,30 @@ type roomPostState = {
   posts: roomPostType[]
   loading: boolean
   error: string | null
+  page: number
+  limit: number
+  total: number
+  pages: number
 }
 
 const initialState: roomPostState = {
   posts: [],
   loading: false,
   error: null,
+  page: 1,
+  limit: 10,
+  total: 0,
+  pages: 0,
 }
 
 const roomPostSlice = createSlice({
-  name: "userPost",
+  name: "userRoomPost",
   initialState,
-  reducers: {},
+  reducers: {
+    setRoomPage: (state, action: PayloadAction<number>) => {
+      state.page = action.payload
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createRoomPostThunk.pending, (state) => {
@@ -69,7 +81,12 @@ const roomPostSlice = createSlice({
       })
       .addCase(createRoomPostThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.posts = action.payload // добавим новый пост в начало
+        state.posts = action.payload.posts
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
+        // state.posts = action.payload
       })
       .addCase(createRoomPostThunk.rejected, (state, action) => {
         state.loading = false
@@ -83,7 +100,11 @@ const roomPostSlice = createSlice({
       .addCase(getRoomPostsThunk.fulfilled, (state, action) => {
         console.log("getRoomPostsThunk", action.payload)
         state.loading = false
-        state.posts = action.payload
+        state.posts = action.payload.posts
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(getRoomPostsThunk.rejected, (state, action) => {
         state.loading = false
@@ -97,7 +118,11 @@ const roomPostSlice = createSlice({
       .addCase(delRoomPostsThunk.fulfilled, (state, action) => {
         console.log("delRoomPostsThunk", action.payload)
         state.loading = false
-        state.posts = action.payload
+        state.posts = action.payload.posts
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(delRoomPostsThunk.rejected, (state, action) => {
         state.loading = false
@@ -143,5 +168,6 @@ const roomPostSlice = createSlice({
       })
   },
 })
+export const { setRoomPage } = roomPostSlice.actions
 
 export default roomPostSlice.reducer

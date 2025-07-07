@@ -20,11 +20,17 @@ import { AddMembersToRoom } from "../addMembersToRoom/AddMembersToRoom"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 import Image from "next/image"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
+import { setRoomPage } from "@/store/slices/roomPostsSlice"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 const Room = () => {
   const [addFriendsToRoom, setAddFriendsToRoom] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
+  const pageFromUrl = Number(searchParams.get("page")) || 1
   const isAuth = useAppSelector((state) => state.auth.isAuth)
   const userId = useAppSelector((state) => state.auth.userId)
 
@@ -38,7 +44,7 @@ const Room = () => {
   // const owner = useAppSelector((state: RootState) => state.rooms.owner)
   const loading = useAppSelector((state) => state.rooms.loading)
   const friends = useAppSelector((state) => state.users.friends)
-  const posts = useAppSelector((state) => state.roomPost.posts)
+  const { posts, page, pages } = useAppSelector((state) => state.roomPost)
   const dispatch = useAppDispatch()
   const { id } = useParams<{ id: string }>()
 
@@ -68,12 +74,39 @@ const Room = () => {
     dispatch(delFriendFromRoomThunk({ userId: userId, roomId: id }))
   }
   useEffect(() => {
-    if (isAuth) {
-      console.log("roomId", id)
-      dispatch(getRoomPostsThunk(id))
+    if (isAuth && typeof id === "string") {
+      dispatch(setRoomPage(pageFromUrl))
+      dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
+    }
+  }, [isAuth, dispatch, id, pageFromUrl])
+
+  useEffect(() => {
+    if (isAuth && typeof id === "string") {
       dispatch(getRoomByIdThunk(id))
     }
   }, [isAuth, dispatch, id])
+
+  // useEffect(() => {
+  //   if (isAuth) {
+  //     console.log("roomId", id)
+  //     dispatch(getRoomPostsThunk({ roomId: id, page }))
+  //     dispatch(getRoomByIdThunk(id))
+  //   }
+  // }, [isAuth, dispatch, id,page])
+
+  // useEffect(() => {
+  //   if (isAuth && typeof id === "string") {
+  //     dispatch(setRoomPage(pageFromUrl)) // обновляем Redux
+  //     dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl })) // грузим посты
+  //     dispatch(getRoomByIdThunk(id)) // грузим инфо о комнате
+  //   }
+  // }, [isAuth, dispatch, id, pageFromUrl])
+
+  // useEffect(() => {
+  //   if (isAuth && typeof id === "string") {
+  //     dispatch(getRoomPostsThunk({ roomId: id, page }))
+  //   }
+  // }, [page])
 
   useEffect(() => {
     if (addFriendsToRoom) {
@@ -102,6 +135,15 @@ const Room = () => {
     if (isOwner) {
       setChangeAvatarModal(true)
     }
+  }
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("page", String(newPage))
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
   }
 
   // console.log("posts", posts)
@@ -171,7 +213,15 @@ const Room = () => {
         )}
       </div>
       <Suspense fallback={<div>Загрузка...</div>}>
-        <PostsBlock posts={posts} userId={userId} isProfile={false} />
+        <PostsBlock
+          posts={posts}
+          userId={userId}
+          isProfile={false}
+          page={page}
+          pages={pages}
+          onPageChange={handlePageChange}
+          loading={loading}
+        />
       </Suspense>
     </>
   )

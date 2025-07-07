@@ -55,4 +55,11 @@
       // }
     }
   }
+  .forgotPassword {
+    a {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }

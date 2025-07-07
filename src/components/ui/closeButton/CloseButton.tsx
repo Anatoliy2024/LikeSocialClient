@@ -3,7 +3,7 @@ import React from "react"
 import styles from "./CloseButton.module.scss"
 
 type Props = {
-  onClick: () => void
+  onClick: (e?: React.MouseEvent<HTMLButtonElement>) => void
   title?: string // при наведении будет подсказка
   style?: object
 }

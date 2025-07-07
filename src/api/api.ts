@@ -129,16 +129,26 @@ export const postAPI = {
       .post("userPosts/create", data)
       .then((response) => response.data)
   },
-  getUserPost() {
-    return instance.get("userPosts").then((response) => response.data)
-  },
-  delUserPost(postId: string) {
+  getUserPost(page: number, limit?: number) {
     return instance
-      .delete(`userPosts/${postId}`)
+      .get("userPosts", {
+        params: { page, limit },
+      })
       .then((response) => response.data)
   },
-  getUserPostsByUserId(userId: string) {
-    return instance.get(`/userPosts/${userId}`).then((res) => res.data)
+  getUserPostsByUserId(userId: string, page: number, limit?: number) {
+    return instance
+      .get(`/userPosts/${userId}`, {
+        params: { page, limit },
+      })
+      .then((res) => res.data)
+  },
+  delUserPost(postId: string, page: number, limit?: number) {
+    return instance
+      .delete(`userPosts/${postId}`, {
+        params: { page, limit },
+      })
+      .then((response) => response.data)
   },
   createUserComment(postId: string, comment: string) {
     return instance
@@ -157,15 +167,26 @@ export const roomPostAPI = {
       .post("roomPosts/create", data)
       .then((response) => response.data)
   },
-  getRoomPosts(roomId: string) {
+  getRoomPosts(roomId: string, page: number, limit?: number) {
     //?page=1&limit=10
     //  .get(`roomPosts/${roomId}`, { params })
-    return instance.get(`roomPosts/${roomId}`).then((response) => response.data)
+    return instance
+      .get(`roomPosts/${roomId}`, {
+        params: { page, limit },
+      })
+      .then((response) => response.data)
   },
-  delRoomPost(postId: string, roomId: string | null) {
+  delRoomPost(
+    postId: string,
+    roomId: string | null,
+    page: number,
+    limit?: number
+  ) {
     // /post/:postId
     return instance
-      .delete(`roomPosts/post/${postId}?roomId=${roomId}`)
+      .delete(`roomPosts/post/${postId}?roomId=${roomId}`, {
+        params: { page, limit },
+      })
       .then((response) => response.data)
   },
   createRoomComment(postId: string, roomId: string, comment: string) {

@@ -27,7 +27,9 @@ export default function Header({
     <div className={style.wrapper}>
       <div className={style.logoWrapper}>
         <div>
-          <Image src="/logo.png" alt="logo" width={40} height={40} />
+          <Link href="/">
+            <Image src="/logo.png" alt="logo" width={40} height={40} />
+          </Link>
         </div>
         {showButton && (
           <div
