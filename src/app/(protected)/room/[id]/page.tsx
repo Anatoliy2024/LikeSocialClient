@@ -22,6 +22,7 @@ import Image from "next/image"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
 import { setRoomPage } from "@/store/slices/roomPostsSlice"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import { RootState } from "@/store/store"
 
 const Room = () => {
   const [addFriendsToRoom, setAddFriendsToRoom] = useState(false)
@@ -31,10 +32,10 @@ const Room = () => {
   const searchParams = useSearchParams()
 
   const pageFromUrl = Number(searchParams.get("page")) || 1
-  const isAuth = useAppSelector((state) => state.auth.isAuth)
-  const userId = useAppSelector((state) => state.auth.userId)
+  const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
+  const userId = useAppSelector((state: RootState) => state.auth.userId)
 
-  const room = useAppSelector((state) => state.rooms.room)
+  const room = useAppSelector((state: RootState) => state.rooms.room)
   // const members = useAppSelector((state: RootState) => state.rooms.room?.members)
 
   // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)

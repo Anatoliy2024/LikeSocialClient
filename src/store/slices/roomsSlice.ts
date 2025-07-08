@@ -22,6 +22,10 @@ const initialState = {
   room: null as null | RoomType,
   loading: false,
   error: null as string | null,
+  page: 1,
+  limit: 10,
+  total: 0,
+  pages: 0,
 }
 
 const roomsSlice = createSlice({
@@ -36,7 +40,11 @@ const roomsSlice = createSlice({
       })
       .addCase(createRoomThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.rooms = action.payload
+        state.rooms = action.payload.rooms
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(createRoomThunk.rejected, (state, action) => {
         state.loading = false
@@ -49,7 +57,12 @@ const roomsSlice = createSlice({
       })
       .addCase(getRoomsThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.rooms = action.payload
+        // state.rooms = action.payload
+        state.rooms = action.payload.rooms
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(getRoomsThunk.rejected, (state, action) => {
         state.loading = false
@@ -130,19 +143,30 @@ const roomsSlice = createSlice({
       })
       .addCase(delRoomThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.rooms = action.payload
+        // state.rooms = action.payload
+        state.rooms = action.payload.rooms
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(delRoomThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка при удалении комнаты"
       })
+
       .addCase(leaveRoomThunk.pending, (state) => {
         state.loading = true
         state.error = null
       })
       .addCase(leaveRoomThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.rooms = action.payload
+        // state.rooms = action.payload
+        state.rooms = action.payload.rooms
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
       })
       .addCase(leaveRoomThunk.rejected, (state, action) => {
         state.loading = false

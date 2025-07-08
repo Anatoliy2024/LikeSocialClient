@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
-import { FormValuesAddRooms } from "../../app/(protected)/rooms/addRoomBlock/AddRoomBlock"
+import { FormValuesAddRooms } from "../../components/addRoomBlock/AddRoomBlock"
 import { fileAPI, roomAPI } from "@/api/api"
 type AddFriends = {
   users: string[]
@@ -23,6 +23,14 @@ export type RoomType = {
   avatarPublicId: string
 }
 
+export type RespRoomType = {
+  rooms: RoomType[]
+  page: number
+  limit: number
+  total: number
+  pages: number
+}
+
 export type RoomMemberType = {
   _id?: string
   username: string
@@ -30,7 +38,7 @@ export type RoomMemberType = {
 }
 
 export const createRoomThunk = createAsyncThunk<
-  RoomType[], // тип данных, которые вернутся — массив пользователей
+  RespRoomType, // тип данных, которые вернутся — массив пользователей
   FormValuesAddRooms, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("rooms/create", async ({ name, description }, thunkAPI) => {
@@ -48,12 +56,12 @@ export const createRoomThunk = createAsyncThunk<
   }
 })
 export const getRoomsThunk = createAsyncThunk<
-  RoomType[], // тип данных, которые вернутся — массив пользователей
-  void, // параметр тип данных которые отправляю
+  RespRoomType, // тип данных, которые вернутся — массив пользователей
+  number, // параметр тип данных которые отправляю
   { rejectValue: string }
->("rooms/getRooms", async (_, thunkAPI) => {
+>("rooms/getRooms", async (page, thunkAPI) => {
   try {
-    const data = await roomAPI.getRooms()
+    const data = await roomAPI.getRooms(page)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -122,12 +130,12 @@ export const delFriendFromRoomThunk = createAsyncThunk<
   }
 })
 export const delRoomThunk = createAsyncThunk<
-  RoomType[], // тип данных, которые вернутся — массив пользователей
-  string, // параметр тип данных которые отправляю
+  RespRoomType, // тип данных, которые вернутся — массив пользователей
+  { roomId: string; page: number }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("rooms/delRoom", async (roomId, thunkAPI) => {
+>("rooms/delRoom", async ({ roomId, page }, thunkAPI) => {
   try {
-    const data = await roomAPI.delRoom(roomId)
+    const data = await roomAPI.delRoom(roomId, page)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -140,12 +148,12 @@ export const delRoomThunk = createAsyncThunk<
   }
 })
 export const leaveRoomThunk = createAsyncThunk<
-  RoomType[], // тип данных, которые вернутся — массив пользователей
-  string, // параметр тип данных которые отправляю
+  RespRoomType, // тип данных, которые вернутся — массив пользователей
+  { roomId: string; page: number }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("rooms/leaveRoom", async (roomId, thunkAPI) => {
+>("rooms/leaveRoom", async ({ roomId, page }, thunkAPI) => {
   try {
-    const data = await roomAPI.leaveRoom(roomId)
+    const data = await roomAPI.leaveRoom(roomId, page)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios

@@ -207,8 +207,10 @@ export const roomAPI = {
       .post(`room/create`, { name, description })
       .then((response) => response.data)
   },
-  getRooms() {
-    return instance.get(`room/getRooms`).then((response) => response.data)
+  getRooms(page: number, limit?: number) {
+    return instance
+      .get(`room/getRooms`, { params: { page, limit } })
+      .then((response) => response.data)
   },
   getRoomById(roomId: string) {
     return instance
@@ -227,14 +229,14 @@ export const roomAPI = {
       .delete(`room/delFriend/${userId}?roomId=${roomId}`)
       .then((response) => response.data)
   },
-  delRoom(roomId: string) {
+  delRoom(roomId: string, page: number, limit?: number) {
     return instance
-      .delete(`room/delRoom/${roomId}`)
+      .delete(`room/delRoom/${roomId}`, { params: { page, limit } })
       .then((response) => response.data)
   },
-  leaveRoom(roomId: string) {
+  leaveRoom(roomId: string, page: number, limit?: number) {
     return instance
-      .delete(`room/leaveRoom/${roomId}`)
+      .delete(`room/leaveRoom/${roomId}`, { params: { page, limit } })
       .then((response) => response.data)
   },
 }
