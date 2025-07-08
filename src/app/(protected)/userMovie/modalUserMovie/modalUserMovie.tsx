@@ -19,11 +19,13 @@ export const ModalUserMovie = ({
   selectedMovie,
   myMoviesPage,
   setSelectedMovie,
+  page,
 }: {
   handleCloseModalUserMovie: () => void
   selectedMovie: UserMovieType
   myMoviesPage: boolean
   setSelectedMovie: (movie: UserMovieType) => void
+  page: number
 }) => {
   const dispatch = useAppDispatch()
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
@@ -51,6 +53,7 @@ export const ModalUserMovie = ({
           userMovieId: selectedMovie._id,
           newStatus:
             selectedMovie.status === "wantToSee" ? "watched" : "wantToSee",
+          page,
         })
       )
 
@@ -67,6 +70,7 @@ export const ModalUserMovie = ({
           userMovieId: selectedMovie._id,
           status:
             selectedMovie.status === "wantToSee" ? "wantToSee" : "watched",
+          page,
         })
       )
       handleCloseModalUserMovie()

@@ -200,6 +200,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
           selectedMovie={selectedMovie}
           myMoviesPage={myMoviesPage}
           setSelectedMovie={setSelectedMovie}
+          page={page}
         />
       )}
       {isCreateMovieWantToSee && (
