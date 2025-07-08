@@ -171,7 +171,7 @@ const PostModal = ({
     setChangeAvatarModal(false)
   }
   const handleOpenModal = () => {
-    if (playerId === authorId) {
+    if (playerId === authorId._id) {
       setChangeAvatarModal(true)
     }
   }
@@ -245,7 +245,7 @@ const PostModal = ({
                   <StarRatingView value={ratings.story} />
                 </div>
               </div>
-              {playerId !== authorId && (
+              {playerId !== authorId._id && (
                 <div className={style.starsBlock}>
                   {myVoice && !isEditing ? (
                     <>

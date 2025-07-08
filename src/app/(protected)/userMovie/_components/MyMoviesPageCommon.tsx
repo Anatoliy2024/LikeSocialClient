@@ -13,11 +13,13 @@ import {
 } from "@/store/slices/userMoviesSlice"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
-import MovieCard from "@/components/MovieCard/MovieCard"
+// import MovieCard from "@/components/MovieCard/MovieCard"
 import styles from "./MyMoviesPage.module.scss"
 import ButtonMenu from "@/components/ui/button/Button"
 import CreateMovieWantToSee from "../CreateMovieWantToSee/CreateMovieWantToSee"
 import { ModalUserMovie } from "../modalUserMovie/modalUserMovie"
+import UserMovieList from "@/components/uгserMovieList/UserMovieList"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 type Props =
   | { myMoviesPage: true; userId?: never }
@@ -34,55 +36,122 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
 
   // const { id: userId } = useParams()
 
-  const { myMovies, publicMovies, loading, error } = useAppSelector(
-    (state: RootState) => state.userMovies
+  const {
+    myMovies,
+    publicMovies,
+    loading,
+    error,
+    page,
+
+    pages,
+  } = useAppSelector((state: RootState) => state.userMovies)
+  const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
+  console.log(
+    "state.userMovies*****************",
+    myMovies,
+    publicMovies,
+    loading,
+    error,
+    page,
+
+    pages
   )
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const pageFromUrl = Number(searchParams.get("page")) || 1
+
+  // useEffect(() => {
+  //   if (isAuth && typeof id === "string") {
+  //     dispatch(setRoomPage(pageFromUrl))
+  //     dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
+  //   }
+  // }, [isAuth, dispatch, id, pageFromUrl])
+
+  // useEffect(() => {
+  //   if (isAuth && typeof id === "string") {
+  //     dispatch(getRoomByIdThunk(id))
+  //   }
+  // }, [isAuth, dispatch, id])
 
   useEffect(() => {
-    dispatch(clearUserMoviesError())
-    if (myMoviesPage) {
-      if (activeTab === "wantToSee") {
-        dispatch(fetchMyWantToSeeMoviesThunk())
+    if (isAuth) {
+      dispatch(clearUserMoviesError())
+      if (myMoviesPage) {
+        if (activeTab === "wantToSee") {
+          dispatch(fetchMyWantToSeeMoviesThunk(pageFromUrl))
+        } else {
+          dispatch(fetchMyWatchedMoviesThunk(pageFromUrl))
+        }
       } else {
-        dispatch(fetchMyWatchedMoviesThunk())
-      }
-    } else {
-      if (!userId) return
-      dispatch(clearPublicMovies())
-      if (activeTab === "wantToSee") {
-        dispatch(fetchPublicWantToSeeMoviesThunk(userId))
-      } else {
-        dispatch(fetchPublicWatchedMoviesThunk(userId))
+        if (!userId) return
+        dispatch(clearPublicMovies())
+        if (activeTab === "wantToSee") {
+          dispatch(
+            fetchPublicWantToSeeMoviesThunk({ userId, page: pageFromUrl })
+          )
+        } else {
+          dispatch(fetchPublicWatchedMoviesThunk({ userId, page: pageFromUrl }))
+        }
       }
     }
-  }, [dispatch, userId, myMoviesPage, activeTab])
+  }, [dispatch, userId, myMoviesPage, activeTab, isAuth, pageFromUrl])
 
-  const renderMovies = () => {
-    const movies = userId
-      ? activeTab === "wantToSee"
-        ? publicMovies.wantToSee
-        : publicMovies.watched
-      : activeTab === "wantToSee"
-      ? myMovies.wantToSee
-      : myMovies.watched
-    console.log("movie", movies)
+  const movies = userId
+    ? activeTab === "wantToSee"
+      ? publicMovies.wantToSee
+      : publicMovies.watched
+    : activeTab === "wantToSee"
+    ? myMovies.wantToSee
+    : myMovies.watched
+  console.log("movie", movies)
 
-    if (loading) return <p>Загрузка...</p>
-    if (error) return <p className={styles.error}>{error}</p>
-    if (!movies?.length) return <p>Фильмов нет</p>
-    return (
-      <div className={styles.grid}>
-        {movies.map((movie) => (
-          <MovieCard
-            myMoviesPage={myMoviesPage}
-            key={movie._id}
-            movie={movie}
-            onClick={() => handleShowModalUserMovie(movie)}
-          />
-        ))}
-      </div>
-    )
-  }
+  // const renderMovies = () => {
+  //   const movies = userId
+  //     ? activeTab === "wantToSee"
+  //       ? publicMovies.wantToSee
+  //       : publicMovies.watched
+  //     : activeTab === "wantToSee"
+  //     ? myMovies.wantToSee
+  //     : myMovies.watched
+  //   console.log("movie", movies)
+
+  //   if (loading) return <p>Загрузка...</p>
+  //   if (error) return <p className={styles.error}>{error}</p>
+  //   if (!movies?.length) return <p>Фильмов нет</p>
+  //   return (
+  //     <div className={styles.grid}>
+  //       {pages > 1 && (
+  //           <div style={{ marginTop: 20 }}>
+  //             {Array.from({ length: pages }, (_, i) => i + 1).map((num) => (
+  //               <button
+  //                 key={num}
+  //                 disabled={num === page}
+  //                 onClick={() => onPageChange(num)}
+  //                 style={{
+  //                   marginRight: 5,
+  //                   padding: "5px 10px",
+  //                   fontWeight: num === page ? "bold" : "normal",
+  //                   cursor: num === page ? "default" : "pointer",
+  //                 }}
+  //               >
+  //                 {num}
+  //               </button>
+  //             ))}
+  //           </div>
+  //         )}
+  //       {movies.map((movie) => (
+  //         <MovieCard
+  //           myMoviesPage={myMoviesPage}
+  //           key={movie._id}
+  //           movie={movie}
+  //           onClick={() => handleShowModalUserMovie(movie)}
+  //         />
+  //       ))}
+  //     </div>
+  //   )
+  // }
 
   const showCreateMovieWantToSee = () => {
     setIsCreateMovieWantToSee(true)
@@ -103,6 +172,24 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
     setShowModalUserMovie(false)
     setSelectedMovie(null)
     // console.log("closeCreateMovieWantToSee", isCreateMovieWantToSee)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("page", String(newPage))
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+
+  const handleTabChange = (tab: "wantToSee" | "watched") => {
+    setActiveTab(tab)
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("page") // удаляем параметр страницы
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
   return (
@@ -135,7 +222,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
             className={`${styles.tabButton} ${
               activeTab === "wantToSee" ? styles.active : ""
             }`}
-            onClick={() => setActiveTab("wantToSee")}
+            onClick={() => handleTabChange("wantToSee")}
           >
             Хочу посмотреть
           </button>
@@ -143,13 +230,22 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
             className={`${styles.tabButton} ${
               activeTab === "watched" ? styles.active : ""
             }`}
-            onClick={() => setActiveTab("watched")}
+            onClick={() => handleTabChange("watched")}
           >
             Просмотрено
           </button>
         </div>
 
-        {renderMovies()}
+        <UserMovieList
+          movies={movies}
+          loading={loading}
+          error={error}
+          myMoviesPage={myMoviesPage}
+          page={page}
+          pages={pages}
+          onClickMovie={handleShowModalUserMovie}
+          onPageChange={handlePageChange}
+        />
       </div>
     </>
   )

@@ -1,6 +1,11 @@
 "use client"
+import { Suspense } from "react"
 import MyMoviesPageCommon from "./_components/MyMoviesPageCommon"
 
 export default function MyMoviesPage() {
-  return <MyMoviesPageCommon myMoviesPage />
+  return (
+    <Suspense>
+      <MyMoviesPageCommon myMoviesPage />
+    </Suspense>
+  )
 }

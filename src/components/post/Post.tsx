@@ -18,7 +18,7 @@ type PostType = {
   content: string | null
   authorName: string | null
   avatar: string
-  avatarPublicId: string
+  // avatarPublicId: string
   ratings: {
     acting: number
     specialEffects: number
@@ -116,7 +116,7 @@ const Post = ({
           </div>
         ) : null}
 
-        {authorName && (
+        {authorName && roomId && (
           <div className={style.blockAuthorName}>
             <span>Автор: </span>
             {authorName}

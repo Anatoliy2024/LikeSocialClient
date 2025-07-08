@@ -15,10 +15,15 @@ export type RatingType = {
   story: number
   stars: number
 }
+export type authorIdType = {
+  username: string
+  avatar: string
+  _id: string
+}
 
 export type userPostType = {
   _id: string
-  authorId: string
+  authorId: authorIdType
   imagePost?: string
   // roomId: string | null
   title: string

@@ -348,17 +348,31 @@ export const userMovieAPI = {
   //   data: { status: "wantToSee" }, // передаём текущий таб
   // }
 
-  deleteUserMovie(userMovieId: string, status: "wantToSee" | "watched") {
+  deleteUserMovie(
+    userMovieId: string,
+    status: "wantToSee" | "watched",
+    page: number,
+    limit?: number
+  ) {
     return instance
       .delete(`user-movie/delete/${userMovieId}`, {
         data: { status }, // ⬅️ обязательно внутри data!
+        params: { page, limit },
       })
       .then((res) => res.data)
   },
 
-  updateUserMovieStatus(userMovieId: string, status: "wantToSee" | "watched") {
+  updateUserMovieStatus(
+    userMovieId: string,
+    status: "wantToSee" | "watched",
+    page: number,
+    limit?: number
+  ) {
     return instance
-      .patch(`user-movie/update-status/${userMovieId}`, { status })
+      .patch(`user-movie/update-status/${userMovieId}`, {
+        status,
+        params: { page, limit },
+      })
       .then((res) => res.data)
   },
 
@@ -369,23 +383,29 @@ export const userMovieAPI = {
   //     .then((res) => res.data)
   // },
 
-  getMyWantToSeeMovies() {
-    return instance.get("user-movie/my/want-to-see").then((res) => res.data)
-  },
-
-  getMyWatchedMovies() {
-    return instance.get("user-movie/my/watched").then((res) => res.data)
-  },
-
-  getPublicWantToSeeMovies(userId: string) {
+  getMyWantToSeeMovies(page: number, limit?: number) {
     return instance
-      .get(`user-movie/${userId}/public/want-to-see`)
+      .get("user-movie/my/want-to-see", { params: { page, limit } })
       .then((res) => res.data)
   },
 
-  getPublicWatchedMovies(userId: string) {
+  getMyWatchedMovies(page: number, limit?: number) {
     return instance
-      .get(`user-movie/${userId}/public/watched`)
+      .get("user-movie/my/watched", { params: { page, limit } })
+      .then((res) => res.data)
+  },
+
+  getPublicWantToSeeMovies(userId: string, page: number, limit?: number) {
+    return instance
+      .get(`user-movie/${userId}/public/want-to-see`, {
+        params: { page, limit },
+      })
+      .then((res) => res.data)
+  },
+
+  getPublicWatchedMovies(userId: string, page: number, limit?: number) {
+    return instance
+      .get(`user-movie/${userId}/public/watched`, { params: { page, limit } })
       .then((res) => res.data)
   },
 }

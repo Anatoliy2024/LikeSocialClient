@@ -11,6 +11,7 @@ import { useParams, useRouter, usePathname } from "next/navigation"
 import PostModal from "@/components/postModal/PostModal"
 import { useSearchParams } from "next/navigation"
 import { userPostType } from "@/store/slices/userPostsSlice"
+import { Paginator } from "../Paginator/Paginator"
 
 type PostsBlockProps = {
   posts: userPostType[]
@@ -119,6 +120,9 @@ const PostsBlock = ({
               }}
             />
           )}
+          {pages > 1 && (
+            <Paginator pages={pages} onPageChange={onPageChange} page={page} />
+          )}
           <div className={style.containerPosts}>
             {posts.length > 0
               ? posts
@@ -139,7 +143,7 @@ const PostsBlock = ({
                         key={post._id}
                         title={post.title}
                         content={post.content}
-                        authorName={post?.authorName || ""}
+                        authorName={post.authorId.username}
                         ratings={post.ratings}
                         createdAt={post.createdAt}
                         id={post._id}
@@ -151,32 +155,14 @@ const PostsBlock = ({
                         onClick={() => openPostModal(post._id)}
                         comments={post.comments}
                         votesCount={post.votesCount}
-                        avatarPublicId={post.avatarPublicId}
+                        // avatarPublicId={post.avatarPublicId}
                         page={page}
                       />
                     )
                   })
               : null}
           </div>
-          {pages > 1 && (
-            <div style={{ marginTop: 20 }}>
-              {Array.from({ length: pages }, (_, i) => i + 1).map((num) => (
-                <button
-                  key={num}
-                  disabled={num === page}
-                  onClick={() => onPageChange(num)}
-                  style={{
-                    marginRight: 5,
-                    padding: "5px 10px",
-                    fontWeight: num === page ? "bold" : "normal",
-                    cursor: num === page ? "default" : "pointer",
-                  }}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          )}
+
           {loading && <p>Загрузка...</p>}
         </div>
         {selectedPost && (

@@ -31,6 +31,10 @@ type userMoviesSliceType = {
   }
   loading: boolean
   error: string | null
+  page: number
+  limit: number
+  total: number
+  pages: number
 }
 const initialState: userMoviesSliceType = {
   myMovies: {
@@ -43,6 +47,10 @@ const initialState: userMoviesSliceType = {
   },
   loading: false,
   error: null,
+  page: 1,
+  limit: 10,
+  total: 0,
+  pages: 0,
 }
 
 const userMoviesSlice = createSlice({
@@ -64,7 +72,11 @@ const userMoviesSlice = createSlice({
         state.error = null
       })
       .addCase(createUserMovieThunk.fulfilled, (state, action) => {
-        state.myMovies.wantToSee = action.payload.userMovies
+        state.myMovies.wantToSee = action.payload.userMovies.movies
+        state.page = action.payload.userMovies.page
+        state.limit = action.payload.userMovies.limit
+        state.total = action.payload.userMovies.total
+        state.pages = action.payload.userMovies.pages
         state.loading = false
       })
       .addCase(createUserMovieThunk.rejected, (state, action) => {
@@ -79,7 +91,7 @@ const userMoviesSlice = createSlice({
         state.error = null
       })
       .addCase(deleteUserMovieThunk.fulfilled, (state, action) => {
-        const updatedUserMovies = action.payload.userMovies
+        const updatedUserMovies = action.payload.userMovies.movies
         const status = action.payload.status
         console.log("updatedUserMovies", updatedUserMovies)
         console.log("status*************", status)
@@ -88,7 +100,12 @@ const userMoviesSlice = createSlice({
         } else {
           state.myMovies.watched = updatedUserMovies
         }
-        state.myMovies.wantToSee = action.payload.userMovies
+        // state.myMovies.wantToSee = action.payload.userMovies.movies
+        state.page = action.payload.userMovies.page
+        state.limit = action.payload.userMovies.limit
+        state.total = action.payload.userMovies.total
+        state.pages = action.payload.userMovies.pages
+        // state.myMovies.wantToSee = action.payload.userMovies
         state.loading = false
       })
       .addCase(deleteUserMovieThunk.rejected, (state, action) => {
@@ -104,7 +121,7 @@ const userMoviesSlice = createSlice({
 
       .addCase(toggleUserMovieStatusThunk.fulfilled, (state, action) => {
         // state.items = action.payload
-        const updatedUserMovies = action.payload.userMovies
+        const updatedUserMovies = action.payload.userMovies.movies
         const status = action.payload.status
         // console.log("updatedUserMovies", updatedUserMovies)
         // console.log("state.myMovies.wantToSee", state.myMovies.wantToSee)
@@ -115,6 +132,11 @@ const userMoviesSlice = createSlice({
         } else {
           state.myMovies.watched = updatedUserMovies
         }
+        state.page = action.payload.userMovies.page
+        state.limit = action.payload.userMovies.limit
+        state.total = action.payload.userMovies.total
+        state.pages = action.payload.userMovies.pages
+
         // state.myMovies.wantToSee = state.myMovies.wantToSee.filter(
         //   (userMovie) => userMovie._id !== updatedUserMovies._id
         // )
@@ -135,9 +157,16 @@ const userMoviesSlice = createSlice({
 
       .addCase(fetchMyWantToSeeMoviesThunk.fulfilled, (state, action) => {
         // state.items = action.payload
-        const updatedUserMovies = action.payload.userMovies
-        console.log("updatedUserMovies", updatedUserMovies)
+        const updatedUserMovies = action.payload.userMovies.movies
+        console.log(
+          "updatedUserMovies***************",
+          action.payload.userMovies
+        )
         state.myMovies.wantToSee = updatedUserMovies
+        state.page = action.payload.userMovies.page
+        state.limit = action.payload.userMovies.limit
+        state.total = action.payload.userMovies.total
+        state.pages = action.payload.userMovies.pages
         state.loading = false
       })
       .addCase(fetchMyWantToSeeMoviesThunk.rejected, (state, action) => {
@@ -155,8 +184,14 @@ const userMoviesSlice = createSlice({
 
       .addCase(fetchMyWatchedMoviesThunk.fulfilled, (state, action) => {
         // state.items = action.payload
-        const updatedUserMovies = action.payload.userMovies
+        const updatedUserMovies = action.payload.userMovies.movies
         state.myMovies.watched = updatedUserMovies
+
+        state.page = action.payload.userMovies.page
+        state.limit = action.payload.userMovies.limit
+        state.total = action.payload.userMovies.total
+        state.pages = action.payload.userMovies.pages
+
         state.loading = false
       })
       .addCase(fetchMyWatchedMoviesThunk.rejected, (state, action) => {
@@ -174,8 +209,12 @@ const userMoviesSlice = createSlice({
 
       .addCase(fetchPublicWantToSeeMoviesThunk.fulfilled, (state, action) => {
         // state.items = action.payload
-        const updatedUserMovies = action.payload.userMovies
+        const updatedUserMovies = action.payload.userMovies.movies
         state.publicMovies.wantToSee = updatedUserMovies
+        state.page = action.payload.userMovies.page
+        state.limit = action.payload.userMovies.limit
+        state.total = action.payload.userMovies.total
+        state.pages = action.payload.userMovies.pages
         state.loading = false
       })
       .addCase(fetchPublicWantToSeeMoviesThunk.rejected, (state, action) => {
@@ -193,8 +232,13 @@ const userMoviesSlice = createSlice({
 
       .addCase(fetchPublicWatchedMoviesThunk.fulfilled, (state, action) => {
         // state.items = action.payload
-        const updatedUserMovies = action.payload.userMovies
+        const updatedUserMovies = action.payload.userMovies.movies
         state.publicMovies.watched = updatedUserMovies
+
+        state.page = action.payload.userMovies.page
+        state.limit = action.payload.userMovies.limit
+        state.total = action.payload.userMovies.total
+        state.pages = action.payload.userMovies.pages
         state.loading = false
       })
       .addCase(fetchPublicWatchedMoviesThunk.rejected, (state, action) => {
