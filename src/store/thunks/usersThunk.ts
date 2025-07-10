@@ -9,33 +9,41 @@ export type UserType = {
   avatar: string
   _id: string
 }
+export type UserTypeReq = {
+  users: UserType[]
+  page: number
+  limit: number
+  total: number
+  pages: number
+}
 
-export const getAllUsersThunk = createAsyncThunk(
-  "user/all",
-  async (_, thunkAPI) => {
-    try {
-      const data = await userAPI.getAllUsers()
+export const getAllUsersThunk = createAsyncThunk<
+  UserTypeReq, // тип данных, которые вернутся — массив пользователей
+  number, // параметр — тип запроса: "friends" | "requests" | "sent"
+  { rejectValue: string }
+>("user/all", async (page, thunkAPI) => {
+  try {
+    const data = await userAPI.getAllUsers(page)
 
-      return data
-    } catch (error: unknown) {
-      // Проверка, является ли ошибка ошибкой Axios
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        return thunkAPI.rejectWithValue(error.response.data.message)
-      }
-
-      // если это вообще не ошибка axios или нет message
-      return thunkAPI.rejectWithValue("Ошибка при запросе всех юзеров")
+    return data
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
     }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue("Ошибка при запросе всех юзеров")
   }
-)
+})
 
 export const getUserRelationsThunk = createAsyncThunk<
-  UserType[], // тип данных, которые вернутся — массив пользователей
-  string, // параметр — тип запроса: "friends" | "requests" | "sent"
+  UserTypeReq, // тип данных, которые вернутся — массив пользователей
+  { type: string; page: number }, // параметр — тип запроса: "friends" | "requests" | "sent"
   { rejectValue: string }
->("users/getUserRelations", async (type, thunkAPI) => {
+>("users/getUserRelations", async ({ type, page }, thunkAPI) => {
   try {
-    const data = await userAPI.getUserRelations(type)
+    const data = await userAPI.getUserRelations(type, page)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -48,12 +56,12 @@ export const getUserRelationsThunk = createAsyncThunk<
 })
 
 export const requestFriendThunk = createAsyncThunk<
-  UserType[], // тип данных, которые вернутся — массив пользователей
-  string, // параметр — тип запроса: "friends" | "requests" | "sent"
+  UserTypeReq, // тип данных, которые вернутся — массив пользователей
+  { userId: string; page: number }, // параметр — тип запроса: "friends" | "requests" | "sent"
   { rejectValue: string }
->("user/requestFriend", async (userId, thunkAPI) => {
+>("user/requestFriend", async ({ userId, page }, thunkAPI) => {
   try {
-    const data = await userAPI.requestFriend(userId)
+    const data = await userAPI.requestFriend(userId, page)
 
     return data
   } catch (error: unknown) {
@@ -70,12 +78,12 @@ export const requestFriendThunk = createAsyncThunk<
 })
 
 export const acceptFriendThunk = createAsyncThunk<
-  { friends: UserType[]; friendRequests: UserType[] }, // тип данных, которые вернутся — массив пользователей
-  string, // параметр — тип запроса: "friends" | "requests" | "sent"
+  { friends: UserTypeReq; friendRequests: UserTypeReq }, // тип данных, которые вернутся — массив пользователей
+  { type: string; page: number }, // параметр — тип запроса: "friends" | "requests" | "sent"
   { rejectValue: string }
->("users/acceptFriend", async (type, thunkAPI) => {
+>("users/acceptFriend", async ({ type, page }, thunkAPI) => {
   try {
-    const data = await userAPI.acceptFriend(type)
+    const data = await userAPI.acceptFriend(type, page)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -86,12 +94,12 @@ export const acceptFriendThunk = createAsyncThunk<
   }
 })
 export const delFriendThunk = createAsyncThunk<
-  UserType[], // тип данных, которые вернутся — массив пользователей
-  string, // параметр — тип запроса: "friends" | "requests" | "sent"
+  UserTypeReq, // тип данных, которые вернутся — массив пользователей
+  { type: string; page: number }, // параметр — тип запроса: "friends" | "requests" | "sent"
   { rejectValue: string }
->("users/delFriend", async (type, thunkAPI) => {
+>("users/delFriend", async ({ type, page }, thunkAPI) => {
   try {
-    const data = await userAPI.delFriend(type)
+    const data = await userAPI.delFriend(type, page)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -102,12 +110,12 @@ export const delFriendThunk = createAsyncThunk<
   }
 })
 export const cancelRequestFriendThunk = createAsyncThunk<
-  UserType[], // тип данных, которые вернутся — массив пользователей
-  string, // параметр — тип запроса: "friends" | "requests" | "sent"
+  UserTypeReq, // тип данных, которые вернутся — массив пользователей
+  { type: string; page: number }, // параметр — тип запроса: "friends" | "requests" | "sent"
   { rejectValue: string }
->("users/cancelRequestFriend", async (type, thunkAPI) => {
+>("users/cancelRequestFriend", async ({ type, page }, thunkAPI) => {
   try {
-    const data = await userAPI.cancelFriendRequest(type)
+    const data = await userAPI.cancelFriendRequest(type, page)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -120,22 +128,29 @@ export const cancelRequestFriendThunk = createAsyncThunk<
 })
 export const getMyFriendsIdThunk = createAsyncThunk<
   {
-    friends: UserType[]
-    friendRequests: UserType[]
-    sentFriendRequests: UserType[]
+    friends: UserTypeReq
+    friendRequests: UserTypeReq
+    sentFriendRequests: UserTypeReq
   }, // тип данных, которые вернутся — массив пользователей
-  void, // параметр — тип запроса: "friends" | "requests" | "sent"
+  { friendsPage: number; requestsPage: number; sentPage: number }, // параметр — тип запроса: "friends" | "requests" | "sent"
   { rejectValue: string }
->("users/getMyFriendsId", async (_, thunkAPI) => {
-  try {
-    const data = await userAPI.getMyFriendsId()
-    console.log("getMyFriendsIdThunk")
-    return data
-  } catch (error: unknown) {
-    // Проверка, является ли ошибка ошибкой Axios
-    if (axios.isAxiosError(error) && error.response?.data?.message) {
-      return thunkAPI.rejectWithValue(error.response.data.message)
+>(
+  "users/getMyFriendsId",
+  async ({ friendsPage, requestsPage, sentPage }, thunkAPI) => {
+    try {
+      const data = await userAPI.getMyFriendsId(
+        friendsPage,
+        requestsPage,
+        sentPage
+      )
+      console.log("getMyFriendsIdThunk")
+      return data
+    } catch (error: unknown) {
+      // Проверка, является ли ошибка ошибкой Axios
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+      return thunkAPI.rejectWithValue("Ошибка при получении getMyFriendsId")
     }
-    return thunkAPI.rejectWithValue("Ошибка при получении getMyFriendsId")
   }
-})
+)

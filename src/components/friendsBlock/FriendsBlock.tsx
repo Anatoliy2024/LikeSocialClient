@@ -1,0 +1,97 @@
+"use client"
+import FriendsList from "@/components/friendsList/FriendsList"
+import ButtonMenu from "@/components/ui/button/Button"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import { RootState } from "@/store/store"
+import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
+import Link from "next/link"
+import { useEffect } from "react"
+import style from "./FriendsBlock.module.scss"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
+export function FriendsBlock() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const {
+    users: friendRequestsUsers,
+    page: friendRequestsPage,
+    // total: friendRequestsTotal,
+    pages: friendRequestsPages,
+  } = useAppSelector((state: RootState) => state.users.friendRequests)
+
+  const {
+    users: friendsUsers,
+    page: friendsPage,
+    // total: friendsTotal,
+    pages: friendsPages,
+  } = useAppSelector((state: RootState) => state.users.friends)
+
+  const {
+    users: sentFriendRequestsUsers,
+    page: sentRequestsPage,
+    // total: sentRequestsTotal,
+    pages: sentRequestsPages,
+  } = useAppSelector((state: RootState) => state.users.sentFriendRequests)
+
+  const friendsPageFromUrl = Number(searchParams.get("friendsPage")) || 1
+  const requestsPageFromUrl = Number(searchParams.get("requestsPage")) || 1
+  const sentPageFromUrl = Number(searchParams.get("sentPage")) || 1
+
+  //   const handlePageChange = (newPage: number) => {
+  //     const params = new URLSearchParams(searchParams.toString())
+  //     params.set("page", String(newPage))
+
+  //     router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+  //     // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  //   }
+  // const users = useAppSelector((state: RootState) => state.users.users)
+  const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(
+        getUserRelationsThunk({ type: "friends", page: friendsPageFromUrl })
+      )
+      dispatch(
+        getUserRelationsThunk({ type: "requests", page: requestsPageFromUrl })
+      )
+      dispatch(getUserRelationsThunk({ type: "sent", page: sentPageFromUrl }))
+    }
+  }, [
+    isAuth,
+    dispatch,
+    friendsPageFromUrl,
+    requestsPageFromUrl,
+    sentPageFromUrl,
+  ])
+
+  return (
+    <div className={style.wrapper}>
+      <FriendsList
+        type={"friendRequests"}
+        users={friendRequestsUsers}
+        page={friendRequestsPage}
+        pages={friendRequestsPages}
+      />
+      <FriendsList
+        type={"friends"}
+        users={friendsUsers}
+        page={friendsPage}
+        pages={friendsPages}
+      />
+      <FriendsList
+        type={"sentFriendRequests"}
+        users={sentFriendRequestsUsers}
+        page={sentRequestsPage}
+        pages={sentRequestsPages}
+      />
+      {/* Friends <FriendsList type={"sentFriendRequests"}/> */}
+      {/* <FriendsList/> */}
+      <Link href="/friends/search">
+        <ButtonMenu>Поиск друзей</ButtonMenu>
+      </Link>
+    </div>
+  )
+}

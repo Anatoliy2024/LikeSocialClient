@@ -4,22 +4,30 @@ import style from "./FriendsList.module.scss"
 import { RootState } from "@/store/store"
 import ButtonMenu from "../ui/button/Button"
 // import { getUserProfileThunk } from "@/store/thunks/profileThunk"
-import { useRouter } from "next/navigation"
+
 import {
   acceptFriendThunk,
   cancelRequestFriendThunk,
   delFriendThunk,
+  UserType,
 } from "@/store/thunks/usersThunk"
 import Image from "next/image"
+import { Paginator } from "../Paginator/Paginator"
+// import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 type FriendsListProps = {
   type: "friendRequests" | "friends" | "sentFriendRequests" // ограничим, чтобы был ключ из users
+  users: UserType[]
+  page: number
+  pages: number
 }
 
-const FriendsList = ({ type }: FriendsListProps) => {
+const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
   const loading = useAppSelector((state: RootState) => state.users.loading)
+  // const router = useRouter()
+  // const pathname = usePathname()
+  // const searchParams = useSearchParams()
 
-  const router = useRouter()
   const dispatch = useAppDispatch()
   const title = {
     friendRequests: "Заявки в друзья",
@@ -31,11 +39,18 @@ const FriendsList = ({ type }: FriendsListProps) => {
     friends: "Удалить друга",
     sentFriendRequests: "Отменить заявку",
   }
+  const pageType = {
+    friendRequests: "friendsPage",
+    friends: "requestsPage",
+    sentFriendRequests: "sentPage",
+  }
+
+  // const pageFromUrl = Number(searchParams.get(pageType[type])) || 1
 
   const handleClick = (type: string, userId: string) => {
     switch (type) {
       case "friendRequests":
-        return dispatch(acceptFriendThunk(userId))
+        return dispatch(acceptFriendThunk({ userId, page: pageFromUrl }))
       case "friends":
         return dispatch(delFriendThunk(userId))
       case "sentFriendRequests":
@@ -44,21 +59,31 @@ const FriendsList = ({ type }: FriendsListProps) => {
   }
 
   // Берём нужный массив из users по ключу type
-  const list = useAppSelector(
-    (state: RootState) => state.users[type]
-  ) as Array<{ _id: string; username: string; avatar: string }>
+  // const list = useAppSelector((state: RootState) => state.users[type])
 
   const handleLinkUser = (userId: string) => {
     router.push(`/profile/${userId}`)
   }
 
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set(pageType[type], String(newPage))
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+
   return (
     <div className={style.wrapper}>
       <h2>{title[type]}</h2>
-      {list.length === 0 ? (
+      {pages > 1 && (
+        <Paginator pages={pages} onPageChange={handlePageChange} page={page} />
+      )}
+      {users.length === 0 ? (
         <p>Пусто</p>
       ) : (
-        list.map((user) => (
+        users.map((user) => (
           <div key={user._id} className={style.containerUser}>
             <div
               className={style.imgNameContainer}
