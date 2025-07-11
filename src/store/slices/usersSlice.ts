@@ -118,6 +118,7 @@ const usersSlice = createSlice({
       })
       .addCase(requestFriendThunk.fulfilled, (state, action) => {
         state.loading = false
+        console.log("action.payload", action.payload)
         state.sentFriendRequests = action.payload
 
         // state.sentFriendRequests.users = action.payload.users
@@ -190,8 +191,9 @@ const usersSlice = createSlice({
       })
       .addCase(cancelRequestFriendThunk.fulfilled, (state, action) => {
         state.loading = false
+        console.log("action.payload", action.payload)
         state.sentFriendRequests = action.payload
-
+        console.log("state.sentFriendRequests", state.sentFriendRequests)
         // state.sentFriendRequests.users = action.payload.users
         // state.sentFriendRequests.page = action.payload.page
         // state.sentFriendRequests.limit = action.payload.limit

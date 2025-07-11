@@ -48,6 +48,7 @@ const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
     case "none":
     default:
       buttonText = "Добавить в друзья"
+
       onClickHandler = () => dispatch(requestFriendThunk({ userId: id, page }))
       break
   }

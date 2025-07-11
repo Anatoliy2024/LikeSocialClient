@@ -59,13 +59,13 @@ export const AddMembersToRoom = ({
   return (
     <div className={style.wrapper} onClick={handleCloseAddMembersFromRoom}>
       <div className={style.container} onClick={(e) => e.stopPropagation()}>
+        <h3>Участники</h3>
+        <Paginator
+          pages={pages}
+          page={page}
+          onPageChange={onChangePageFriends}
+        />
         <form onSubmit={handleSubmit(onSubmit)}>
-          <h3>Участники</h3>
-          <Paginator
-            pages={pages}
-            page={page}
-            onPageChange={onChangePageFriends}
-          />
           <div className={style.list}>
             {availableFriends.map((friend) => (
               <div key={friend._id} className={style.member}>

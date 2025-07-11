@@ -36,10 +36,10 @@ export function SearchBlock() {
       dispatch(getMyFriendsIdThunk())
     }
   }, [isAuth, dispatch, urlPage])
-  console.log("friends", friends)
-  console.log("friendRequests", friendRequests)
-  console.log("sentFriendRequests", sentFriendRequests)
-  console.log("users", users)
+  // console.log("friends", friends)
+  // console.log("friendRequests", friendRequests)
+  // console.log("sentFriendRequests", sentFriendRequests)
+  // console.log("users", users)
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())

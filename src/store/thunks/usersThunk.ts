@@ -61,6 +61,7 @@ export const requestFriendThunk = createAsyncThunk<
   { rejectValue: string }
 >("user/requestFriend", async ({ userId, page }, thunkAPI) => {
   try {
+    // console.log("userId, page", userId, page)
     const data = await userAPI.requestFriend(userId, page)
 
     return data
