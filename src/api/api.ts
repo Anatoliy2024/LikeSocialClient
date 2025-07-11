@@ -94,12 +94,8 @@ export const userAPI = {
       .get("user/all", { params: { page, limit } })
       .then((res) => res.data)
   },
-  getMyFriendsId(friendsPage: number, requestsPage: number, sentPage: number) {
-    return instance
-      .get("user/myFriendsId", {
-        params: { friendsPage, requestsPage, sentPage },
-      })
-      .then((res) => res.data)
+  getMyFriendsId() {
+    return instance.get("user/myFriendsId").then((res) => res.data)
   },
   requestFriend(userId: string, page: number, limit?: number) {
     return instance

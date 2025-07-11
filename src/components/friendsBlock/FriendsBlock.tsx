@@ -7,10 +7,11 @@ import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 import Link from "next/link"
 import { useEffect } from "react"
 import style from "./FriendsBlock.module.scss"
-import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
+
 export function FriendsBlock() {
-  const router = useRouter()
-  const pathname = usePathname()
+  // const router = useRouter()
+  // const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const {
@@ -67,6 +68,20 @@ export function FriendsBlock() {
     sentPageFromUrl,
   ])
 
+  // const handlePageChange = (newPage: number,type:string) => {
+  //   const pageType = {
+  //     friendRequests: "friendsPage",
+  //     friends: "requestsPage",
+  //     sentFriendRequests: "sentPage",
+  //   }
+  //   const params = new URLSearchParams(searchParams.toString())
+  //   params.set(pageType[type], String(newPage))
+
+  //   router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+  //   // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  // }
+
   return (
     <div className={style.wrapper}>
       <FriendsList
@@ -74,18 +89,26 @@ export function FriendsBlock() {
         users={friendRequestsUsers}
         page={friendRequestsPage}
         pages={friendRequestsPages}
+        // handlePageChange={handlePageChange}
+        // urlPage={requestsPageFromUrl}
       />
       <FriendsList
         type={"friends"}
         users={friendsUsers}
         page={friendsPage}
         pages={friendsPages}
+        // handlePageChange={handlePageChange}
+
+        // urlPage={friendsPageFromUrl}
       />
       <FriendsList
         type={"sentFriendRequests"}
         users={sentFriendRequestsUsers}
         page={sentRequestsPage}
         pages={sentRequestsPages}
+        // handlePageChange={handlePageChange}
+
+        // urlPage={sentPageFromUrl}
       />
       {/* Friends <FriendsList type={"sentFriendRequests"}/> */}
       {/* <FriendsList/> */}

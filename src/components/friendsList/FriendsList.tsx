@@ -13,7 +13,7 @@ import {
 } from "@/store/thunks/usersThunk"
 import Image from "next/image"
 import { Paginator } from "../Paginator/Paginator"
-// import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 type FriendsListProps = {
   type: "friendRequests" | "friends" | "sentFriendRequests" // ограничим, чтобы был ключ из users
@@ -24,11 +24,16 @@ type FriendsListProps = {
 
 const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
   const loading = useAppSelector((state: RootState) => state.users.loading)
-  // const router = useRouter()
-  // const pathname = usePathname()
-  // const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const dispatch = useAppDispatch()
+  const pageType = {
+    friendRequests: "requestsPage",
+    friends: "friendsPage",
+    sentFriendRequests: "sentPage",
+  }
   const title = {
     friendRequests: "Заявки в друзья",
     friends: "Друзья",
@@ -39,30 +44,18 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
     friends: "Удалить друга",
     sentFriendRequests: "Отменить заявку",
   }
-  const pageType = {
-    friendRequests: "friendsPage",
-    friends: "requestsPage",
-    sentFriendRequests: "sentPage",
-  }
 
   // const pageFromUrl = Number(searchParams.get(pageType[type])) || 1
 
   const handleClick = (type: string, userId: string) => {
     switch (type) {
       case "friendRequests":
-        return dispatch(acceptFriendThunk({ userId, page: pageFromUrl }))
+        return dispatch(acceptFriendThunk({ userId, page }))
       case "friends":
-        return dispatch(delFriendThunk(userId))
+        return dispatch(delFriendThunk({ userId, page }))
       case "sentFriendRequests":
-        return dispatch(cancelRequestFriendThunk(userId))
+        return dispatch(cancelRequestFriendThunk({ userId, page }))
     }
-  }
-
-  // Берём нужный массив из users по ключу type
-  // const list = useAppSelector((state: RootState) => state.users[type])
-
-  const handleLinkUser = (userId: string) => {
-    router.push(`/profile/${userId}`)
   }
 
   const handlePageChange = (newPage: number) => {
@@ -72,6 +65,13 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
     // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+
+  // Берём нужный массив из users по ключу type
+  // const list = useAppSelector((state: RootState) => state.users[type])
+
+  const handleLinkUser = (userId: string) => {
+    router.push(`/profile/${userId}`)
   }
 
   return (

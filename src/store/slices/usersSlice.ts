@@ -210,9 +210,9 @@ const usersSlice = createSlice({
       })
       .addCase(getMyFriendsIdThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.friendRequests = action.payload.friendRequests
-        state.friends = action.payload.friends
-        state.sentFriendRequests = action.payload.sentFriendRequests
+        state.friendRequests.users = action.payload.friendRequests
+        state.friends.users = action.payload.friends
+        state.sentFriendRequests.users = action.payload.sentFriendRequests
       })
       .addCase(getMyFriendsIdThunk.rejected, (state, action) => {
         state.loading = false
