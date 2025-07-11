@@ -18,7 +18,7 @@ import styles from "./MyMoviesPage.module.scss"
 import ButtonMenu from "@/components/ui/button/Button"
 import CreateMovieWantToSee from "../CreateMovieWantToSee/CreateMovieWantToSee"
 import { ModalUserMovie } from "../modalUserMovie/modalUserMovie"
-import UserMovieList from "@/components/uгserMovieList/UserMovieList"
+import UserMovieList from "@/components/userMovieList/UserMovieList"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 type Props =

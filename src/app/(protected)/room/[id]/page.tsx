@@ -31,7 +31,9 @@ const Room = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const pageFromUrl = Number(searchParams.get("page")) || 1
+  const pageRoomFromUrl = Number(searchParams.get("pageRoom")) || 1
+  const pageUserFriendsFromUrl =
+    Number(searchParams.get("pageUserFriends")) || 1
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
 
@@ -44,7 +46,11 @@ const Room = () => {
   // const members = useAppSelector((state: RootState) => state.rooms.members)
   // const owner = useAppSelector((state: RootState) => state.rooms.owner)
   const loading = useAppSelector((state) => state.rooms.loading)
-  const friends = useAppSelector((state) => state.users.friends)
+  const {
+    users: friends,
+    page: friendsPage,
+    pages: friendsPages,
+  } = useAppSelector((state) => state.users.friends)
   const { posts, page, pages } = useAppSelector((state) => state.roomPost)
   const dispatch = useAppDispatch()
   const { id } = useParams<{ id: string }>()
@@ -59,6 +65,10 @@ const Room = () => {
   }
   const handleCloseAddMembersFromRoom = () => {
     setAddFriendsToRoom(false)
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("pageUserFriends") // удаляем параметр страницы
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
   const onSubmitMembers = (members: string[]) => {
     // console.log("members", members)
@@ -76,10 +86,10 @@ const Room = () => {
   }
   useEffect(() => {
     if (isAuth && typeof id === "string") {
-      dispatch(setRoomPage(pageFromUrl))
-      dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
+      dispatch(setRoomPage(pageRoomFromUrl))
+      dispatch(getRoomPostsThunk({ roomId: id, page: pageRoomFromUrl }))
     }
-  }, [isAuth, dispatch, id, pageFromUrl])
+  }, [isAuth, dispatch, id, pageRoomFromUrl])
 
   useEffect(() => {
     if (isAuth && typeof id === "string") {
@@ -111,9 +121,11 @@ const Room = () => {
 
   useEffect(() => {
     if (addFriendsToRoom) {
-      dispatch(getUserRelationsThunk("friends"))
+      dispatch(
+        getUserRelationsThunk({ type: "friends", page: pageUserFriendsFromUrl })
+      )
     }
-  }, [addFriendsToRoom, dispatch])
+  }, [addFriendsToRoom, dispatch, pageUserFriendsFromUrl])
 
   console.log("owner", room?.owner)
   if (typeof id !== "string") return <div>Неверный ID</div>
@@ -140,7 +152,15 @@ const Room = () => {
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("page", String(newPage))
+    params.set("pageRoom", String(newPage))
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+  const handleChangeUrlFriendsPage = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("pageUserFriends", String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
@@ -156,6 +176,9 @@ const Room = () => {
           friends={friends}
           handleCloseAddMembersFromRoom={handleCloseAddMembersFromRoom}
           onSubmitMembers={onSubmitMembers}
+          onChangePageFriends={handleChangeUrlFriendsPage}
+          page={friendsPage}
+          pages={friendsPages}
         />
       )}
       {changeAvatarModal && (

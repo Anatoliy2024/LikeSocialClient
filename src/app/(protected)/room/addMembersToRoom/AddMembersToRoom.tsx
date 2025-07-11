@@ -8,6 +8,7 @@ import { UserType } from "@/store/thunks/usersThunk"
 import { useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
 import { useEffect } from "react"
+import { Paginator } from "@/components/Paginator/Paginator"
 
 type FormData = {
   selected: string[]
@@ -17,11 +18,17 @@ export const AddMembersToRoom = ({
   handleCloseAddMembersFromRoom,
   friends,
   onSubmitMembers, // <- функция для обработки выбранных участников
+  onChangePageFriends,
+  page,
+  pages,
 }: {
   members: RoomMemberType[]
   handleCloseAddMembersFromRoom: () => void
   friends: UserType[]
   onSubmitMembers: (members: string[]) => void
+  onChangePageFriends: (newPage: number) => void
+  page: number
+  pages: number
 }) => {
   const loading = useAppSelector((state: RootState) => state.rooms.loading)
 
@@ -54,6 +61,11 @@ export const AddMembersToRoom = ({
       <div className={style.container} onClick={(e) => e.stopPropagation()}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <h3>Участники</h3>
+          <Paginator
+            pages={pages}
+            page={page}
+            onPageChange={onChangePageFriends}
+          />
           <div className={style.list}>
             {availableFriends.map((friend) => (
               <div key={friend._id} className={style.member}>
