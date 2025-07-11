@@ -73,6 +73,7 @@ export function SearchBlock() {
               userName={user.username}
               id={user._id}
               status={status}
+              page={page}
             />
           )
         })}

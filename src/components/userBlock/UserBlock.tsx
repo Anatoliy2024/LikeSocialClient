@@ -17,9 +17,10 @@ type UserBlockProps = {
   userName: string
   id: string
   status: StatusType
+  page: number
 }
 
-const UserBlock = ({ avatar, userName, id, status }: UserBlockProps) => {
+const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
   const dispatch = useAppDispatch()
   const router = useRouter()
 
@@ -33,20 +34,21 @@ const UserBlock = ({ avatar, userName, id, status }: UserBlockProps) => {
   switch (status) {
     case "friend":
       buttonText = "Удалить из друзей"
-      onClickHandler = () => dispatch(delFriendThunk(id))
+      onClickHandler = () => dispatch(delFriendThunk({ userId: id, page }))
       break
     case "incoming":
       buttonText = "Принять заявку"
-      onClickHandler = () => dispatch(acceptFriendThunk(id))
+      onClickHandler = () => dispatch(acceptFriendThunk({ userId: id, page }))
       break
     case "outgoing":
       buttonText = "Отменить заявку"
-      onClickHandler = () => dispatch(cancelRequestFriendThunk(id))
+      onClickHandler = () =>
+        dispatch(cancelRequestFriendThunk({ userId: id, page }))
       break
     case "none":
     default:
       buttonText = "Добавить в друзья"
-      onClickHandler = () => dispatch(requestFriendThunk(id))
+      onClickHandler = () => dispatch(requestFriendThunk({ userId: id, page }))
       break
   }
   // console.log("buttonText", buttonText)
