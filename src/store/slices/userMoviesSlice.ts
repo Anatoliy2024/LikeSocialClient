@@ -123,6 +123,8 @@ const userMoviesSlice = createSlice({
         // state.items = action.payload
         const updatedUserMovies = action.payload.userMovies.movies
         const status = action.payload.status
+        console.log("updatedUserMovies***", updatedUserMovies)
+        console.log("status***", status)
         // console.log("updatedUserMovies", updatedUserMovies)
         // console.log("state.myMovies.wantToSee", state.myMovies.wantToSee)
         // console.log("updatedUserMovies", updatedUserMovies)
@@ -256,7 +258,8 @@ const userMoviesSlice = createSlice({
       .addCase(uploadUserMovieAvatarThunk.fulfilled, (state, action) => {
         const updateUserMovie = action.payload.userMovie
         const status = action.payload.status
-        console.log("updateUserMovie", updateUserMovie)
+        console.log("updateUserMovie***", updateUserMovie)
+        console.log("status***", status)
         if (status === "wantToSee") {
           state.myMovies.wantToSee = state.myMovies.wantToSee.map((userMovie) =>
             userMovie._id === updateUserMovie._id ? updateUserMovie : userMovie

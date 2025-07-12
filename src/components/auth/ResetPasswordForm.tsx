@@ -49,7 +49,8 @@ export default function ResetPassword() {
         <h2>Сброс пароля</h2>
         <form onSubmit={handleSubmit}>
           <input
-            type="text"
+            // type="text"
+            type="password"
             placeholder="Новый пароль"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

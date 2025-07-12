@@ -1,6 +1,7 @@
 import { fileAPI, userAPI } from "@/api/api"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
+import { UserType } from "./usersThunk"
 
 export type ProfileType = {
   name: string | null
@@ -21,6 +22,8 @@ export const getMyProfileThunk = createAsyncThunk<
     isMyProfile: boolean
     avatar: string
     avatarPublicId: string
+    subscriptions: UserType[]
+    subscribers: UserType[]
   },
   void,
   { rejectValue: string }
@@ -43,6 +46,7 @@ export const getUserProfileThunk = createAsyncThunk<
     isMyProfile: boolean
     avatar: string
     avatarPublicId: string
+    isSubscribed: boolean
   },
   string,
   { rejectValue: string }
@@ -94,3 +98,54 @@ export const changeAvatarUserThunk = createAsyncThunk<
     )
   }
 })
+
+export const subscribeToUserThunk = createAsyncThunk(
+  "user/subscribe",
+  async (userId: string, thunkAPI) => {
+    try {
+      // subscribeToUser
+      // unsubscribeFromUser
+      const data = userAPI.subscribeToUser(userId)
+
+      // const response = await axios.post(
+      //   "/api/users/subscribe",
+      //   { userId },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      //     },
+      //   }
+      // )
+      return data
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+      return thunkAPI.rejectWithValue("Ошибка при подписке")
+    }
+  }
+)
+export const unsubscribeFromUserThunk = createAsyncThunk(
+  "user/unsubscribe",
+  async (userId: string, thunkAPI) => {
+    try {
+      const data = userAPI.unsubscribeFromUser(userId)
+
+      // const response = await axios.post(
+      //   "/api/users/unsubscribe",
+      //   { userId },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      //     },
+      //   }
+      // )
+      return data
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+      return thunkAPI.rejectWithValue("Ошибка при отписке")
+    }
+  }
+)

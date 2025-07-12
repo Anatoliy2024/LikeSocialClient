@@ -11,6 +11,7 @@ import users from "./slices/usersSlice"
 import rooms from "./slices/roomsSlice"
 import server from "./slices/serverSlice"
 import userMovies from "./slices/userMoviesSlice"
+import notificationsReducer from "./slices/notificationsSlice"
 
 export const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ export const store = configureStore({
     rooms: rooms,
     server: server,
     userMovies: userMovies,
+    notifications: notificationsReducer,
     // добавь другие редьюсеры здесь
   },
 })

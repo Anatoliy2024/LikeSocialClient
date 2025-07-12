@@ -123,6 +123,12 @@ export const userAPI = {
       .get(`user/getUserRelations`, { params: { type, page, limit } })
       .then((res) => res.data)
   },
+  subscribeToUser(userId: string) {
+    return instance.post(`user/subscribe`, { userId }).then((res) => res.data)
+  },
+  unsubscribeFromUser(userId: string) {
+    return instance.post(`user/unsubscribe`, { userId }).then((res) => res.data)
+  },
 }
 
 export const postAPI = {
@@ -411,5 +417,27 @@ export const userMovieAPI = {
     return instance
       .get(`user-movie/${userId}/public/watched`, { params: { page, limit } })
       .then((res) => res.data)
+  },
+}
+
+export const notificationsAPI = {
+  fetchNotifications() {
+    return instance.get("notifications").then((res) => res.data)
+  },
+  markAllNotificationsRead() {
+    return instance
+      .patch("notifications/markAsRead", null)
+      .then((res) => res.data)
+  },
+  // createNotification(notificationData) {
+  //   return instance
+  //     .post("/api/notifications", notificationData)
+  //     .then((res) => res.data)
+  // },
+  deleteNotification(id: string) {
+    return instance.delete(`notifications/${id}`).then((res) => res.data)
+  },
+  deleteAllNotifications() {
+    return instance.delete("notifications").then((res) => res.data)
   },
 }

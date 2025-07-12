@@ -13,6 +13,7 @@ import {
 import { UserTypeReq } from "../thunks/usersThunk"
 type InitialStateUserType = {
   users: UserTypeReq
+
   loading: boolean
   error: string | null
   friendRequests: UserTypeReq
@@ -28,6 +29,7 @@ const initialState: InitialStateUserType = {
     total: 0,
     pages: 0,
   },
+
   loading: false,
   error: null,
   friendRequests: {

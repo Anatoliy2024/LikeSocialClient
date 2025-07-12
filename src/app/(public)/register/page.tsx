@@ -92,6 +92,7 @@ const Register = () => {
           <div className={style.infoContainer}>
             <input
               id="password"
+              type="password"
               {...register("password", {
                 required: "password обязателен",
                 minLength: {

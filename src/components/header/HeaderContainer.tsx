@@ -5,6 +5,12 @@ import { RootState } from "@/store/store"
 // import { logout } from "@/store/slices/authSlice"
 import { useRouter } from "next/navigation"
 import { logoutThunk } from "@/store/thunks/authThunk"
+import { useEffect, useState } from "react"
+import {
+  deleteAllNotificationsThunk,
+  fetchNotificationsThunk,
+  markAllNotificationsReadThunk,
+} from "@/store/thunks/notificationsThunk"
 
 const HeaderContainer = ({
   handleShowToggleMenu,
@@ -15,18 +21,38 @@ const HeaderContainer = ({
   showButton: boolean
   menuOpen: boolean
 }) => {
+  const dispatch = useAppDispatch()
+  const router = useRouter()
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const username = useAppSelector((state: RootState) => state.auth.username)
   const avatar = useAppSelector((state: RootState) => state.auth.avatar)
   // const avatar = useAppSelector((state: RootState) => state.profile.avatar)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const notifications = useAppSelector(
+    (state: RootState) => state.notifications
+  )
+  useEffect(() => {
+    dispatch(fetchNotificationsThunk())
+  }, [dispatch])
 
-  const dispatch = useAppDispatch()
-  const router = useRouter()
   const logoutButton = () => {
     dispatch(logoutThunk())
     router.push("/")
     localStorage.removeItem("accessToken")
   }
+  const toggleShowNotification = () => {
+    setShowNotifications((prev) => !prev)
+  }
+  const deleteAllNotifications = () => {
+    dispatch(deleteAllNotificationsThunk())
+  }
+  const markAllNotificationsRead = () => {
+    dispatch(markAllNotificationsReadThunk())
+  }
+
+  // const handleCloseHotification =()=>{
+  //   setShowNotifications(false)
+  // }
 
   return (
     <Header
@@ -37,6 +63,13 @@ const HeaderContainer = ({
       handleShowToggleMenu={handleShowToggleMenu}
       showButton={showButton}
       menuOpen={menuOpen}
+      showNotifications={showNotifications}
+      toggleShowNotification={toggleShowNotification}
+      notifications={notifications}
+      deleteAllNotifications={deleteAllNotifications}
+      markAllNotificationsRead={markAllNotificationsRead}
+      // handleShowNotification={handleShowNotification}
+      // handleCloseNotification={handleCloseNotification}
     />
   )
 }

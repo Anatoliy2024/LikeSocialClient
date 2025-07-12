@@ -1,0 +1,35 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  //   background-color: rgba(255, 255, 255, 0.577);
+  .container {
+    min-width: 70vw;
+    min-height: 70vh;
+    padding: 10px;
+    color: antiquewhite;
+    background-color: rgba(41, 44, 122, 0.927);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    .list {
+      max-height: 60vh;
+      overflow-y: auto;
+      //   width: auto;
+      padding: 0 20px;
+    }
+    .buttonBlock {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+  }
+}

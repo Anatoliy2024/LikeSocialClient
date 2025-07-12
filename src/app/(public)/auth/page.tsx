@@ -76,6 +76,7 @@ const Auth = () => {
           <div>
             <input
               id="password"
+              type="password"
               {...register("password", {
                 required: "password обязателен",
                 minLength: {

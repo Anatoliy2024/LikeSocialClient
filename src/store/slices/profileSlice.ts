@@ -5,7 +5,10 @@ import {
   changeMyProfileThunk,
   getMyProfileThunk,
   getUserProfileThunk,
+  subscribeToUserThunk,
+  unsubscribeFromUserThunk,
 } from "../thunks/profileThunk"
+import { UserType } from "../thunks/usersThunk"
 
 export type profileState = {
   name: string
@@ -22,6 +25,9 @@ export type profileState = {
   profileError: string | null
   avatar: string
   avatarPublicId: string
+  isSubscribed: boolean
+  subscriptions: UserType[] // на кого подписан
+  subscribers: UserType[] // кто подписался
 }
 
 const initialState: profileState = {
@@ -39,12 +45,34 @@ const initialState: profileState = {
   profileError: null,
   avatar: "",
   avatarPublicId: "",
+  subscriptions: [],
+  subscribers: [],
+  isSubscribed: false,
 }
 
 const profileSlice = createSlice({
   name: "profile",
   initialState,
-  reducers: {},
+  reducers: {
+    clearProfile: (state) => {
+      state.name = ""
+      state.sureName = ""
+      state.status = ""
+      state.birthDate = ""
+      state.address = {
+        country: "",
+        city: "",
+      }
+      state.relationshipStatus = ""
+      state.isMyProfile = false
+      state.profileLoading = false
+      state.profileError = null
+      state.avatarPublicId = ""
+      state.subscriptions = []
+      state.subscribers = []
+      state.isSubscribed = false
+    },
+  },
   extraReducers: (builder) => {
     builder
       //getUserProfileThunk
@@ -64,14 +92,11 @@ const profileSlice = createSlice({
         state.address.country = newStateUserInfo.address.country ?? ""
         state.address.city = newStateUserInfo.address.city ?? ""
 
-        // state.sureName = action.payload.userInfo.sureName
-        // state.status = action.payload.userInfo.status
-        // state.birthDate = action.payload.userInfo.birthDate
-        // state.address = action.payload.userInfo.address
-        // state.relationshipStatus = action.payload.userInfo.relationshipStatus
         state.isMyProfile = action.payload.isMyProfile
         state.avatar = action.payload.avatar
         state.avatarPublicId = action.payload.avatarPublicId
+        state.subscriptions = action.payload.subscriptions
+        state.subscribers = action.payload.subscribers
       })
 
       .addCase(getMyProfileThunk.rejected, (state, action) => {
@@ -95,15 +120,12 @@ const profileSlice = createSlice({
         state.address.country = newStateUserInfo.address.country ?? ""
         state.address.city = newStateUserInfo.address.city ?? ""
 
-        // state.name = action.payload.userInfo.name
-        // state.sureName = action.payload.userInfo.sureName
-        // state.status = action.payload.userInfo.status
-        // state.birthDate = action.payload.userInfo.birthDate
-        // state.address = action.payload.userInfo.address
-        // state.relationshipStatus = action.payload.userInfo.relationshipStatus
         state.isMyProfile = action.payload.isMyProfile
         state.avatar = action.payload.avatar
         state.avatarPublicId = action.payload.avatarPublicId
+        state.isSubscribed = action.payload.isSubscribed
+        // state.subscriptions = action.payload.subscriptions
+        // state.subscribers = action.payload.subscribers
       })
       .addCase(getUserProfileThunk.rejected, (state, action) => {
         state.profileLoading = false
@@ -152,8 +174,35 @@ const profileSlice = createSlice({
         state.profileLoading = false
         state.profileError = action.payload as string
       })
+
+      .addCase(subscribeToUserThunk.pending, (state) => {
+        state.profileLoading = true
+        state.profileError = null
+      })
+      .addCase(subscribeToUserThunk.fulfilled, (state, action) => {
+        state.profileLoading = false
+
+        state.isSubscribed = action.payload.isSubscribed
+      })
+      .addCase(subscribeToUserThunk.rejected, (state, action) => {
+        state.profileLoading = false
+        state.profileError = action.payload as string
+      })
+
+      .addCase(unsubscribeFromUserThunk.pending, (state) => {
+        state.profileLoading = true
+        state.profileError = null
+      })
+      .addCase(unsubscribeFromUserThunk.fulfilled, (state, action) => {
+        state.profileLoading = false
+        state.isSubscribed = action.payload.isSubscribed
+      })
+      .addCase(unsubscribeFromUserThunk.rejected, (state, action) => {
+        state.profileLoading = false
+        state.profileError = action.payload as string
+      })
   },
 })
 
-// export const { logout } = authSlice.actions
+export const { clearProfile } = profileSlice.actions
 export default profileSlice.reducer

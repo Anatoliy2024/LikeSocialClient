@@ -15,6 +15,11 @@ import Image from "next/image"
 import { getAgeFromBirthDate } from "@/utils/getAge"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
 import Link from "next/link"
+import {
+  subscribeToUserThunk,
+  unsubscribeFromUserThunk,
+} from "@/store/thunks/profileThunk"
+import { clearProfile } from "@/store/slices/profileSlice"
 
 type FormProfileInfo = {
   name: string
@@ -25,37 +30,6 @@ type FormProfileInfo = {
   city: string
   relationshipStatus: string
 }
-// type profileDataType = {
-//   address: { country: string; city: string }
-//   age: string
-//   isMyProfile: boolean
-//   name: string
-//   profileError: null | string
-//   profileLoading: boolean
-//   relationshipStatus: string
-//   status: string
-//   sureName: string
-//   avatar: string
-// }
-
-// type profileDataType = Omit<
-//   profileState,
-//   | "address"
-//   | "name"
-//   | "sureName"
-//   | "status"
-//   | "age"
-//   | "relationshipStatus"
-//   | "profileError"
-// > & {
-//   address: { country: string; city: string }
-//   name: string
-//   sureName: string
-//   status: string
-//   age: string
-//   relationshipStatus: string
-//   profileError: string | null
-// }
 
 const ProfileBlock = ({
   isMyProfilePage,
@@ -85,6 +59,7 @@ const ProfileBlock = ({
   useEffect(() => {
     if (!isAuth) return
     if (isAuth) {
+      dispatch(clearProfile())
       if (isMyProfilePage) {
         dispatch(getMyProfileThunk())
       } else if (userId) {
@@ -165,6 +140,14 @@ const ProfileBlock = ({
 
   const handleUserAvatarUpload = async (file: File) => {
     await dispatch(changeAvatarUserThunk(file)).unwrap()
+  }
+
+  const handleSubscribe = (userId: string) => {
+    dispatch(subscribeToUserThunk(userId))
+  }
+
+  const handleUnsubscribe = (userId: string) => {
+    dispatch(unsubscribeFromUserThunk(userId))
   }
 
   return (
@@ -359,6 +342,41 @@ const ProfileBlock = ({
                     </Link>
                   )}
                 </div>
+                {profileData.subscriptions.length > 0 && (
+                  <div>
+                    <h3>Мои подписки:</h3>
+                    {profileData.subscriptions.map((subscription) => (
+                      <div key={subscription._id}>{subscription.username}</div>
+                    ))}
+                  </div>
+                )}
+                {profileData.subscribers.length > 0 && (
+                  <div>
+                    <h3>Мои подписчики:</h3>
+                    {profileData.subscribers.map((subscribers) => (
+                      <div key={subscribers._id}>{subscribers.username}</div>
+                    ))}
+                  </div>
+                )}
+
+                {!isMyProfilePage &&
+                  (profileData.isSubscribed ? (
+                    <ButtonMenu
+                      onClick={() => {
+                        if (userId) handleUnsubscribe(userId)
+                      }}
+                    >
+                      Отписаться
+                    </ButtonMenu>
+                  ) : (
+                    <ButtonMenu
+                      onClick={() => {
+                        if (userId) handleSubscribe(userId)
+                      }}
+                    >
+                      Подписаться
+                    </ButtonMenu>
+                  ))}
               </>
             )}
           </div>
