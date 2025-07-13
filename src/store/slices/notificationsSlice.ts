@@ -7,6 +7,7 @@ import {
   deleteAllNotificationsThunk,
   notificationsType,
 } from "../thunks/notificationsThunk"
+
 export type initialStateNotificationsType = {
   items: notificationsType[]
   loading: boolean
@@ -40,7 +41,8 @@ const notificationsSlice = createSlice({
       .addCase(fetchNotificationsThunk.fulfilled, (state, action) => {
         state.loading = false
         const notifications = action.payload.notifications
-        if (notifications) {
+        console.log("сработал fetchNotificationsThunk", action.payload)
+        if (Array.isArray(notifications)) {
           state.items = notifications
           state.unreadCount = notifications.filter((n) => !n.isRead).length
         }

@@ -11,6 +11,7 @@ import ButtonMenu from "../ui/button/Button"
 import style from "./Notifications.module.scss"
 import { initialStateNotificationsType } from "@/store/slices/notificationsSlice"
 import Image from "next/image"
+import CloseButton from "../ui/closeButton/CloseButton"
 
 export const Notifications = ({
   toggleShowNotification,
@@ -38,6 +39,9 @@ export const Notifications = ({
   return (
     <div className={style.wrapper} onClick={toggleShowNotification}>
       <div className={style.container} onClick={(e) => e.stopPropagation()}>
+        <div className={style.buttonCloseBlock}>
+          <CloseButton onClick={toggleShowNotification} />
+        </div>
         {/* <h2>Уведомления ({unreadCount})</h2> */}
         {unreadCount === 0 && <div>Новых уведомлений нет...</div>}
         {loading && <p>Загрузка...</p>}
