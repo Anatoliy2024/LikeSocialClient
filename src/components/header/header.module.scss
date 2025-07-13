@@ -54,9 +54,36 @@
     .containerNotification {
       position: relative;
       .toggleButton {
-        width: 40px;
-        height: 40px;
-        background-color: #ccc;
+        color: #28287266;
+        width: 45px;
+        height: 45px;
+        // background-color: #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 20px;
+        cursor: pointer;
+        &:hover {
+          background: #8f93da;
+          color: #ffffff;
+        }
+        .fireBlock {
+          position: relative;
+          .fireCountBlock {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background: #4b4ab1;
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            width: 17px;
+            height: 17px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+        }
       }
     }
   }

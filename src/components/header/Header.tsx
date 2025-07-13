@@ -6,6 +6,8 @@ import Image from "next/image"
 import { Notifications } from "../Notifications/Notifications"
 
 import { initialStateNotificationsType } from "@/store/slices/notificationsSlice"
+import { FireIcon } from "@/assets/icons/fireIcon"
+import { NotificationIcon } from "@/assets/icons/notificationIcon"
 type HeaderData = {
   isAuth: boolean
   username: string | null
@@ -65,8 +67,25 @@ HeaderData) {
             <button
               onClick={toggleShowNotification}
               className={style.toggleButton}
+              style={{
+                background: showNotifications
+                  ? notifications.unreadCount > 0
+                    ? "#ff7745"
+                    : "#8f93da"
+                  : "",
+                color: showNotifications ? "#ffffff" : "",
+              }}
             >
-              N({notifications.unreadCount})
+              {notifications.unreadCount > 0 ? (
+                <div className={style.fireBlock}>
+                  <FireIcon showNotifications={showNotifications} />
+                  <div className={style.fireCountBlock}>
+                    {notifications.unreadCount}
+                  </div>
+                </div>
+              ) : (
+                <NotificationIcon />
+              )}
             </button>
             {showNotifications && (
               <Notifications

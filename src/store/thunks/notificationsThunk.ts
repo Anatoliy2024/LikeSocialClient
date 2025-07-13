@@ -1,13 +1,18 @@
 import { notificationsAPI } from "@/api/api"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
+type senderType = {
+  _id: string
+  avatar: string
+  username: string
+}
 export type notificationsType = {
   createdAt: string
   isRead: boolean
   message: string
   recipientId: string
   roomId: string | null
-  senderId: string
+  senderId: senderType
   type: string
   __v: string
   _id: string

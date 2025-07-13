@@ -10,6 +10,7 @@ import { useEffect } from "react"
 import ButtonMenu from "../ui/button/Button"
 import style from "./Notifications.module.scss"
 import { initialStateNotificationsType } from "@/store/slices/notificationsSlice"
+import Image from "next/image"
 
 export const Notifications = ({
   toggleShowNotification,
@@ -33,7 +34,7 @@ export const Notifications = ({
       document.body.style.overflow = ""
     }
   }, [])
-
+  console.log("items***", items)
   return (
     <div className={style.wrapper} onClick={toggleShowNotification}>
       <div className={style.container} onClick={(e) => e.stopPropagation()}>
@@ -41,10 +42,24 @@ export const Notifications = ({
         {unreadCount === 0 && <div>Новых уведомлений нет...</div>}
         {loading && <p>Загрузка...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <ul className={style.list}>
+        <ul className={style.lists}>
           {items.map((n) => (
-            <li key={n._id} style={{ color: n.isRead ? "green" : "white" }}>
-              {n.message}
+            <li
+              key={n._id}
+              style={{ color: n.isRead ? "green" : "white" }}
+              className={style.list}
+            >
+              {n.senderId?.avatar && (
+                <div className={style.imgBlockList}>
+                  <Image
+                    src={n.senderId.avatar}
+                    alt="avatar"
+                    width={20}
+                    height={20}
+                  />
+                </div>
+              )}
+              <div className={style.message}>{n.message}</div>
             </li>
           ))}
         </ul>

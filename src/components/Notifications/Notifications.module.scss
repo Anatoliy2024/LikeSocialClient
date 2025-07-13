@@ -20,11 +20,35 @@
     justify-content: center;
     align-items: center;
     border-radius: 20px;
-    .list {
+    .lists {
       max-height: 60vh;
       overflow-y: auto;
       //   width: auto;
       padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      .list {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        .imgBlockList {
+          min-width: 40px;
+          min-height: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          border-radius: 50%;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        .message {
+        }
+      }
     }
     .buttonBlock {
       display: flex;

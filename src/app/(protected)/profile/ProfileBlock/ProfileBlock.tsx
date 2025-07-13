@@ -343,18 +343,42 @@ const ProfileBlock = ({
                   )}
                 </div>
                 {profileData.subscriptions.length > 0 && (
-                  <div>
+                  <div className={style.subBlock}>
                     <h3>Мои подписки:</h3>
                     {profileData.subscriptions.map((subscription) => (
-                      <div key={subscription._id}>{subscription.username}</div>
+                      <div key={subscription._id} className={style.subPerson}>
+                        <div className={style.imgBlockSub}>
+                          <Image
+                            src={subscription.avatar}
+                            alt="avatar"
+                            width={20}
+                            height={20}
+                          />
+                        </div>
+                        <div className={style.nameBlock}>
+                          {subscription.username}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
                 {profileData.subscribers.length > 0 && (
-                  <div>
+                  <div className={style.subBlock}>
                     <h3>Мои подписчики:</h3>
                     {profileData.subscribers.map((subscribers) => (
-                      <div key={subscribers._id}>{subscribers.username}</div>
+                      <div key={subscribers._id} className={style.subPerson}>
+                        <div className={style.imgBlockSub}>
+                          <Image
+                            src={subscribers.avatar}
+                            alt="avatar"
+                            width={10}
+                            height={10}
+                          />
+                        </div>
+                        <div className={style.nameBlock}>
+                          {subscribers.username}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}

@@ -30,6 +30,32 @@
           color: rgb(213, 189, 251);
         }
       }
+      .subBlock {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        .subPerson {
+          display: flex;
+          gap: 5px;
+          align-items: center;
+          .imgBlockSub {
+            min-width: 40px;
+            min-height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+          .nameBlock {
+          }
+        }
+      }
     }
     .form {
       & > div {
