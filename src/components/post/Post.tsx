@@ -154,7 +154,19 @@ const Post = ({
             </div>
           </div>
         </div>
-        {content && <div className={style.contentPost}>{content}</div>}
+        {content && (
+          <div className={style.contentPost}>
+            {content
+              ?.split("\n")
+              .filter((line) => line.trim() !== "") // убираем пустые строки
+              .map((paragraph, i) => (
+                <p key={i} className={style.paragraph}>
+                  {paragraph}
+                </p>
+              ))}
+          </div>
+        )}
+        {/* {content && <div className={style.contentPost}>{content}</div>} */}
         <div className={style.dataTimeAndStars}>
           <div>{formatData(createdAt)}</div>
           <div className={style.starCommentBlock}>

@@ -86,6 +86,10 @@
           }
         }
       }
+      .contentBlock {
+        white-space: pre-wrap;
+        text-indent: 1.5em;
+      }
       .commentsBlock {
         color: #c0a2e6;
         .createCommentsBlock {

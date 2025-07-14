@@ -5,6 +5,10 @@
   color: rgb(247, 241, 255);
   position: relative;
   cursor: pointer;
+  transition: box-shadow 0.5s ease;
+  &:hover {
+    box-shadow: 0 0 20px rgb(233, 208, 252);
+  }
   .blockHeaderPost {
     display: flex;
     justify-content: space-between;
@@ -58,6 +62,9 @@
     line-clamp: 3;
     overflow: hidden;
     line-height: 1.7;
+
+    white-space: pre-wrap;
+    text-indent: 1em;
   }
   .dataTimeAndStars {
     color: #8b97ff;

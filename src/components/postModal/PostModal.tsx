@@ -365,7 +365,17 @@ const PostModal = ({
                   : "Других оценок нет"}
               </div>
             </div>
-            <p>{content}</p>
+            <div className={style.contentBlock}>
+              {content
+                ?.split("\n")
+                .filter((line) => line.trim() !== "") // убираем пустые строки
+                .map((paragraph, i) => (
+                  <p key={i} className={style.paragraph}>
+                    {paragraph}
+                  </p>
+                ))}
+            </div>
+            {/* <div className={style.contentBlock}>{content}</div> */}
 
             <div className={style.commentsBlock}>
               <div className={style.createCommentsBlock}>
