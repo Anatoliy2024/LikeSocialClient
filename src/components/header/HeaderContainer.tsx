@@ -32,8 +32,8 @@ const HeaderContainer = ({
     (state: RootState) => state.notifications
   )
   useEffect(() => {
-    dispatch(fetchNotificationsThunk())
-  }, [dispatch])
+    if (isAuth) dispatch(fetchNotificationsThunk())
+  }, [dispatch, isAuth])
 
   const logoutButton = () => {
     dispatch(logoutThunk())
