@@ -56,6 +56,10 @@
         flex-wrap: wrap;
         padding-bottom: 20px;
         .blockImg {
+          max-width: 500px;
+          img {
+            width: 100%;
+          }
         }
         .starsBlock {
         }
