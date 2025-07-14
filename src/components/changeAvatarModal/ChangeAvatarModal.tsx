@@ -6,7 +6,11 @@ import ButtonMenu from "@/components/ui/button/Button"
 // import { useAppDispatch, useAppSelector } from "@/store/hooks"
 // import { changeAvatarUserThunk } from "@/store/thunks/profileThunk"
 // import { RootState } from "@/store/store"
-import Image from "next/image"
+// import Image from "next/image"
+import { compressImage } from "@/utils/compressImage"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+// import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+
 export const ChangeAvatarModal = ({
   handleCloseModal,
   onUpload,
@@ -35,6 +39,8 @@ export const ChangeAvatarModal = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [loadingLocal, setIsLoadingLocal] = useState(false)
 
+  // const [originalSize, setOriginalSize] = useState<number | null>(null)
+  // const [compressedSize, setCompressedSize] = useState<number | null>(null)
   // const dispatch = useAppDispatch()
   // const loading = useAppSelector(
   //   (state: RootState) => state.profile.profileLoading
@@ -44,6 +50,11 @@ export const ChangeAvatarModal = ({
       const selectedFile = e.target.files[0]
       setFile(selectedFile)
       setPreviewUrl(URL.createObjectURL(selectedFile)) // создаём URL для предпросмотра
+      //начало
+      // setOriginalSize(selectedFile.size)
+
+      // setCompressedSize(null) // сбрасываем предыдущий результат
+      //конец
     }
   }
 
@@ -60,7 +71,16 @@ export const ChangeAvatarModal = ({
     if (!file) return
     setIsLoadingLocal(true)
     try {
-      await onUpload(file, context)
+      const compressedFile = await compressImage(file)
+
+      // setCompressedSize(compressedFile.size)
+      console.log(
+        `***********************************************До: ${(
+          file.size / 1024
+        ).toFixed(2)} KB | После: ${(compressedFile.size / 1024).toFixed(2)} KB`
+      )
+      await onUpload(compressedFile, context)
+      // await onUpload(file, context)
       handleCloseModal()
     } catch (error) {
       console.error("Ошибка загрузки:", error)
@@ -94,7 +114,14 @@ export const ChangeAvatarModal = ({
         <input type="file" accept="image/*" onChange={handleChange} />
         {previewUrl && (
           <div className={style.preview}>
-            <Image
+            {/* <CloudinaryImage
+              src={previewUrl}
+              alt="Предпросмотр аватара"
+              className={style.preview}
+              width={200}
+              height={200}
+            /> */}
+            <CloudinaryImage
               src={previewUrl}
               alt="Предпросмотр аватара"
               className={style.preview}
@@ -103,6 +130,7 @@ export const ChangeAvatarModal = ({
             />
           </div>
         )}
+        {/* {originalSize && <div>{originalSize}</div>} */}
         <div className={style.buttonBlock}>
           <ButtonMenu
             loading={loading ? loading : loadingLocal}

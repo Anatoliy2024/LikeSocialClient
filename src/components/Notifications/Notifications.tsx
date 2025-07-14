@@ -10,8 +10,9 @@ import { useEffect } from "react"
 import ButtonMenu from "../ui/button/Button"
 import style from "./Notifications.module.scss"
 import { initialStateNotificationsType } from "@/store/slices/notificationsSlice"
-import Image from "next/image"
+// import Image from "next/image"
 import CloseButton from "../ui/closeButton/CloseButton"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 
 export const Notifications = ({
   toggleShowNotification,
@@ -55,11 +56,11 @@ export const Notifications = ({
             >
               {n.senderId?.avatar && (
                 <div className={style.imgBlockList}>
-                  <Image
+                  <CloudinaryImage
                     src={n.senderId.avatar}
                     alt="avatar"
-                    width={20}
-                    height={20}
+                    width={80}
+                    height={80}
                   />
                 </div>
               )}

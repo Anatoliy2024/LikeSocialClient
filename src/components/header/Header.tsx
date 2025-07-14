@@ -2,12 +2,13 @@ import Link from "next/link"
 import style from "./header.module.scss"
 import ArrowBottom from "@/assets/icons/arrowBottom"
 import ButtonMenu from "../ui/button/Button"
-import Image from "next/image"
+// import Image from "next/image"
 import { Notifications } from "../Notifications/Notifications"
 
 import { initialStateNotificationsType } from "@/store/slices/notificationsSlice"
 import { FireIcon } from "@/assets/icons/fireIcon"
 import { NotificationIcon } from "@/assets/icons/notificationIcon"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 type HeaderData = {
   isAuth: boolean
   username: string | null
@@ -47,7 +48,12 @@ HeaderData) {
       <div className={style.logoWrapper}>
         <div>
           <Link href="/">
-            <Image src="/logo.png" alt="logo" width={40} height={40} />
+            <CloudinaryImage
+              src="/logo.png"
+              alt="logo"
+              width={120}
+              height={120}
+            />
           </Link>
         </div>
         {showButton && (
@@ -114,11 +120,11 @@ HeaderData) {
           <div className={style.profile}>
             {username}
             <div className={style.avatarBlock}>
-              <Image
+              <CloudinaryImage
                 src={avatar ? avatar : "/1.png"}
                 alt="avatar"
-                width={50}
-                height={50}
+                width={120}
+                height={120}
               />
             </div>
             <ArrowBottom />

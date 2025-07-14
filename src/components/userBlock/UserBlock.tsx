@@ -8,7 +8,8 @@ import ButtonMenu from "../ui/button/Button"
 import style from "./UserBlock.module.scss"
 import { useAppDispatch } from "@/store/hooks"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
+// import Image from "next/image"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 
 type StatusType = "friend" | "incoming" | "outgoing" | "none"
 
@@ -57,7 +58,7 @@ const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
     <div className={style.wrapper}>
       <div className={style.imgNameBlock} onClick={() => handleLinkUser(id)}>
         <div className={style.imgBlock}>
-          <Image src={avatar} alt="Avatar" width={150} height={150} />
+          <CloudinaryImage src={avatar} alt="Avatar" width={400} height={400} />
         </div>
         <div>{userName}</div>
       </div>

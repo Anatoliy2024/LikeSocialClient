@@ -1,9 +1,10 @@
 "use client"
 import React from "react"
 import style from "./MovieCard.module.scss"
-import Image from "next/image"
+// import Image from "next/image"
 import { UserMovieType } from "@/store/slices/userMoviesSlice"
 import { translatorGenres } from "@/utils/translatorGenres"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 
 export type MovieCardProps = {
   movie: UserMovieType
@@ -16,12 +17,12 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
     <>
       <div className={style.card} onClick={onClick}>
         <div className={style.imgBlock}>
-          <Image
+          <CloudinaryImage
             src={movie.avatar}
             alt={movie.title}
             className={style.image}
-            height={180}
-            width={180}
+            height={600}
+            width={600}
           />
         </div>
         <div className={style.content}>

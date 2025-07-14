@@ -5,12 +5,14 @@ import style from "./Post.module.scss"
 import { delUserPostsThunk } from "@/store/thunks/userPostThunk"
 import CloseButton from "../ui/closeButton/CloseButton"
 import { formatData } from "@/utils/formatData"
-import Image from "next/image"
+// import Image from "next/image"
 import { delRoomPostsThunk } from "@/store/thunks/roomPostThunk"
 import { translatorGenres } from "@/utils/translatorGenres"
 import { Comments } from "@/assets/icons/comments"
 import { Star } from "@/assets/icons/star"
 import { userCommentType } from "@/store/slices/roomPostsSlice"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+// import { FixedSizeCloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 // import { useRouter } from "next/navigation"
 
 type PostType = {
@@ -123,16 +125,42 @@ const Post = ({
           </div>
         )}
         <div className={style.imageStarsContainer}>
-          <div className={style.blockImg}>
+          {/* <div className={style.blockImg}>
             {avatar && (
-              <Image
+              <FixedSizeCloudinaryImage
                 src={avatar}
                 alt="postImage"
                 width={200}
                 height={200}
-                priority
               />
+              // <Image
+              //   src={avatar}
+              //   alt="postImage"
+              //   width={200}
+              //   height={200}
+              //   priority
+              // />
             )}
+
+            
+          </div> */}
+          <div className={style.blockImg}>
+            {avatar && (
+              <CloudinaryImage
+                src={avatar}
+                alt="postImage"
+                width={800}
+                height={800}
+              />
+              // <Image
+              //   src={avatar}
+              //   alt="postImage"
+              //   width={200}
+              //   height={200}
+              //   priority
+              // />
+            )}
+
             {/* <Image src={imagePost} alt="postImage" width={200} height={200} /> */}
           </div>
           <div className={style.blockStars}>

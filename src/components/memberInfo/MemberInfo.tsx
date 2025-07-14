@@ -1,6 +1,7 @@
-import Image from "next/image"
+// import Image from "next/image"
 import style from "./MemberInfo.module.scss"
 import CloseButton from "../ui/closeButton/CloseButton"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 // import { X } from "lucide-react" // иконка крестика (можно заменить на любую)
 export const MemberInfo = ({
   name,
@@ -24,7 +25,12 @@ export const MemberInfo = ({
   return (
     <div className={style.wrapper}>
       <div className={style.blockImg}>
-        <Image src={avatar} alt="AvatarImage" width={60} height={60} />
+        <CloudinaryImage
+          src={avatar}
+          alt="AvatarImage"
+          width={120}
+          height={120}
+        />
       </div>
       <div className={style.blockName}>{name}</div>
       {isDeleteMember && (

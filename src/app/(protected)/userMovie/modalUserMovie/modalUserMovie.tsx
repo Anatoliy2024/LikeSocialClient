@@ -1,7 +1,7 @@
 "use client"
 import { UserMovieType } from "@/store/slices/userMoviesSlice"
 import style from "./modalUserMovie.module.scss"
-import Image from "next/image"
+// import Image from "next/image"
 import ButtonMenu from "@/components/ui/button/Button"
 import { translatorGenres } from "@/utils/translatorGenres"
 import { useEffect, useState } from "react"
@@ -14,6 +14,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
+import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 export const ModalUserMovie = ({
   handleCloseModalUserMovie,
   selectedMovie,
@@ -137,11 +138,11 @@ export const ModalUserMovie = ({
             {/* <h3>{selectedMovie.title}</h3> */}
             <div className={style.imgAndGenreBlock}>
               <div className={style.imgBlock} onClick={handleOpenModal}>
-                <Image
+                <CloudinaryImage
                   src={selectedMovie.avatar}
                   alt={"Avatar"}
-                  width={200}
-                  height={200}
+                  width={600}
+                  height={600}
                 />
               </div>
               {selectedMovie.genres.length > 0 ? (

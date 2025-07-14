@@ -10,15 +10,15 @@ import {
   getRoomByIdThunk,
   getRoomsThunk,
   leaveRoomThunk,
-  OwnerType,
-  RoomMemberType,
+  // OwnerType,
+  // RoomMemberType,
   RoomType,
 } from "../thunks/roomsThunk"
 
 const initialState = {
   rooms: [] as RoomType[],
-  members: [] as RoomMemberType[],
-  owner: null as OwnerType,
+  // members: [] as RoomMemberType[],
+  // owner: null as OwnerType,
   room: null as null | RoomType,
   loading: false,
   error: null as string | null,
@@ -93,12 +93,14 @@ const roomsSlice = createSlice({
         state.loading = false
         const newRoom = action.payload
         // updatedRoom
-
-        state.rooms = state.rooms.map((room) =>
-          room._id === newRoom._id ? newRoom : room
-        )
-        state.members = newRoom.members
-        state.owner = newRoom.owner
+        console.log("newRoom", newRoom)
+        console.log("state.rooms", state.rooms)
+        state.room = newRoom
+        // state.rooms = state.rooms.map((room) =>
+        //   room._id === newRoom._id ? newRoom : room
+        // )
+        // state.members = newRoom.members
+        // state.owner = newRoom.owner
 
         // state.loading = false
         // const updatedRoom = action.payload
@@ -118,11 +120,13 @@ const roomsSlice = createSlice({
       .addCase(delFriendFromRoomThunk.fulfilled, (state, action) => {
         state.loading = false
         const newRoom = action.payload
-        state.rooms = state.rooms.map((room) =>
-          room._id === newRoom._id ? newRoom : room
-        )
-        state.members = newRoom.members
-        state.owner = newRoom.owner
+        state.room = newRoom
+
+        // state.rooms = state.rooms.map((room) =>
+        //   room._id === newRoom._id ? newRoom : room
+        // )
+        // state.members = newRoom.members
+        // state.owner = newRoom.owner
 
         // state.loading = false
         // const updatedRoom = action.payload

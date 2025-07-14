@@ -39,8 +39,8 @@
           gap: 5px;
           align-items: center;
           .imgBlockSub {
-            min-width: 40px;
-            min-height: 40px;
+            max-width: 40px;
+            max-height: 40px;
             border-radius: 50%;
             display: flex;
             justify-content: center;

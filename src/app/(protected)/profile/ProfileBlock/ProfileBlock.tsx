@@ -11,7 +11,7 @@ import {
 } from "@/store/thunks/profileThunk"
 import ButtonMenu from "@/components/ui/button/Button"
 import { RootState } from "@/store/store"
-import Image from "next/image"
+// import Image from "next/image"
 import { getAgeFromBirthDate } from "@/utils/getAge"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
 import Link from "next/link"
@@ -20,6 +20,8 @@ import {
   unsubscribeFromUserThunk,
 } from "@/store/thunks/profileThunk"
 import { clearProfile } from "@/store/slices/profileSlice"
+import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
+// import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 type FormProfileInfo = {
   name: string
@@ -162,12 +164,28 @@ const ProfileBlock = ({
       <div className={style.wrapper}>
         {/* <h2>ProfileBlock</h2> */}
         <div className={style.profileContainer}>
-          <div className={style.blockImg} onClick={handleOpenModal}>
+          {/* <div className={style.blockImg} onClick={handleOpenModal}>
             <Image
               src={profileData.avatar || ""}
               alt="avatar"
               width={300}
               height={300}
+            />
+          </div> */}
+          {/* <div className={style.blockImg} onClick={handleOpenModal}>
+            <CloudinaryImage
+              src={profileData.avatar || ""}
+              alt="avatar"
+              width={300}
+              height={300}
+            />
+          </div> */}
+          <div className={style.blockImg} onClick={handleOpenModal}>
+            <CloudinaryImage
+              src={profileData.avatar || ""}
+              alt="avatar"
+              width={600}
+              height={600}
             />
           </div>
           <div className={style.infoBlock}>
@@ -348,11 +366,11 @@ const ProfileBlock = ({
                     {profileData.subscriptions.map((subscription) => (
                       <div key={subscription._id} className={style.subPerson}>
                         <div className={style.imgBlockSub}>
-                          <Image
+                          <CloudinaryImage
                             src={subscription.avatar}
                             alt="avatar"
-                            width={20}
-                            height={20}
+                            width={70}
+                            height={70}
                           />
                         </div>
                         <div className={style.nameBlock}>
@@ -368,11 +386,11 @@ const ProfileBlock = ({
                     {profileData.subscribers.map((subscribers) => (
                       <div key={subscribers._id} className={style.subPerson}>
                         <div className={style.imgBlockSub}>
-                          <Image
+                          <CloudinaryImage
                             src={subscribers.avatar}
                             alt="avatar"
-                            width={10}
-                            height={10}
+                            width={70}
+                            height={70}
                           />
                         </div>
                         <div className={style.nameBlock}>

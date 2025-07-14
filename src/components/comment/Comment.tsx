@@ -1,7 +1,8 @@
 import { formatData } from "@/utils/formatData"
-import Image from "next/image"
+// import Image from "next/image"
 import style from "./Comment.module.scss"
 import { userCommentType } from "@/store/slices/roomPostsSlice"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 export const Comment = ({ data }: { data: userCommentType }) => {
   console.log("data Comment", data)
   const { userId, text, createdAt } = data
@@ -11,7 +12,7 @@ export const Comment = ({ data }: { data: userCommentType }) => {
     <div className={style.container}>
       <div className={style.userInfoBlock}>
         <div className={style.blockImg}>
-          <Image src={avatar} alt="avatar" width={40} height={40} />
+          <CloudinaryImage src={avatar} alt="avatar" width={120} height={120} />
         </div>
         <div className={style.blockName}>{username}</div>
         <div className={style.blockContent}>{text}</div>

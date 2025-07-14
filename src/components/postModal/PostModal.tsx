@@ -2,7 +2,7 @@
 import style from "./PostModal.module.scss"
 import CloseButton from "../ui/closeButton/CloseButton"
 import StarRatingView from "../starRatingView/StarRatingView"
-import Image from "next/image"
+// import Image from "next/image"
 import { translatorGenres } from "@/utils/translatorGenres"
 import { useEffect, useState } from "react"
 import ButtonMenu from "../ui/button/Button"
@@ -22,6 +22,7 @@ import StarRating from "../starRating/StarRating"
 import { voiceAPI } from "@/api/api"
 import { userPostType } from "@/store/slices/userPostsSlice"
 import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 // import { RootState } from '@/store/store'
 
 export type RatingFormValues = {
@@ -79,7 +80,7 @@ const PostModal = ({
   const {
     genres,
     title,
-    authorName,
+
     avatar,
     ratings,
     comments,
@@ -88,6 +89,7 @@ const PostModal = ({
     _id: postId,
     authorId,
   } = post
+  const authorName = post.authorId.username
   const [comment, setComment] = useState("")
 
   const handleSendComment = async () => {
@@ -221,10 +223,20 @@ const PostModal = ({
                 ))}
               </div>
             ) : null}
-            <div>Автор: {authorName}</div>
+            {authorName && roomId && (
+              <div className={style.blockAuthorName}>
+                <span>Автор: </span>
+                {authorName}
+              </div>
+            )}
             <div className={style.imageStarsBlock}>
               <div className={style.blockImg} onClick={handleOpenModal}>
-                <Image src={avatar} alt="avatar" width={300} height={300} />
+                <CloudinaryImage
+                  src={avatar}
+                  alt="avatar"
+                  width={800}
+                  height={800}
+                />
               </div>
               <div className={style.starsBlock}>
                 <h4>Оценка автора</h4>
@@ -333,11 +345,11 @@ const PostModal = ({
                         <div key={v._id} className={style.otherStars}>
                           <div className={style.userInfo}>
                             <div className={style.blockImg}>
-                              <Image
+                              <CloudinaryImage
                                 src={v.userId.avatar}
                                 alt="avatar"
-                                width={30}
-                                height={30}
+                                width={100}
+                                height={100}
                               />
                             </div>
 

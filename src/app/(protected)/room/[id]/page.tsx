@@ -18,11 +18,12 @@ import { MemberInfo } from "@/components/memberInfo/MemberInfo"
 import ButtonMenu from "@/components/ui/button/Button"
 import { AddMembersToRoom } from "../addMembersToRoom/AddMembersToRoom"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
-import Image from "next/image"
+// import Image from "next/image"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
 import { setRoomPage } from "@/store/slices/roomPostsSlice"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { RootState } from "@/store/store"
+import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 const Room = () => {
   const [addFriendsToRoom, setAddFriendsToRoom] = useState(false)
@@ -97,28 +98,6 @@ const Room = () => {
     }
   }, [isAuth, dispatch, id])
 
-  // useEffect(() => {
-  //   if (isAuth) {
-  //     console.log("roomId", id)
-  //     dispatch(getRoomPostsThunk({ roomId: id, page }))
-  //     dispatch(getRoomByIdThunk(id))
-  //   }
-  // }, [isAuth, dispatch, id,page])
-
-  // useEffect(() => {
-  //   if (isAuth && typeof id === "string") {
-  //     dispatch(setRoomPage(pageFromUrl)) // обновляем Redux
-  //     dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl })) // грузим посты
-  //     dispatch(getRoomByIdThunk(id)) // грузим инфо о комнате
-  //   }
-  // }, [isAuth, dispatch, id, pageFromUrl])
-
-  // useEffect(() => {
-  //   if (isAuth && typeof id === "string") {
-  //     dispatch(getRoomPostsThunk({ roomId: id, page }))
-  //   }
-  // }, [page])
-
   useEffect(() => {
     if (addFriendsToRoom) {
       dispatch(
@@ -192,11 +171,11 @@ const Room = () => {
       <div className={style.containerMembers}>
         <div className={style.blockRoomMainInfo}>
           <div className={style.blockAvatarRoom} onClick={handleOpenModal}>
-            <Image
+            <CloudinaryImage
               src={room?.avatar || ""}
               alt="roomAvatar"
-              width={200}
-              height={200}
+              width={600}
+              height={600}
             />
           </div>
           <div>

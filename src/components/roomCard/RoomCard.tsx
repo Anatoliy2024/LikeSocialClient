@@ -1,11 +1,12 @@
 import { formatData } from "@/utils/formatData"
 import style from "./RoomCard.module.scss"
-import Image from "next/image"
+// import Image from "next/image"
 import { useRouter } from "next/navigation"
 import ButtonMenu from "@/components/ui/button/Button"
 import { RoomType } from "@/store/thunks/roomsThunk"
 import { useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 
 export const RoomCard = ({
   data,
@@ -42,11 +43,11 @@ export const RoomCard = ({
     <div className={style.wrapper}>
       <div className={style.mainInfo} onClick={() => handleLinkUser(_id)}>
         <div className={style.blockImg}>
-          <Image
+          <CloudinaryImage
             src={avatar} // путь к изображению в public
             alt="roomImage"
-            width={200}
-            height={200}
+            width={600}
+            height={600}
           />
         </div>
         <div className={style.blockInfo}>
