@@ -10,9 +10,22 @@
   grid-area: h;
   user-select: none;
 
-  position: sticky;
+  // position: sticky;
   top: 0;
   z-index: 50;
+  position: fixed;
+  transition: transform 0.3s ease;
+  width: 100%;
+
+  // .wrapper {
+  //   position: fixed;
+  //   top: 0;
+  //   width: 100%;
+  //   z-index: 1000;
+  //   transition: transform 0.3s ease;
+  //   background-color: white;
+  //   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  // }
 
   .logoWrapper {
     display: flex;
@@ -145,6 +158,9 @@
   .profileWrapper:hover .menu {
     display: flex;
   }
+}
+.hidden {
+  transform: translateY(-100%);
 }
 
 // .hamburger span {

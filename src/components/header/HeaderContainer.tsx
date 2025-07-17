@@ -11,7 +11,8 @@ import {
   fetchNotificationsThunk,
   markAllNotificationsReadThunk,
 } from "@/store/thunks/notificationsThunk"
-
+// import throttle from "lodash.throttle"
+import { useHideOnScroll } from "@/hooks/useHideOnScroll"
 const HeaderContainer = ({
   handleShowToggleMenu,
   showButton,
@@ -21,6 +22,9 @@ const HeaderContainer = ({
   showButton: boolean
   menuOpen: boolean
 }) => {
+  // const [showHeader, setShowHeader] = useState(true)
+  // // const [lastScrollY, setLastScrollY] = useState(0)
+  // const lastScrollYRef = useRef(0)
   const dispatch = useAppDispatch()
   const router = useRouter()
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
@@ -50,9 +54,7 @@ const HeaderContainer = ({
     dispatch(markAllNotificationsReadThunk())
   }
 
-  // const handleCloseHotification =()=>{
-  //   setShowNotifications(false)
-  // }
+  const showHeader = useHideOnScroll()
 
   return (
     <Header
@@ -68,6 +70,7 @@ const HeaderContainer = ({
       notifications={notifications}
       deleteAllNotifications={deleteAllNotifications}
       markAllNotificationsRead={markAllNotificationsRead}
+      showHeader={showHeader}
       // handleShowNotification={handleShowNotification}
       // handleCloseNotification={handleCloseNotification}
     />

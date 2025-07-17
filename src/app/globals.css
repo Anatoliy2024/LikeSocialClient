@@ -26,6 +26,7 @@ body {
 } */
 body {
   font-size: 1.3rem;
+  background-color: rgb(182, 135, 254);
 }
 .no-scroll {
   overflow: hidden;
