@@ -83,35 +83,37 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
       {users.length === 0 ? (
         <p>Пусто</p>
       ) : (
-        users.map((user) => (
-          <div key={user._id} className={style.containerUser}>
-            <div
-              className={style.imgNameContainer}
-              onClick={() => handleLinkUser(user._id)}
-            >
-              <div className={style.containerImg}>
-                <Image
-                  src={user.avatar}
-                  alt={user.username}
-                  width={100}
-                  height={100}
-                />
-              </div>
-              <span>{user.username}</span>
-            </div>
-            <div className={style.buttonContainer}>
-              <ButtonMenu
-                disabled={loading}
-                loading={loading}
-                onClick={() => {
-                  handleClick(type, user._id)
-                }}
+        <div className={style.listsBlock}>
+          {users.map((user) => (
+            <div key={user._id} className={style.containerUser}>
+              <div
+                className={style.imgNameContainer}
+                onClick={() => handleLinkUser(user._id)}
               >
-                {messageType[type]}
-              </ButtonMenu>
+                <div className={style.containerImg}>
+                  <Image
+                    src={user.avatar}
+                    alt={user.username}
+                    width={100}
+                    height={100}
+                  />
+                </div>
+                <span>{user.username}</span>
+              </div>
+              <div className={style.buttonContainer}>
+                <ButtonMenu
+                  disabled={loading}
+                  loading={loading}
+                  onClick={() => {
+                    handleClick(type, user._id)
+                  }}
+                >
+                  {messageType[type]}
+                </ButtonMenu>
+              </div>
             </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   )

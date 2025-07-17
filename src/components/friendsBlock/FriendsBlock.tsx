@@ -84,6 +84,11 @@ export function FriendsBlock() {
 
   return (
     <div className={style.wrapper}>
+      <Link href="/friends/search">
+        <div className={style.buttonBlock}>
+          <ButtonMenu>Поиск друзей</ButtonMenu>
+        </div>
+      </Link>
       <FriendsList
         type={"friendRequests"}
         users={friendRequestsUsers}
@@ -112,9 +117,6 @@ export function FriendsBlock() {
       />
       {/* Friends <FriendsList type={"sentFriendRequests"}/> */}
       {/* <FriendsList/> */}
-      <Link href="/friends/search">
-        <ButtonMenu>Поиск друзей</ButtonMenu>
-      </Link>
     </div>
   )
 }

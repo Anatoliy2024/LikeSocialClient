@@ -62,15 +62,16 @@ export default function RoomsBlock() {
         value={name}
       /> */}
       {showAddBlock && <AddRoomBlock handleCloseBlock={handleCloseBlock} />}
-
-      <ButtonMenu
-        onClick={() => {
-          setShowAddBlock(true)
-          // dispatch(createRoomThunk(name))
-        }}
-      >
-        создать комнату
-      </ButtonMenu>
+      <div className={style.buttonBlock}>
+        <ButtonMenu
+          onClick={() => {
+            setShowAddBlock(true)
+            // dispatch(createRoomThunk(name))
+          }}
+        >
+          создать комнату
+        </ButtonMenu>
+      </div>
       {pages > 1 && (
         <Paginator pages={pages} onPageChange={handlePageChange} page={page} />
       )}

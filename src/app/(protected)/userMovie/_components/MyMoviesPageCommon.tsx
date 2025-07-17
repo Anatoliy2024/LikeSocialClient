@@ -213,7 +213,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
           {userId ? "Фильмы пользователя" : "Мои фильмы"}
         </h1>
         {myMoviesPage && (
-          <div>
+          <div className={styles.createMovieButton}>
             <ButtonMenu onClick={showCreateMovieWantToSee}>Создать</ButtonMenu>
           </div>
         )}

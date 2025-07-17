@@ -10,6 +10,8 @@ import {
 import UserBlock from "@/components/userBlock/UserBlock"
 import { Paginator } from "@/components/Paginator/Paginator"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
+import ButtonMenu from "../ui/button/Button"
 export function SearchBlock() {
   const router = useRouter()
   const pathname = usePathname()
@@ -51,32 +53,40 @@ export function SearchBlock() {
   }
   return (
     <div className={style.wrapper}>
+      <Link href="/friends">
+        <div className={style.buttonBlock}>
+          <ButtonMenu>Назад</ButtonMenu>
+        </div>
+      </Link>
       <h2>SearchFriends</h2>
       {pages > 1 && (
         <Paginator page={page} pages={pages} onPageChange={handlePageChange} />
       )}
-      {users.length > 0 &&
-        users.map((user) => {
-          let status: "friend" | "incoming" | "outgoing" | "none" = "none"
-          if (friends.some((f) => f._id === user._id)) {
-            status = "friend"
-          } else if (friendRequests.some((r) => r._id === user._id)) {
-            status = "incoming"
-          } else if (sentFriendRequests.some((s) => s._id === user._id)) {
-            status = "outgoing"
-          }
-          console.log(user.username, status)
-          return (
-            <UserBlock
-              key={user._id}
-              avatar={user.avatar}
-              userName={user.username}
-              id={user._id}
-              status={status}
-              page={page}
-            />
-          )
-        })}
+      {users.length > 0 && (
+        <div className={style.listBlock}>
+          {users.map((user) => {
+            let status: "friend" | "incoming" | "outgoing" | "none" = "none"
+            if (friends.some((f) => f._id === user._id)) {
+              status = "friend"
+            } else if (friendRequests.some((r) => r._id === user._id)) {
+              status = "incoming"
+            } else if (sentFriendRequests.some((s) => s._id === user._id)) {
+              status = "outgoing"
+            }
+            console.log(user.username, status)
+            return (
+              <UserBlock
+                key={user._id}
+                avatar={user.avatar}
+                userName={user.username}
+                id={user._id}
+                status={status}
+                page={page}
+              />
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
