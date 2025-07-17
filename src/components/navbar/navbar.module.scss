@@ -10,6 +10,23 @@
       background-color: rgba(0, 0, 0, 0.2);
     }
   }
+  .scrollTopBtn {
+    position: fixed;
+    bottom: 30px;
+    left: 60px;
+    background-color: #543d8e;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    // z-index: 100;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+      background-color: #2a30d7;
+    }
+  }
 }
 
 .hidden {

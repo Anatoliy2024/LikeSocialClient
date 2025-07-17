@@ -1,7 +1,8 @@
+"use client"
 import Link from "next/link"
 import style from "./navbar.module.scss"
-import { RefObject } from "react"
-
+import { RefObject, useEffect, useState } from "react"
+import throttle from "lodash.throttle"
 export default function Navbar({
   isOpen,
   navRef,
@@ -11,6 +12,21 @@ export default function Navbar({
   navRef: RefObject<HTMLDivElement | null>
   onClose: () => void
 }) {
+  const [showScrollTop, setShowScrollTop] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = throttle(() => {
+      setShowScrollTop(window.scrollY > 100)
+    }, 300)
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   const handleLinkClick = () => {
     const isMobile = window.innerWidth <= 768
     if (isMobile && onClose) {
@@ -37,6 +53,12 @@ export default function Navbar({
       <Link href="/userMovie" onClick={handleLinkClick}>
         <div>Want To See</div>
       </Link>
+
+      {showScrollTop && (
+        <button onClick={scrollToTop} className={style.scrollTopBtn}>
+          ↑ Наверх
+        </button>
+      )}
     </div>
   )
 }
