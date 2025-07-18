@@ -14,6 +14,8 @@ import { initialStateNotificationsType } from "@/store/slices/notificationsSlice
 import CloseButton from "../ui/closeButton/CloseButton"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 
+import Link from "next/link"
+
 export const Notifications = ({
   toggleShowNotification,
   notifications,
@@ -55,14 +57,22 @@ export const Notifications = ({
               className={style.list}
             >
               {n.senderId?.avatar && (
-                <div className={style.imgBlockList}>
-                  <CloudinaryImage
-                    src={n.senderId.avatar}
-                    alt="avatar"
-                    width={80}
-                    height={80}
-                  />
-                </div>
+                <Link
+                  href={`/profile/${n.senderId._id}`}
+                  onClick={toggleShowNotification}
+                >
+                  <div className={style.imgBlockList}>
+                    <CloudinaryImage
+                      src={n.senderId.avatar}
+                      alt="avatar"
+                      width={80}
+                      height={80}
+                    />
+                  </div>
+                </Link>
+                // <ProfileLink userId={n.senderId._id} currentUserId={userId}>
+
+                // </ProfileLink>
               )}
               <div className={style.message}>{n.message}</div>
             </li>

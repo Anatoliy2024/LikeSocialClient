@@ -33,6 +33,19 @@ export default function Navbar({
       onClose()
     }
   }
+
+  // useEffect(() => {
+  //   // при монтировании — запрещаем прокрутку
+  //   const originalOverflow = document.body.style.overflow
+
+  //   if (isOpen) {
+  //     document.body.style.overflow = "hidden"
+  //   }
+
+  //   return () => {
+  //     document.body.style.overflow = originalOverflow
+  //   }
+  // }, [isOpen])
   return (
     <div
       ref={navRef}

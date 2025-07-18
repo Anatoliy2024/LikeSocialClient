@@ -3,7 +3,15 @@ import { formatData } from "@/utils/formatData"
 import style from "./Comment.module.scss"
 import { userCommentType } from "@/store/slices/roomPostsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
-export const Comment = ({ data }: { data: userCommentType }) => {
+// import Link from "next/link"
+import { ProfileLink } from "../ProfileLink/ProfileLink"
+export const Comment = ({
+  data,
+  playerId,
+}: {
+  data: userCommentType
+  playerId: string
+}) => {
   console.log("data Comment", data)
   const { userId, text, createdAt } = data
   const { username, avatar } = userId
@@ -11,10 +19,33 @@ export const Comment = ({ data }: { data: userCommentType }) => {
   return (
     <div className={style.container}>
       <div className={style.userInfoBlock}>
-        <div className={style.blockImg}>
-          <CloudinaryImage src={avatar} alt="avatar" width={120} height={120} />
-        </div>
-        <div className={style.blockName}>{username}</div>
+        <ProfileLink userId={userId._id} currentUserId={playerId}>
+          <div className={style.avatarBlock}>
+            <div className={style.blockImg}>
+              <CloudinaryImage
+                src={avatar}
+                alt="avatar"
+                width={120}
+                height={120}
+              />
+            </div>
+            <div className={style.blockName}>{username}</div>
+          </div>
+        </ProfileLink>
+        {/* <Link href={`/profile/${userId._id}`}>
+          <div className={style.avatarBlock}>
+            <div className={style.blockImg}>
+              <CloudinaryImage
+                src={avatar}
+                alt="avatar"
+                width={120}
+                height={120}
+              />
+            </div>
+            <div className={style.blockName}>{username}</div>
+          </div>
+        </Link> */}
+
         <div className={style.blockContent}>{text}</div>
       </div>
 

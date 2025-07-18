@@ -82,6 +82,14 @@
               gap: 10px;
               border-radius: 20px;
               background: #465bc2;
+              cursor: pointer;
+              // &:hover {
+              //   background-color: rgba(0, 0, 0, 0.552);
+              // }
+              // &:active {
+              //   background-color: rgba(0, 0, 0, 0.816);
+              //   color: white;
+              // }
               .blockImg {
                 overflow: hidden;
                 border-radius: 50%;
@@ -116,6 +124,11 @@
             height: 120px;
             resize: none;
           }
+        }
+        .commentList {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
         }
         .showCommentsBlock {
         }

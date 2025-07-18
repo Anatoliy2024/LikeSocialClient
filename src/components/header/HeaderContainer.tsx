@@ -28,6 +28,7 @@ const HeaderContainer = ({
   const dispatch = useAppDispatch()
   const router = useRouter()
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
+
   const username = useAppSelector((state: RootState) => state.auth.username)
   const avatar = useAppSelector((state: RootState) => state.auth.avatar)
   // const avatar = useAppSelector((state: RootState) => state.profile.avatar)

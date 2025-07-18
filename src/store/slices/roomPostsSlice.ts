@@ -42,7 +42,7 @@ export type roomPostType = {
 export type userCommentType = {
   _id: string
   userId: {
-    _id?: string
+    _id: string
     username: string
     avatar: string
   }

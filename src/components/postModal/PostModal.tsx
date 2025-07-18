@@ -23,6 +23,9 @@ import { voiceAPI } from "@/api/api"
 import { userPostType } from "@/store/slices/userPostsSlice"
 import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+// import Link from "next/link"
+import { ProfileLink } from "../ProfileLink/ProfileLink"
+// import { ProfileLink } from "../ProfileLink/ProfileLink"
 // import { RootState } from '@/store/store'
 
 export type RatingFormValues = {
@@ -61,6 +64,7 @@ const PostModal = ({
   const [isEditing, setIsEditing] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const myVoice = votes.find((v) => v.userId._id === playerId)
+  console.log("votes***", votes)
   useEffect(() => {
     const fetchVoices = async () => {
       try {
@@ -343,18 +347,26 @@ const PostModal = ({
                       .filter((voice) => voice.userId._id !== playerId)
                       .map((v) => (
                         <div key={v._id} className={style.otherStars}>
-                          <div className={style.userInfo}>
-                            <div className={style.blockImg}>
-                              <CloudinaryImage
-                                src={v.userId.avatar}
-                                alt="avatar"
-                                width={100}
-                                height={100}
-                              />
-                            </div>
+                          <ProfileLink
+                            userId={v.userId._id}
+                            currentUserId={playerId}
+                          >
+                            <div className={style.userInfo}>
+                              <div className={style.blockImg}>
+                                <CloudinaryImage
+                                  src={v.userId.avatar}
+                                  alt="avatar"
+                                  width={100}
+                                  height={100}
+                                />
+                              </div>
 
-                            <div>{v.userId.username}</div>
-                          </div>
+                              <div>{v.userId.username}</div>
+                            </div>
+                          </ProfileLink>
+                          {/* <Link href={`/profile/${v.userId._id}`}>
+                            
+                          </Link> */}
 
                           <div>
                             <div>Общая: </div>
@@ -409,13 +421,19 @@ const PostModal = ({
               <div className={style.showCommentsBlock}>
                 <h3>Комментарии:</h3>
                 {comments?.length > 0 ? (
-                  comments
-                    .slice()
-                    .reverse()
+                  <div className={style.commentList}>
+                    {comments
+                      .slice()
+                      .reverse()
 
-                    .map((comment) => (
-                      <Comment key={comment._id} data={comment} />
-                    ))
+                      .map((comment) => (
+                        <Comment
+                          key={comment._id}
+                          data={comment}
+                          playerId={playerId}
+                        />
+                      ))}
+                  </div>
                 ) : (
                   <p>Комментариев нет</p>
                 )}

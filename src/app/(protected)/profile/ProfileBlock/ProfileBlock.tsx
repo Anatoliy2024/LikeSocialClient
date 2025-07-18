@@ -21,6 +21,7 @@ import {
 } from "@/store/thunks/profileThunk"
 import { clearProfile } from "@/store/slices/profileSlice"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
+import { SubBlock } from "@/components/subBlock/SubBlock"
 // import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 type FormProfileInfo = {
@@ -361,44 +362,16 @@ const ProfileBlock = ({
                   )}
                 </div>
                 {profileData.subscriptions.length > 0 && (
-                  <div className={style.subBlock}>
-                    <h3>Мои подписки:</h3>
-                    {profileData.subscriptions.map((subscription) => (
-                      <div key={subscription._id} className={style.subPerson}>
-                        <div className={style.imgBlockSub}>
-                          <CloudinaryImage
-                            src={subscription.avatar}
-                            alt="avatar"
-                            width={70}
-                            height={70}
-                          />
-                        </div>
-                        <div className={style.nameBlock}>
-                          {subscription.username}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <SubBlock
+                    subsData={profileData.subscriptions}
+                    type={"subscriptions"}
+                  />
                 )}
                 {profileData.subscribers.length > 0 && (
-                  <div className={style.subBlock}>
-                    <h3>Мои подписчики:</h3>
-                    {profileData.subscribers.map((subscribers) => (
-                      <div key={subscribers._id} className={style.subPerson}>
-                        <div className={style.imgBlockSub}>
-                          <CloudinaryImage
-                            src={subscribers.avatar}
-                            alt="avatar"
-                            width={70}
-                            height={70}
-                          />
-                        </div>
-                        <div className={style.nameBlock}>
-                          {subscribers.username}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <SubBlock
+                    subsData={profileData.subscribers}
+                    type={"subscribers"}
+                  />
                 )}
 
                 {!isMyProfilePage &&

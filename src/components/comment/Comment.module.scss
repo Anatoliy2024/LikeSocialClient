@@ -7,18 +7,33 @@
     display: flex;
     gap: 10px;
     align-items: center;
-    // width: 150px;
-    .blockImg {
-      width: 40px;
-      border-radius: 50%;
-
-      overflow: hidden;
+    .avatarBlock {
       display: flex;
+      gap: 10px;
       align-items: center;
-      justify-content: center;
+      cursor: pointer;
+      // border-radius: 20px;
+      // padding: 5px;
+      // &:hover {
+      //   background-color: rgba(0, 0, 0, 0.552);
+      // }
+      // &:active {
+      //   background-color: rgba(0, 0, 0, 0.816);
+      //   color: white;
+      // }
+      .blockImg {
+        width: 40px;
+        border-radius: 50%;
+
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .blockName {
+      }
     }
-    .blockName {
-    }
+    // width: 150px;
   }
 
   .blockContent {

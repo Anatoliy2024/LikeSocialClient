@@ -11,6 +11,7 @@ import { NotificationIcon } from "@/assets/icons/notificationIcon"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 type HeaderData = {
   isAuth: boolean
+
   username: string | null
   avatar: string
   logoutFn: () => void
@@ -29,6 +30,7 @@ type HeaderData = {
 
 export default function Header({
   isAuth,
+
   username,
   avatar,
   logoutFn,

@@ -1,0 +1,36 @@
+.subBlock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  .subPerson {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 20px;
+    &:hover {
+      background: #0000006c;
+    }
+    &:active {
+      background: #000000c8;
+      color: white;
+    }
+    .imgBlockSub {
+      max-width: 40px;
+      max-height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    .nameBlock {
+    }
+  }
+}
