@@ -7,13 +7,20 @@ import HeaderContainer from "@/components/header/HeaderContainer"
 import AuthProvider from "./AuthProvider"
 import { ServerType } from "@/store/slices/serverSlice"
 import { useTikServer } from "@/utils/useTikServer"
+import { getSocket } from "@/lib/socket"
+
 import style from "@/components/navbar/navbar.module.scss"
+import { RootState } from "@/store/store"
+
 export default function InnerApp({ children }: { children: React.ReactNode }) {
-  const dispatch = useAppDispatch()
-  const server = useAppSelector((state) => state.server) as ServerType
   const [menuOpen, setMenuOpen] = useState(false)
   const [showButton, setShowButton] = useState(false)
   const navRef = useRef<HTMLDivElement | null>(null)
+
+  const dispatch = useAppDispatch()
+  const server = useAppSelector((state) => state.server) as ServerType
+  const userId = useAppSelector((state: RootState) => state.auth.userId) // пример, где хранится user
+
   const handleShowToggleMenu = () => {
     setMenuOpen((prev) => !prev)
   }
@@ -39,6 +46,24 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   }, [dispatch])
 
   useTikServer(server?.statusServer)
+
+  useEffect(() => {
+    if (!userId) return
+
+    const socket = getSocket()
+    socket.connect()
+    socket.emit("user-connected", userId)
+
+    socket.on("online-users", (users) => {
+      console.log("Сейчас онлайн:", users)
+      // Тут можешь диспатчить в стор, если хочешь хранить онлайн список
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [userId])
+
   if (server?.loading) {
     return <div>Сервер просыпается, пожалуйста подождите...</div>
   }

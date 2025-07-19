@@ -103,7 +103,7 @@ const roomPostSlice = createSlice({
         state.error = null
       })
       .addCase(getRoomPostsThunk.fulfilled, (state, action) => {
-        console.log("getRoomPostsThunk", action.payload)
+        // console.log("getRoomPostsThunk", action.payload)
         state.loading = false
         state.posts = action.payload.posts
         state.page = action.payload.page
@@ -121,7 +121,7 @@ const roomPostSlice = createSlice({
         state.error = null
       })
       .addCase(delRoomPostsThunk.fulfilled, (state, action) => {
-        console.log("delRoomPostsThunk", action.payload)
+        // console.log("delRoomPostsThunk", action.payload)
         state.loading = false
         state.posts = action.payload.posts
         state.page = action.payload.page
@@ -139,7 +139,7 @@ const roomPostSlice = createSlice({
         state.error = null
       })
       .addCase(createRoomCommentThunk.fulfilled, (state, action) => {
-        console.log("createRoomCommentThunk", action.payload)
+        // console.log("createRoomCommentThunk", action.payload)
         state.loading = false
         const updatedPost = action.payload
         state.posts = state.posts.map((post) =>
@@ -159,7 +159,7 @@ const roomPostSlice = createSlice({
         state.error = null
       })
       .addCase(uploadRoomPostAvatarThunk.fulfilled, (state, action) => {
-        console.log("createRoomCommentThunk", action.payload)
+        // console.log("createRoomCommentThunk", action.payload)
         state.loading = false
         const updatedPost = action.payload
         state.posts = state.posts.map((post) =>

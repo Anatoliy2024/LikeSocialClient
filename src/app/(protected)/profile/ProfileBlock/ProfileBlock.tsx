@@ -22,6 +22,7 @@ import {
 import { clearProfile } from "@/store/slices/profileSlice"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import { SubBlock } from "@/components/subBlock/SubBlock"
+import { formatData } from "@/utils/formatData"
 // import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 type FormProfileInfo = {
@@ -70,7 +71,7 @@ const ProfileBlock = ({
       }
     }
   }, [isMyProfilePage, userId, isAuth, dispatch])
-  console.log("profileData", profileData)
+  // console.log("profileData", profileData)
 
   const handleEditClick = () => {
     setIsEdit(true)
@@ -104,7 +105,7 @@ const ProfileBlock = ({
   // }, [])
 
   const handleSave = (dataForm: FormProfileInfo) => {
-    console.log("dataForm brefore", dataForm)
+    // console.log("dataForm brefore", dataForm)
 
     const dataToSend = {
       userInfo: {
@@ -115,12 +116,12 @@ const ProfileBlock = ({
         },
       },
     }
-    console.log("dataToSend after", dataToSend)
+    // console.log("dataToSend after", dataToSend)
     dispatch(changeMyProfileThunk(dataToSend))
     // здесь можно собрать данные и отправить на сервер
     setIsEdit(false)
   }
-  console.log("profileData", profileData)
+  // console.log("profileData", profileData)
 
   if (profileData.profileLoading) {
     return <div>Загрузка...</div>
@@ -181,14 +182,30 @@ const ProfileBlock = ({
               height={300}
             />
           </div> */}
-          <div className={style.blockImg} onClick={handleOpenModal}>
-            <CloudinaryImage
-              src={profileData.avatar || ""}
-              alt="avatar"
-              width={600}
-              height={600}
-            />
+          <div className={style.imageContainer}>
+            <div className={style.userImgOnlineBlock}>
+              <div className={style.blockImg} onClick={handleOpenModal}>
+                <CloudinaryImage
+                  src={profileData.avatar || ""}
+                  alt="avatar"
+                  width={600}
+                  height={600}
+                />
+              </div>
+              {!isMyProfilePage && profileData.isOnline && (
+                <div className={style.onlineBlock}></div>
+              )}
+            </div>
+            {!isMyProfilePage &&
+              !profileData.isOnline &&
+              profileData.lastSeen && (
+                <div className={style.lastSeenBlock}>
+                  <div>Был онлайн:</div>
+                  <div>{formatData(profileData.lastSeen)}</div>
+                </div>
+              )}
           </div>
+
           <div className={style.infoBlock}>
             {isEdit ? (
               <form onSubmit={handleSubmit(handleSave)} className={style.form}>

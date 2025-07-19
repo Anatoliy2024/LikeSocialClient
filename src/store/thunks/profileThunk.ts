@@ -47,6 +47,8 @@ export const getUserProfileThunk = createAsyncThunk<
     avatar: string
     avatarPublicId: string
     isSubscribed: boolean
+    isOnline: boolean
+    lastSeen: null | string
   },
   string,
   { rejectValue: string }

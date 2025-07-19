@@ -28,6 +28,8 @@ export type profileState = {
   isSubscribed: boolean
   subscriptions: UserType[] // на кого подписан
   subscribers: UserType[] // кто подписался
+  isOnline?: boolean
+  lastSeen?: string | null
 }
 
 const initialState: profileState = {
@@ -48,6 +50,8 @@ const initialState: profileState = {
   subscriptions: [],
   subscribers: [],
   isSubscribed: false,
+  isOnline: false,
+  lastSeen: null,
 }
 
 const profileSlice = createSlice({
@@ -71,6 +75,8 @@ const profileSlice = createSlice({
       state.subscriptions = []
       state.subscribers = []
       state.isSubscribed = false
+      state.isOnline = false
+      state.lastSeen = null
     },
   },
   extraReducers: (builder) => {
@@ -124,6 +130,9 @@ const profileSlice = createSlice({
         state.avatar = action.payload.avatar
         state.avatarPublicId = action.payload.avatarPublicId
         state.isSubscribed = action.payload.isSubscribed
+        state.isOnline = action.payload.isOnline
+        state.lastSeen = action.payload.lastSeen
+
         // state.subscriptions = action.payload.subscriptions
         // state.subscribers = action.payload.subscribers
       })

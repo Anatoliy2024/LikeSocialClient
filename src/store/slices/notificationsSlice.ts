@@ -41,7 +41,7 @@ const notificationsSlice = createSlice({
       .addCase(fetchNotificationsThunk.fulfilled, (state, action) => {
         state.loading = false
         const notifications = action.payload.notifications
-        console.log("сработал fetchNotificationsThunk", action.payload)
+        // console.log("сработал fetchNotificationsThunk", action.payload)
         if (Array.isArray(notifications)) {
           state.items = notifications
           state.unreadCount = notifications.filter((n) => !n.isRead).length

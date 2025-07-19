@@ -39,7 +39,7 @@ const PostsBlock = ({
   // }
   {
     const [activeCreateNewPost, setActiveCreateNewPost] = useState(false)
-    console.log("pages", pages)
+    // console.log("pages", pages)
     const playerId = useAppSelector((state: RootState) => state.auth.userId)
 
     const pathname = usePathname()

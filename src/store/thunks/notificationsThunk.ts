@@ -30,7 +30,7 @@ export const fetchNotificationsThunk = createAsyncThunk<
 >("notifications/fetchNotifications", async (_, thunkAPI) => {
   try {
     const data = await notificationsAPI.fetchNotifications()
-    console.log("data fetchNotificationsThunk", data)
+    // console.log("data fetchNotificationsThunk", data)
     // const response = await axios.get("/api/notifications")
     return data
   } catch (error) {

@@ -37,7 +37,7 @@ export const registerThunk = createAsyncThunk(
   ) => {
     try {
       const data = await authAPI.register(username, email, password, inviteKey)
-      console.log(data)
+      // console.log(data)
 
       // Распаковываем accessToken
       const decoded = jwtDecode<DecodedToken>(data.accessToken)
@@ -60,7 +60,7 @@ export const authThunk = createAsyncThunk(
     try {
       const data = await authAPI.auth(username, password)
       const decoded = jwtDecode<DecodedToken>(data.accessToken)
-      console.log(decoded)
+      // console.log(decoded)
       return decoded
     } catch (error: unknown) {
       // Проверка, является ли ошибка ошибкой Axios
@@ -78,7 +78,7 @@ export const verifyThunk = createAsyncThunk(
   async ({ username, passwordVerify }: VerifyParams, thunkAPI) => {
     try {
       const data = await authAPI.verify(username, passwordVerify)
-      console.log(data)
+      // console.log(data)
       return data
     } catch (error: unknown) {
       // Проверка, является ли ошибка ошибкой Axios
@@ -97,7 +97,7 @@ export const authCheckThunk = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const data = await authAPI.me()
-      console.log(data)
+      // console.log(data)
 
       return data
     } catch (error: unknown) {
@@ -116,7 +116,7 @@ export const logoutThunk = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const data = await authAPI.postLogout()
-      console.log(data)
+      // console.log(data)
 
       return data
     } catch (error: unknown) {

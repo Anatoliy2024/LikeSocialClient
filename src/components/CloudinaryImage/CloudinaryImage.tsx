@@ -29,6 +29,7 @@ export const CloudinaryImage = ({
   style,
   priority = false,
 }: Props) => {
+  // console.log("CloudinaryImage***", src)
   const url = cloudinaryLoader({ src, width })
 
   return (

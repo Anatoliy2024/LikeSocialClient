@@ -31,7 +31,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   const { posts, page, pages, loading } = useAppSelector(
     (state) => state.userPost
   )
-  console.log("posts************", posts)
+  // console.log("posts************", posts)
   useEffect(() => {
     if (!isAuth) return
     if (isAuth) {

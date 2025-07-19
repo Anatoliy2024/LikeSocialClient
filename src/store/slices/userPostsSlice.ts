@@ -106,7 +106,7 @@ const userPostSlice = createSlice({
         state.error = null
       })
       .addCase(getUserPostsThunk.fulfilled, (state, action) => {
-        console.log("getUserPostsThunk", action.payload)
+        // console.log("getUserPostsThunk", action.payload)
         state.loading = false
         // state.posts = action.payload
         state.posts = action.payload.posts
@@ -124,7 +124,7 @@ const userPostSlice = createSlice({
         state.error = null
       })
       .addCase(getUserPostsByIdThunk.fulfilled, (state, action) => {
-        console.log("getUserPostsByIdThunk", action.payload)
+        // console.log("getUserPostsByIdThunk", action.payload)
         state.loading = false
         // state.posts = action.payload
 
@@ -144,7 +144,7 @@ const userPostSlice = createSlice({
         state.error = null
       })
       .addCase(delUserPostsThunk.fulfilled, (state, action) => {
-        console.log("delUserPostsThunk", action.payload)
+        // console.log("delUserPostsThunk", action.payload)
         state.loading = false
         // state.posts = action.payload
 
@@ -163,7 +163,7 @@ const userPostSlice = createSlice({
         state.error = null
       })
       .addCase(createUserCommentThunk.fulfilled, (state, action) => {
-        console.log("createUserCommentThunk", action.payload)
+        // console.log("createUserCommentThunk", action.payload)
         state.loading = false
         const updatedPost = action.payload
         // console.log("createUserCommentThunk", action.payload)
@@ -184,7 +184,7 @@ const userPostSlice = createSlice({
         state.error = null
       })
       .addCase(uploadUserPostAvatarThunk.fulfilled, (state, action) => {
-        console.log("createUserCommentThunk", action.payload)
+        // console.log("createUserCommentThunk", action.payload)
         state.loading = false
         const updatedPost = action.payload
         // console.log("createUserCommentThunk", action.payload)

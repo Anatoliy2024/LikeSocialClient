@@ -13,8 +13,8 @@ const ButtonMenu = ({
   disabled?: boolean
   loading?: boolean
 }) => {
-  console.log("loading", loading)
-  console.log("disabled", disabled)
+  // console.log("loading", loading)
+  // console.log("disabled", disabled)
   return (
     <button
       onClick={onClick}
