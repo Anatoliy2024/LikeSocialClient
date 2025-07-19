@@ -13,6 +13,7 @@ export const getSocket = () => {
       {
         withCredentials: true,
         autoConnect: false,
+        transports: ["websocket", "polling"],
       }
     )
   }
