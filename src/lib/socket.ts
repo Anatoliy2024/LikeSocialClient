@@ -8,8 +8,8 @@ export const getSocket = () => {
     socket = io(
       process.env.NEXT_PUBLIC_API_URL ||
         (process.env.NODE_ENV === "development"
-          ? "http://localhost:5000/"
-          : "https://likesocial.onrender.com/"),
+          ? "http://localhost:5000"
+          : "https://likesocial.onrender.com"),
       {
         withCredentials: true,
         autoConnect: false,
