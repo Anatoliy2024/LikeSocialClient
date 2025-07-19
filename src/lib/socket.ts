@@ -1,17 +1,13 @@
 // src/lib/socket.ts
+import { baseApiUrl } from "@/api/instance"
 import { io, Socket } from "socket.io-client"
 
 let socket: Socket | null = null
 
 export const getSocket = () => {
   if (!socket) {
-    const url =
-      process.env.NEXT_PUBLIC_API_URL ||
-      (process.env.NODE_ENV === "development"
-        ? "http://localhost:5000/api"
-        : "https://likesocial.onrender.com/api")
-    console.log("url socket", url)
-    socket = io(url, {
+    console.log("url socket", baseApiUrl)
+    socket = io(baseApiUrl, {
       withCredentials: true,
       // autoConnect: false,
       // transports: ["websocket", "polling"],

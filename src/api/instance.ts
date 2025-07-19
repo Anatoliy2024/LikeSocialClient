@@ -1,19 +1,16 @@
 import axios from "axios"
 
-// const baseURL = process.env.NEXT_PUBLIC_API_URL
-//   ? process.env.NEXT_PUBLIC_API_URL + "/api/"
-//   : "http://localhost:5000/api/"
+// Получаем базовый URL из env или fallback
+export const baseApiUrl = process.env.NEXT_PUBLIC_API_URL
+  ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "") // убираем слеш в конце, если есть
+  : process.env.NODE_ENV === "development"
+  ? "http://localhost:5000"
+  : "https://likesocial.onrender.com"
 
-// const instance = axios.create({
-//   baseURL,
-//   withCredentials: true, // важно: чтобы кука с refreshToken передавалась
-// })
+// Добавляем /api в конце
+const baseURL = baseApiUrl + "/api"
 const instance = axios.create({
-  baseURL:
-    process.env.NEXT_PUBLIC_API_URL ||
-    (process.env.NODE_ENV === "development"
-      ? "http://localhost:5000/api/"
-      : "https://likesocial.onrender.com/api/"),
+  baseURL,
   withCredentials: true,
 })
 
