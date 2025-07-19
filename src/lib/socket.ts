@@ -6,7 +6,7 @@ let socket: Socket | null = null
 
 export const getSocket = () => {
   if (!socket) {
-    console.log("url socket", baseApiUrl)
+    //
     socket = io(baseApiUrl, {
       withCredentials: true,
       // autoConnect: false,
