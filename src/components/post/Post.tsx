@@ -169,7 +169,7 @@ const Post = ({
               <StarRatingView value={ratings.stars} />
             </div>
             <div>
-              <div>Экшен: </div>
+              <div>Актерская игра: </div>
               <StarRatingView value={ratings.acting} />
             </div>
             <div>
