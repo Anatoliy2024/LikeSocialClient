@@ -12,6 +12,8 @@ import { Comments } from "@/assets/icons/comments"
 import { Star } from "@/assets/icons/star"
 import { userCommentType } from "@/store/slices/roomPostsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+import { useState } from "react"
+import ConfirmModal from "../ConfirmModal/ConfirmModal"
 // import { FixedSizeCloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 // import { useRouter } from "next/navigation"
 
@@ -58,6 +60,7 @@ const Post = ({
   page,
 }: PostType) => {
   const dispatch = useAppDispatch()
+  const [isConfirmOpen, setConfirmOpen] = useState(false)
   // const router = useRouter()
   // const date = new Date(createdAt)
   // const formatted = `${String(date.getDate()).padStart(2, "0")}.${String(
@@ -77,6 +80,8 @@ const Post = ({
     } catch (err) {
       console.error("Ошибка удаления поста:", err)
       // можно показать уведомление об ошибке
+    } finally {
+      setConfirmOpen(false)
     }
   }
 
@@ -103,7 +108,8 @@ const Post = ({
                 if (e) {
                   e.stopPropagation()
                 }
-                handleDelete(id)
+                setConfirmOpen(true)
+                // handleDelete(id)
               }}
               title="Удалить пост"
             />
@@ -215,6 +221,13 @@ const Post = ({
           onClose={() => router.push(`/room/${roomId}`)}
         />
       )} */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => handleDelete(id)}
+        title="Удалить пост?"
+        message="Вы уверены, что хотите удалить этот пост? Это действие нельзя отменить."
+      />
     </>
   )
 }

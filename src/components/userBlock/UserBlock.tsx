@@ -10,6 +10,8 @@ import { useAppDispatch } from "@/store/hooks"
 import { useRouter } from "next/navigation"
 // import Image from "next/image"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+import { useState } from "react"
+import ConfirmModal from "../ConfirmModal/ConfirmModal"
 
 type StatusType = "friend" | "incoming" | "outgoing" | "none"
 
@@ -22,11 +24,18 @@ type UserBlockProps = {
 }
 
 const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
+  const [isConfirmOpen, setConfirmOpen] = useState(false)
+
   const dispatch = useAppDispatch()
   const router = useRouter()
 
   const handleLinkUser = (userId: string) => {
     router.push(`/profile/${userId}`)
+  }
+
+  const handleDelete = () => {
+    dispatch(delFriendThunk({ userId: id, page }))
+    setConfirmOpen(false)
   }
 
   let buttonText = ""
@@ -35,7 +44,8 @@ const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
   switch (status) {
     case "friend":
       buttonText = "Удалить из друзей"
-      onClickHandler = () => dispatch(delFriendThunk({ userId: id, page }))
+      onClickHandler = () => setConfirmOpen(true)
+      //  dispatch(delFriendThunk({ userId: id, page }))
       break
     case "incoming":
       buttonText = "Принять заявку"
@@ -55,18 +65,35 @@ const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
   }
   // console.log("buttonText", buttonText)
   return (
-    <div className={style.wrapper}>
-      <div className={style.imgNameBlock} onClick={() => handleLinkUser(id)}>
-        <div className={style.imgBlock}>
-          <CloudinaryImage src={avatar} alt="Avatar" width={400} height={400} />
+    <>
+      <div className={style.wrapper}>
+        <div className={style.imgNameBlock} onClick={() => handleLinkUser(id)}>
+          <div className={style.imgBlock}>
+            <CloudinaryImage
+              src={avatar}
+              alt="Avatar"
+              width={400}
+              height={400}
+            />
+          </div>
+          <div>{userName}</div>
         </div>
-        <div>{userName}</div>
+
+        <div className={style.infoBlock}>
+          <ButtonMenu onClick={onClickHandler}>{buttonText}</ButtonMenu>
+        </div>
       </div>
 
-      <div className={style.infoBlock}>
-        <ButtonMenu onClick={onClickHandler}>{buttonText}</ButtonMenu>
-      </div>
-    </div>
+      {status === "friend" && (
+        <ConfirmModal
+          isOpen={isConfirmOpen}
+          onCancel={() => setConfirmOpen(false)}
+          onConfirm={handleDelete}
+          title="Удалить друга?"
+          message="Вы уверены, что хотите удалить этого пользователя из друзей?"
+        />
+      )}
+    </>
   )
 }
 

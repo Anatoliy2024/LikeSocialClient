@@ -14,6 +14,8 @@ import {
 import Image from "next/image"
 import { Paginator } from "../Paginator/Paginator"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import { useState } from "react"
+import ConfirmModal from "../ConfirmModal/ConfirmModal"
 
 type FriendsListProps = {
   type: "friendRequests" | "friends" | "sentFriendRequests" // ограничим, чтобы был ключ из users
@@ -23,6 +25,8 @@ type FriendsListProps = {
 }
 
 const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
+  const [confirmVisible, setConfirmVisible] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const loading = useAppSelector((state: RootState) => state.users.loading)
   const router = useRouter()
   const pathname = usePathname()
@@ -75,47 +79,81 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
   }
 
   return (
-    <div className={style.wrapper}>
-      <h2>{title[type]}</h2>
-      {pages > 1 && (
-        <Paginator pages={pages} onPageChange={handlePageChange} page={page} />
-      )}
-      {users.length === 0 ? (
-        <p>Пусто</p>
-      ) : (
-        <div className={style.listsBlock}>
-          {users.map((user) => (
-            <div key={user._id} className={style.containerUser}>
-              <div
-                className={style.imgNameContainer}
-                onClick={() => handleLinkUser(user._id)}
-              >
-                <div className={style.containerImg}>
-                  <Image
-                    src={user.avatar}
-                    alt={user.username}
-                    width={100}
-                    height={100}
-                  />
-                </div>
-                <span>{user.username}</span>
-              </div>
-              <div className={style.buttonContainer}>
-                <ButtonMenu
-                  disabled={loading}
-                  loading={loading}
-                  onClick={() => {
-                    handleClick(type, user._id)
-                  }}
+    <>
+      <div className={style.wrapper}>
+        <h2>{title[type]}</h2>
+        {pages > 1 && (
+          <Paginator
+            pages={pages}
+            onPageChange={handlePageChange}
+            page={page}
+          />
+        )}
+        {users.length === 0 ? (
+          <p>Пусто</p>
+        ) : (
+          <div className={style.listsBlock}>
+            {users.map((user) => (
+              <div key={user._id} className={style.containerUser}>
+                <div
+                  className={style.imgNameContainer}
+                  onClick={() => handleLinkUser(user._id)}
                 >
-                  {messageType[type]}
-                </ButtonMenu>
+                  <div className={style.containerImg}>
+                    <Image
+                      src={user.avatar}
+                      alt={user.username}
+                      width={100}
+                      height={100}
+                    />
+                  </div>
+                  <span>{user.username}</span>
+                </div>
+                <div className={style.buttonContainer}>
+                  <ButtonMenu
+                    disabled={loading}
+                    loading={loading}
+                    onClick={() => {
+                      // handleClick(type, user._id)
+                      if (
+                        type === "friendRequests" ||
+                        type === "sentFriendRequests"
+                      ) {
+                        handleClick(type, user._id) // сразу
+                      } else {
+                        setSelectedUserId(user._id) // сохраняем userId
+                        setConfirmVisible(true) // открываем модалку
+                      }
+                    }}
+                  >
+                    {messageType[type]}
+                  </ButtonMenu>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {type === "friends" && (
+        <ConfirmModal
+          isOpen={confirmVisible}
+          onCancel={() => {
+            setSelectedUserId(null)
+            setConfirmVisible(false)
+          }}
+          onConfirm={() => {
+            if (selectedUserId) {
+              handleClick("friends", selectedUserId)
+              setSelectedUserId(null)
+            }
+            setConfirmVisible(false)
+          }}
+          title="Удалить друга?"
+          message="Вы уверены, что хотите удалить этого пользователя из друзей?"
+        />
       )}
-    </div>
+    </>
   )
 }
 
