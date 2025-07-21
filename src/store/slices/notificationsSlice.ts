@@ -26,6 +26,12 @@ const notificationsSlice = createSlice({
   name: "notifications",
   initialState,
   reducers: {
+    addNotification(state, action) {
+      state.items.unshift(action.payload)
+      if (!action.payload.isRead) {
+        state.unreadCount += 1
+      }
+    },
     // removeNotification(state, action) {
     //   state.items = state.items.filter((n) => n._id !== action.payload)
     //   state.unreadCount = state.items.filter((n) => !n.isRead).length
@@ -68,24 +74,6 @@ const notificationsSlice = createSlice({
         state.error = action.error.message || "Ошибка обновления уведомлений"
       })
 
-      // // Создание уведомления
-      // .addCase(createNotificationThunk.pending, (state) => {
-      //   state.loading = true
-      //   state.error = null
-      // })
-      // .addCase(createNotificationThunk.fulfilled, (state, action) => {
-      //   state.loading = false
-      //   const notification = action.payload.notifications
-
-      //   state.items = notification
-      //   state.unreadCount = notification.filter((n) => !n.isRead).length
-      //   // state.items.unshift(action.payload) // Добавляем новое уведомление в начало
-      // })
-      // .addCase(createNotificationThunk.rejected, (state, action) => {
-      //   state.loading = false
-      //   state.error = action.error.message || "Ошибка создания уведомления"
-      // })
-
       // Удаление одного уведомления
       .addCase(deleteNotificationThunk.pending, (state) => {
         state.loading = true
@@ -121,5 +109,5 @@ const notificationsSlice = createSlice({
   },
 })
 
-// export const { removeNotification } = notificationsSlice.actions
+export const { addNotification } = notificationsSlice.actions
 export default notificationsSlice.reducer

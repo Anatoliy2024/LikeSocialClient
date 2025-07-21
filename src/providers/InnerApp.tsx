@@ -11,6 +11,11 @@ import { getSocket } from "@/lib/socket"
 
 import style from "@/components/navbar/navbar.module.scss"
 import { RootState } from "@/store/store"
+import {
+  setOnlineStatusList,
+  updateUserStatus,
+} from "@/store/slices/onlineStatusSlice"
+import { addNotification } from "@/store/slices/notificationsSlice"
 
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -52,17 +57,33 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
     const socket = getSocket()
     socket.connect()
+
     socket.emit("user-connected", userId)
+    socket.emit("get-online-users")
+
+    socket.on("user-status-changed", ({ userId, status }) => {
+      dispatch(updateUserStatus({ userId, status }))
+
+      // обновляем локально статус этого пользователя
+    })
 
     socket.on("online-users", (users) => {
+      dispatch(setOnlineStatusList(users))
       console.log("Сейчас онлайн:", users)
       // Тут можешь диспатчить в стор, если хочешь хранить онлайн список
+    })
+
+    socket.on("new-notification", (notification) => {
+      // например, добавить в Redux:
+      dispatch(addNotification(notification))
+      // или показать toast:
+      // toast(notification.message)
     })
 
     return () => {
       socket.disconnect()
     }
-  }, [userId])
+  }, [userId, dispatch])
 
   if (server?.loading) {
     return <div>Сервер просыпается, пожалуйста подождите...</div>

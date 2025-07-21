@@ -49,10 +49,23 @@ const ProfileBlock = ({
   const dispatch = useAppDispatch()
 
   const profileData = useAppSelector((state: RootState) => state.profile)
+  const profileLastSeen = useAppSelector(
+    (state: RootState) => state.profile.lastSeen
+  )
+
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const loading = useAppSelector(
     (state: RootState) => state.profile.profileLoading
   )
+  const status = useAppSelector((state: RootState) =>
+    !isMyProfilePage
+      ? state.onlineStatus[userId as string]
+      : { isOnline: true, lastSeen: null }
+  )
+
+  const lastSeen = status?.isOnline ? null : status?.lastSeen ?? profileLastSeen
+
+  console.log("lastSeen************", lastSeen)
   const {
     register,
     handleSubmit,
@@ -89,20 +102,6 @@ const ProfileBlock = ({
   const handleCancel = () => {
     setIsEdit(false)
   }
-
-  // useEffect(() => {
-  //   if (profileData.name) {
-  //     reset({
-  //       name: profileData.name,
-  //       sureName: profileData.sureName,
-  //       status: profileData.status,
-  //       birthDate: profileData.birthDate,
-  //       country: profileData.address.country,
-  //       city: profileData.address.city,
-  //       relationshipStatus: profileData.relationshipStatus,
-  //     })
-  //   }
-  // }, [])
 
   const handleSave = (dataForm: FormProfileInfo) => {
     // console.log("dataForm brefore", dataForm)
@@ -166,22 +165,6 @@ const ProfileBlock = ({
       <div className={style.wrapper}>
         {/* <h2>ProfileBlock</h2> */}
         <div className={style.profileContainer}>
-          {/* <div className={style.blockImg} onClick={handleOpenModal}>
-            <Image
-              src={profileData.avatar || ""}
-              alt="avatar"
-              width={300}
-              height={300}
-            />
-          </div> */}
-          {/* <div className={style.blockImg} onClick={handleOpenModal}>
-            <CloudinaryImage
-              src={profileData.avatar || ""}
-              alt="avatar"
-              width={300}
-              height={300}
-            />
-          </div> */}
           <div className={style.imageContainer}>
             <div className={style.userImgOnlineBlock}>
               <div className={style.blockImg} onClick={handleOpenModal}>
@@ -192,18 +175,16 @@ const ProfileBlock = ({
                   height={600}
                 />
               </div>
-              {!isMyProfilePage && profileData.isOnline && (
-                <div className={style.onlineBlock}></div>
-              )}
+              {status?.isOnline && <div className={style.onlineBlock}></div>}
             </div>
-            {!isMyProfilePage &&
-              !profileData.isOnline &&
-              profileData.lastSeen && (
-                <div className={style.lastSeenBlock}>
-                  <div>Был онлайн:</div>
-                  <div>{formatData(profileData.lastSeen)}</div>
+            {!status?.isOnline && lastSeen && (
+              <div className={style.lastSeenBlock}>
+                <div>Был онлайн:</div>
+                <div>
+                  {typeof lastSeen === "string" ? formatData(lastSeen) : ""}
                 </div>
-              )}
+              </div>
+            )}
           </div>
 
           <div className={style.infoBlock}>
