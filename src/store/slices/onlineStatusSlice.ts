@@ -5,7 +5,7 @@ type OnlineStatus = {
   lastSeen: string | null // null, если сейчас онлайн
 }
 
-type OnlineStatusState = {
+export type OnlineStatusState = {
   [userId: string]: OnlineStatus
 }
 

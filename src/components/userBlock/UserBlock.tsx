@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { useState } from "react"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
+import { OnlineStatusState } from "@/store/slices/onlineStatusSlice"
 
 type StatusType = "friend" | "incoming" | "outgoing" | "none"
 
@@ -21,9 +22,17 @@ type UserBlockProps = {
   id: string
   status: StatusType
   page: number
+  usersOnline: OnlineStatusState
 }
 
-const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
+const UserBlock = ({
+  avatar,
+  userName,
+  id,
+  status,
+  page,
+  usersOnline,
+}: UserBlockProps) => {
   const [isConfirmOpen, setConfirmOpen] = useState(false)
 
   const dispatch = useAppDispatch()
@@ -68,13 +77,18 @@ const UserBlock = ({ avatar, userName, id, status, page }: UserBlockProps) => {
     <>
       <div className={style.wrapper}>
         <div className={style.imgNameBlock} onClick={() => handleLinkUser(id)}>
-          <div className={style.imgBlock}>
-            <CloudinaryImage
-              src={avatar}
-              alt="Avatar"
-              width={400}
-              height={400}
-            />
+          <div className={style.imageContainer}>
+            <div className={style.imgBlock}>
+              <CloudinaryImage
+                src={avatar}
+                alt="Avatar"
+                width={400}
+                height={400}
+              />
+            </div>
+            {usersOnline[id]?.isOnline && (
+              <div className={style.onlineBlock}></div>
+            )}
           </div>
           <div>{userName}</div>
         </div>

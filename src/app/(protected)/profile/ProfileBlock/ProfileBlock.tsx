@@ -57,11 +57,10 @@ const ProfileBlock = ({
   const loading = useAppSelector(
     (state: RootState) => state.profile.profileLoading
   )
-  const status = useAppSelector((state: RootState) =>
-    !isMyProfilePage
-      ? state.onlineStatus[userId as string]
-      : { isOnline: true, lastSeen: null }
-  )
+  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
+  const status = !isMyProfilePage
+    ? usersOnline[userId as string]
+    : { isOnline: true, lastSeen: null }
 
   const lastSeen = status?.isOnline ? null : status?.lastSeen ?? profileLastSeen
 
@@ -363,12 +362,14 @@ const ProfileBlock = ({
                   <SubBlock
                     subsData={profileData.subscriptions}
                     type={"subscriptions"}
+                    usersOnline={usersOnline}
                   />
                 )}
                 {profileData.subscribers.length > 0 && (
                   <SubBlock
                     subsData={profileData.subscribers}
                     type={"subscribers"}
+                    usersOnline={usersOnline}
                   />
                 )}
 

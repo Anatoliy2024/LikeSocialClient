@@ -29,6 +29,7 @@ export function SearchBlock() {
   const sentFriendRequests = useAppSelector(
     (state: RootState) => state.users.sentFriendRequests.users
   )
+  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
 
   const dispatch = useAppDispatch()
@@ -82,6 +83,7 @@ export function SearchBlock() {
                 id={user._id}
                 status={status}
                 page={page}
+                usersOnline={usersOnline}
               />
             )
           })}

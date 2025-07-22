@@ -7,19 +7,34 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    .imgBlock {
+    .imageContainer {
       width: 150px;
       height: 150px;
-      border-radius: 50%;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #eee;
-      img {
+      position: relative;
+      .imgBlock {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #eee;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      .onlineBlock {
+        position: absolute;
+        bottom: 13px;
+        right: 13px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #3edc00;
+        border: 2px solid white; // для рамки, если надо
       }
     }
   }

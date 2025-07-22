@@ -28,6 +28,8 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const loading = useAppSelector((state: RootState) => state.users.loading)
+  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
+
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -99,13 +101,18 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
                   className={style.imgNameContainer}
                   onClick={() => handleLinkUser(user._id)}
                 >
-                  <div className={style.containerImg}>
-                    <Image
-                      src={user.avatar}
-                      alt={user.username}
-                      width={100}
-                      height={100}
-                    />
+                  <div className={style.imageContainer}>
+                    <div className={style.imageBlock}>
+                      <Image
+                        src={user.avatar}
+                        alt={user.username}
+                        width={100}
+                        height={100}
+                      />
+                    </div>
+                    {usersOnline[user._id]?.isOnline && (
+                      <div className={style.onlineBlock}></div>
+                    )}
                   </div>
                   <span>{user.username}</span>
                 </div>
