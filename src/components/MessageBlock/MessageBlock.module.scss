@@ -1,0 +1,50 @@
+.container {
+  padding: 10px;
+  .messagesList {
+    .messageList {
+      align-items: center;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+
+      .userImgOnlineBlock {
+        position: relative;
+        width: 70px;
+        height: 70px;
+
+        .blockImg {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 50%;
+          overflow: hidden;
+
+          img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        .onlineBlock {
+          position: absolute;
+          bottom: 5px;
+          right: 5px;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background-color: #3edc00;
+          border: 1px solid white; // для рамки, если надо
+        }
+      }
+
+      .contentBlock {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+}

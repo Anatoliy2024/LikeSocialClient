@@ -17,6 +17,9 @@ export const getSocket = () => {
       reconnectionDelay: 5000,
       reconnectionDelayMax: 10000,
       timeout: 10000,
+      auth: {
+        token: localStorage.getItem("accessToken"), // или откуда ты хранишь JWT
+      },
     })
   }
   return socket

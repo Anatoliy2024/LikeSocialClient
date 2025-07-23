@@ -1,0 +1,31 @@
+.wrapper {
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.589);
+  .container {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70vw;
+    min-height: 70vh;
+    background-color: rgb(51, 28, 142);
+    border-radius: 20px;
+    padding: 20px;
+    flex-direction: column;
+    gap: 20px;
+    textarea {
+      border: 1px solid white;
+      border-radius: 20px;
+      padding-left: 10px;
+      width: 80%;
+    }
+  }
+}

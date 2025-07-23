@@ -40,7 +40,7 @@ export const RoomCard = ({
   const router = useRouter()
   const handleLinkUser = (roomId: string) => {
     router.push(`/room/${roomId}`)
-    console.log("`/room/${roomId}`")
+    // console.log("`/room/${roomId}`")
   }
   if (!_id) return <div>нет id</div>
 

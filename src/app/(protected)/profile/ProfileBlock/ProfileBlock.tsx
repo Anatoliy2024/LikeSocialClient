@@ -23,6 +23,7 @@ import { clearProfile } from "@/store/slices/profileSlice"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import { SubBlock } from "@/components/subBlock/SubBlock"
 import { formatData } from "@/utils/formatData"
+import { CreateUserMessageModal } from "@/components/createUserMessageModal/CreateUserMessageModal"
 // import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 type FormProfileInfo = {
@@ -44,6 +45,7 @@ const ProfileBlock = ({
 }) => {
   const [isEdit, setIsEdit] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
+  const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
   // const birthDate = watch("birthDate")
   // isMyProfilePage={isMyProfilePage} userId={userId}
   const dispatch = useAppDispatch()
@@ -152,6 +154,12 @@ const ProfileBlock = ({
     dispatch(unsubscribeFromUserThunk(userId))
   }
 
+  const handleShowModalCreateMessage = () => {
+    setShowModalCreateMessage(true)
+  }
+  const handleCloseModalCreateMessage = () => {
+    setShowModalCreateMessage(false)
+  }
   return (
     <>
       {changeAvatarModal && (
@@ -159,6 +167,12 @@ const ProfileBlock = ({
           handleCloseModal={handleCloseModal}
           loading={loading}
           onUpload={handleUserAvatarUpload}
+        />
+      )}
+      {showModalCreateMessage && userId && (
+        <CreateUserMessageModal
+          onClose={handleCloseModalCreateMessage}
+          userId={userId}
         />
       )}
       <div className={style.wrapper}>
@@ -358,6 +372,11 @@ const ProfileBlock = ({
                     </Link>
                   )}
                 </div>
+                {!isMyProfilePage && (
+                  <ButtonMenu onClick={handleShowModalCreateMessage}>
+                    Написать сообщение
+                  </ButtonMenu>
+                )}
                 {profileData.subscriptions.length > 0 && (
                   <SubBlock
                     subsData={profileData.subscriptions}

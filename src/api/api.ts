@@ -441,3 +441,20 @@ export const notificationsAPI = {
     return instance.delete("notifications").then((res) => res.data)
   },
 }
+
+export const dialogsAPI = {
+  getUserDialog() {
+    return instance.get("dialogs").then((res) => res.data)
+  },
+  getUserMessage(dialogId: string) {
+    return instance.get(`dialogs/dialog/${dialogId}`).then((res) => res.data)
+  },
+  // sendUserMessage(recipientUserId: string, text: string, dialogId?: string) {
+  //   return instance
+  //     .patch(`send-message`, { recipientUserId, text, dialogId })
+  //     .then((res) => res.data)
+  // },
+  // deleteUserMessage(messageId: string) {
+  //   return instance.delete(`/message/${messageId}`).then((res) => res.data)
+  // },
+}

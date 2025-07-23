@@ -13,6 +13,7 @@ import server from "./slices/serverSlice"
 import userMovies from "./slices/userMoviesSlice"
 import notifications from "./slices/notificationsSlice"
 import onlineStatus from "./slices/onlineStatusSlice"
+import dialogsReducer from "./slices/dialogsSlice"
 
 export const store = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ export const store = configureStore({
     userMovies: userMovies,
     notifications: notifications,
     onlineStatus: onlineStatus,
+    dialogs: dialogsReducer,
     // добавь другие редьюсеры здесь
   },
 })
