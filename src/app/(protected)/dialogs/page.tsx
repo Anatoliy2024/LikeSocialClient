@@ -4,7 +4,7 @@ import style from "./Dialogs.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { getUserDialogsThunk } from "@/store/thunks/dialogsThunk"
 import { RootState } from "@/store/store"
-import Image from "next/image"
+// import Image from "next/image"
 import { formatData } from "@/utils/formatData"
 import { useRouter } from "next/navigation"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
@@ -43,10 +43,10 @@ export default function Dialogs() {
               <div className={style.mainInfoUserBlock}>
                 <div className={style.containerImageDialogs}>
                   <div className={style.blockImageDialogs}>
-                    <Image
+                    <CloudinaryImage
                       src={member.avatar}
-                      width={100}
-                      height={100}
+                      width={200}
+                      height={200}
                       alt="userAvatar"
                     />
                   </div>
@@ -65,13 +65,12 @@ export default function Dialogs() {
                       <CloudinaryImage
                         src={dialog.lastMessageId.senderId.avatar}
                         alt="avatar"
-                        width={200}
-                        height={200}
+                        width={100}
+                        height={100}
                       />
                     </div>
-                    {usersOnline[member._id]?.isOnline && (
-                      <div className={style.onlineBlock}></div>
-                    )}
+                    {usersOnline[dialog.lastMessageId.senderId._id]
+                      ?.isOnline && <div className={style.onlineBlock}></div>}
                   </div>
                   {/* <div className={style.lastMessageAvatar}>
                     <Image
