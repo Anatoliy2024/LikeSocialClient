@@ -26,21 +26,34 @@ export interface DialogType {
   }[]
   lastMessageId?: MessageType
 }
+export interface DialogShortType {
+  _id: string
+  members: string[]
+  lastMessageId?: MessageType
+}
 
 interface DialogsState {
   dialogs: DialogType[]
   messages: MessageType[]
-  currentDialogId: string | null
+  currentDialog: DialogShortType | null
   loading: boolean
   error: string | null
+  totalCount: number
+  currentPage: number
+
+  hasMore: boolean
 }
 
 const initialState: DialogsState = {
   dialogs: [],
   messages: [],
-  currentDialogId: null,
+  currentDialog: null,
   loading: false,
   error: null,
+  totalCount: 0,
+  currentPage: 1,
+
+  hasMore: true,
 }
 
 const dialogsSlice = createSlice({
@@ -52,8 +65,15 @@ const dialogsSlice = createSlice({
     // },
     addMessageFromSocket(state, action: PayloadAction<MessageType>) {
       // if (state.currentDialogId === action.payload.dialogId) {
+      // console.log("action.payload", action.payload)
       state.messages.unshift(action.payload)
       // }
+    },
+    clearMessages: (state) => {
+      state.messages = []
+      state.currentPage = 1
+      state.hasMore = true
+      state.currentDialog = null
     },
   },
 
@@ -77,9 +97,18 @@ const dialogsSlice = createSlice({
         state.error = null
       })
       .addCase(getUserMessagesThunk.fulfilled, (state, action) => {
-        state.messages = action.payload.messages
-        state.currentDialogId = action.payload.dialogId
+        // state.messages = action.payload.messages
+        // console.log("state.messages", state.messages)
+        // state.messages = [...state.messages, ...action.payload.messages]
+        // state.currentDialog = action.payload.dialog
+        // state.loading = false
+        const newMessages = action.payload.messages
+        state.messages = [...state.messages, ...newMessages]
+        state.totalCount = action.payload.totalCount
         state.loading = false
+        // state.currentPage +=  1
+        state.hasMore = state.messages.length < state.totalCount
+        if (!state.currentDialog) state.currentDialog = action.payload.dialog
       })
       .addCase(getUserMessagesThunk.rejected, (state, action) => {
         state.loading = false
@@ -88,5 +117,5 @@ const dialogsSlice = createSlice({
   },
 })
 
-export const { addMessageFromSocket } = dialogsSlice.actions
+export const { addMessageFromSocket, clearMessages } = dialogsSlice.actions
 export default dialogsSlice.reducer

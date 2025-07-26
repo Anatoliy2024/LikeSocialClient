@@ -1,5 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { DialogType, MessageType } from "../slices/dialogsSlice"
+import {
+  DialogShortType,
+  DialogType,
+  MessageType,
+} from "../slices/dialogsSlice"
 import { dialogsAPI } from "@/api/api"
 import axios from "axios"
 
@@ -22,12 +26,12 @@ export const getUserDialogsThunk = createAsyncThunk<
 
 // ✅ Получить сообщения по dialogId
 export const getUserMessagesThunk = createAsyncThunk<
-  { messages: MessageType[]; dialogId: string },
-  string,
+  { messages: MessageType[]; dialog: DialogShortType; totalCount: number },
+  { dialogId: string; page: number },
   { rejectValue: string }
->("dialogs/getMessages", async (dialogId, thunkAPI) => {
+>("dialogs/getMessages", async ({ dialogId, page }, thunkAPI) => {
   try {
-    const data = await dialogsAPI.getUserMessage(dialogId)
+    const data = await dialogsAPI.getUserMessage(dialogId, page)
     return data
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {

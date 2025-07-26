@@ -4,7 +4,7 @@ import {
   delFriendThunk,
   requestFriendThunk,
 } from "@/store/thunks/usersThunk"
-import ButtonMenu from "../ui/button/Button"
+// import ButtonMenu from "../ui/button/Button"
 import style from "./UserBlock.module.scss"
 import { useAppDispatch } from "@/store/hooks"
 import { useRouter } from "next/navigation"
@@ -13,6 +13,12 @@ import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { useState } from "react"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
 import { OnlineStatusState } from "@/store/slices/onlineStatusSlice"
+import { DelFriend } from "@/assets/icons/delFriend"
+import { AcceptFriend } from "@/assets/icons/acceptFriend"
+import { DeniedFriendRequest } from "@/assets/icons/deniedFriendRequest"
+import { AddFriend } from "@/assets/icons/addFriend"
+import { MessageText } from "@/assets/icons/messageText"
+import { CreateUserMessageModal } from "../createUserMessageModal/CreateUserMessageModal"
 
 type StatusType = "friend" | "incoming" | "outgoing" | "none"
 
@@ -34,6 +40,7 @@ const UserBlock = ({
   usersOnline,
 }: UserBlockProps) => {
   const [isConfirmOpen, setConfirmOpen] = useState(false)
+  const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
 
   const dispatch = useAppDispatch()
   const router = useRouter()
@@ -47,34 +54,54 @@ const UserBlock = ({
     setConfirmOpen(false)
   }
 
-  let buttonText = ""
+  // const messageComponentMap = {
+  //   friendRequests: <AcceptFriend />,
+  //   friends: <DelFriend />,
+  //   sentFriendRequests: <DeniedFriendRequest />,
+  // }
+
+  let friendStatusButtonBlock = null
   let onClickHandler = () => {}
   // console.log("status", status)
   switch (status) {
     case "friend":
-      buttonText = "Удалить из друзей"
+      friendStatusButtonBlock = <DelFriend />
       onClickHandler = () => setConfirmOpen(true)
       //  dispatch(delFriendThunk({ userId: id, page }))
       break
     case "incoming":
-      buttonText = "Принять заявку"
+      friendStatusButtonBlock = <AcceptFriend />
       onClickHandler = () => dispatch(acceptFriendThunk({ userId: id, page }))
       break
     case "outgoing":
-      buttonText = "Отменить заявку"
+      friendStatusButtonBlock = <DeniedFriendRequest />
       onClickHandler = () =>
         dispatch(cancelRequestFriendThunk({ userId: id, page }))
       break
     case "none":
     default:
-      buttonText = "Добавить в друзья"
+      friendStatusButtonBlock = <AddFriend />
 
       onClickHandler = () => dispatch(requestFriendThunk({ userId: id, page }))
       break
   }
+
+  const handleShowModalCreateMessage = () => {
+    setShowModalCreateMessage(true)
+  }
+  const handleCloseModalCreateMessage = () => {
+    setShowModalCreateMessage(false)
+  }
+
   // console.log("buttonText", buttonText)
   return (
     <>
+      {showModalCreateMessage && id && (
+        <CreateUserMessageModal
+          onClose={handleCloseModalCreateMessage}
+          userId={id}
+        />
+      )}
       <div className={style.wrapper}>
         <div className={style.imgNameBlock} onClick={() => handleLinkUser(id)}>
           <div className={style.imageContainer}>
@@ -92,10 +119,21 @@ const UserBlock = ({
           </div>
           <div>{userName}</div>
         </div>
-
-        <div className={style.infoBlock}>
-          <ButtonMenu onClick={onClickHandler}>{buttonText}</ButtonMenu>
+        <div className={style.buttonContainer}>
+          <div
+            className={style.buttonBlock}
+            onClick={handleShowModalCreateMessage}
+          >
+            <MessageText />
+          </div>
+          <div className={style.buttonBlock} onClick={onClickHandler}>
+            {friendStatusButtonBlock}
+          </div>
         </div>
+
+        {/* <div className={style.infoBlock}>
+          <ButtonMenu onClick={onClickHandler}>{buttonText}</ButtonMenu>
+        </div> */}
       </div>
 
       {status === "friend" && (

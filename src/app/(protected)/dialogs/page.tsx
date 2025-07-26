@@ -60,17 +60,20 @@ export default function Dialogs() {
               {dialog?.lastMessageId && (
                 // <div className={style.dialogContent}>
                 <div className={style.dialogLastMessage}>
-                  <div className={style.userImgOnlineBlock}>
-                    <div className={style.blockImg}>
-                      <CloudinaryImage
-                        src={dialog.lastMessageId.senderId.avatar}
-                        alt="avatar"
-                        width={100}
-                        height={100}
-                      />
+                  <div className={style.mainContentLastMessage}>
+                    <div className={style.userImgOnlineBlock}>
+                      <div className={style.blockImg}>
+                        <CloudinaryImage
+                          src={dialog.lastMessageId.senderId.avatar}
+                          alt="avatar"
+                          width={100}
+                          height={100}
+                        />
+                      </div>
+                      {/* {usersOnline[dialog.lastMessageId.senderId._id]
+                      ?.isOnline && <div className={style.onlineBlock}></div>} */}
                     </div>
-                    {usersOnline[dialog.lastMessageId.senderId._id]
-                      ?.isOnline && <div className={style.onlineBlock}></div>}
+                    <div>{dialog.lastMessageId.text}</div>
                   </div>
                   {/* <div className={style.lastMessageAvatar}>
                     <Image
@@ -80,10 +83,9 @@ export default function Dialogs() {
                       alt="avatarUser"
                     />
                   </div> */}
-                  <div className={style.contentLastMessage}>
-                    <div>{dialog.lastMessageId.text}</div>
-                    <div>{formatData(dialog.lastMessageId.createdAt)}</div>
-                  </div>
+                  <div>{formatData(dialog.lastMessageId.createdAt)}</div>
+                  {/* <div className={style.contentLastMessage}>
+                  </div> */}
                 </div>
 
                 // </div>

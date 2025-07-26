@@ -54,8 +54,9 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!userId) return
-
-    const socket = getSocket()
+    const token = localStorage.getItem("accessToken")
+    if (!token) return
+    const socket = getSocket(token)
     socket.connect()
 
     socket.emit("user-connected", userId)

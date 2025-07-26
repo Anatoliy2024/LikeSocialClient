@@ -6,9 +6,11 @@ import { getSocket } from "@/lib/socket"
 export const CreateUserMessageModal = ({
   onClose,
   userId,
+  dialogId,
 }: {
   onClose: () => void
   userId: string
+  dialogId?: string
 }) => {
   const [messageText, setMessageText] = useState("")
   const socket = getSocket()
@@ -17,6 +19,7 @@ export const CreateUserMessageModal = ({
       socket.emit("sendMessage", {
         recipientUserId: userId,
         text: messageText,
+        dialogId,
       })
 
       onClose()

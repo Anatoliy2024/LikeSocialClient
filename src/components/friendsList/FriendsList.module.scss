@@ -13,7 +13,7 @@
     gap: 10px;
     .containerUser {
       display: flex;
-
+      align-items: center;
       justify-content: space-between;
       .imgNameContainer {
         display: flex;
@@ -26,6 +26,10 @@
           width: 100px;
           height: 100px;
           position: relative;
+          @media (max-width: 850px) {
+            width: 80px;
+            height: 80px;
+          }
           .imageBlock {
             border-radius: 50%;
             overflow: hidden;
@@ -55,7 +59,29 @@
     }
     .buttonContainer {
       display: flex;
-      align-items: center;
+      gap: 10px;
+      // .buttonContainer {
+      //   display: flex;
+      //   align-items: center;
+      //   justify-content: center;
+      //   width: 50px;
+      //   height: 50px;
+      // }
+      .buttonBlock {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #806c97;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: #b9a9cb;
+        }
+      }
     }
   }
 }

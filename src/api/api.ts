@@ -446,8 +446,10 @@ export const dialogsAPI = {
   getUserDialog() {
     return instance.get("dialogs").then((res) => res.data)
   },
-  getUserMessage(dialogId: string) {
-    return instance.get(`dialogs/dialog/${dialogId}`).then((res) => res.data)
+  getUserMessage(dialogId: string, page: number, limit?: number) {
+    return instance
+      .get(`dialogs/dialog/${dialogId}`, { params: { page, limit } })
+      .then((res) => res.data)
   },
   // sendUserMessage(recipientUserId: string, text: string, dialogId?: string) {
   //   return instance

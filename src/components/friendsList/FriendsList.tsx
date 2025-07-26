@@ -2,7 +2,7 @@
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import style from "./FriendsList.module.scss"
 import { RootState } from "@/store/store"
-import ButtonMenu from "../ui/button/Button"
+// import ButtonMenu from "../ui/button/Button"
 // import { getUserProfileThunk } from "@/store/thunks/profileThunk"
 
 import {
@@ -16,6 +16,11 @@ import { Paginator } from "../Paginator/Paginator"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
+import { DeniedFriendRequest } from "@/assets/icons/deniedFriendRequest"
+import { DelFriend } from "@/assets/icons/delFriend"
+import { AcceptFriend } from "@/assets/icons/acceptFriend"
+import { MessageText } from "@/assets/icons/messageText"
+import { CreateUserMessageModal } from "../createUserMessageModal/CreateUserMessageModal"
 
 type FriendsListProps = {
   type: "friendRequests" | "friends" | "sentFriendRequests" // ограничим, чтобы был ключ из users
@@ -25,9 +30,12 @@ type FriendsListProps = {
 }
 
 const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
+  const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
+  const [targetUserId, setTargetUserId] = useState<null | string>(null)
+
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
-  const loading = useAppSelector((state: RootState) => state.users.loading)
+  // const loading = useAppSelector((state: RootState) => state.users.loading)
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
 
   const router = useRouter()
@@ -45,10 +53,15 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
     friends: "Друзья",
     sentFriendRequests: "Мои заявки",
   }
-  const messageType = {
-    friendRequests: "Принять заявку",
-    friends: "Удалить друга",
-    sentFriendRequests: "Отменить заявку",
+  // const messageType = {
+  //   friendRequests: "Принять заявку",
+  //   friends: "Удалить друга",
+  //   sentFriendRequests: "Отменить заявку",
+  // }
+  const messageComponentMap = {
+    friendRequests: <AcceptFriend />,
+    friends: <DelFriend />,
+    sentFriendRequests: <DeniedFriendRequest />,
   }
 
   // const pageFromUrl = Number(searchParams.get(pageType[type])) || 1
@@ -79,9 +92,23 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
   const handleLinkUser = (userId: string) => {
     router.push(`/profile/${userId}`)
   }
+  const handleShowModalCreateMessage = (userId: string) => {
+    setShowModalCreateMessage(true)
+    setTargetUserId(userId)
+  }
+  const handleCloseModalCreateMessage = () => {
+    setShowModalCreateMessage(false)
+    setTargetUserId(null)
+  }
 
   return (
     <>
+      {showModalCreateMessage && targetUserId && (
+        <CreateUserMessageModal
+          onClose={handleCloseModalCreateMessage}
+          userId={targetUserId}
+        />
+      )}
       <div className={style.wrapper}>
         <h2>{title[type]}</h2>
         {pages > 1 && (
@@ -117,6 +144,33 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
                   <span>{user.username}</span>
                 </div>
                 <div className={style.buttonContainer}>
+                  <div
+                    className={style.buttonBlock}
+                    onClick={() => {
+                      handleShowModalCreateMessage(user._id)
+                    }}
+                  >
+                    <MessageText />
+                  </div>
+                  <div
+                    className={style.buttonBlock}
+                    onClick={() => {
+                      // handleClick(type, user._id)
+                      if (
+                        type === "friendRequests" ||
+                        type === "sentFriendRequests"
+                      ) {
+                        handleClick(type, user._id) // сразу
+                      } else {
+                        setSelectedUserId(user._id) // сохраняем userId
+                        setConfirmVisible(true) // открываем модалку
+                      }
+                    }}
+                  >
+                    {messageComponentMap[type]}
+                  </div>
+                </div>
+                {/* <div className={style.buttonContainer}>
                   <ButtonMenu
                     disabled={loading}
                     loading={loading}
@@ -135,7 +189,7 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
                   >
                     {messageType[type]}
                   </ButtonMenu>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>
