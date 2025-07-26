@@ -3,6 +3,7 @@ import { useState } from "react"
 import style from "./CreateUserMessageModal.module.scss"
 import ButtonMenu from "../ui/button/Button"
 import { getSocket } from "@/lib/socket"
+// import CloseButton from "../ui/closeButton/CloseButton"
 export const CreateUserMessageModal = ({
   onClose,
   userId,
@@ -28,19 +29,26 @@ export const CreateUserMessageModal = ({
     }
   }
   return (
-    <div className={style.wrapper} onClick={onClose}>
-      <div className={style.container} onClick={(e) => e.stopPropagation()}>
+    <div className={style.wrapper}>
+      <div className={style.container}>
+        <h2>Новое сообщение</h2>
+        {/* <div className={style.buttonCloseBlock}>
+          <CloseButton onClick={onClose} title="Закрыть" />
+        </div> */}
         <textarea
           onChange={(e) => setMessageText(e.currentTarget.value)}
           value={messageText}
         />
-        <ButtonMenu
-          onClick={() => {
-            handleSendMessage()
-          }}
-        >
-          Отправить
-        </ButtonMenu>
+        <div className={style.buttonBlock}>
+          <ButtonMenu
+            onClick={() => {
+              handleSendMessage()
+            }}
+          >
+            Отправить
+          </ButtonMenu>
+          <ButtonMenu onClick={onClose}>Отмена</ButtonMenu>
+        </div>
       </div>
     </div>
   )
