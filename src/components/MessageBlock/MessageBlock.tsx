@@ -4,7 +4,7 @@ import { RootState } from "@/store/store"
 import { getUserMessagesThunk } from "@/store/thunks/dialogsThunk"
 // import Image from "next/image"
 import { useParams } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import style from "./MessageBlock.module.scss"
 import { getSocket } from "@/lib/socket"
 import {
@@ -19,16 +19,19 @@ import ButtonMenu from "../ui/button/Button"
 import { CreateUserMessageModal } from "../createUserMessageModal/CreateUserMessageModal"
 
 import { ProfileLink } from "../ProfileLink/ProfileLink"
+import Spinner from "../ui/spinner/Spinner"
+
 export const MessageBlock = () => {
   const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
-
+  // const loaderRef = useRef<HTMLDivElement | null>(null)
+  // const throttleRef = useRef(false)
+  const observerRef = useRef<IntersectionObserver | null>(null)
   const joinedRef = useRef(false)
   const socket = getSocket()
   const dispatch = useAppDispatch()
   // const messages = useAppSelector((state: RootState) => state.dialogs.messages)
-  const { messages, hasMore, currentPage, currentDialog } = useAppSelector(
-    (state) => state.dialogs
-  )
+  const { messages, hasMore, currentPage, currentDialog, loading } =
+    useAppSelector((state) => state.dialogs)
 
   const userId = useAppSelector((state) => state.auth.userId)
 
@@ -79,6 +82,30 @@ export const MessageBlock = () => {
   const handleCloseModalCreateMessage = () => {
     setShowModalCreateMessage(false)
   }
+  // console.log("messages**", messages)
+
+  const lastMessageRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return
+
+      if (observerRef.current) observerRef.current.disconnect()
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            dispatch(changeCurrantPage())
+          }
+        },
+        {
+          threshold: 1, // 👈 Весь элемент должен быть в зоне видимости
+          // rootMargin: "0px 0px -100px 0px",
+        }
+      )
+
+      if (node) observerRef.current.observe(node)
+    },
+    [loading, hasMore, dispatch]
+  )
 
   return (
     <>
@@ -96,51 +123,62 @@ export const MessageBlock = () => {
           Написать сообщение
         </ButtonMenu>
 
-        <div>
+        <div id="scrollArea">
           {messages.length > 0 && (
             <div className={style.messagesList}>
-              {messages.map((message) => (
-                <li key={message._id} className={style.messageList}>
-                  <ProfileLink
-                    userId={message.senderId._id}
-                    currentUserId={userId}
+              {messages.map((message, i) => {
+                const isLast = i === messages.length - 1
+                return (
+                  <div
+                    key={message._id}
+                    className={style.messageList}
+                    ref={isLast ? lastMessageRef : null}
                   >
-                    <div className={style.userImgOnlineBlock}>
-                      <div className={style.blockImg}>
-                        <CloudinaryImage
-                          src={message.senderId.avatar}
-                          alt="avatar"
-                          width={200}
-                          height={200}
-                        />
+                    <ProfileLink
+                      userId={message.senderId._id}
+                      currentUserId={userId}
+                    >
+                      <div className={style.userImgOnlineBlock}>
+                        <div className={style.blockImg}>
+                          <CloudinaryImage
+                            src={message.senderId.avatar}
+                            alt="avatar"
+                            width={200}
+                            height={200}
+                          />
+                        </div>
+                        {usersOnline[message.senderId._id]?.isOnline &&
+                          message.senderId._id !== userId && (
+                            <div className={style.onlineBlock}></div>
+                          )}
                       </div>
-                      {usersOnline[message.senderId._id]?.isOnline &&
-                        message.senderId._id !== userId && (
-                          <div className={style.onlineBlock}></div>
-                        )}
-                    </div>
-                  </ProfileLink>
+                    </ProfileLink>
 
-                  {/*                 
-                <div className=''>
-                  <Image
-                    src={message.senderId.avatar}
-                    width={60}
-                    height={60}
-                    alt="userAvatar"
-                  />
-                </div> */}
-                  <div className={style.contentBlock}>
-                    <div>{message.text}</div>
-                    <div>{formatData(message.createdAt)}</div>
+                    {/*                 
+              <div className=''>
+                <Image
+                  src={message.senderId.avatar}
+                  width={60}
+                  height={60}
+                  alt="userAvatar"
+                />
+              </div> */}
+                    <div className={style.contentBlock}>
+                      <div>{message.text}</div>
+                      <div>{formatData(message.createdAt)}</div>
+                    </div>
                   </div>
-                </li>
-              ))}
+                )
+              })}
             </div>
           )}
-          {hasMore && (
+          {loading && <Spinner />}
+          {/* {hasMore && <div ref={loaderRef} style={{ height: 1 }} />} */}
+          {/* {hasMore && (
             <div className={style.buttonNextPage}>
               <ButtonMenu
+                loading={loading}
+                disabled={loading}
                 onClick={() => {
                   dispatch(changeCurrantPage())
                 }}
@@ -148,7 +186,7 @@ export const MessageBlock = () => {
                 следующая страница
               </ButtonMenu>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </>
