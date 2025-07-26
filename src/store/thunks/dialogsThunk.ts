@@ -26,7 +26,12 @@ export const getUserDialogsThunk = createAsyncThunk<
 
 // ✅ Получить сообщения по dialogId
 export const getUserMessagesThunk = createAsyncThunk<
-  { messages: MessageType[]; dialog: DialogShortType; totalCount: number },
+  {
+    messages: MessageType[]
+    dialog: DialogShortType
+    totalCount: number
+    pages: number
+  },
   { dialogId: string; page: number },
   { rejectValue: string }
 >("dialogs/getMessages", async ({ dialogId, page }, thunkAPI) => {

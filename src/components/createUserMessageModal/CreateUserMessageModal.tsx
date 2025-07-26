@@ -9,7 +9,7 @@ export const CreateUserMessageModal = ({
   dialogId,
 }: {
   onClose: () => void
-  userId: string
+  userId?: string
   dialogId?: string
 }) => {
   const [messageText, setMessageText] = useState("")

@@ -75,6 +75,9 @@ const dialogsSlice = createSlice({
       state.hasMore = true
       state.currentDialog = null
     },
+    changeCurrantPage: (state) => {
+      state.currentPage += 1
+    },
   },
 
   extraReducers: (builder) => {
@@ -103,11 +106,16 @@ const dialogsSlice = createSlice({
         // state.currentDialog = action.payload.dialog
         // state.loading = false
         const newMessages = action.payload.messages
-        state.messages = [...state.messages, ...newMessages]
+
+        if (state.currentPage === 1) {
+          state.messages = newMessages
+        } else {
+          state.messages = [...state.messages, ...newMessages]
+        }
         state.totalCount = action.payload.totalCount
         state.loading = false
         // state.currentPage +=  1
-        state.hasMore = state.messages.length < state.totalCount
+        state.hasMore = state.currentPage < action.payload.pages
         if (!state.currentDialog) state.currentDialog = action.payload.dialog
       })
       .addCase(getUserMessagesThunk.rejected, (state, action) => {
@@ -117,5 +125,6 @@ const dialogsSlice = createSlice({
   },
 })
 
-export const { addMessageFromSocket, clearMessages } = dialogsSlice.actions
+export const { addMessageFromSocket, clearMessages, changeCurrantPage } =
+  dialogsSlice.actions
 export default dialogsSlice.reducer
