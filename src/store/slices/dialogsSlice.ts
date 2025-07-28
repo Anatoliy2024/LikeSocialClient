@@ -26,16 +26,16 @@ export interface DialogType {
   }[]
   lastMessageId?: MessageType
 }
-export interface DialogShortType {
-  _id: string
-  members: string[]
-  lastMessageId?: MessageType
-}
+// export interface DialogShortType {
+//   _id: string
+//   members: string[]
+//   lastMessageId?: MessageType
+// }
 
 interface DialogsState {
   dialogs: DialogType[]
   messages: MessageType[]
-  currentDialog: DialogShortType | null
+  currentDialog: DialogType | null
   loading: boolean
   error: string | null
   totalCount: number
@@ -108,10 +108,14 @@ const dialogsSlice = createSlice({
         const newMessages = action.payload.messages
 
         if (state.currentPage === 1) {
+          console.log("поучение первой старницы")
           state.messages = newMessages
         } else {
+          console.log("поучение другой старницы")
+
           state.messages = [...state.messages, ...newMessages]
         }
+        console.log(state.messages)
         state.totalCount = action.payload.totalCount
         state.loading = false
         // state.currentPage +=  1

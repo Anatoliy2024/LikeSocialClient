@@ -18,9 +18,9 @@
     padding: 20px;
     color: rgb(223, 205, 255);
     @media (max-width: 1250px) {
-      min-width: 90vw;
+      min-width: 100vw;
       min-height: 80vh;
-      margin: 10px;
+      // margin: 10px;
       // padding: 10px;
       padding: 10px;
       .imageStarsBlock {
@@ -29,13 +29,13 @@
     }
 
     .contentWrapper {
-      max-height: 90vh; // ограничим максимальную высоту
+      max-height: 80vh; // ограничим максимальную высоту
       overflow-y: auto; // включим вертикальный скролл при необходимости
       padding: 10px;
 
-      // @media (max-width: 1250px) {
-      //   // padding: 10px;
-      // }
+      @media (max-width: 500px) {
+        padding: 0 10px 0 0;
+      }
 
       &::-webkit-scrollbar-track {
         border-radius: 20px;
@@ -49,6 +49,9 @@
       .headerModule {
         display: flex;
         justify-content: space-between;
+        h2 {
+          word-break: break-all;
+        }
       }
       .imageStarsBlock {
         display: flex;
@@ -112,6 +115,8 @@
       .contentBlock {
         white-space: pre-wrap;
         text-indent: 1.5em;
+        word-break: break-all;
+        // text-align: center;
       }
       .commentsBlock {
         color: #c0a2e6;
@@ -135,6 +140,9 @@
       }
       .blockAuthorName {
         color: rgb(205, 113, 254);
+        div {
+          word-break: break-all;
+        }
       }
     }
   }

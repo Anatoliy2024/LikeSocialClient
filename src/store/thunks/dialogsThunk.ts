@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import {
-  DialogShortType,
+  // DialogShortType,
   DialogType,
   MessageType,
 } from "../slices/dialogsSlice"
@@ -28,7 +28,7 @@ export const getUserDialogsThunk = createAsyncThunk<
 export const getUserMessagesThunk = createAsyncThunk<
   {
     messages: MessageType[]
-    dialog: DialogShortType
+    dialog: DialogType
     totalCount: number
     pages: number
   },

@@ -1,5 +1,8 @@
 .wrapper {
   padding: 10px;
+  @media (max-width: 500px) {
+    padding: 10px 0;
+  }
   h2 {
     text-align: center;
   }

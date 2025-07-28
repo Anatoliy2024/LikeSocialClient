@@ -93,6 +93,7 @@ const CreatePost = ({
           <div>
             <label htmlFor="title">Заголовок:</label>
             <input
+              className={style.titleBlock}
               id="title"
               {...register("title", { required: "Заголовок обязателен" })}
               placeholder={"Введите заголовок"}
@@ -100,7 +101,7 @@ const CreatePost = ({
             {errors.title && <p>{errors.title?.message as string}</p>}
             {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
           </div>
-          <div>
+          <div className={style.genresBlock}>
             <label>Жанры:</label>
             <div>
               <label>
@@ -212,7 +213,7 @@ const CreatePost = ({
             />
           </div>
 
-          <div>
+          <div className={style.buttonBlock}>
             <ButtonMenu type="submit" disabled={loading} loading={loading}>
               Опубликовать
             </ButtonMenu>

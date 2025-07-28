@@ -2,11 +2,16 @@
   padding: 10px;
   background-color: rgba(0, 0, 0, 0.478);
   border-radius: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   cursor: pointer;
   color: rgb(226, 202, 202);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  @media (max-width: 500px) {
+  }
   .mainInfo {
     display: flex;
     gap: 20px;
@@ -29,5 +34,29 @@
         object-fit: cover;
       }
     }
+    .blockInfo {
+      & > div {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .blockInfoContent {
+        word-break: break-all;
+      }
+    }
+  }
+  .buttonBlock {
+    text-align: center;
+    padding: 10px;
+    // width: 100%;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    &:hover {
+      background-color: beige;
+      color: black;
+    }
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
   }
 }

@@ -26,32 +26,34 @@ export const SubBlock = ({
   return (
     <div className={style.subBlock}>
       <h3>{textControl[type]}</h3>
-      {subsData.map((sub) => {
-        // console.log(
-        //   "usersOnline[sub._id]?.isOnline",
-        //   usersOnline[sub._id]?.isOnline
-        // )
-        return (
-          <Link key={sub._id} href={`/profile/${sub._id}`}>
-            <div className={style.subPerson}>
-              <div className={style.imageBlockContainer}>
-                <div className={style.imgBlockSub}>
-                  <CloudinaryImage
-                    src={sub.avatar}
-                    alt="avatar"
-                    width={70}
-                    height={70}
-                  />
+      <div className={style.subList}>
+        {subsData.map((sub) => {
+          // console.log(
+          //   "usersOnline[sub._id]?.isOnline",
+          //   usersOnline[sub._id]?.isOnline
+          // )
+          return (
+            <Link key={sub._id} href={`/profile/${sub._id}`}>
+              <div className={style.subPerson}>
+                <div className={style.imageBlockContainer}>
+                  <div className={style.imgBlockSub}>
+                    <CloudinaryImage
+                      src={sub.avatar}
+                      alt="avatar"
+                      width={70}
+                      height={70}
+                    />
+                  </div>
+                  {usersOnline[sub._id]?.isOnline && (
+                    <div className={style.onlineBlock}></div>
+                  )}
                 </div>
-                {usersOnline[sub._id]?.isOnline && (
-                  <div className={style.onlineBlock}></div>
-                )}
+                <div className={style.nameBlock}>{sub.username}</div>
               </div>
-              <div className={style.nameBlock}>{sub.username}</div>
-            </div>
-          </Link>
-        )
-      })}
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }

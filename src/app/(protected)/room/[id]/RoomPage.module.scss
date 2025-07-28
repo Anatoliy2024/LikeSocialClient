@@ -1,12 +1,28 @@
 .containerMembers {
   text-align: center;
   padding: 10px;
+
   .blockRoomMainInfo {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
     @media (max-width: 850px) {
       justify-content: center;
+    }
+    .blockNameAndDescription {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      & > div {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        span:last-child {
+          word-break: break-all;
+          color: rgb(213, 201, 244);
+        }
+      }
     }
     .blockAvatarRoom {
       display: flex;
@@ -21,6 +37,7 @@
   }
   .membersBlock {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
   }
 }

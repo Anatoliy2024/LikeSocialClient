@@ -230,7 +230,7 @@ const PostModal = ({
             {authorName && roomId && (
               <div className={style.blockAuthorName}>
                 <span>Автор: </span>
-                {authorName}
+                <div>{authorName}</div>
               </div>
             )}
             <div className={style.imageStarsBlock}>

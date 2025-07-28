@@ -5,9 +5,10 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { getUserDialogsThunk } from "@/store/thunks/dialogsThunk"
 import { RootState } from "@/store/store"
 // import Image from "next/image"
-import { formatData } from "@/utils/formatData"
+// import { formatData } from "@/utils/formatData"
 import { useRouter } from "next/navigation"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
+import { formatMessageTime } from "@/utils/formatMessageTime"
 
 export default function Dialogs() {
   const dispatch = useAppDispatch()
@@ -42,57 +43,36 @@ export default function Dialogs() {
                   handleLinkDialog(dialog._id)
                 }}
               >
-                <div className={style.mainInfoUserBlock}>
-                  <div className={style.containerImageDialogs}>
-                    <div className={style.blockImageDialogs}>
-                      <CloudinaryImage
-                        src={member.avatar}
-                        width={200}
-                        height={200}
-                        alt="userAvatar"
-                      />
-                    </div>
-                    {usersOnline[member._id]?.isOnline && (
-                      <div className={style.onlineBlockDialogs}></div>
-                    )}
+                {/* <div className={style.mainInfoUserBlock}> */}
+                <div className={style.containerImageDialogs}>
+                  <div className={style.blockImageDialogs}>
+                    <CloudinaryImage
+                      src={member.avatar}
+                      width={200}
+                      height={200}
+                      alt="userAvatar"
+                    />
                   </div>
-                  <div>{member.username}</div>
+                  {usersOnline[member._id]?.isOnline && (
+                    <div className={style.onlineBlockDialogs}></div>
+                  )}
                 </div>
+                <div className={style.dialogInfo}>
+                  <div className={style.userName}>{member.username}</div>
 
-                {dialog?.lastMessageId && (
-                  // <div className={style.dialogContent}>
-                  <div className={style.dialogLastMessage}>
-                    <div className={style.mainContentLastMessage}>
-                      <div className={style.userImgOnlineBlock}>
-                        <div className={style.blockImg}>
-                          <CloudinaryImage
-                            src={dialog.lastMessageId.senderId.avatar}
-                            alt="avatar"
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                        {/* {usersOnline[dialog.lastMessageId.senderId._id]
-                      ?.isOnline && <div className={style.onlineBlock}></div>} */}
+                  {dialog?.lastMessageId && (
+                    <div className={style.dialogLastMessage}>
+                      <div className={style.dialogLastMessageContent}>
+                        <div>{dialog.lastMessageId.senderId.username}:</div>
+                        <div>{dialog.lastMessageId.text}</div>
                       </div>
 
-                      <div>{dialog.lastMessageId.text}</div>
+                      <div className={style.timeBlock}>
+                        {formatMessageTime(dialog.lastMessageId.createdAt)}
+                      </div>
                     </div>
-                    {/* <div className={style.lastMessageAvatar}>
-                    <Image
-                      src={dialog.lastMessageId.senderId.avatar}
-                      width={50}
-                      height={50}
-                      alt="avatarUser"
-                    />
-                  </div> */}
-                    <div>{formatData(dialog.lastMessageId.createdAt)}</div>
-                    {/* <div className={style.contentLastMessage}>
-                  </div> */}
-                  </div>
-
-                  // </div>
-                )}
+                  )}
+                </div>
               </li>
             )
           })}

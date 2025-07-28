@@ -123,7 +123,7 @@ HeaderData) {
       {isAuth && (
         <div className={style.profileWrapper}>
           <div className={style.profile}>
-            {username}
+            <div className={style.userNameBlock}>{username}</div>
             <div className={style.avatarBlock}>
               <CloudinaryImage
                 src={avatar ? avatar : "/1.png"}

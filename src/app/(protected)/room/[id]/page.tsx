@@ -178,7 +178,7 @@ const Room = () => {
               height={600}
             />
           </div>
-          <div>
+          <div className={style.blockNameAndDescription}>
             <div>
               <span>Название комнаты:</span>
               <span>{room?.name}</span>

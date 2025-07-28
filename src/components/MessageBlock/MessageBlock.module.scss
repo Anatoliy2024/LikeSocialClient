@@ -1,53 +1,137 @@
 .container {
-  padding: 10px;
-  .messagesList {
-    .messageList {
-      align-items: center;
-      display: flex;
-      gap: 10px;
-      padding: 10px;
+  // padding: 10px;
+  position: relative;
+  .userInfo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: #4571be;
+    position: fixed;
+    min-width: 100%;
+    transition: all 0.3s ease;
+    height: 60px;
+    z-index: 20;
+    padding: 10px;
+    .buttonBackBlock {
+      border-radius: 50%;
+      padding: 5px;
+      &:hover {
+        background-color: #11386d;
+        color: white;
+      }
+    }
 
-      .userImgOnlineBlock {
-        position: relative;
-        width: 70px;
-        height: 70px;
+    .userImgOnlineBlock {
+      // position: sticky;
+      width: 50px;
+      height: 50px;
 
-        .blockImg {
+      .blockImg {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        overflow: hidden;
+
+        img {
+          object-fit: cover;
           width: 100%;
           height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          border-radius: 50%;
-          overflow: hidden;
-
-          img {
-            object-fit: cover;
-            width: 100%;
-            height: 100%;
-          }
-        }
-
-        .onlineBlock {
-          position: absolute;
-          bottom: 5px;
-          right: 5px;
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background-color: #3edc00;
-          border: 1px solid white; // для рамки, если надо
         }
       }
 
-      .contentBlock {
-        flex: 1;
-        display: flex;
-        justify-content: space-between;
+      .onlineBlock {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #3edc00;
+        border: 1px solid white; // для рамки, если надо
       }
     }
   }
-  .buttonNextPage {
-    text-align: center;
+  .moveHeaderMessage {
+    transform: translateY(-200%);
+  }
+  .contentMessageBlock {
+    padding-top: 70px;
+    .messagesList {
+      // width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px;
+      .messageList {
+        // align-items: center;
+
+        display: flex;
+        gap: 10px;
+        padding: 10px;
+        // border: 1px solid rgb(87, 60, 182);
+        max-width: 80%;
+        min-width: 30%;
+        border-radius: 20px;
+        // justify-content: flex-start;
+
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        div:first-child {
+          flex: 1;
+          word-break: break-word;
+        }
+        div:last-child {
+          font-size: 11px;
+          color: rgb(44, 32, 132);
+          display: flex;
+          align-self: flex-end;
+          justify-items: end;
+        }
+      }
+      .recipient {
+        // justify-content: flex-end;
+        background-color: #b5c7af;
+        margin-left: auto;
+        position: relative;
+        border-bottom-right-radius: 0;
+        &::after {
+          content: "";
+          position: absolute;
+          right: -9px;
+          bottom: 0;
+          width: 0;
+          height: 0;
+          border-top: 10px solid transparent;
+          border-left: 10px solid #b5c7af; // тот же цвет что и фон
+        }
+
+        // justify-items: right;
+      }
+      .me {
+        margin-right: auto;
+        background-color: rgb(255, 255, 255);
+        // border-bottom-right-radius: 0;
+        position: relative;
+        border-bottom-left-radius: 0;
+
+        &::after {
+          content: "";
+          position: absolute;
+          left: -9px;
+          bottom: 0;
+          width: 0;
+          height: 0;
+          border-top: 10px solid transparent;
+          border-right: 10px solid #ffffff;
+        }
+      }
+    }
+    .buttonNextPage {
+      text-align: center;
+    }
   }
 }

@@ -1,15 +1,19 @@
 "use client"
-import { formatData } from "@/utils/formatData"
+// import { formatData } from "@/utils/formatData"
 import style from "./RoomCard.module.scss"
 // import Image from "next/image"
 import { useRouter } from "next/navigation"
-import ButtonMenu from "@/components/ui/button/Button"
+// import ButtonMenu from "@/components/ui/button/Button"
 import { RoomType } from "@/store/thunks/roomsThunk"
 import { useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
 import { useState } from "react"
+import { People } from "@/assets/icons/people"
+import { Exit } from "@/assets/icons/exit"
+import { Trash } from "@/assets/icons/trash"
+import Spinner from "../ui/spinner/Spinner"
 
 export const RoomCard = ({
   data,
@@ -30,7 +34,7 @@ export const RoomCard = ({
     members,
     owner,
     avatar,
-    createdAt,
+    // createdAt,
 
     _id,
   } = data
@@ -57,26 +61,38 @@ export const RoomCard = ({
             />
           </div>
           <div className={style.blockInfo}>
-            <h3>
+            <div>
               <span>Название:</span>
-              <span>{name}</span>
-            </h3>
+              <span className={style.blockInfoContent}>{name}</span>
+            </div>
             <div>
               <span>Описание:</span>
-              <span>{description}</span>
+              <span className={style.blockInfoContent}>{description}</span>
             </div>
             <div>
-              <span>Количество участников: </span>
-              <span>{members?.length}</span>
+              <People />:<span>{members?.length}</span>
             </div>
-            <div>
+            {/* <div>
               <span>Дата создания: </span>
               <span>{formatData(createdAt)}</span>
-            </div>
+            </div> */}
           </div>
         </div>
-        <div>
-          <ButtonMenu
+        <div
+          className={style.buttonBlock}
+          onClick={() => {
+            setConfirmOpen(true)
+            // if (isOwner) {
+            //   delRoom(_id)
+            // } else {
+            //   leaveRoom(_id)
+            // }
+          }}
+        >
+          {isOwner && !loading && <Trash />}
+          {!isOwner && !loading && <Exit />}
+          {loading && <Spinner />}
+          {/* <ButtonMenu
             disabled={loading}
             loading={loading}
             onClick={() => {
@@ -89,7 +105,7 @@ export const RoomCard = ({
             }}
           >
             {isOwner ? "Удалить" : "Выйти"}
-          </ButtonMenu>
+          </ButtonMenu> */}
         </div>
       </div>
       <ConfirmModal
