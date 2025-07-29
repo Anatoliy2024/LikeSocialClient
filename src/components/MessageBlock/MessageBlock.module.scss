@@ -75,7 +75,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-
+    padding-bottom: 60px;
     // justify-content: end;
 
     .messagesList {
@@ -160,6 +160,12 @@
   }
   .newMessageBlock {
     flex: 0 0 60px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
 
     // width: 100%;
     min-width: calc(100% - 250px);
@@ -203,6 +209,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+
       &:hover {
         background-color: #11386d;
         color: white;
