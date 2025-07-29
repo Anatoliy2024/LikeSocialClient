@@ -19,13 +19,15 @@ import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
 import Spinner from "../ui/spinner/Spinner"
 import Link from "next/link"
-import { useHideOnScroll } from "@/hooks/useHideOnScroll"
+// import { useHideOnScroll } from "@/hooks/useHideOnScroll"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import { ArrowBack } from "@/assets/icons/arrowBack"
 import { SendMessage } from "@/assets/icons/sendMessage"
 
 export const MessageBlock = () => {
   const [textMessage, setTextMessage] = useState("")
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+  const prevTouchY = useRef<number | null>(null)
 
   const joinedRef = useRef(false)
   const socket = getSocket()
@@ -75,19 +77,72 @@ export const MessageBlock = () => {
   useEffect(() => {
     // При загрузке сообщений скроллим к низу
     if (!hasLoaded) return
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+    // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
     // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    // scrollContainerRef.current?.scrollIntoView({ behavior: "smooth" })
+    const container = scrollContainerRef.current
+    if (!container) return
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
   }, [hasLoaded])
 
+  // useEffect(() => {
+  //   let prevTouchY: number | null = null
+
+  //   const handleWheel = (e: WheelEvent) => {
+  //     const isAtTop = window.scrollY === 0
+  //     const isScrollingUp = e.deltaY < 0
+
+  //     if (isAtTop && isScrollingUp && hasMore && !loading) {
+  //       console.log("ПК: вверху и скроллим вверх")
+  //       dispatch(changeCurrantPage())
+  //     }
+  //   }
+
+  //   const handleTouchMove = (e: TouchEvent) => {
+  //     const touch = e.touches[0]
+  //     const currentY = touch.clientY
+
+  //     if (prevTouchY !== null) {
+  //       const deltaY = currentY - prevTouchY
+  //       const isScrollingUp = deltaY > 0
+  //       const isAtTop = window.scrollY === 0
+
+  //       if (isAtTop && isScrollingUp && hasMore && !loading) {
+  //         console.log("Мобильное: вверху и тянем вниз (скроллим вверх)")
+  //         dispatch(changeCurrantPage())
+  //       }
+  //     }
+
+  //     prevTouchY = currentY
+  //   }
+
+  //   const resetTouch = () => {
+  //     prevTouchY = null
+  //   }
+
+  //   window.addEventListener("wheel", handleWheel)
+  //   window.addEventListener("touchmove", handleTouchMove)
+  //   window.addEventListener("touchend", resetTouch)
+  //   window.addEventListener("touchcancel", resetTouch)
+
+  //   return () => {
+  //     window.removeEventListener("wheel", handleWheel)
+  //     window.removeEventListener("touchmove", handleTouchMove)
+  //     window.removeEventListener("touchend", resetTouch)
+  //     window.removeEventListener("touchcancel", resetTouch)
+  //   }
+  // }, [dispatch, loading, hasMore])
+
   useEffect(() => {
-    let prevTouchY: number | null = null
+    const container = scrollContainerRef.current
+    if (!container) return
 
     const handleWheel = (e: WheelEvent) => {
-      const isAtTop = window.scrollY === 0
+      const isAtTop = container.scrollTop === 0
       const isScrollingUp = e.deltaY < 0
 
       if (isAtTop && isScrollingUp && hasMore && !loading) {
-        console.log("ПК: вверху и скроллим вверх")
+        console.log("Загрузка сообщений (wheel)")
         dispatch(changeCurrantPage())
       }
     }
@@ -96,38 +151,45 @@ export const MessageBlock = () => {
       const touch = e.touches[0]
       const currentY = touch.clientY
 
-      if (prevTouchY !== null) {
-        const deltaY = currentY - prevTouchY
+      if (prevTouchY.current !== null) {
+        const deltaY = currentY - prevTouchY.current
         const isScrollingUp = deltaY > 0
-        const isAtTop = window.scrollY === 0
+        const isAtTop = container.scrollTop === 0
 
         if (isAtTop && isScrollingUp && hasMore && !loading) {
-          console.log("Мобильное: вверху и тянем вниз (скроллим вверх)")
+          console.log("Загрузка сообщений (touch)")
           dispatch(changeCurrantPage())
         }
       }
 
-      prevTouchY = currentY
+      prevTouchY.current = currentY
     }
 
-    const resetTouch = () => {
-      prevTouchY = null
+    const handleTouchEnd = () => {
+      prevTouchY.current = null
     }
 
-    window.addEventListener("wheel", handleWheel)
-    window.addEventListener("touchmove", handleTouchMove)
-    window.addEventListener("touchend", resetTouch)
-    window.addEventListener("touchcancel", resetTouch)
+    container.addEventListener("wheel", handleWheel, { passive: true })
+    container.addEventListener("touchmove", handleTouchMove, { passive: true })
+    container.addEventListener("touchend", handleTouchEnd)
 
     return () => {
-      window.removeEventListener("wheel", handleWheel)
-      window.removeEventListener("touchmove", handleTouchMove)
-      window.removeEventListener("touchend", resetTouch)
-      window.removeEventListener("touchcancel", resetTouch)
+      container.removeEventListener("wheel", handleWheel)
+      container.removeEventListener("touchmove", handleTouchMove)
+      container.removeEventListener("touchend", handleTouchEnd)
     }
-  }, [dispatch, loading, hasMore])
+  }, [hasMore, loading, dispatch])
 
-  const optionHeaderMessage = useHideOnScroll()
+  useEffect(() => {
+    document.body.style.overflow = "hidden"
+    document.body.style.overscrollBehavior = "none"
+    return () => {
+      document.body.style.overflow = ""
+      document.body.style.overscrollBehavior = ""
+    }
+  }, [])
+
+  // const optionHeaderMessage = useHideOnScroll()
   if (!recipientId) return <div>Диалог не найден</div>
 
   const handleSendMessage = async () => {
@@ -138,7 +200,12 @@ export const MessageBlock = () => {
         id,
       })
       setTimeout(() => {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+        // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+        // scrollContainerRef.current?.scrollTo({ behavior: "smooth" })
+
+        const container = scrollContainerRef.current
+        if (!container) return
+        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
       }, 500)
 
       setTextMessage("")
@@ -157,9 +224,12 @@ export const MessageBlock = () => {
   return (
     <div className={style.container}>
       <div
-        className={`${style.userInfo} ${
-          !optionHeaderMessage ? style.moveHeaderMessage : ""
-        }`}
+        className={
+          `${style.userInfo}`
+          // ${
+          //   !optionHeaderMessage ? style.moveHeaderMessage : ""
+          // }`
+        }
       >
         <Link href={"/dialogs/"} className={style.buttonBackBlock}>
           <ArrowBack />
@@ -185,48 +255,44 @@ export const MessageBlock = () => {
       </div>
 
       {/* <h2>dialog</h2> */}
-      <div className={style.contentMessageBlock}>
-        <div id="scrollArea">
-          {messages.length > 0 && (
-            <div className={style.messagesList}>
-              {loading && <Spinner />}
-              {messages.map((message) => {
-                return (
-                  <div
-                    key={message._id}
-                    className={`${style.messageList} ${
-                      message.senderId._id !== userId
-                        ? style.recipient
-                        : style.me
-                    }`}
-                  >
-                    <div>{message.text}</div>
-                    <div>{formatMessageTime(message.createdAt)}</div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-        {/* <div ref={messagesEndRef} /> */}
+      <div className={style.contentMessageBlock} ref={scrollContainerRef}>
+        {messages.length > 0 && (
+          <div className={style.messagesList}>
+            {loading && <Spinner />}
+            {messages.map((message) => {
+              return (
+                <div
+                  key={message._id}
+                  className={`${style.messageList} ${
+                    message.senderId._id !== userId ? style.recipient : style.me
+                  }`}
+                >
+                  <div>{message.text}</div>
+                  <div>{formatMessageTime(message.createdAt)}</div>
+                </div>
+              )
+            })}
+          </div>
+        )}
 
-        <div className={style.newMessageBlock}>
-          <div className={style.newMessageBlockImage}>
-            <input
-              type="text"
-              placeholder="Сообщение"
-              onChange={(e) => setTextMessage(e.target.value)}
-              value={textMessage}
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-          <div
-            onClick={handleSendMessage}
-            title="Отправить сообщение"
-            className={style.newMessageButtonBlock}
-          >
-            <SendMessage />
-          </div>
+        {/* <div ref={messagesEndRef} /> */}
+      </div>
+      <div className={style.newMessageBlock}>
+        <div className={style.newMessageBlockImage}>
+          <input
+            type="text"
+            placeholder="Сообщение"
+            onChange={(e) => setTextMessage(e.target.value)}
+            value={textMessage}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+        <div
+          onClick={handleSendMessage}
+          title="Отправить сообщение"
+          className={style.newMessageButtonBlock}
+        >
+          <SendMessage />
         </div>
       </div>
     </div>
