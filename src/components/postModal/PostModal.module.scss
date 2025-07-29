@@ -50,7 +50,10 @@
         display: flex;
         justify-content: space-between;
         h2 {
-          word-break: break-all;
+          // word-break: break-all;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          word-break: normal;
         }
       }
       .imageStarsBlock {
@@ -115,7 +118,10 @@
       .contentBlock {
         white-space: pre-wrap;
         text-indent: 1.5em;
-        word-break: break-all;
+        // word-break: break-all;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: normal;
         // text-align: center;
       }
       .commentsBlock {
@@ -141,7 +147,10 @@
       .blockAuthorName {
         color: rgb(205, 113, 254);
         div {
-          word-break: break-all;
+          // word-break: break-all;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          word-break: normal;
         }
       }
     }

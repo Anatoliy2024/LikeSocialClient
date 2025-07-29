@@ -42,6 +42,7 @@ interface DialogsState {
   currentPage: number
 
   hasMore: boolean
+  hasLoaded: boolean
 }
 
 const initialState: DialogsState = {
@@ -54,6 +55,8 @@ const initialState: DialogsState = {
   currentPage: 1,
 
   hasMore: true,
+
+  hasLoaded: false,
 }
 
 const dialogsSlice = createSlice({
@@ -66,7 +69,7 @@ const dialogsSlice = createSlice({
     addMessageFromSocket(state, action: PayloadAction<MessageType>) {
       // if (state.currentDialogId === action.payload.dialogId) {
       // console.log("action.payload", action.payload)
-      state.messages.unshift(action.payload)
+      state.messages.push(action.payload)
       // }
     },
     clearMessages: (state) => {
@@ -74,6 +77,7 @@ const dialogsSlice = createSlice({
       state.currentPage = 1
       state.hasMore = true
       state.currentDialog = null
+      state.hasLoaded = false
     },
     changeCurrantPage: (state) => {
       state.currentPage += 1
@@ -105,7 +109,7 @@ const dialogsSlice = createSlice({
         // state.messages = [...state.messages, ...action.payload.messages]
         // state.currentDialog = action.payload.dialog
         // state.loading = false
-        const newMessages = action.payload.messages
+        const newMessages = action.payload.messages.reverse()
 
         if (state.currentPage === 1) {
           console.log("поучение первой старницы")
@@ -113,11 +117,13 @@ const dialogsSlice = createSlice({
         } else {
           console.log("поучение другой старницы")
 
-          state.messages = [...state.messages, ...newMessages]
+          // state.messages = [...state.messages, ...newMessages]
+          state.messages = [...newMessages, ...state.messages]
         }
         console.log(state.messages)
         state.totalCount = action.payload.totalCount
         state.loading = false
+        state.hasLoaded = true
         // state.currentPage +=  1
         state.hasMore = state.currentPage < action.payload.pages
         if (!state.currentDialog) state.currentDialog = action.payload.dialog

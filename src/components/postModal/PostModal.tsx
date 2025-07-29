@@ -249,7 +249,7 @@ const PostModal = ({
                   <StarRatingView value={ratings.stars} />
                 </div>
                 <div>
-                  <div>Экшен: </div>
+                  <div>Актерская игра: </div>
                   <StarRatingView value={ratings.acting} />
                 </div>
                 <div>
@@ -271,7 +271,7 @@ const PostModal = ({
                         <StarRatingView value={myVoice.ratings.stars} />
                       </div>
                       <div>
-                        <div>Экшен: </div>
+                        <div>Актерская игра: </div>
                         <StarRatingView value={myVoice.ratings.acting} />
                       </div>
                       <div>

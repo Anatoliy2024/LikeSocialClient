@@ -84,7 +84,10 @@
     white-space: pre-wrap;
     text-indent: 1em;
     // overflow-wrap: break-word;
-    word-break: break-all;
+    // word-break: break-all;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: normal;
   }
   .dataTimeAndStars {
     color: #8b97ff;

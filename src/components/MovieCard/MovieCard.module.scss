@@ -68,12 +68,17 @@
     flex-direction: column;
     gap: 0.5rem;
     max-width: 100%;
+    @media (max-width: 500px) {
+      padding: 10px 0 0 0;
+    }
     .title {
       font-size: 1.1rem;
       font-weight: 600;
       color: #111827;
       max-width: 100%;
       @include lineClamp(1);
+      text-align: center;
+      color: #6037e7;
       // line-height: 1.7;
     }
 

@@ -17,6 +17,11 @@
     border-radius: 20px;
     padding: 20px;
     color: rgb(223, 205, 255);
+    @media (max-width: 500px) {
+      min-width: 100vw;
+      padding: 10px;
+      max-height: 90vh;
+    }
 
     .containerWrapper {
       max-height: 90vh; // ограничим максимальную высоту
@@ -25,6 +30,10 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      @media (max-width: 500px) {
+        max-height: 80vh;
+        padding: 10px;
+      }
       &::-webkit-scrollbar-track {
         border-radius: 20px;
       }
@@ -51,6 +60,9 @@
         gap: 20px;
         align-items: center;
         flex-wrap: wrap;
+        @media (max-width: 1000px) {
+          justify-content: center;
+        }
         .imgBlock {
           overflow: hidden;
           border-radius: 50%;
@@ -66,7 +78,7 @@
         }
         .genresBlock {
           display: flex;
-
+          justify-content: center;
           gap: 10px;
           flex-wrap: wrap;
           color: rgb(159, 217, 255);

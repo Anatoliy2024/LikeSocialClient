@@ -50,16 +50,17 @@ export const RoomCard = ({
 
   return (
     <>
-      <div className={style.wrapper}>
-        <div className={style.mainInfo} onClick={() => handleLinkUser(_id)}>
-          <div className={style.blockImg}>
-            <CloudinaryImage
-              src={avatar} // путь к изображению в public
-              alt="roomImage"
-              width={600}
-              height={600}
-            />
-          </div>
+      <div className={style.wrapper} onClick={() => handleLinkUser(_id)}>
+        {/* <div className={style.mainInfo} onClick={() => handleLinkUser(_id)}> */}
+        <div className={style.blockImg}>
+          <CloudinaryImage
+            src={avatar} // путь к изображению в public
+            alt="roomImage"
+            width={600}
+            height={600}
+          />
+        </div>
+        <div className={style.mainInfoContent}>
           <div className={style.blockInfo}>
             <div>
               <span>Название:</span>
@@ -77,36 +78,18 @@ export const RoomCard = ({
               <span>{formatData(createdAt)}</span>
             </div> */}
           </div>
-        </div>
-        <div
-          className={style.buttonBlock}
-          onClick={() => {
-            setConfirmOpen(true)
-            // if (isOwner) {
-            //   delRoom(_id)
-            // } else {
-            //   leaveRoom(_id)
-            // }
-          }}
-        >
-          {isOwner && !loading && <Trash />}
-          {!isOwner && !loading && <Exit />}
-          {loading && <Spinner />}
-          {/* <ButtonMenu
-            disabled={loading}
-            loading={loading}
+          <div
+            className={style.buttonBlock}
             onClick={() => {
               setConfirmOpen(true)
-              // if (isOwner) {
-              //   delRoom(_id)
-              // } else {
-              //   leaveRoom(_id)
-              // }
             }}
           >
-            {isOwner ? "Удалить" : "Выйти"}
-          </ButtonMenu> */}
+            {isOwner && !loading && <Trash />}
+            {!isOwner && !loading && <Exit />}
+            {loading && <Spinner />}
+          </div>
         </div>
+        {/* </div> */}
       </div>
       <ConfirmModal
         isOpen={isConfirmOpen}
