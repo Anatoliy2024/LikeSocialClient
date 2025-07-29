@@ -211,13 +211,15 @@ export const MessageBlock = () => {
         {/* <div ref={messagesEndRef} /> */}
 
         <div className={style.newMessageBlock}>
-          <input
-            type="text"
-            placeholder="Сообщение"
-            onChange={(e) => setTextMessage(e.target.value)}
-            value={textMessage}
-            onKeyDown={handleKeyDown}
-          />
+          <div className={style.newMessageBlockImage}>
+            <input
+              type="text"
+              placeholder="Сообщение"
+              onChange={(e) => setTextMessage(e.target.value)}
+              value={textMessage}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
           <div
             onClick={handleSendMessage}
             title="Отправить сообщение"

@@ -79,9 +79,23 @@
     @media (max-width: 768px) {
       min-width: 100%;
     }
-    input {
-      flex: 1;
+    @media (max-width: 500px) {
+      padding: 0 5px;
+    }
+    .newMessageBlockImage {
+      flex: 1 1 100px;
       padding: 8px;
+      -webkit-text-fill-color: initial;
+      input {
+        width: 100%;
+        &::placeholder {
+          color: #999;
+          opacity: 1;
+        }
+      }
+
+      // min-width: 100px;
+      // width: auto;
     }
     .newMessageButtonBlock {
       border-radius: 50%;
