@@ -15,7 +15,7 @@
     background: rgb(72, 31, 112);
     min-height: 60vh;
     min-width: 60vw;
-    max-height: 100vh;
+    max-height: 85vh;
     border-radius: 20px;
     color: rgb(178, 210, 210);
     overflow-y: auto;
@@ -28,7 +28,7 @@
     }
     @media (max-width: 500px) {
       min-width: 100vw;
-      min-height: 100vh;
+      min-height: 80vh;
       padding: 10px;
       margin: 0px;
 
