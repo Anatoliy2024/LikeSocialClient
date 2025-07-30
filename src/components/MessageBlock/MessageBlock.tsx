@@ -56,6 +56,9 @@ export const MessageBlock = () => {
     lastSeen,
   }
 
+  // useEffect(() => {
+  //   dispatch(clearMessages())
+  // }, [dispatch])
   // const lastSeen = status.isOnline ? null : status.lastSeen ?? lastSeen
 
   const { id } = useParams<{ id: string }>()
@@ -70,11 +73,11 @@ export const MessageBlock = () => {
     }
 
     dispatch(clearMessages())
-    // console.log(
-    //   "dispatch(getUserMessagesThunk({ dialogId: id, page: 1 })) сработал после dispatch(clearMessages())  "
-    // )
+    console.log(
+      "dispatch(getUserMessagesThunk({ dialogId: id, page: 1 })) сработал после dispatch(clearMessages())  "
+    )
+    dispatch(getUserMessagesThunk({ dialogId: id, page: 1 }))
 
-    // dispatch(getUserMessagesThunk({ dialogId: id, page: 1 }))
     // hasLoadedRef.current = true
 
     socket.emit("joinDialog", id)
@@ -96,13 +99,16 @@ export const MessageBlock = () => {
 
   useEffect(() => {
     console.log("id", id)
-    if (!id) return
+    console.log("currentDialog?._id", currentDialog?._id)
+    console.log("currentPage******** before", currentPage)
+
+    if (!id || currentDialog?._id !== id || currentPage === 1) return
     console.log(
       "Сработал dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))"
     )
-    console.log("currentPage********", currentPage)
+    console.log("currentPage******** after", currentPage)
     dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))
-  }, [dispatch, currentPage, id])
+  }, [dispatch, currentPage, id, currentDialog?._id])
 
   const lastMessageRef = useCallback(
     (node: HTMLDivElement | null) => {
