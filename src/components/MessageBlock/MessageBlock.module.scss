@@ -1,14 +1,16 @@
 .container {
   // padding: 10px;
-  // position: relative;
-  height: calc(100vh - 60px);
+  position: relative;
+  // height: calc(100vh - 60px);
   // min-height: 2000px;
   // padding-top: 70px;
-  display: flex;
-  flex-direction: column;
+  // display: flex;
+  // flex-direction: column;
   .userInfo {
-    flex: 0 0 60px;
+    // flex: 0 0 60px;
     // height: 60px;
+    position: fixed;
+    // top: 0;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -20,6 +22,7 @@
     height: 60px;
     z-index: 20;
     padding: 10px;
+
     @media (max-width: 768px) {
       min-width: 100%;
     }
@@ -70,8 +73,13 @@
   }
 
   .contentMessageBlock {
-    // padding: 70px 0;
-    flex: 1 1 auto;
+    // display: flex;
+    // flex-direction: column;
+    // gap: 2px;
+    // padding: 10px;
+
+    padding: 120px 0;
+    // flex: 1 1 auto;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -80,7 +88,7 @@
 
     .messagesList {
       // width: 100%;
-      flex: 1 1 auto;
+      // flex: 1 1 auto;
       justify-content: flex-end;
       // overflow-y: auto;
       display: flex;
@@ -116,7 +124,7 @@
           justify-items: end;
         }
       }
-      .recipient {
+      .me {
         // justify-content: flex-end;
         background-color: #b5c7af;
         margin-left: auto;
@@ -135,7 +143,7 @@
 
         // justify-items: right;
       }
-      .me {
+      .recipient {
         margin-right: auto;
         background-color: #f3e8ff;
         // border-bottom-right-radius: 0;
@@ -159,13 +167,16 @@
     }
   }
   .newMessageBlock {
-    flex: 0 0 60px;
+    // flex: 0 0 60px;
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom);
+    top: 120px;
+    height: 60px;
+    // bottom: 0;
+    // left: 0;
+    // right: 0;
+    // z-index: 1000;
+    // padding-bottom: env(safe-area-inset-bottom);
+    transition: all 0.3s ease;
 
     // width: 100%;
     min-width: calc(100% - 250px);
@@ -186,7 +197,7 @@
     @media (max-width: 500px) {
       padding: 0 5px;
     }
-    .newMessageBlockImage {
+    .newMessageBlockInput {
       flex: 1 1 100px;
       padding: 8px;
       -webkit-text-fill-color: initial;

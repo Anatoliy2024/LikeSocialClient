@@ -69,7 +69,8 @@ const dialogsSlice = createSlice({
     addMessageFromSocket(state, action: PayloadAction<MessageType>) {
       // if (state.currentDialogId === action.payload.dialogId) {
       // console.log("action.payload", action.payload)
-      state.messages.push(action.payload)
+      // state.messages.push(action.payload)
+      state.messages.unshift(action.payload)
       // }
     },
     clearMessages: (state) => {
@@ -109,16 +110,17 @@ const dialogsSlice = createSlice({
         // state.messages = [...state.messages, ...action.payload.messages]
         // state.currentDialog = action.payload.dialog
         // state.loading = false
-        const newMessages = action.payload.messages.reverse()
+        const newMessages = action.payload.messages
 
         if (state.currentPage === 1) {
           console.log("поучение первой старницы")
           state.messages = newMessages
         } else {
-          console.log("поучение другой старницы")
+          console.log("поучение другой старницы", state.currentPage)
+          // console.log("поучение другой старницы")
 
-          // state.messages = [...state.messages, ...newMessages]
-          state.messages = [...newMessages, ...state.messages]
+          state.messages = [...state.messages, ...newMessages]
+          // state.messages = [...newMessages, ...state.messages]
         }
         console.log(state.messages)
         state.totalCount = action.payload.totalCount

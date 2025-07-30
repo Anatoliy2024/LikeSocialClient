@@ -4,7 +4,7 @@ import { RootState } from "@/store/store"
 import { getUserMessagesThunk } from "@/store/thunks/dialogsThunk"
 
 import { useParams } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import style from "./MessageBlock.module.scss"
 import { getSocket } from "@/lib/socket"
 import {
@@ -23,12 +23,13 @@ import Link from "next/link"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import { ArrowBack } from "@/assets/icons/arrowBack"
 import { SendMessage } from "@/assets/icons/sendMessage"
+import { useHideOnScroll } from "@/hooks/useHideOnScroll"
 
 export const MessageBlock = () => {
   const [textMessage, setTextMessage] = useState("")
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
-  const prevTouchY = useRef<number | null>(null)
-
+  // const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+  // const prevTouchY = useRef<number | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
   const joinedRef = useRef(false)
   const socket = getSocket()
   const dispatch = useAppDispatch()
@@ -74,26 +75,50 @@ export const MessageBlock = () => {
     dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))
   }, [dispatch, currentPage, id, hasLoaded])
 
-  useEffect(() => {
-    // При загрузке сообщений скроллим к низу
-    if (!hasLoaded) return
-    // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
-    // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    // scrollContainerRef.current?.scrollIntoView({ behavior: "smooth" })
-    const container = scrollContainerRef.current
-    if (!container) return
-    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
-  }, [hasLoaded])
-
   // useEffect(() => {
-  //   let prevTouchY: number | null = null
+  //   // При загрузке сообщений скроллим к низу
+  //   if (!hasLoaded) return
+  //   // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+  //   // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  //   // scrollContainerRef.current?.scrollIntoView({ behavior: "smooth" })
+  //   const container = scrollContainerRef.current
+  //   if (!container) return
+  //   container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
+  // }, [hasLoaded])
+
+  const lastMessageRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return
+
+      if (observerRef.current) observerRef.current.disconnect()
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            dispatch(changeCurrantPage())
+          }
+        },
+        {
+          threshold: 1, // 👈 Весь элемент должен быть в зоне видимости
+          // rootMargin: "0px 0px -100px 0px",
+        }
+      )
+
+      if (node) observerRef.current.observe(node)
+    },
+    [loading, hasMore, dispatch]
+  )
+  const optionHeaderMessage = useHideOnScroll()
+  // useEffect(() => {
+  //   const container = scrollContainerRef.current
+  //   if (!container) return
 
   //   const handleWheel = (e: WheelEvent) => {
-  //     const isAtTop = window.scrollY === 0
+  //     const isAtTop = container.scrollTop === 0
   //     const isScrollingUp = e.deltaY < 0
 
   //     if (isAtTop && isScrollingUp && hasMore && !loading) {
-  //       console.log("ПК: вверху и скроллим вверх")
+  //       console.log("Загрузка сообщений (wheel)")
   //       dispatch(changeCurrantPage())
   //     }
   //   }
@@ -102,92 +127,43 @@ export const MessageBlock = () => {
   //     const touch = e.touches[0]
   //     const currentY = touch.clientY
 
-  //     if (prevTouchY !== null) {
-  //       const deltaY = currentY - prevTouchY
+  //     if (prevTouchY.current !== null) {
+  //       const deltaY = currentY - prevTouchY.current
   //       const isScrollingUp = deltaY > 0
-  //       const isAtTop = window.scrollY === 0
+  //       const isAtTop = container.scrollTop === 0
 
   //       if (isAtTop && isScrollingUp && hasMore && !loading) {
-  //         console.log("Мобильное: вверху и тянем вниз (скроллим вверх)")
+  //         console.log("Загрузка сообщений (touch)")
   //         dispatch(changeCurrantPage())
   //       }
   //     }
 
-  //     prevTouchY = currentY
+  //     prevTouchY.current = currentY
   //   }
 
-  //   const resetTouch = () => {
-  //     prevTouchY = null
+  //   const handleTouchEnd = () => {
+  //     prevTouchY.current = null
   //   }
 
-  //   window.addEventListener("wheel", handleWheel)
-  //   window.addEventListener("touchmove", handleTouchMove)
-  //   window.addEventListener("touchend", resetTouch)
-  //   window.addEventListener("touchcancel", resetTouch)
+  //   container.addEventListener("wheel", handleWheel, { passive: true })
+  //   container.addEventListener("touchmove", handleTouchMove, { passive: true })
+  //   container.addEventListener("touchend", handleTouchEnd)
 
   //   return () => {
-  //     window.removeEventListener("wheel", handleWheel)
-  //     window.removeEventListener("touchmove", handleTouchMove)
-  //     window.removeEventListener("touchend", resetTouch)
-  //     window.removeEventListener("touchcancel", resetTouch)
+  //     container.removeEventListener("wheel", handleWheel)
+  //     container.removeEventListener("touchmove", handleTouchMove)
+  //     container.removeEventListener("touchend", handleTouchEnd)
   //   }
-  // }, [dispatch, loading, hasMore])
+  // }, [hasMore, loading, dispatch])
 
-  useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container) return
-
-    const handleWheel = (e: WheelEvent) => {
-      const isAtTop = container.scrollTop === 0
-      const isScrollingUp = e.deltaY < 0
-
-      if (isAtTop && isScrollingUp && hasMore && !loading) {
-        console.log("Загрузка сообщений (wheel)")
-        dispatch(changeCurrantPage())
-      }
-    }
-
-    const handleTouchMove = (e: TouchEvent) => {
-      const touch = e.touches[0]
-      const currentY = touch.clientY
-
-      if (prevTouchY.current !== null) {
-        const deltaY = currentY - prevTouchY.current
-        const isScrollingUp = deltaY > 0
-        const isAtTop = container.scrollTop === 0
-
-        if (isAtTop && isScrollingUp && hasMore && !loading) {
-          console.log("Загрузка сообщений (touch)")
-          dispatch(changeCurrantPage())
-        }
-      }
-
-      prevTouchY.current = currentY
-    }
-
-    const handleTouchEnd = () => {
-      prevTouchY.current = null
-    }
-
-    container.addEventListener("wheel", handleWheel, { passive: true })
-    container.addEventListener("touchmove", handleTouchMove, { passive: true })
-    container.addEventListener("touchend", handleTouchEnd)
-
-    return () => {
-      container.removeEventListener("wheel", handleWheel)
-      container.removeEventListener("touchmove", handleTouchMove)
-      container.removeEventListener("touchend", handleTouchEnd)
-    }
-  }, [hasMore, loading, dispatch])
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden"
-    document.body.style.overscrollBehavior = "none"
-    return () => {
-      document.body.style.overflow = ""
-      document.body.style.overscrollBehavior = ""
-    }
-  }, [])
+  // useEffect(() => {
+  //   document.body.style.overflow = "hidden"
+  //   document.body.style.overscrollBehavior = "none"
+  //   return () => {
+  //     document.body.style.overflow = ""
+  //     document.body.style.overscrollBehavior = ""
+  //   }
+  // }, [])
 
   // const optionHeaderMessage = useHideOnScroll()
   if (!recipientId) return <div>Диалог не найден</div>
@@ -199,14 +175,15 @@ export const MessageBlock = () => {
         text: textMessage,
         id,
       })
-      setTimeout(() => {
-        // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
-        // scrollContainerRef.current?.scrollTo({ behavior: "smooth" })
+      // setTimeout(() => {
+      //   // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+      //   // scrollContainerRef.current?.scrollTo({ behavior: "smooth" })
 
-        const container = scrollContainerRef.current
-        if (!container) return
-        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
-      }, 500)
+      //   const container = scrollContainerRef.current
+      //   if (!container) return
+      window.scrollTo({ top: 0, behavior: "smooth" })
+      // container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
+      // }, 500)
 
       setTextMessage("")
     } catch (error) {
@@ -224,12 +201,8 @@ export const MessageBlock = () => {
   return (
     <div className={style.container}>
       <div
-        className={
-          `${style.userInfo}`
-          // ${
-          //   !optionHeaderMessage ? style.moveHeaderMessage : ""
-          // }`
-        }
+        className={`${style.userInfo}
+          ${!optionHeaderMessage ? style.moveHeaderMessage : ""}`}
       >
         <Link href={"/dialogs/"} className={style.buttonBackBlock}>
           <ArrowBack />
@@ -255,30 +228,36 @@ export const MessageBlock = () => {
       </div>
 
       {/* <h2>dialog</h2> */}
-      <div className={style.contentMessageBlock} ref={scrollContainerRef}>
+      <div className={style.contentMessageBlock}>
         {messages.length > 0 && (
           <div className={style.messagesList}>
-            {loading && <Spinner />}
-            {messages.map((message) => {
+            {messages.map((message, i) => {
+              const isLast = i === messages.length - 1
               return (
                 <div
                   key={message._id}
                   className={`${style.messageList} ${
                     message.senderId._id !== userId ? style.recipient : style.me
                   }`}
+                  ref={isLast ? lastMessageRef : null}
                 >
                   <div>{message.text}</div>
                   <div>{formatMessageTime(message.createdAt)}</div>
                 </div>
               )
             })}
+            {loading && <Spinner />}
           </div>
         )}
 
         {/* <div ref={messagesEndRef} /> */}
       </div>
-      <div className={style.newMessageBlock}>
-        <div className={style.newMessageBlockImage}>
+      <div
+        className={`${style.newMessageBlock} ${
+          !optionHeaderMessage ? style.moveHeaderMessage : ""
+        }`}
+      >
+        <div className={style.newMessageBlockInput}>
           <input
             type="text"
             placeholder="Сообщение"
