@@ -39,11 +39,11 @@
       // position: sticky;
       width: 50px;
       height: 50px;
-
+      position: relative;
       .blockImg {
         width: 100%;
         height: 100%;
-        display: relative;
+        display: flex;
         justify-content: center;
         align-items: center;
         border-radius: 50%;
@@ -58,8 +58,8 @@
 
       .onlineBlock {
         position: absolute;
-        bottom: 5px;
-        right: 5px;
+        bottom: 2px;
+        right: 2px;
         width: 10px;
         height: 10px;
         border-radius: 50%;
@@ -78,9 +78,9 @@
     // gap: 2px;
     // padding: 10px;
 
-    padding: 120px 0;
+    padding: 120px 0 60px 0;
     // flex: 1 1 auto;
-    overflow-y: auto;
+    // overflow-y: auto;
     display: flex;
     flex-direction: column;
     padding-bottom: 60px;
@@ -89,7 +89,7 @@
     .messagesList {
       // width: 100%;
       // flex: 1 1 auto;
-      justify-content: flex-end;
+      // justify-content: flex-end;
       // overflow-y: auto;
       display: flex;
       flex-direction: column;
