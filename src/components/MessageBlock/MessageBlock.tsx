@@ -41,7 +41,7 @@ export const MessageBlock = () => {
     currentPage,
     currentDialog,
     loading,
-    // hasLoaded,
+    hasLoaded,
     isOnline,
     lastSeen,
   } = useAppSelector((state) => state.dialogs)
@@ -106,14 +106,24 @@ export const MessageBlock = () => {
 
   const lastMessageRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading) return
+      if (loading || !hasLoaded) return
 
       if (observerRef.current) observerRef.current.disconnect()
 
       observerRef.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && hasMore) {
+            console.log(
+              "currentPage******** before changeCurrantPage()",
+              currentPage
+            )
+
+            console.log("Сработал dispatch(changeCurrantPage())")
             dispatch(changeCurrantPage())
+            console.log(
+              "currentPage******** after changeCurrantPage()",
+              currentPage
+            )
           }
         },
         {
@@ -124,7 +134,7 @@ export const MessageBlock = () => {
 
       if (node) observerRef.current.observe(node)
     },
-    [loading, hasMore, dispatch]
+    [loading, hasMore, dispatch, hasLoaded]
   )
   const optionHeaderMessage = useHideOnScroll()
 
