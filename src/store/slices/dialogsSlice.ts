@@ -119,8 +119,9 @@ const dialogsSlice = createSlice({
           console.log("поучение первой старницы")
           console.log(" state.hasLoaded", state.hasLoaded)
           console.log("newMessages", newMessages)
-          state.messages =
-            newMessages.length === 0 ? state.messages : newMessages
+          state.messages = newMessages
+          // state.messages =
+          //   newMessages.length === 0 ? state.messages : newMessages
           state.hasLoaded = true
           state.currentDialog = action.payload.dialog
           state.isOnline = action.payload.isOnline
@@ -132,7 +133,7 @@ const dialogsSlice = createSlice({
           state.messages = [...state.messages, ...newMessages]
           // state.messages = [...newMessages, ...state.messages]
         }
-        console.log(state.messages)
+        // console.log(state.messages)
         state.totalCount = action.payload.totalCount
         state.loading = false
 

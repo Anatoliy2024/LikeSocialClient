@@ -95,10 +95,12 @@ export const MessageBlock = () => {
   // }, [id])
 
   useEffect(() => {
+    console.log("id", id)
     if (!id) return
     console.log(
       "Сработал dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))"
     )
+    console.log("currentPage********", currentPage)
     dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))
   }, [dispatch, currentPage, id])
 
