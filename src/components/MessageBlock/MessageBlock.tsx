@@ -70,11 +70,11 @@ export const MessageBlock = () => {
     }
 
     dispatch(clearMessages())
-    console.log(
-      "dispatch(getUserMessagesThunk({ dialogId: id, page: 1 })) сработал после dispatch(clearMessages())  "
-    )
+    // console.log(
+    //   "dispatch(getUserMessagesThunk({ dialogId: id, page: 1 })) сработал после dispatch(clearMessages())  "
+    // )
 
-    dispatch(getUserMessagesThunk({ dialogId: id, page: 1 }))
+    // dispatch(getUserMessagesThunk({ dialogId: id, page: 1 }))
     // hasLoadedRef.current = true
 
     socket.emit("joinDialog", id)
@@ -95,7 +95,7 @@ export const MessageBlock = () => {
   // }, [id])
 
   useEffect(() => {
-    if (!id || currentPage === 1) return
+    if (!id) return
     console.log(
       "Сработал dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))"
     )
@@ -125,6 +125,13 @@ export const MessageBlock = () => {
     [loading, hasMore, dispatch]
   )
   const optionHeaderMessage = useHideOnScroll()
+
+  if (!recipientId && loading)
+    return (
+      <div style={{ paddingTop: "50px" }}>
+        <Spinner />
+      </div>
+    )
 
   if (!recipientId) return <div>Диалог не найден</div>
 

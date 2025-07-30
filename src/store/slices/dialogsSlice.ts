@@ -118,7 +118,9 @@ const dialogsSlice = createSlice({
         if (state.currentPage === 1 && !state.hasLoaded) {
           console.log("поучение первой старницы")
           console.log(" state.hasLoaded", state.hasLoaded)
-          state.messages = newMessages
+          console.log("newMessages", newMessages)
+          state.messages =
+            newMessages.length === 0 ? state.messages : newMessages
           state.hasLoaded = true
           state.currentDialog = action.payload.dialog
           state.isOnline = action.payload.isOnline
