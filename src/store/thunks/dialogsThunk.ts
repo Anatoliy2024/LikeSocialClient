@@ -31,6 +31,8 @@ export const getUserMessagesThunk = createAsyncThunk<
     dialog: DialogType
     totalCount: number
     pages: number
+    isOnline?: boolean
+    lastSeen?: string | null
   },
   { dialogId: string; page: number },
   { rejectValue: string }

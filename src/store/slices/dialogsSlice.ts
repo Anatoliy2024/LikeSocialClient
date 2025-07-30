@@ -40,9 +40,10 @@ interface DialogsState {
   error: string | null
   totalCount: number
   currentPage: number
-
   hasMore: boolean
   hasLoaded: boolean
+  isOnline?: boolean
+  lastSeen?: string | null
 }
 
 const initialState: DialogsState = {
@@ -53,10 +54,10 @@ const initialState: DialogsState = {
   error: null,
   totalCount: 0,
   currentPage: 1,
-
   hasMore: true,
-
   hasLoaded: false,
+  isOnline: false,
+  lastSeen: null,
 }
 
 const dialogsSlice = createSlice({
@@ -79,6 +80,8 @@ const dialogsSlice = createSlice({
       state.hasMore = true
       state.currentDialog = null
       state.hasLoaded = false
+      state.isOnline = false
+      state.lastSeen = null
     },
     changeCurrantPage: (state) => {
       state.currentPage += 1
@@ -112,10 +115,15 @@ const dialogsSlice = createSlice({
         // state.loading = false
         const newMessages = action.payload.messages
 
-        if (state.currentPage === 1) {
+        if (state.currentPage === 1 && !state.hasLoaded) {
           console.log("поучение первой старницы")
+          console.log(" state.hasLoaded", state.hasLoaded)
           state.messages = newMessages
-        } else {
+          state.hasLoaded = true
+          state.currentDialog = action.payload.dialog
+          state.isOnline = action.payload.isOnline
+          state.lastSeen = action.payload.lastSeen
+        } else if (state.currentPage !== 1 && state.hasLoaded) {
           console.log("поучение другой старницы", state.currentPage)
           // console.log("поучение другой старницы")
 
@@ -125,10 +133,9 @@ const dialogsSlice = createSlice({
         console.log(state.messages)
         state.totalCount = action.payload.totalCount
         state.loading = false
-        state.hasLoaded = true
+
         // state.currentPage +=  1
         state.hasMore = state.currentPage < action.payload.pages
-        if (!state.currentDialog) state.currentDialog = action.payload.dialog
       })
       .addCase(getUserMessagesThunk.rejected, (state, action) => {
         state.loading = false

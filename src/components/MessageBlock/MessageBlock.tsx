@@ -24,25 +24,39 @@ import { formatMessageTime } from "@/utils/formatMessageTime"
 import { ArrowBack } from "@/assets/icons/arrowBack"
 import { SendMessage } from "@/assets/icons/sendMessage"
 import { useHideOnScroll } from "@/hooks/useHideOnScroll"
+import { formatData } from "@/utils/formatData"
 
 export const MessageBlock = () => {
   const [textMessage, setTextMessage] = useState("")
-  // const scrollContainerRef = useRef<HTMLDivElement | null>(null)
-  // const prevTouchY = useRef<number | null>(null)
+
   const observerRef = useRef<IntersectionObserver | null>(null)
   const joinedRef = useRef(false)
+  // const hasLoadedRef = useRef(false)
   const socket = getSocket()
   const dispatch = useAppDispatch()
-  // const messages = useAppSelector((state: RootState) => state.dialogs.messages)
-  const { messages, hasMore, currentPage, currentDialog, loading, hasLoaded } =
-    useAppSelector((state) => state.dialogs)
-  // const { hasLoaded } = useAppSelector((state) => state.dialogs)
-  const userId = useAppSelector((state) => state.auth.userId)
 
+  const {
+    messages,
+    hasMore,
+    currentPage,
+    currentDialog,
+    loading,
+    // hasLoaded,
+    isOnline,
+    lastSeen,
+  } = useAppSelector((state) => state.dialogs)
+  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
+  const userId = useAppSelector((state) => state.auth.userId)
   const recipientId = currentDialog?.members.find(
     (member) => member._id !== userId
   )
-  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
+
+  const status = usersOnline[recipientId?._id as string] ?? {
+    isOnline,
+    lastSeen,
+  }
+
+  // const lastSeen = status.isOnline ? null : status.lastSeen ?? lastSeen
 
   const { id } = useParams<{ id: string }>()
 
@@ -56,7 +70,12 @@ export const MessageBlock = () => {
     }
 
     dispatch(clearMessages())
+    console.log(
+      "dispatch(getUserMessagesThunk({ dialogId: id, page: 1 })) сработал после dispatch(clearMessages())  "
+    )
+
     dispatch(getUserMessagesThunk({ dialogId: id, page: 1 }))
+    // hasLoadedRef.current = true
 
     socket.emit("joinDialog", id)
     socket.on("newMessage", messageHandler)
@@ -70,21 +89,18 @@ export const MessageBlock = () => {
     }
   }, [id, dispatch, socket])
 
-  useEffect(() => {
-    if (!id || currentPage === 1 || hasLoaded === false) return
-    dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))
-  }, [dispatch, currentPage, id, hasLoaded])
-
   // useEffect(() => {
-  //   // При загрузке сообщений скроллим к низу
-  //   if (!hasLoaded) return
-  //   // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
-  //   // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  //   // scrollContainerRef.current?.scrollIntoView({ behavior: "smooth" })
-  //   const container = scrollContainerRef.current
-  //   if (!container) return
-  //   container.scrollTo({ top: container.scrollHeight, behavior: "smooth" })
-  // }, [hasLoaded])
+  //   // Сброс флага при смене диалога
+  //   hasLoadedRef.current = false
+  // }, [id])
+
+  useEffect(() => {
+    if (!id || currentPage === 1) return
+    console.log(
+      "Сработал dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))"
+    )
+    dispatch(getUserMessagesThunk({ dialogId: id, page: currentPage }))
+  }, [dispatch, currentPage, id])
 
   const lastMessageRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -109,63 +125,7 @@ export const MessageBlock = () => {
     [loading, hasMore, dispatch]
   )
   const optionHeaderMessage = useHideOnScroll()
-  // useEffect(() => {
-  //   const container = scrollContainerRef.current
-  //   if (!container) return
 
-  //   const handleWheel = (e: WheelEvent) => {
-  //     const isAtTop = container.scrollTop === 0
-  //     const isScrollingUp = e.deltaY < 0
-
-  //     if (isAtTop && isScrollingUp && hasMore && !loading) {
-  //       console.log("Загрузка сообщений (wheel)")
-  //       dispatch(changeCurrantPage())
-  //     }
-  //   }
-
-  //   const handleTouchMove = (e: TouchEvent) => {
-  //     const touch = e.touches[0]
-  //     const currentY = touch.clientY
-
-  //     if (prevTouchY.current !== null) {
-  //       const deltaY = currentY - prevTouchY.current
-  //       const isScrollingUp = deltaY > 0
-  //       const isAtTop = container.scrollTop === 0
-
-  //       if (isAtTop && isScrollingUp && hasMore && !loading) {
-  //         console.log("Загрузка сообщений (touch)")
-  //         dispatch(changeCurrantPage())
-  //       }
-  //     }
-
-  //     prevTouchY.current = currentY
-  //   }
-
-  //   const handleTouchEnd = () => {
-  //     prevTouchY.current = null
-  //   }
-
-  //   container.addEventListener("wheel", handleWheel, { passive: true })
-  //   container.addEventListener("touchmove", handleTouchMove, { passive: true })
-  //   container.addEventListener("touchend", handleTouchEnd)
-
-  //   return () => {
-  //     container.removeEventListener("wheel", handleWheel)
-  //     container.removeEventListener("touchmove", handleTouchMove)
-  //     container.removeEventListener("touchend", handleTouchEnd)
-  //   }
-  // }, [hasMore, loading, dispatch])
-
-  // useEffect(() => {
-  //   document.body.style.overflow = "hidden"
-  //   document.body.style.overscrollBehavior = "none"
-  //   return () => {
-  //     document.body.style.overflow = ""
-  //     document.body.style.overscrollBehavior = ""
-  //   }
-  // }, [])
-
-  // const optionHeaderMessage = useHideOnScroll()
   if (!recipientId) return <div>Диалог не найден</div>
 
   const handleSendMessage = async () => {
@@ -224,6 +184,12 @@ export const MessageBlock = () => {
         </ProfileLink>
         <div>
           <div>{recipientId.username}</div>
+
+          {!status.isOnline && status.lastSeen && (
+            <div className={style.lastSeen}>
+              <span>был(а):</span> <span>{formatData(status.lastSeen)}</span>
+            </div>
+          )}
         </div>
       </div>
 
