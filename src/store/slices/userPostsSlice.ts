@@ -6,6 +6,7 @@ import {
   delUserPostsThunk,
   getUserPostsByIdThunk,
   getUserPostsThunk,
+  updateUserPostThunk,
   uploadUserPostAvatarThunk,
 } from "../thunks/userPostThunk"
 
@@ -97,6 +98,25 @@ const userPostSlice = createSlice({
         // state.posts.unshift(action.payload) // добавим новый пост в начало
       })
       .addCase(createUserPostThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Ошибка при создании поста"
+      })
+      .addCase(updateUserPostThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateUserPostThunk.fulfilled, (state, action) => {
+        state.loading = false
+
+        const postData = action.payload.post
+        console.log("postData*** updateUserPostThunk", postData)
+        state.posts = state.posts.map((post) =>
+          post._id === postData._id ? postData : post
+        )
+
+        // state.posts.unshift(action.payload) // добавим новый пост в начало
+      })
+      .addCase(updateUserPostThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка при создании поста"
       })

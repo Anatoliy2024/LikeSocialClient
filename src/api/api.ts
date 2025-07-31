@@ -138,6 +138,12 @@ export const postAPI = {
       .post("userPosts/create", data)
       .then((response) => response.data)
   },
+  updateUserPost(data: FormData) {
+    // createUserPost(data: Partial<userPostType>) {
+    return instance
+      .put("userPosts/update", data)
+      .then((response) => response.data)
+  },
   getUserPost(page: number, limit?: number) {
     return instance
       .get("userPosts", {
@@ -174,6 +180,12 @@ export const roomPostAPI = {
   createRoomPost(data: FormData) {
     return instance
       .post("roomPosts/create", data)
+      .then((response) => response.data)
+  },
+  updateRoomPost(data: FormData) {
+    // createUserPost(data: Partial<userPostType>) {
+    return instance
+      .put("roomPosts/update", data)
       .then((response) => response.data)
   },
   getRoomPosts(roomId: string, page: number, limit?: number) {

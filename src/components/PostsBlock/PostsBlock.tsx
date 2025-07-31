@@ -2,7 +2,7 @@
 import ButtonMenu from "@/components/ui/button/Button"
 import style from "./PostsBlock.module.scss"
 import { useEffect, useState } from "react"
-import CreatePost from "@/components/createPost/CreatePost"
+
 import { RootState } from "@/store/store"
 import { useAppSelector } from "@/store/hooks"
 // import { getUserPostsThunk } from "@/store/thunks/userPostThunks"
@@ -12,6 +12,7 @@ import PostModal from "@/components/postModal/PostModal"
 import { useSearchParams } from "next/navigation"
 import { userPostType } from "@/store/slices/userPostsSlice"
 import { Paginator } from "../Paginator/Paginator"
+import PostForm from "@/components/postForm/PostForm"
 
 type PostsBlockProps = {
   posts: userPostType[]
@@ -112,7 +113,7 @@ const PostsBlock = ({
             </ButtonMenu>
           )}
           {activeCreateNewPost && (
-            <CreatePost
+            <PostForm
               isProfile={isProfile}
               roomId={roomId}
               hiddenBlock={() => {

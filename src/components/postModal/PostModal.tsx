@@ -25,6 +25,8 @@ import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 // import Link from "next/link"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
+import { Edit } from "@/assets/icons/edit"
+import PostForm, { FormCreatePost } from "../postForm/PostForm"
 // import { ProfileLink } from "../ProfileLink/ProfileLink"
 // import { RootState } from '@/store/store'
 
@@ -95,6 +97,7 @@ const PostModal = ({
   } = post
   const authorName = post.authorId.username
   const [comment, setComment] = useState("")
+  const [editPost, setEditPost] = useState(false)
 
   const handleSendComment = async () => {
     setLoading(true)
@@ -202,7 +205,29 @@ const PostModal = ({
       console.log(error)
     }
   }
+  const showEditPost = () => {
+    setEditPost(true)
+  }
+  const closeEditPost = () => {
+    setEditPost(false)
+  }
 
+  function adaptPostToForm(post: userPostType): FormCreatePost {
+    return {
+      title: post.title || "",
+      content: post.content || "",
+      roomId: post.roomId || null,
+      genres: post.genres || [],
+      stars: post.ratings?.stars || 0,
+      acting: post.ratings?.acting || 0,
+      specialEffects: post.ratings?.specialEffects || 0,
+      story: post.ratings?.story || 0,
+      avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
+      avatar: post.avatar || "",
+      _id: post._id || "",
+    }
+  }
+  console.log("post", post)
   return (
     <>
       {changeAvatarModal && (
@@ -213,12 +238,26 @@ const PostModal = ({
           context={{ roomId, postId }}
         />
       )}
+      {editPost && (
+        <PostForm
+          isProfile={!roomId}
+          roomId={roomId}
+          hiddenBlock={closeEditPost}
+          editMode={true}
+          initialData={adaptPostToForm(post)}
+        />
+      )}
       <div className={style.wrapper} onClick={() => onClose()}>
         <div className={style.container} onClick={(e) => e.stopPropagation()}>
           <div className={style.contentWrapper}>
             <div className={style.headerModule}>
               <h2>{title}</h2>
-              <CloseButton onClick={onClose} />
+              <div className={style.headerModuleButtonBlock}>
+                <div className={style.buttonBlockEdit} onClick={showEditPost}>
+                  <Edit />
+                </div>
+                <CloseButton onClick={onClose} />
+              </div>
             </div>
             {genres.length > 0 ? (
               <div className={style.genresBlock}>

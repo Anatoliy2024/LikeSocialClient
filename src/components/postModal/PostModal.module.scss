@@ -55,6 +55,24 @@
           word-wrap: break-word;
           word-break: normal;
         }
+        .headerModuleButtonBlock {
+          display: flex;
+          gap: 20px;
+          align-items: center;
+          .buttonBlockEdit {
+            border-radius: 50%;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            // color: black;
+            &:hover {
+              background-color: rgb(223, 205, 255);
+              // color: rgb(223, 205, 255);
+              color: #453e98;
+            }
+          }
+        }
       }
       .imageStarsBlock {
         display: flex;

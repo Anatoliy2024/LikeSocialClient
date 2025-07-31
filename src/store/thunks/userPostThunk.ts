@@ -15,7 +15,7 @@ export const createUserPostThunk = createAsyncThunk<
   FormData, // параметр тип данных которые отправляю
   // Partial<userPostType>, // параметр тип данных которые отправляю
   { rejectValue: string }
->("post/createPost", async (postData, thunkAPI) => {
+>("userPost/createPost", async (postData, thunkAPI) => {
   try {
     const data = await postAPI.createUserPost(postData)
 
@@ -31,6 +31,31 @@ export const createUserPostThunk = createAsyncThunk<
   }
 })
 
+export const updateUserPostThunk = createAsyncThunk<
+  {
+    post: userPostType
+  }, // тип данных, которые вернутся — массив пользователей
+  FormData, // параметр тип данных которые отправляю
+  // Partial<userPostType>, // параметр тип данных которые отправляю
+  { rejectValue: string }
+>("userPost/updatePost", async (dataForm, thunkAPI) => {
+  try {
+    console.log("Запустилась юзер пост санка")
+
+    const data = await postAPI.updateUserPost(dataForm)
+
+    return data
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue("Ошибка при изменении поста")
+  }
+})
+
 export const getUserPostsThunk = createAsyncThunk<
   {
     posts: userPostType[]
@@ -41,7 +66,7 @@ export const getUserPostsThunk = createAsyncThunk<
   }, // тип данных, которые вернутся — массив пользователей
   number, // параметр тип данных которые отправляю
   { rejectValue: string }
->("post/getPosts", async (page, thunkAPI) => {
+>("userPost/getPosts", async (page, thunkAPI) => {
   try {
     const data = await postAPI.getUserPost(page)
     return data
@@ -66,7 +91,7 @@ export const getUserPostsByIdThunk = createAsyncThunk<
   }, // тип данных, которые вернутся — массив пользователей
   { userId: string; page: number }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("post/getUserPostsById", async ({ userId, page }, thunkAPI) => {
+>("userPost/getPostsById", async ({ userId, page }, thunkAPI) => {
   try {
     const data = await postAPI.getUserPostsByUserId(userId, page)
     return data
@@ -88,7 +113,7 @@ export const delUserPostsThunk = createAsyncThunk<
   }, // тип данных, которые вернутся — массив пользователей
   { postId: string; page: number }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("post/delPosts", async ({ postId, page }, thunkAPI) => {
+>("userPost/delPosts", async ({ postId, page }, thunkAPI) => {
   try {
     const data = await postAPI.delUserPost(postId, page)
     return data
@@ -103,7 +128,7 @@ export const delUserPostsThunk = createAsyncThunk<
   }
 })
 export const createUserCommentThunk = createAsyncThunk(
-  "post/createUserComment",
+  "userPost/createComment",
   async (
     { postId, comment }: { postId: string; comment: string },
     thunkAPI
@@ -123,7 +148,7 @@ export const createUserCommentThunk = createAsyncThunk(
   }
 )
 export const uploadUserPostAvatarThunk = createAsyncThunk(
-  "post/uploadUserPostAvatar",
+  "userPost/uploadPostAvatar",
   async ({ file, postId }: { file: File; postId: string }, thunkAPI) => {
     try {
       const data = await fileAPI.uploadUserPostAvatar(file, postId)

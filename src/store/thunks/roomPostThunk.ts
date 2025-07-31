@@ -51,7 +51,7 @@ export const createRoomPostThunk = createAsyncThunk<
   FormData, // параметр тип данных которые отправляю
   // Partial<roomPostType>, // параметр тип данных которые отправляю
   { rejectValue: string }
->("post/createPost", async (postData, thunkAPI) => {
+>("roomPost/createPost", async (postData, thunkAPI) => {
   try {
     const data = await roomPostAPI.createRoomPost(postData)
 
@@ -66,6 +66,29 @@ export const createRoomPostThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue("Ошибка при создании поста")
   }
 })
+export const updateRoomPostThunk = createAsyncThunk<
+  {
+    post: roomPostType
+  }, // тип данных, которые вернутся — массив пользователей
+  FormData, // параметр тип данных которые отправляю
+  // Partial<roomPostType>, // параметр тип данных которые отправляю
+  { rejectValue: string }
+>("roomPost/updatePost", async (dataForm, thunkAPI) => {
+  try {
+    console.log("Запустилась рум пост санка")
+    const data = await roomPostAPI.updateRoomPost(dataForm)
+
+    return data
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue("Ошибка при редактировании поста")
+  }
+})
 
 export const getRoomPostsThunk = createAsyncThunk<
   {
@@ -77,7 +100,7 @@ export const getRoomPostsThunk = createAsyncThunk<
   }, // тип данных, которые вернутся — массив пользователей
   { roomId: string; page: number }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("post/getPosts", async ({ roomId, page }, thunkAPI) => {
+>("roomPost/getPosts", async ({ roomId, page }, thunkAPI) => {
   const state = thunkAPI.getState() as RootState
   // const page = state.roomPost.page // если хранится в сторе
   const limit = state.roomPost.limit
@@ -104,7 +127,7 @@ export const delRoomPostsThunk = createAsyncThunk<
   }, // тип данных, которые вернутся — массив пользователей
   { postId: string; roomId: string | null; page: number }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("post/delPosts", async ({ postId, roomId, page }, thunkAPI) => {
+>("roomPost/delPosts", async ({ postId, roomId, page }, thunkAPI) => {
   try {
     const data = await roomPostAPI.delRoomPost(postId, roomId, page)
     return data
@@ -119,7 +142,7 @@ export const delRoomPostsThunk = createAsyncThunk<
   }
 })
 export const createRoomCommentThunk = createAsyncThunk(
-  "post/createRoomComment",
+  "roomPost/createComment",
   async ({ postId, roomId, comment }: Record<string, string>, thunkAPI) => {
     try {
       const data = await roomPostAPI.createRoomComment(postId, roomId, comment)
@@ -137,7 +160,7 @@ export const createRoomCommentThunk = createAsyncThunk(
 )
 
 export const uploadRoomPostAvatarThunk = createAsyncThunk(
-  "post/uploadRoomPostAvatar",
+  "roomPost/uploadPostAvatar",
   async ({ file, postId }: { file: File; postId: string }, thunkAPI) => {
     try {
       const data = await fileAPI.uploadRoomPostAvatar(file, postId)

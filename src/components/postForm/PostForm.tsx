@@ -1,38 +1,49 @@
 "use client"
 import { useForm } from "react-hook-form"
 import ButtonMenu from "../ui/button/Button"
-import style from "./CreatePost.module.scss"
+import style from "./PostForm.module.scss"
 
 import StarRating from "../starRating/StarRating"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { createUserPostThunk } from "@/store/thunks/userPostThunk"
-import { createRoomPostThunk } from "@/store/thunks/roomPostThunk"
+import {
+  createUserPostThunk,
+  updateUserPostThunk,
+} from "@/store/thunks/userPostThunk"
+import {
+  createRoomPostThunk,
+  updateRoomPostThunk,
+} from "@/store/thunks/roomPostThunk"
 import { RootState } from "@/store/store"
 import { useEffect, useState } from "react"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { compressImage } from "@/utils/compressImage"
 
-type FormCreatePost = {
+export type FormCreatePost = {
   title: string
   content: string
   roomId: string | null
-
   genres: string[]
   stars: number
   acting: number
   specialEffects: number
   story: number
   avatarFile: FileList | null
+  avatar?: string
+  _id?: string
 }
 
-const CreatePost = ({
+const PostForm = ({
   hiddenBlock,
   isProfile,
   roomId,
+  editMode,
+  initialData,
 }: {
   hiddenBlock: () => void
   isProfile: boolean
-  roomId: string | null
+  roomId: string | null | undefined
+  editMode?: boolean
+  initialData?: Partial<FormCreatePost>
 }) => {
   const [preview, setPreview] = useState<string | null>(null)
   // const [loadingLocal, setIsLoadingLocal] = useState(false)
@@ -42,7 +53,9 @@ const CreatePost = ({
     formState: { errors },
     watch,
     setValue,
-  } = useForm<FormCreatePost>()
+  } = useForm<FormCreatePost>({
+    defaultValues: initialData || {},
+  })
   const dispatch = useAppDispatch()
   // const { id } = useParams()
   const loading = useAppSelector((state: RootState) => state.userPost.loading)
@@ -71,6 +84,12 @@ const CreatePost = ({
 
       if (roomId) {
         formData.append("roomId", roomId)
+      } else if (initialData?.roomId) {
+        formData.append("roomId", initialData?.roomId)
+      }
+
+      if (initialData?._id) {
+        formData.append("postId", initialData._id)
       }
 
       formData.append("ratings[stars]", dataForm.stars?.toString())
@@ -81,9 +100,11 @@ const CreatePost = ({
       )
       formData.append("ratings[story]", dataForm.story?.toString())
 
-      dataForm.genres?.forEach((genre) => {
-        formData.append("genres[]", genre)
-      })
+      if (dataForm.genres) {
+        dataForm.genres?.forEach((genre) => {
+          formData.append("genres[]", genre)
+        })
+      }
 
       if (dataForm.avatarFile?.[0]) {
         const file = dataForm.avatarFile?.[0]
@@ -109,11 +130,41 @@ const CreatePost = ({
           // setIsLoadingLocal(false)
         }
       }
+      // console.log(
+      //   "JSON.stringify(formData) === JSON.stringify(initialData)",
+      //   JSON.stringify(formData) === JSON.stringify(initialData)
+      // )
+      // if (JSON.stringify(formData) === JSON.stringify(initialData)) {
+      //   return hiddenBlock()
+      // }
+      // if (editMode && initialData?.id) {
+      //   dispatch(updatePostThunk({ id: initialData.id, formData }))
+      // } else {
+      //   dispatch(createRoomPostThunk(formData))
+      // }
+      console.log("editMode", editMode)
+      console.log("isProfile", isProfile)
+      console.log("roomId", !roomId)
       if (isProfile) {
-        dispatch(createUserPostThunk(formData))
+        if (!editMode) {
+          dispatch(createUserPostThunk(formData))
+        } else {
+          if (initialData?._id) {
+            console.log("Редактирование поста в профиле", formData)
+            dispatch(updateUserPostThunk(formData))
+          }
+        }
       } else {
+        console.log("isProfile", isProfile)
         console.log("formData", formData)
-        dispatch(createRoomPostThunk(formData))
+        if (!editMode) {
+          dispatch(createRoomPostThunk(formData))
+        } else {
+          if (initialData?._id) {
+            console.log("Редактирование комнаты", formData)
+            dispatch(updateRoomPostThunk(formData))
+          }
+        }
       }
 
       hiddenBlock()
@@ -142,6 +193,16 @@ const CreatePost = ({
     }
   }, [watch("avatarFile")])
 
+  useEffect(() => {
+    if (initialData?.avatar && typeof initialData.avatar === "string") {
+      setPreview(initialData.avatar)
+      console.log("initialData.avatar", initialData.avatar)
+    }
+  }, [initialData])
+  useEffect(() => {
+    console.log("Ошибки валидации формы:", errors)
+  }, [errors])
+
   return (
     <div
       className={style.wrapper}
@@ -165,11 +226,7 @@ const CreatePost = ({
           <div className={style.formImageBlock}>
             <label className={style.customFileUpload}>
               Загрузить аватарку
-              <input
-                type="file"
-                accept="image/*"
-                {...register("avatarFile", { required: true })}
-              />
+              <input type="file" accept="image/*" {...register("avatarFile")} />
             </label>
             {preview && (
               <div className={style.preview}>
@@ -297,7 +354,7 @@ const CreatePost = ({
 
           <div className={style.buttonBlock}>
             <ButtonMenu type="submit" disabled={loading} loading={loading}>
-              Опубликовать
+              {!editMode ? "Опубликовать" : "Сохранить"}
             </ButtonMenu>
             <ButtonMenu onClick={() => hiddenBlock()}>Отмена</ButtonMenu>
           </div>
@@ -307,4 +364,4 @@ const CreatePost = ({
   )
 }
 
-export default CreatePost
+export default PostForm

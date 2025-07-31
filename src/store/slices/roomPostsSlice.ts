@@ -5,6 +5,7 @@ import {
   createRoomPostThunk,
   delRoomPostsThunk,
   getRoomPostsThunk,
+  updateRoomPostThunk,
   uploadRoomPostAvatarThunk,
 } from "../thunks/roomPostThunk"
 
@@ -94,6 +95,26 @@ const roomPostSlice = createSlice({
         // state.posts = action.payload
       })
       .addCase(createRoomPostThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Ошибка при создании поста"
+      })
+      .addCase(updateRoomPostThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateRoomPostThunk.fulfilled, (state, action) => {
+        state.loading = false
+        const postData = action.payload.post
+        console.log("postData*** updateRoomPostThunk", postData)
+        state.posts = state.posts.map((post) => {
+          console.log("post", post._id)
+          console.log("postData", postData._id)
+          return post._id === postData._id ? postData : post
+        })
+
+        // state.posts = action.payload
+      })
+      .addCase(updateRoomPostThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка при создании поста"
       })
