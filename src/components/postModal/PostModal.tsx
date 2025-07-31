@@ -238,7 +238,7 @@ const PostModal = ({
           context={{ roomId, postId }}
         />
       )}
-      {editPost && (
+      {authorId._id === playerId && editPost && (
         <PostForm
           isProfile={!roomId}
           roomId={roomId}
@@ -253,9 +253,11 @@ const PostModal = ({
             <div className={style.headerModule}>
               <h2>{title}</h2>
               <div className={style.headerModuleButtonBlock}>
-                <div className={style.buttonBlockEdit} onClick={showEditPost}>
-                  <Edit />
-                </div>
+                {authorId._id === playerId && (
+                  <div className={style.buttonBlockEdit} onClick={showEditPost}>
+                    <Edit />
+                  </div>
+                )}
                 <CloseButton onClick={onClose} />
               </div>
             </div>
