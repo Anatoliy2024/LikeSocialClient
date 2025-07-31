@@ -59,14 +59,20 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
 
     // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
   }
-
+  console.log(
+    "isMyProfilePage ? playerId : userId",
+    isMyProfilePage ? playerId : userId
+  )
+  console.log("isMyProfilePage ", isMyProfilePage)
+  console.log("playerId", playerId)
+  console.log("userId ", userId)
   return (
     <div>
       <ProfileBlock isMyProfilePage={isMyProfilePage} userId={userId} />
       <Suspense fallback={<div>Загрузка...</div>}>
         <PostsBlock
           posts={posts}
-          userId={isMyProfilePage ? playerId : userId}
+          userId={playerId}
           isProfile
           page={page}
           pages={pages}

@@ -300,22 +300,22 @@ export const fileAPI = {
       .post("file/uploadRoomAvatar", formData)
       .then((res) => res.data)
   },
-  uploadRoomPostAvatar(file: File, postId: string) {
-    const formData = new FormData()
-    formData.append("image", file)
-    formData.append("postId", postId) // передаём roomId в FormData
-    return instance
-      .post("file/uploadRoomPostAvatar", formData)
-      .then((res) => res.data)
-  },
-  uploadUserPostAvatar(file: File, postId: string) {
-    const formData = new FormData()
-    formData.append("image", file)
-    formData.append("postId", postId) // передаём roomId в FormData
-    return instance
-      .post("file/uploadUserPostAvatar", formData)
-      .then((res) => res.data)
-  },
+  // uploadRoomPostAvatar(file: File, postId: string) {
+  //   const formData = new FormData()
+  //   formData.append("image", file)
+  //   formData.append("postId", postId) // передаём roomId в FormData
+  //   return instance
+  //     .post("file/uploadRoomPostAvatar", formData)
+  //     .then((res) => res.data)
+  // },
+  // uploadUserPostAvatar(file: File, postId: string) {
+  //   const formData = new FormData()
+  //   formData.append("image", file)
+  //   formData.append("postId", postId) // передаём roomId в FormData
+  //   return instance
+  //     .post("file/uploadUserPostAvatar", formData)
+  //     .then((res) => res.data)
+  // },
 
   uploadUserMovieAvatar(file: File, userMovieId: string, status: string) {
     const formData = new FormData()

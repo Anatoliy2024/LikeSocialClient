@@ -9,11 +9,11 @@ import ButtonMenu from "../ui/button/Button"
 import { useAppDispatch } from "@/store/hooks"
 import {
   createUserCommentThunk,
-  uploadUserPostAvatarThunk,
+  // uploadUserPostAvatarThunk,
 } from "@/store/thunks/userPostThunk"
 import {
   createRoomCommentThunk,
-  uploadRoomPostAvatarThunk,
+  // uploadRoomPostAvatarThunk,
 } from "@/store/thunks/roomPostThunk"
 import { Comment } from "../comment/Comment"
 import { useForm } from "react-hook-form"
@@ -21,7 +21,7 @@ import StarRating from "../starRating/StarRating"
 
 import { voiceAPI } from "@/api/api"
 import { userPostType } from "@/store/slices/userPostsSlice"
-import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
+// import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 // import Link from "next/link"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
@@ -64,7 +64,7 @@ const PostModal = ({
 
   const [votes, setVotes] = useState<VotesType[]>([])
   const [isEditing, setIsEditing] = useState(false)
-  const [changeAvatarModal, setChangeAvatarModal] = useState(false)
+  // const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const myVoice = votes.find((v) => v.userId._id === playerId)
   console.log("votes***", votes)
   useEffect(() => {
@@ -176,35 +176,35 @@ const PostModal = ({
   //   }
   // }
 
-  const handleCloseModal = () => {
-    setChangeAvatarModal(false)
-  }
-  const handleOpenModal = () => {
-    if (playerId === authorId._id) {
-      setChangeAvatarModal(true)
-    }
-  }
+  // const handleCloseModal = () => {
+  //   setChangeAvatarModal(false)
+  // }
+  // const handleOpenModal = () => {
+  //   if (playerId === authorId._id) {
+  //     setChangeAvatarModal(true)
+  //   }
+  // }
 
-  const handleAvatarPostUpload = async (
-    file: File,
-    context?: { postId?: string; roomId?: string }
-  ) => {
-    try {
-      if (!context?.postId) return
-      if (context.roomId) {
-        await dispatch(
-          uploadRoomPostAvatarThunk({ file, postId: context.postId })
-        ).unwrap()
-      } else {
-        await dispatch(
-          uploadUserPostAvatarThunk({ file, postId: context.postId })
-        ).unwrap()
-      }
-      handleCloseModal()
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // const handleAvatarPostUpload = async (
+  //   file: File,
+  //   context?: { postId?: string; roomId?: string }
+  // ) => {
+  //   try {
+  //     if (!context?.postId) return
+  //     if (context.roomId) {
+  //       await dispatch(
+  //         uploadRoomPostAvatarThunk({ file, postId: context.postId })
+  //       ).unwrap()
+  //     } else {
+  //       await dispatch(
+  //         uploadUserPostAvatarThunk({ file, postId: context.postId })
+  //       ).unwrap()
+  //     }
+  //     handleCloseModal()
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
   const showEditPost = () => {
     setEditPost(true)
   }
@@ -230,14 +230,14 @@ const PostModal = ({
   console.log("post", post)
   return (
     <>
-      {changeAvatarModal && (
+      {/* {changeAvatarModal && (
         <ChangeAvatarModal
           handleCloseModal={handleCloseModal}
           loading={loading}
           onUpload={handleAvatarPostUpload}
           context={{ roomId, postId }}
         />
-      )}
+      )} */}
       {authorId._id === playerId && editPost && (
         <PostForm
           isProfile={!roomId}
@@ -275,7 +275,7 @@ const PostModal = ({
               </div>
             )}
             <div className={style.imageStarsBlock}>
-              <div className={style.blockImg} onClick={handleOpenModal}>
+              <div className={style.blockImg}>
                 <CloudinaryImage
                   src={avatar}
                   alt="avatar"

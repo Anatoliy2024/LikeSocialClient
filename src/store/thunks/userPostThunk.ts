@@ -2,7 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { userPostType } from "../slices/userPostsSlice"
-import { fileAPI, postAPI } from "@/api/api"
+import { postAPI } from "@/api/api"
 
 export const createUserPostThunk = createAsyncThunk<
   {
@@ -147,22 +147,22 @@ export const createUserCommentThunk = createAsyncThunk(
     }
   }
 )
-export const uploadUserPostAvatarThunk = createAsyncThunk(
-  "userPost/uploadPostAvatar",
-  async ({ file, postId }: { file: File; postId: string }, thunkAPI) => {
-    try {
-      const data = await fileAPI.uploadUserPostAvatar(file, postId)
-      return data
-    } catch (error: unknown) {
-      // Проверка, является ли ошибка ошибкой Axios
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        return thunkAPI.rejectWithValue(error.response.data.message)
-      }
+// export const uploadUserPostAvatarThunk = createAsyncThunk(
+//   "userPost/uploadPostAvatar",
+//   async ({ file, postId }: { file: File; postId: string }, thunkAPI) => {
+//     try {
+//       const data = await fileAPI.uploadUserPostAvatar(file, postId)
+//       return data
+//     } catch (error: unknown) {
+//       // Проверка, является ли ошибка ошибкой Axios
+//       if (axios.isAxiosError(error) && error.response?.data?.message) {
+//         return thunkAPI.rejectWithValue(error.response.data.message)
+//       }
 
-      // если это вообще не ошибка axios или нет message
-      return thunkAPI.rejectWithValue(
-        "Ошибка при изменении аватарки user поста"
-      )
-    }
-  }
-)
+//       // если это вообще не ошибка axios или нет message
+//       return thunkAPI.rejectWithValue(
+//         "Ошибка при изменении аватарки user поста"
+//       )
+//     }
+//   }
+// )

@@ -6,7 +6,7 @@ import {
   delRoomPostsThunk,
   getRoomPostsThunk,
   updateRoomPostThunk,
-  uploadRoomPostAvatarThunk,
+  // uploadRoomPostAvatarThunk,
 } from "../thunks/roomPostThunk"
 
 export type RatingType = {
@@ -175,23 +175,23 @@ const roomPostSlice = createSlice({
         state.loading = false
         state.error = action.error.message || "Ошибка при создании комментария"
       })
-      .addCase(uploadRoomPostAvatarThunk.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(uploadRoomPostAvatarThunk.fulfilled, (state, action) => {
-        // console.log("createRoomCommentThunk", action.payload)
-        state.loading = false
-        const updatedPost = action.payload
-        state.posts = state.posts.map((post) =>
-          post._id === updatedPost._id ? updatedPost : post
-        )
-      })
-      .addCase(uploadRoomPostAvatarThunk.rejected, (state, action) => {
-        state.loading = false
-        state.error =
-          action.error.message || "Ошибка при изменении аватарки room поста"
-      })
+    // .addCase(uploadRoomPostAvatarThunk.pending, (state) => {
+    //   state.loading = true
+    //   state.error = null
+    // })
+    // .addCase(uploadRoomPostAvatarThunk.fulfilled, (state, action) => {
+    //   // console.log("createRoomCommentThunk", action.payload)
+    //   state.loading = false
+    //   const updatedPost = action.payload
+    //   state.posts = state.posts.map((post) =>
+    //     post._id === updatedPost._id ? updatedPost : post
+    //   )
+    // })
+    // .addCase(uploadRoomPostAvatarThunk.rejected, (state, action) => {
+    //   state.loading = false
+    //   state.error =
+    //     action.error.message || "Ошибка при изменении аватарки room поста"
+    // })
   },
 })
 export const { setRoomPage } = roomPostSlice.actions
