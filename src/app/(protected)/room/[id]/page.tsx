@@ -37,7 +37,7 @@ const Room = () => {
     Number(searchParams.get("pageUserFriends")) || 1
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
-
+  console.log("userId", userId)
   const room = useAppSelector((state: RootState) => state.rooms.room)
   // const members = useAppSelector((state: RootState) => state.rooms.room?.members)
 
@@ -224,6 +224,7 @@ const Room = () => {
           pages={pages}
           onPageChange={handlePageChange}
           loading={loading}
+          isOwner={isOwner}
         />
       </Suspense>
     </>

@@ -3,8 +3,8 @@ import ButtonMenu from "@/components/ui/button/Button"
 import style from "./PostsBlock.module.scss"
 import { useEffect, useState } from "react"
 
-import { RootState } from "@/store/store"
-import { useAppSelector } from "@/store/hooks"
+// import { RootState } from "@/store/store"
+// import { useAppSelector } from "@/store/hooks"
 // import { getUserPostsThunk } from "@/store/thunks/userPostThunks"
 import Post from "@/components/post/Post"
 import { useParams, useRouter, usePathname } from "next/navigation"
@@ -16,12 +16,13 @@ import PostForm from "@/components/postForm/PostForm"
 
 type PostsBlockProps = {
   posts: userPostType[]
-  userId: string | undefined
+  userId: string | undefined | null
   isProfile: boolean
   page: number
   pages: number
   onPageChange: (page: number) => void
   loading: boolean
+  isOwner?: boolean
 }
 
 const PostsBlock = ({
@@ -32,6 +33,7 @@ const PostsBlock = ({
   pages,
   onPageChange,
   loading,
+  isOwner,
 }: PostsBlockProps) =>
   //  {
   //   posts: userPostType[]
@@ -41,7 +43,7 @@ const PostsBlock = ({
   {
     const [activeCreateNewPost, setActiveCreateNewPost] = useState(false)
     // console.log("pages", pages)
-    const playerId = useAppSelector((state: RootState) => state.auth.userId)
+    // const playerId = useAppSelector((state: RootState) => state.auth.userId)
 
     const pathname = usePathname()
     const { id } = useParams<{ id: string }>()
@@ -62,7 +64,7 @@ const PostsBlock = ({
       ? posts.find((post) => post._id === postId)
       : null
     // console.log("selectedPost", selectedPost)
-    const isMyPost = !userId || playerId === userId
+    // const isMyPost = !userId || playerId === userId
 
     const openPostModal = (id: string) => {
       const searchParams = new URLSearchParams()
@@ -103,15 +105,14 @@ const PostsBlock = ({
         <div className={style.wrapper}>
           {/* <h2>PostsBlock</h2> */}
 
-          {isMyPost && (
-            <ButtonMenu
-              onClick={() => {
-                setActiveCreateNewPost(true)
-              }}
-            >
-              Add new post
-            </ButtonMenu>
-          )}
+          <ButtonMenu
+            onClick={() => {
+              setActiveCreateNewPost(true)
+            }}
+          >
+            Add new post
+          </ButtonMenu>
+
           {activeCreateNewPost && (
             <PostForm
               isProfile={isProfile}
@@ -139,6 +140,12 @@ const PostsBlock = ({
                     if (!post._id) {
                       console.warn("Пост без _id:", post)
                     }
+                    const isMyPost =
+                      post.authorId._id === userId || isOwner || false
+                    console.log("isMyPost", isMyPost)
+                    console.log(" post.authorId._id", post.authorId._id)
+                    console.log("userId", userId)
+                    console.log("isOwner", isOwner)
                     return (
                       <Post
                         key={post._id}
@@ -169,7 +176,7 @@ const PostsBlock = ({
         {selectedPost && (
           <PostModal
             post={selectedPost}
-            playerId={playerId as string}
+            playerId={userId as string}
             onClose={() => {
               closeModal()
             }}

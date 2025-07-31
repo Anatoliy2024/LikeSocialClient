@@ -27,6 +27,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   // // const profileData = useAppSelector((state: RootState) => state.profile)
 
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
+  const playerId = useAppSelector((state: RootState) => state.auth.userId)
   // const posts = useAppSelector((state: RootState) => state.userPost.posts)
   const { posts, page, pages, loading } = useAppSelector(
     (state) => state.userPost
@@ -65,7 +66,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
       <Suspense fallback={<div>Загрузка...</div>}>
         <PostsBlock
           posts={posts}
-          userId={userId}
+          userId={isMyProfilePage ? playerId : userId}
           isProfile
           page={page}
           pages={pages}
