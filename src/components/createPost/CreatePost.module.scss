@@ -48,13 +48,48 @@
         padding: 5px;
         border-radius: 10px;
         flex: 1;
+
+        // @media (max-width: 500px) {
+        //   max-width: 200px;
+        // }
         // width: 100%;
+      }
+      .formImageBlock {
+        justify-content: center;
+        padding: 10px 0;
+        .customFileUpload {
+          display: inline-block;
+          padding: 10px;
+          cursor: pointer;
+          border-radius: 8px;
+          background-color: #4f46e5;
+          color: white;
+          // max-width: 10px;
+          // font-weight: bold;
+          transition: background-color 0.3s;
+          &:hover {
+            background-color: #3729ca;
+          }
+        }
+        // max-width: calc(100vw - 100px);
+
+        input {
+          display: none;
+          // max-width: calc(100% - 100px);
+        }
+        .preview {
+          width: 200px;
+          height: 200px;
+
+          border-radius: 50%;
+        }
       }
       & > div {
         display: flex;
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
+        max-width: 100%;
       }
       .buttonBlock {
         justify-content: space-between;

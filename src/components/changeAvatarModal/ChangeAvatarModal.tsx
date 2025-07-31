@@ -3,13 +3,9 @@ import { useEffect, useState } from "react"
 import style from "./ChangeAvatarModal.module.scss"
 
 import ButtonMenu from "@/components/ui/button/Button"
-// import { useAppDispatch, useAppSelector } from "@/store/hooks"
-// import { changeAvatarUserThunk } from "@/store/thunks/profileThunk"
-// import { RootState } from "@/store/store"
-// import Image from "next/image"
+
 import { compressImage } from "@/utils/compressImage"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
-// import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 
 export const ChangeAvatarModal = ({
   handleCloseModal,
@@ -39,34 +35,14 @@ export const ChangeAvatarModal = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [loadingLocal, setIsLoadingLocal] = useState(false)
 
-  // const [originalSize, setOriginalSize] = useState<number | null>(null)
-  // const [compressedSize, setCompressedSize] = useState<number | null>(null)
-  // const dispatch = useAppDispatch()
-  // const loading = useAppSelector(
-  //   (state: RootState) => state.profile.profileLoading
-  // )
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0]
       setFile(selectedFile)
       setPreviewUrl(URL.createObjectURL(selectedFile)) // создаём URL для предпросмотра
-      //начало
-      // setOriginalSize(selectedFile.size)
-
-      // setCompressedSize(null) // сбрасываем предыдущий результат
-      //конец
     }
   }
 
-  // const handleUpload = async () => {
-  //   if (!file) return
-  //   try {
-  //     await dispatch(changeAvatarUserThunk(file)).unwrap()
-  //     handleCloseModal()
-  //   } catch (error) {
-  //     console.error("Ошибка загрузки:", error)
-  //   }
-  // }
   const handleUpload = async () => {
     if (!file) return
     setIsLoadingLocal(true)
@@ -114,13 +90,6 @@ export const ChangeAvatarModal = ({
         <input type="file" accept="image/*" onChange={handleChange} />
         {previewUrl && (
           <div className={style.preview}>
-            {/* <CloudinaryImage
-              src={previewUrl}
-              alt="Предпросмотр аватара"
-              className={style.preview}
-              width={200}
-              height={200}
-            /> */}
             <CloudinaryImage
               src={previewUrl}
               alt="Предпросмотр аватара"

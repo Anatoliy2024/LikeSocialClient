@@ -1,6 +1,6 @@
-import { userPostType } from "@/store/slices/userPostsSlice"
+// import { userPostType } from "@/store/slices/userPostsSlice"
 import instance from "./instance"
-import { roomPostType } from "@/store/slices/roomPostsSlice"
+// import { roomPostType } from "@/store/slices/roomPostsSlice"
 import { ProfileType } from "@/store/thunks/profileThunk"
 import { createUserMovieType } from "@/store/thunks/userMoviesThunk"
 
@@ -132,7 +132,8 @@ export const userAPI = {
 }
 
 export const postAPI = {
-  createUserPost(data: Partial<userPostType>) {
+  createUserPost(data: FormData) {
+    // createUserPost(data: Partial<userPostType>) {
     return instance
       .post("userPosts/create", data)
       .then((response) => response.data)
@@ -170,7 +171,7 @@ export const postAPI = {
   // },
 }
 export const roomPostAPI = {
-  createRoomPost(data: Partial<roomPostType>) {
+  createRoomPost(data: FormData) {
     return instance
       .post("roomPosts/create", data)
       .then((response) => response.data)

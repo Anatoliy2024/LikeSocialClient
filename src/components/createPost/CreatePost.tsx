@@ -8,7 +8,9 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { createUserPostThunk } from "@/store/thunks/userPostThunk"
 import { createRoomPostThunk } from "@/store/thunks/roomPostThunk"
 import { RootState } from "@/store/store"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+import { compressImage } from "@/utils/compressImage"
 
 type FormCreatePost = {
   title: string
@@ -20,6 +22,7 @@ type FormCreatePost = {
   acting: number
   specialEffects: number
   story: number
+  avatarFile: FileList | null
 }
 
 const CreatePost = ({
@@ -31,6 +34,8 @@ const CreatePost = ({
   isProfile: boolean
   roomId: string | null
 }) => {
+  const [preview, setPreview] = useState<string | null>(null)
+  // const [loadingLocal, setIsLoadingLocal] = useState(false)
   const {
     register,
     handleSubmit,
@@ -42,25 +47,73 @@ const CreatePost = ({
   // const { id } = useParams()
   const loading = useAppSelector((state: RootState) => state.userPost.loading)
 
-  const handleSave = (dataForm: FormCreatePost) => {
+  const handleSave = async (dataForm: FormCreatePost) => {
     console.log("dataForm", dataForm)
     try {
-      const dataToSend = {
-        title: dataForm.title,
-        content: dataForm.content,
-        roomId: roomId ? roomId : undefined,
-        ratings: {
-          stars: dataForm.stars,
-          acting: dataForm.acting,
-          specialEffects: dataForm.specialEffects,
-          story: dataForm.story,
-        },
-        genres: dataForm.genres ? [...dataForm.genres] : [],
+      // const dataToSend = {
+      //   title: dataForm.title,
+      //   content: dataForm.content,
+      //   roomId: roomId ? roomId : undefined,
+      //   ratings: {
+      //     stars: dataForm.stars,
+      //     acting: dataForm.acting,
+      //     specialEffects: dataForm.specialEffects,
+      //     story: dataForm.story,
+      //   },
+      //   genres: dataForm.genres ? [...dataForm.genres] : [],
+      //   avatarFile: dataForm?.avatarFile?.[0] ? dataForm.avatarFile[0] : null,
+      // }
+
+      const formData = new FormData()
+
+      formData.append("title", dataForm.title)
+      formData.append("content", dataForm.content)
+
+      if (roomId) {
+        formData.append("roomId", roomId)
+      }
+
+      formData.append("ratings[stars]", dataForm.stars?.toString())
+      formData.append("ratings[acting]", dataForm.acting?.toString())
+      formData.append(
+        "ratings[specialEffects]",
+        dataForm.specialEffects?.toString()
+      )
+      formData.append("ratings[story]", dataForm.story?.toString())
+
+      dataForm.genres?.forEach((genre) => {
+        formData.append("genres[]", genre)
+      })
+
+      if (dataForm.avatarFile?.[0]) {
+        const file = dataForm.avatarFile?.[0]
+        // setIsLoadingLocal(true)
+        try {
+          const compressedFile = await compressImage(file)
+
+          // setCompressedSize(compressedFile.size)
+          console.log(
+            `***********************************************До: ${(
+              file.size / 1024
+            ).toFixed(2)} KB | После: ${(compressedFile.size / 1024).toFixed(
+              2
+            )} KB`
+          )
+          // await onUpload(compressedFile, { roomId })
+          // // await onUpload(file, context)
+          // handleCloseModal()
+          formData.append("avatarFile", compressedFile)
+        } catch (error) {
+          console.error("Ошибка загрузки:", error)
+        } finally {
+          // setIsLoadingLocal(false)
+        }
       }
       if (isProfile) {
-        dispatch(createUserPostThunk(dataToSend))
+        dispatch(createUserPostThunk(formData))
       } else {
-        dispatch(createRoomPostThunk(dataToSend))
+        console.log("formData", formData)
+        dispatch(createRoomPostThunk(formData))
       }
 
       hiddenBlock()
@@ -79,6 +132,15 @@ const CreatePost = ({
       document.body.style.overflow = ""
     }
   }, [])
+
+  useEffect(() => {
+    const avatar = watch("avatarFile")?.[0]
+    if (avatar) {
+      const url = URL.createObjectURL(avatar)
+      setPreview(url)
+      return () => URL.revokeObjectURL(url)
+    }
+  }, [watch("avatarFile")])
 
   return (
     <div
@@ -99,7 +161,27 @@ const CreatePost = ({
               placeholder={"Введите заголовок"}
             />
             {errors.title && <p>{errors.title?.message as string}</p>}
-            {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
+          </div>
+          <div className={style.formImageBlock}>
+            <label className={style.customFileUpload}>
+              Загрузить аватарку
+              <input
+                type="file"
+                accept="image/*"
+                {...register("avatarFile", { required: true })}
+              />
+            </label>
+            {preview && (
+              <div className={style.preview}>
+                <CloudinaryImage
+                  src={preview}
+                  alt="Предпросмотр аватара"
+                  className={style.preview}
+                  width={200}
+                  height={200}
+                />
+              </div>
+            )}
           </div>
           <div className={style.genresBlock}>
             <label>Жанры:</label>

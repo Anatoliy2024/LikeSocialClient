@@ -12,7 +12,8 @@ export const createUserPostThunk = createAsyncThunk<
     total: number
     pages: number
   }, // тип данных, которые вернутся — массив пользователей
-  Partial<userPostType>, // параметр тип данных которые отправляю
+  FormData, // параметр тип данных которые отправляю
+  // Partial<userPostType>, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("post/createPost", async (postData, thunkAPI) => {
   try {

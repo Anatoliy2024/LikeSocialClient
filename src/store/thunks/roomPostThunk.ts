@@ -48,7 +48,8 @@ export const createRoomPostThunk = createAsyncThunk<
     total: number
     pages: number
   }, // тип данных, которые вернутся — массив пользователей
-  Partial<roomPostType>, // параметр тип данных которые отправляю
+  FormData, // параметр тип данных которые отправляю
+  // Partial<roomPostType>, // параметр тип данных которые отправляю
   { rejectValue: string }
 >("post/createPost", async (postData, thunkAPI) => {
   try {
