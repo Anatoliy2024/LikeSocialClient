@@ -6,8 +6,13 @@
   user-select: none;
   div {
     cursor: pointer;
+    border-radius: 10px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    color: #493775;
     &:hover {
-      background-color: rgba(0, 0, 0, 0.2);
+      background-color: rgb(121, 92, 193);
+      color: #f3e8ff;
     }
   }
   .scrollTopBtn {
