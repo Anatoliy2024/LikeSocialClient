@@ -51,19 +51,19 @@ export default function Navbar({
       ref={navRef}
       className={`${style.wrapper} ${!isOpen ? style.hidden : ""}`}
     >
-      <Link href="/profile" onClick={handleLinkClick}>
+      <Link href="/profile" onClick={handleLinkClick} prefetch={false}>
         <div>Profile</div>
       </Link>
-      <Link href="/rooms" onClick={handleLinkClick}>
+      <Link href="/rooms" onClick={handleLinkClick} prefetch={false}>
         <div>Rooms</div>
       </Link>
-      <Link href="/dialogs" onClick={handleLinkClick}>
+      <Link href="/dialogs" onClick={handleLinkClick} prefetch={false}>
         <div>Dialogs</div>
       </Link>
-      <Link href="/friends" onClick={handleLinkClick}>
+      <Link href="/friends" onClick={handleLinkClick} prefetch={false}>
         <div>Friends</div>
       </Link>
-      <Link href="/userMovie" onClick={handleLinkClick}>
+      <Link href="/userMovie" onClick={handleLinkClick} prefetch={false}>
         <div>Want To See</div>
       </Link>
 
