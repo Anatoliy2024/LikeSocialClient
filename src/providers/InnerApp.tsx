@@ -16,6 +16,7 @@ import {
   updateUserStatus,
 } from "@/store/slices/onlineStatusSlice"
 import { addNotification } from "@/store/slices/notificationsSlice"
+import { Loading } from "@/assets/loading/loading"
 
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -87,7 +88,24 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   }, [userId, dispatch])
 
   if (server?.loading) {
-    return <div>Сервер просыпается, пожалуйста подождите...</div>
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          Сервер просыпается, пожалуйста подождите...
+        </div>
+        <div>
+          <Loading />
+        </div>
+      </div>
+    )
   }
 
   if (server?.error) {
