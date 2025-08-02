@@ -8,6 +8,8 @@
   width: 14em;
   height: auto;
   --dur: 4s;
+  //   --bg: hsl(var(--hue), 90%, 98%);
+  //   --fg: hsl(var(--hue), 90%, 10%);
 }
 
 .glareTop,
@@ -93,12 +95,12 @@
   transform-origin: 12.25px 31.5px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: hsl(var(--hue), 90%, 10%);
-    --fg: hsl(var(--hue), 90%, 90%);
-  }
-}
+// @media (prefers-color-scheme: dark) {
+//   :root {
+//     --bg: hsl(var(--hue), 90%, 10%);
+//     --fg: hsl(var(--hue), 90%, 90%);
+//   }
+// }
 
 /* Keyframes */
 @keyframes loader-flip {
