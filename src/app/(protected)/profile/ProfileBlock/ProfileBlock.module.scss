@@ -1,7 +1,7 @@
 .wrapper {
   padding: 10px;
   @media (max-width: 500px) {
-    padding: 10px 0;
+    padding: 10px 5px;
   }
   h2 {
     text-align: center;
@@ -54,9 +54,13 @@
     }
 
     .infoBlock {
+      // .buttonBlock {
+      //   display: flex;
+      // }
       & > div {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
         span:first-child {
           color: rgb(213, 189, 251);
         }
@@ -77,15 +81,16 @@
         }
       }
     }
-    .linkWantToSee {
-      padding: 10px;
-      background: #595aaa;
-      border-radius: 20px;
-      color: rgb(255, 255, 255);
-      &:hover {
-        background: #8789ff;
-        color: rgb(0, 0, 0);
-      }
-    }
+    // .linkWantToSee {
+    //   padding: 10px;
+    //   background: #595aaa;
+    //   border-radius: 20px;
+    //   color: rgb(255, 255, 255);
+    //   // margin: 10px 0;
+    //   &:hover {
+    //     background: #8789ff;
+    //     color: rgb(0, 0, 0);
+    //   }
+    // }
   }
 }

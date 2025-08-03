@@ -56,6 +56,7 @@ const ProfileBlock = ({
   )
 
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
+  // const playerId = useAppSelector((state: RootState) => state.auth.userId)
   const loading = useAppSelector(
     (state: RootState) => state.profile.profileLoading
   )
@@ -313,51 +314,80 @@ const ProfileBlock = ({
               </form>
             ) : (
               <>
+                {/* {(profileData.name || profileData.isMyProfile) && (
+                  <div>
+                    <span>Имя:</span>
+                    <span>{profileData.name || "Введите имя"}</span>
+                  </div>
+                )} */}
                 <div>
                   <span>Имя:</span>
-
-                  <span>{profileData.name || "Введите имя"}</span>
-                </div>
-                <div>
-                  <span>Фамилия:</span>
-
-                  <span>{profileData.sureName || "Введите фамилию"}</span>
-                </div>
-                <div>
-                  <span>Статус:</span>
-
-                  <span>{profileData.status || "Введите статус"}</span>
-                </div>
-                <div>
-                  <span>Возраст:</span>
-
                   <span>
-                    {getAgeFromBirthDate(profileData.birthDate) ||
-                      "Введите возраст"}
+                    {profileData.name ||
+                      (profileData.isMyProfile ? "Введите имя" : "пусто")}
                   </span>
                 </div>
+
+                {(profileData.sureName || profileData.isMyProfile) && (
+                  <div>
+                    <span>Фамилия:</span>
+                    <span>{profileData.sureName || "Введите фамилию"}</span>
+                  </div>
+                )}
+
+                {(profileData.status || profileData.isMyProfile) && (
+                  <div>
+                    <span>Статус:</span>
+                    <span>{profileData.status || "Введите статус"}</span>
+                  </div>
+                )}
+
+                {(profileData.birthDate || profileData.isMyProfile) && (
+                  <div>
+                    <span>Возраст:</span>
+                    <span>
+                      {profileData.birthDate
+                        ? getAgeFromBirthDate(profileData.birthDate)
+                        : "Введите возраст"}
+                    </span>
+                  </div>
+                )}
+
                 <div>
                   <span>Страна:</span>
-
                   <span>
-                    {profileData.address?.country || "Введите страну"}
+                    {profileData.address?.country ||
+                      (profileData.isMyProfile ? "Введите страну" : "пусто")}
                   </span>
                 </div>
-                <div>
-                  <span>Город:</span>
+                {/* {(profileData.address?.country || profileData.isMyProfile) && (
+                  <div>
+                    <span>Страна:</span>
+                    <span>
+                      {profileData.address?.country || "Введите страну"}
+                    </span>
+                  </div>
+                )} */}
 
-                  <span>{profileData.address?.city || "Введите город"}</span>
-                </div>
+                {(profileData.address?.city || profileData.isMyProfile) && (
+                  <div>
+                    <span>Город:</span>
+                    <span>{profileData.address?.city || "Введите город"}</span>
+                  </div>
+                )}
 
-                <div>
-                  <span>Статус отношений:</span>
+                {(profileData.relationshipStatus ||
+                  profileData.isMyProfile) && (
+                  <div>
+                    <span>Статус отношений:</span>
+                    <span>
+                      {profileData.relationshipStatus ||
+                        "Введите статус отношений"}
+                    </span>
+                  </div>
+                )}
 
-                  <span>
-                    {profileData.relationshipStatus ||
-                      "Введите статус отношений"}
-                  </span>
-                </div>
-                <div>
+                <div className={style.buttonBlock}>
                   {profileData.isMyProfile && (
                     <ButtonMenu onClick={handleEditClick}>
                       Редактировать
@@ -366,17 +396,36 @@ const ProfileBlock = ({
                   {!profileData.isMyProfile && (
                     <Link
                       href={`/userMovie/${userId}`}
-                      className={style.linkWantToSee}
+                      // className={style.linkWantToSee}
                     >
-                      <div>Список желаемого</div>
+                      <ButtonMenu>Список желаемого</ButtonMenu>
                     </Link>
                   )}
+                  {!isMyProfilePage && (
+                    <ButtonMenu onClick={handleShowModalCreateMessage}>
+                      Написать сообщение
+                    </ButtonMenu>
+                  )}
+
+                  {!isMyProfilePage &&
+                    (profileData.isSubscribed ? (
+                      <ButtonMenu
+                        onClick={() => {
+                          if (userId) handleUnsubscribe(userId)
+                        }}
+                      >
+                        Отписаться
+                      </ButtonMenu>
+                    ) : (
+                      <ButtonMenu
+                        onClick={() => {
+                          if (userId) handleSubscribe(userId)
+                        }}
+                      >
+                        Подписаться
+                      </ButtonMenu>
+                    ))}
                 </div>
-                {!isMyProfilePage && (
-                  <ButtonMenu onClick={handleShowModalCreateMessage}>
-                    Написать сообщение
-                  </ButtonMenu>
-                )}
                 {profileData.subscriptions.length > 0 && (
                   <SubBlock
                     subsData={profileData.subscriptions}
@@ -391,25 +440,6 @@ const ProfileBlock = ({
                     usersOnline={usersOnline}
                   />
                 )}
-
-                {!isMyProfilePage &&
-                  (profileData.isSubscribed ? (
-                    <ButtonMenu
-                      onClick={() => {
-                        if (userId) handleUnsubscribe(userId)
-                      }}
-                    >
-                      Отписаться
-                    </ButtonMenu>
-                  ) : (
-                    <ButtonMenu
-                      onClick={() => {
-                        if (userId) handleSubscribe(userId)
-                      }}
-                    >
-                      Подписаться
-                    </ButtonMenu>
-                  ))}
               </>
             )}
           </div>
