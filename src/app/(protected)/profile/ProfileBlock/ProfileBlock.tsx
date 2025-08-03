@@ -124,14 +124,14 @@ const ProfileBlock = ({
   }
   // console.log("profileData", profileData)
 
-  if (profileData.profileLoading) {
-    return <div>Загрузка...</div>
-  }
+  // if (profileData.profileLoading) {
+  //   return <div>Загрузка...</div>
+  // }
 
   //   if (!profileData.profile) {
   //     return <div>Профиль не найден</div>
   //   }
-  if (!profileData || !profileData.address) {
+  if (!profileData || !profileData.address || profileData.profileLoading) {
     return <div>Загрузка профиля...</div>
   }
   const handleCloseModal = () => {

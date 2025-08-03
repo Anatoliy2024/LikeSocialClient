@@ -89,6 +89,7 @@ const userPostSlice = createSlice({
       })
       .addCase(createUserPostThunk.fulfilled, (state, action) => {
         state.loading = false
+        console.log("action.payload.posts***", action.payload.posts)
         state.posts = action.payload.posts
         state.page = action.payload.page
         state.limit = action.payload.limit
