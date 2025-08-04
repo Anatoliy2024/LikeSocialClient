@@ -39,7 +39,7 @@ instance.interceptors.response.use(
 
       try {
         const res = await instance.post("/auth/refresh") // с withCredentials
-        console.log("await instance.post('/auth/refresh')", res)
+        // console.log("await instance.post('/auth/refresh')", res)
         // const res = await axios.post(
         //   "/api/proxy/refresh",
         //   {},
