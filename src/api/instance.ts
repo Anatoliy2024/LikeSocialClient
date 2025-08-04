@@ -8,7 +8,7 @@ export const baseApiUrl = process.env.NEXT_PUBLIC_API_URL
   : "https://likesocial.onrender.com"
 
 // Добавляем /api в конце
-const baseURL = baseApiUrl + "/api"
+export const baseURL = baseApiUrl + "/api"
 const instance = axios.create({
   baseURL,
   withCredentials: true,
@@ -38,7 +38,8 @@ instance.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        const res = await instance.post("/auth/refresh") // с withCredentials
+        // const res = await instance.post("/auth/refresh") // с withCredentials
+        const res = await axios.post("/api/proxy/refresh")
         const newAccessToken = res.data.accessToken
         localStorage.setItem("accessToken", newAccessToken)
 
