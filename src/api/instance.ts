@@ -38,12 +38,12 @@ instance.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        // const res = await instance.post("/auth/refresh") // с withCredentials
-        const res = await axios.post(
-          "/api/proxy/refresh",
-          {},
-          { withCredentials: true }
-        )
+        const res = await instance.post("/auth/refresh") // с withCredentials
+        // const res = await axios.post(
+        //   "/api/proxy/refresh",
+        //   {},
+        //   { withCredentials: true }
+        // )
         const newAccessToken = res.data.accessToken
         localStorage.setItem("accessToken", newAccessToken)
 
