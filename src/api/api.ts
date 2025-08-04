@@ -1,13 +1,9 @@
-// import { userPostType } from "@/store/slices/userPostsSlice"
 import instance from "./instance"
-// import { roomPostType } from "@/store/slices/roomPostsSlice"
+
 import { ProfileType } from "@/store/thunks/profileThunk"
 import { createUserMovieType } from "@/store/thunks/userMoviesThunk"
 
 export const authAPI = {
-  // getMyInfo() {
-  //   return instance.get("auth/me").then((response) => response.data)
-  // },
   register(
     username: string,
     email: string,
@@ -28,7 +24,6 @@ export const authAPI = {
 
         return data
       })
-    // .then((response) => response.data)
   },
   auth(username: string, password: string) {
     return instance
@@ -42,7 +37,6 @@ export const authAPI = {
 
         return data
       })
-    // .then((response) => response.data)
   },
   verify(username: string, passwordVerify: string) {
     return instance
@@ -73,11 +67,6 @@ export const authAPI = {
       })
       .then((response) => response.data)
   },
-  // const res = await fetch('http://localhost:5000/api/auth/reset-password', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ token, newPassword: password }),
-  // })
 }
 
 export const userAPI = {
@@ -133,13 +122,11 @@ export const userAPI = {
 
 export const postAPI = {
   createUserPost(data: FormData) {
-    // createUserPost(data: Partial<userPostType>) {
     return instance
       .post("userPosts/create", data)
       .then((response) => response.data)
   },
   updateUserPost(data: FormData) {
-    // createUserPost(data: Partial<userPostType>) {
     return instance
       .put("userPosts/update", data)
       .then((response) => response.data)
@@ -170,11 +157,6 @@ export const postAPI = {
       .post("userPosts/createComment", { postId, comment })
       .then((response) => response.data)
   },
-  // createUserVoice(data) {
-  //   return instance
-  //     .post("userPosts/createVoice", data)
-  //     .then((response) => response.data)
-  // },
 }
 export const roomPostAPI = {
   createRoomPost(data: FormData) {
@@ -183,14 +165,11 @@ export const roomPostAPI = {
       .then((response) => response.data)
   },
   updateRoomPost(data: FormData) {
-    // createUserPost(data: Partial<userPostType>) {
     return instance
       .put("roomPosts/update", data)
       .then((response) => response.data)
   },
   getRoomPosts(roomId: string, page: number, limit?: number) {
-    //?page=1&limit=10
-    //  .get(`roomPosts/${roomId}`, { params })
     return instance
       .get(`roomPosts/${roomId}`, {
         params: { page, limit },
@@ -203,7 +182,6 @@ export const roomPostAPI = {
     page: number,
     limit?: number
   ) {
-    // /post/:postId
     return instance
       .delete(`roomPosts/post/${postId}?roomId=${roomId}`, {
         params: { page, limit },
@@ -215,11 +193,6 @@ export const roomPostAPI = {
       .post("roomPosts/createComment", { postId, roomId, comment })
       .then((response) => response.data)
   },
-  // createRoomVoice(data) {
-  //   return instance
-  //     .post("roomPosts/createVoice", data)
-  //     .then((response) => response.data)
-  // },
 }
 
 export const roomAPI = {
@@ -244,8 +217,6 @@ export const roomAPI = {
       .then((response) => response.data)
   },
   delFriendFromRoom(userId: string, roomId: string) {
-    // console.log("delFriendFromRoom userId", userId)
-
     return instance
       .delete(`room/delFriend/${userId}?roomId=${roomId}`)
       .then((response) => response.data)
@@ -300,22 +271,6 @@ export const fileAPI = {
       .post("file/uploadRoomAvatar", formData)
       .then((res) => res.data)
   },
-  // uploadRoomPostAvatar(file: File, postId: string) {
-  //   const formData = new FormData()
-  //   formData.append("image", file)
-  //   formData.append("postId", postId) // передаём roomId в FormData
-  //   return instance
-  //     .post("file/uploadRoomPostAvatar", formData)
-  //     .then((res) => res.data)
-  // },
-  // uploadUserPostAvatar(file: File, postId: string) {
-  //   const formData = new FormData()
-  //   formData.append("image", file)
-  //   formData.append("postId", postId) // передаём roomId в FormData
-  //   return instance
-  //     .post("file/uploadUserPostAvatar", formData)
-  //     .then((res) => res.data)
-  // },
 
   uploadUserMovieAvatar(file: File, userMovieId: string, status: string) {
     const formData = new FormData()
@@ -326,39 +281,6 @@ export const fileAPI = {
       .post("file/uploadUserMovieAvatar", formData)
       .then((res) => res.data)
   },
-
-  // uploadUserPostImage({ file, postId }: { file: File; postId: string }) {
-  //   const formData = new FormData()
-  //   formData.append("image", file)
-  //   formData.append("postId", postId)
-
-  //   return instance.post("/api/file/upload-user-post", formData).then(res => res.data)
-  // }
-
-  // changeAvatar({
-  //   file,
-  //   userId,
-  //   roomId,
-  //   postRoomId,
-  //   postUserId
-  // }: {
-  //   file: File
-  //   userId?: string
-  //   roomId?: string
-  //   postRoomId?: string
-  //   postUserId?: string
-  // }) {
-  //   const formData = new FormData()
-  //   formData.append("image", file)
-
-  //   if (userId) formData.append("userId", userId)
-  //   if (roomId) formData.append("roomId", roomId)
-  //   if (postUserId) formData.append("postUserId", postUserId)
-  //   if (postRoomId) formData.append("postRoomId", postRoomId)
-  //   return instance
-  //     .post("/api/file/upload", formData)
-  //     .then((response) => response.data)
-  // },
 }
 export const userMovieAPI = {
   createUserMovie(data: createUserMovieType) {
@@ -366,10 +288,6 @@ export const userMovieAPI = {
       .post("user-movie/create-user-movie", data)
       .then((res) => res.data)
   },
-
-  // , {
-  //   data: { status: "wantToSee" }, // передаём текущий таб
-  // }
 
   deleteUserMovie(
     userMovieId: string,
@@ -398,13 +316,6 @@ export const userMovieAPI = {
       })
       .then((res) => res.data)
   },
-
-  // userMovies/update-status/${userMovieId}
-  // watchedUserMovie(userMovieId) {
-  //   return instance
-  //     .post("/user-movie/watched-user-movie", { userMovieId })
-  //     .then((res) => res.data)
-  // },
 
   getMyWantToSeeMovies(page: number, limit?: number) {
     return instance
@@ -442,11 +353,7 @@ export const notificationsAPI = {
       .patch("notifications/markAsRead", null)
       .then((res) => res.data)
   },
-  // createNotification(notificationData) {
-  //   return instance
-  //     .post("/api/notifications", notificationData)
-  //     .then((res) => res.data)
-  // },
+
   deleteNotification(id: string) {
     return instance.delete(`notifications/${id}`).then((res) => res.data)
   },
@@ -464,12 +371,4 @@ export const dialogsAPI = {
       .get(`dialogs/dialog/${dialogId}`, { params: { page, limit } })
       .then((res) => res.data)
   },
-  // sendUserMessage(recipientUserId: string, text: string, dialogId?: string) {
-  //   return instance
-  //     .patch(`send-message`, { recipientUserId, text, dialogId })
-  //     .then((res) => res.data)
-  // },
-  // deleteUserMessage(messageId: string) {
-  //   return instance.delete(`/message/${messageId}`).then((res) => res.data)
-  // },
 }
