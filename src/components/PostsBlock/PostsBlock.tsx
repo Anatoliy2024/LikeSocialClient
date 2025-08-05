@@ -50,10 +50,10 @@ const PostsBlock = ({
 
     const params = useParams<{ id: string }>()
 
-    if (!params || !params.id) {
-      // можно показать заглушку, редирект или бросить ошибку
-      throw new Error("Параметр id не найден")
-    }
+    // if (!params || !params.id) {
+    //   // можно показать заглушку, редирект или бросить ошибку
+    //   throw new Error("Параметр id не найден")
+    // }
 
     const id = params?.id || null
 
