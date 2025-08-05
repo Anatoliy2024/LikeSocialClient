@@ -61,7 +61,16 @@ export const MessageBlock = () => {
   // }, [dispatch])
   // const lastSeen = status.isOnline ? null : status.lastSeen ?? lastSeen
 
-  const { id } = useParams<{ id: string }>()
+  // const { id } = useParams<{ id: string }>()
+
+  const params = useParams<{ id: string }>()
+
+  if (!params || !params.id) {
+    // можно показать заглушку, редирект или бросить ошибку
+    throw new Error("Параметр id не найден")
+  }
+
+  const id = params.id
 
   // Загружаем сообщения при изменении диалога (первый заход)
   useEffect(() => {

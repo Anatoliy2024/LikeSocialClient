@@ -32,9 +32,9 @@ const Room = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const pageRoomFromUrl = Number(searchParams.get("pageRoom")) || 1
+  const pageRoomFromUrl = Number(searchParams?.get("pageRoom")) || 1
   const pageUserFriendsFromUrl =
-    Number(searchParams.get("pageUserFriends")) || 1
+    Number(searchParams?.get("pageUserFriends")) || 1
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
   console.log("userId", userId)
@@ -54,7 +54,14 @@ const Room = () => {
   } = useAppSelector((state) => state.users.friends)
   const { posts, page, pages } = useAppSelector((state) => state.roomPost)
   const dispatch = useAppDispatch()
-  const { id } = useParams<{ id: string }>()
+  const params = useParams<{ id: string }>()
+
+  if (!params || !params.id) {
+    // можно показать заглушку, редирект или бросить ошибку
+    throw new Error("Параметр id не найден")
+  }
+
+  const id = params.id
 
   const isOwner =
     typeof room?.owner === "object" &&
@@ -66,7 +73,7 @@ const Room = () => {
   }
   const handleCloseAddMembersFromRoom = () => {
     setAddFriendsToRoom(false)
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.delete("pageUserFriends") // удаляем параметр страницы
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
@@ -130,7 +137,7 @@ const Room = () => {
   }
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set("pageRoom", String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
@@ -138,7 +145,7 @@ const Room = () => {
     // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
   }
   const handleChangeUrlFriendsPage = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set("pageUserFriends", String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })

@@ -10,7 +10,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 export default function ResetPassword() {
   const searchParams = useSearchParams()
-  const token = searchParams.get("token") ?? ""
+  const token = searchParams?.get("token") ?? ""
 
   const [password, setPassword] = useState("")
   const [message, setMessage] = useState("")

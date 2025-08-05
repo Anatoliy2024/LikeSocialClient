@@ -6,7 +6,7 @@ import MyMoviesPageCommon from "../_components/MyMoviesPageCommon"
 import { Suspense } from "react"
 
 export default function UserProfilePage() {
-  const { id } = useParams()
+  const { id } = useParams() as { id: string }
 
   if (typeof id !== "string") return <div>Неверный ID</div>
 

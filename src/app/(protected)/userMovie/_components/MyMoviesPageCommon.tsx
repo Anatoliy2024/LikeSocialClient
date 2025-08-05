@@ -60,7 +60,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const pageFromUrl = Number(searchParams.get("page")) || 1
+  const pageFromUrl = Number(searchParams?.get("page")) || 1
 
   // useEffect(() => {
   //   if (isAuth && typeof id === "string") {
@@ -175,7 +175,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
   }
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set("page", String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
@@ -186,7 +186,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
   const handleTabChange = (tab: "wantToSee" | "watched") => {
     setActiveTab(tab)
 
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.delete("page") // удаляем параметр страницы
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })

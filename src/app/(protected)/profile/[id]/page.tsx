@@ -8,7 +8,7 @@ import { useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
 
 export default function UserProfilePage() {
-  const { id } = useParams()
+  const { id } = useParams() as { id: string }
 
   const router = useRouter()
   const userId = useAppSelector((state: RootState) => state.auth.userId)

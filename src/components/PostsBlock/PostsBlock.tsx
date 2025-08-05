@@ -46,10 +46,19 @@ const PostsBlock = ({
     // const playerId = useAppSelector((state: RootState) => state.auth.userId)
 
     const pathname = usePathname()
-    const { id } = useParams<{ id: string }>()
+    // const { id } = useParams<{ id: string }>()
 
-    const isRoomPage = pathname.includes("/room")
-    const isProfilePage = pathname.includes("/profile")
+    const params = useParams<{ id: string }>()
+
+    if (!params || !params.id) {
+      // можно показать заглушку, редирект или бросить ошибку
+      throw new Error("Параметр id не найден")
+    }
+
+    const id = params.id
+
+    const isRoomPage = pathname?.includes("/room")
+    const isProfilePage = pathname?.includes("/profile")
 
     const roomId = isRoomPage ? id : null
     const profileUserId = isProfilePage ? id : null
@@ -57,7 +66,7 @@ const PostsBlock = ({
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    const postId = searchParams.get("postId")
+    const postId = searchParams?.get("postId")
     // console.log("postId", postId)
     // const selectedPost = posts.find((post) => post._id === postId)
     const selectedPost = Array.isArray(posts)
