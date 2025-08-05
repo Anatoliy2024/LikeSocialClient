@@ -23,7 +23,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const pageFromUrl = Number(searchParams.get("page")) || 1
+  const pageFromUrl = Number(searchParams?.get("page")) || 1
   // // const profileData = useAppSelector((state: RootState) => state.profile)
 
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
@@ -52,7 +52,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   // dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set("page", String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })

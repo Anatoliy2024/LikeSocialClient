@@ -7,6 +7,9 @@ import {
   getAllUsersThunk,
   getMyFriendsIdThunk,
   getUserRelationsThunk,
+  getUserStatusThunk,
+  // ProfileFriendResponse,
+  RequestFriendResponse,
   requestFriendThunk,
 } from "../thunks/usersThunk"
 
@@ -19,6 +22,7 @@ type InitialStateUserType = {
   friendRequests: UserTypeReq
   friends: UserTypeReq
   sentFriendRequests: UserTypeReq
+  friendshipStatus: "friend" | "incoming" | "outgoing" | "none" | null
 }
 
 const initialState: InitialStateUserType = {
@@ -41,6 +45,11 @@ const initialState: InitialStateUserType = {
   },
   friends: { users: [], page: 1, limit: 10, total: 0, pages: 0 },
   sentFriendRequests: { users: [], page: 1, limit: 10, total: 0, pages: 0 },
+  friendshipStatus: null,
+}
+
+function isUserTypeReq(data: RequestFriendResponse): data is UserTypeReq {
+  return typeof data === "object" && "users" in data
 }
 
 const usersSlice = createSlice({
@@ -121,7 +130,13 @@ const usersSlice = createSlice({
       .addCase(requestFriendThunk.fulfilled, (state, action) => {
         state.loading = false
         console.log("action.payload", action.payload)
-        state.sentFriendRequests = action.payload
+        if (isUserTypeReq(action.payload)) {
+          state.sentFriendRequests = action.payload
+        } else {
+          state.friendshipStatus = action.payload.friendshipStatus
+        }
+
+        // state.sentFriendRequests = action.payload
 
         // state.sentFriendRequests.users = action.payload.users
         // state.sentFriendRequests.page = action.payload.page
@@ -141,8 +156,19 @@ const usersSlice = createSlice({
       })
       .addCase(acceptFriendThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.friends = action.payload.friends
-        state.friendRequests = action.payload.friendRequests
+
+        // Если в ответе есть friendshipStatus — значит это ответ для профиля
+        if ("friendshipStatus" in action.payload.friendRequests) {
+          state.friendshipStatus =
+            action.payload.friendRequests.friendshipStatus
+        } else {
+          state.friends = action.payload.friends
+          state.friendRequests = action.payload.friendRequests
+        }
+
+        // state.friends = action.payload.friends
+        // state.friendRequests = action.payload.friendRequests
+
         // const stateFriends = state.friends
         // const friends = action.payload.friends
 
@@ -173,7 +199,12 @@ const usersSlice = createSlice({
       })
       .addCase(delFriendThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.friends = action.payload
+        // state.friends = action.payload
+        if (isUserTypeReq(action.payload)) {
+          state.friends = action.payload
+        } else {
+          state.friendshipStatus = action.payload.friendshipStatus
+        }
 
         // state.friends.users = action.payload.users
         // state.friends.page = action.payload.page
@@ -193,9 +224,23 @@ const usersSlice = createSlice({
       })
       .addCase(cancelRequestFriendThunk.fulfilled, (state, action) => {
         state.loading = false
-        console.log("action.payload", action.payload)
-        state.sentFriendRequests = action.payload
-        console.log("state.sentFriendRequests", state.sentFriendRequests)
+        // console.log("action.payload", action.payload)
+
+        if (isUserTypeReq(action.payload)) {
+          // console.log("попало не туда")
+          // console.log("action.payload", action.payload)
+          // state.friends = action.payload
+          state.sentFriendRequests = action.payload
+        } else {
+          // console.log(
+          //   "action.payload.friendshipStatus****",
+          //   action.payload.friendshipStatus
+          // )
+
+          state.friendshipStatus = action.payload.friendshipStatus
+        }
+
+        // console.log("state.sentFriendRequests", state.sentFriendRequests)
         // state.sentFriendRequests.users = action.payload.users
         // state.sentFriendRequests.page = action.payload.page
         // state.sentFriendRequests.limit = action.payload.limit
@@ -219,6 +264,20 @@ const usersSlice = createSlice({
         state.sentFriendRequests.users = action.payload.sentFriendRequests
       })
       .addCase(getMyFriendsIdThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error =
+          action.error.message ||
+          "Ошибка при запрос на получении всех id friends"
+      })
+      .addCase(getUserStatusThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(getUserStatusThunk.fulfilled, (state, action) => {
+        state.loading = false
+        state.friendshipStatus = action.payload.friendshipStatus
+      })
+      .addCase(getUserStatusThunk.rejected, (state, action) => {
         state.loading = false
         state.error =
           action.error.message ||

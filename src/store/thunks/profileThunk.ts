@@ -49,6 +49,7 @@ export const getUserProfileThunk = createAsyncThunk<
     isSubscribed: boolean
     isOnline: boolean
     lastSeen: null | string
+    // friendshipStatus: "friend" | "incoming" | "outgoing" | "none"
   },
   string,
   { rejectValue: string }

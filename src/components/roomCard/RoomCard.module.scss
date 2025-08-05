@@ -55,15 +55,26 @@
     }
   }
   // }
-  .buttonBlock {
-    text-align: center;
-    padding: 10px;
-    // width: 100%;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    &:hover {
-      background-color: beige;
-      color: black;
+  .buttonContainer {
+    // text-align: center;
+
+    display: flex;
+    align-items: center;
+
+    .buttonBlock {
+      padding: 10px;
+      // width: 100%;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      &:hover {
+        background-color: beige;
+        color: black;
+      }
     }
     // display: flex;
     // justify-content: center;

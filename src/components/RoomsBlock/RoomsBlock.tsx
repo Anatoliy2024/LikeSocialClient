@@ -27,7 +27,7 @@ export default function RoomsBlock() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const pageFromUrl = Number(searchParams.get("page")) || 1
+  const pageFromUrl = Number(searchParams?.get("page")) || 1
   // const { posts, page, pages,loading } = useAppSelector((state) => state.roomPost)
 
   const handleCloseBlock = () => {
@@ -46,7 +46,7 @@ export default function RoomsBlock() {
   }, [isAuth, dispatch, pageFromUrl])
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set("page", String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })

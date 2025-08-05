@@ -86,27 +86,56 @@ export const userAPI = {
   getMyFriendsId() {
     return instance.get("user/myFriendsId").then((res) => res.data)
   },
-  requestFriend(userId: string, page: number, limit?: number) {
+  requestFriend(
+    userId: string,
+    page?: number,
+    profile?: string,
+    limit?: number
+  ) {
     return instance
-      .post("user/requestFriend", { userId }, { params: { page, limit } })
+      .post(
+        "user/requestFriend",
+        { userId },
+        { params: { page, limit, profile } }
+      )
       .then((res) => res.data)
   },
-  acceptFriend(userId: string, page: number, limit?: number) {
+  acceptFriend(
+    userId: string,
+    page?: number,
+    profile?: string,
+    limit?: number
+  ) {
     return instance
-      .post("user/acceptFriend", { userId }, { params: { page, limit } })
+      .post(
+        "user/acceptFriend",
+        { userId },
+        { params: { page, limit, profile } }
+      )
       .then((response) => response.data)
   },
-  delFriend(userId: string, page: number, limit?: number) {
+  delFriend(userId: string, page?: number, profile?: string, limit?: number) {
     return instance
-      .post("user/delFriend", { userId }, { params: { page, limit } })
+      .post("user/delFriend", { userId }, { params: { page, limit, profile } })
       .then((response) => response.data)
   },
-  cancelFriendRequest(userId: string, page: number, limit?: number) {
+  cancelFriendRequest(
+    userId: string,
+    page?: number,
+    profile?: string,
+    limit?: number
+  ) {
     return instance
-      .post("user/cancelFriendRequest", { userId }, { params: { page, limit } })
+      .post(
+        "user/cancelFriendRequest",
+        { userId },
+        { params: { page, limit, profile } }
+      )
       .then((response) => response.data)
   },
-
+  getUserStatus(userId: string) {
+    return instance.get(`user/getUserStatus/${userId}`).then((res) => res.data)
+  },
   getUserRelations(type: string, page: number, limit?: number) {
     return instance
       .get(`user/getUserRelations`, { params: { type, page, limit } })

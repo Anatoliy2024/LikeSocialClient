@@ -24,6 +24,14 @@ import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import { SubBlock } from "@/components/subBlock/SubBlock"
 import { formatData } from "@/utils/formatData"
 import { CreateUserMessageModal } from "@/components/createUserMessageModal/CreateUserMessageModal"
+import { UnSubButton } from "@/assets/icons/unSubButton"
+import { SubButton } from "@/assets/icons/subButton"
+// import { SendMessage } from "@/assets/icons/sendMessage"
+import { MessageText } from "@/assets/icons/messageText"
+import { StarButton } from "@/assets/icons/starButton"
+// import { Trash } from "@/assets/icons/trash"
+import { ButtonUserStatus } from "@/components/buttonUserStatus/ButtonUserStatus"
+import { getUserStatusThunk } from "@/store/thunks/usersThunk"
 // import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 type FormProfileInfo = {
@@ -54,6 +62,9 @@ const ProfileBlock = ({
   const profileLastSeen = useAppSelector(
     (state: RootState) => state.profile.lastSeen
   )
+  const friendshipStatus = useAppSelector(
+    (state: RootState) => state.users.friendshipStatus
+  )
 
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   // const playerId = useAppSelector((state: RootState) => state.auth.userId)
@@ -82,7 +93,10 @@ const ProfileBlock = ({
       if (isMyProfilePage) {
         dispatch(getMyProfileThunk())
       } else if (userId) {
-        dispatch(getUserProfileThunk(userId))
+        Promise.all([
+          dispatch(getUserProfileThunk(userId)),
+          dispatch(getUserStatusThunk(userId)),
+        ])
       }
     }
   }, [isMyProfilePage, userId, isAuth, dispatch])
@@ -161,6 +175,7 @@ const ProfileBlock = ({
   const handleCloseModalCreateMessage = () => {
     setShowModalCreateMessage(false)
   }
+
   return (
     <>
       {changeAvatarModal && (
@@ -396,35 +411,80 @@ const ProfileBlock = ({
                   {!profileData.isMyProfile && (
                     <Link
                       href={`/userMovie/${userId}`}
+                      className={style.button}
+                      title="Список желаемого"
+                      prefetch={false}
                       // className={style.linkWantToSee}
                     >
-                      <ButtonMenu>Список желаемого</ButtonMenu>
+                      <StarButton />
+                      {/* <ButtonMenu>Список желаемого</ButtonMenu> */}
                     </Link>
                   )}
                   {!isMyProfilePage && (
-                    <ButtonMenu onClick={handleShowModalCreateMessage}>
-                      Написать сообщение
-                    </ButtonMenu>
+                    <div
+                      className={style.button}
+                      onClick={handleShowModalCreateMessage}
+                    >
+                      <MessageText />
+                    </div>
+                    // <ButtonMenu >
+                    //   Написать сообщение
+                    // </ButtonMenu>
                   )}
 
                   {!isMyProfilePage &&
                     (profileData.isSubscribed ? (
-                      <ButtonMenu
+                      <div
+                        title="Отписаться"
                         onClick={() => {
                           if (userId) handleUnsubscribe(userId)
                         }}
+                        className={style.button}
                       >
-                        Отписаться
-                      </ButtonMenu>
+                        <UnSubButton />
+                      </div>
                     ) : (
-                      <ButtonMenu
+                      // <ButtonMenu
+                      //   onClick={() => {
+                      //     if (userId) handleUnsubscribe(userId)
+                      //   }}
+                      // >
+                      //   Отписаться
+                      // </ButtonMenu>
+                      <div
+                        title="Подписаться"
                         onClick={() => {
                           if (userId) handleSubscribe(userId)
                         }}
+                        className={style.button}
                       >
-                        Подписаться
-                      </ButtonMenu>
+                        <SubButton />
+                      </div>
+                      // <ButtonMenu
+                      //   onClick={() => {
+                      //     if (userId) handleSubscribe(userId)
+                      //   }}
+                      // >
+                      //   Подписаться
+                      // </ButtonMenu>
                     ))}
+                  {
+                    !isMyProfilePage && userId && friendshipStatus && (
+                      <ButtonUserStatus
+                        status={friendshipStatus}
+                        id={userId}
+                        profile="true"
+                        className={style.button}
+                      />
+                    )
+
+                    // friendshipStatus(profileData.friendshipStatus)
+                    // (
+                    //   <div className={style.subButton}>
+                    //     <Trash />
+                    //   </div>
+                    // )
+                  }
                 </div>
                 {profileData.subscriptions.length > 0 && (
                   <SubBlock

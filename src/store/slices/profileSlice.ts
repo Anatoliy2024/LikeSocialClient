@@ -26,6 +26,7 @@ export type profileState = {
   avatar: string
   avatarPublicId: string
   isSubscribed: boolean
+  // friendshipStatus: "friend" | "incoming" | "outgoing" | "none" | null
   subscriptions: UserType[] // на кого подписан
   subscribers: UserType[] // кто подписался
   isOnline?: boolean
@@ -50,6 +51,7 @@ const initialState: profileState = {
   subscriptions: [],
   subscribers: [],
   isSubscribed: false,
+  // friendshipStatus: null,
   isOnline: false,
   lastSeen: null,
 }
@@ -75,6 +77,7 @@ const profileSlice = createSlice({
       state.subscriptions = []
       state.subscribers = []
       state.isSubscribed = false
+      // state.friendshipStatus = null
       state.isOnline = false
       state.lastSeen = null
     },
@@ -130,6 +133,7 @@ const profileSlice = createSlice({
         state.avatar = action.payload.avatar
         state.avatarPublicId = action.payload.avatarPublicId
         state.isSubscribed = action.payload.isSubscribed
+        // state.friendshipStatus = action.payload.friendshipStatus
         state.isOnline = action.payload.isOnline
         state.lastSeen = action.payload.lastSeen
 

@@ -78,7 +78,7 @@ const FriendsList = ({ type, users, page, pages }: FriendsListProps) => {
   }
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set(pageType[type], String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })

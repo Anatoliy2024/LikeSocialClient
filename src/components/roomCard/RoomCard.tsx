@@ -79,13 +79,21 @@ export const RoomCard = ({
             </div> */}
           </div>
           <div
-            className={style.buttonBlock}
+            className={style.buttonContainer}
             onClick={() => {
               setConfirmOpen(true)
             }}
           >
-            {isOwner && !loading && <Trash />}
-            {!isOwner && !loading && <Exit />}
+            {isOwner && !loading && (
+              <div title="Удалить комнату" className={style.buttonBlock}>
+                <Trash />
+              </div>
+            )}
+            {!isOwner && !loading && (
+              <div title="Выйти из комнаты" className={style.buttonBlock}>
+                <Exit />
+              </div>
+            )}
             {loading && <Spinner />}
           </div>
         </div>

@@ -16,7 +16,7 @@ export function SearchBlock() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const urlPage = Number(searchParams.get("page")) || 1
+  const urlPage = Number(searchParams?.get("page")) || 1
   const { users, page, pages } = useAppSelector(
     (state: RootState) => state.users.users
   )
@@ -45,7 +45,7 @@ export function SearchBlock() {
   // console.log("users", users)
 
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set("page", String(newPage))
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
