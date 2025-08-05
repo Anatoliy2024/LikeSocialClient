@@ -55,7 +55,7 @@ const PostsBlock = ({
       throw new Error("Параметр id не найден")
     }
 
-    const id = params.id
+    const id = params?.id || null
 
     const isRoomPage = pathname?.includes("/room")
     const isProfilePage = pathname?.includes("/profile")
