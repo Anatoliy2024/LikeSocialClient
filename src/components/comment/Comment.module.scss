@@ -3,6 +3,9 @@
   gap: 20px;
   align-items: center;
   justify-content: space-between;
+  @media (max-width: 600px) {
+    gap: 10px;
+  }
   .userInfoBlock {
     display: flex;
     gap: 10px;
@@ -31,17 +34,29 @@
         justify-content: center;
       }
       .blockName {
+        @media (max-width: 600px) {
+          display: none;
+        }
       }
     }
     // width: 150px;
   }
-
-  .blockContent {
-    // word-break: break-all;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    word-break: normal;
-  }
-  .blockData {
+  .commentContentBlock {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    .blockContent {
+      // word-break: break-all;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: normal;
+    }
+    .blockData {
+      // justify-self: end;
+      font-size: 13px;
+      margin-left: auto;
+    }
   }
 }

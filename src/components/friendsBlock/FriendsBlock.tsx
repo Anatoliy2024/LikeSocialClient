@@ -35,9 +35,9 @@ export function FriendsBlock() {
     pages: sentRequestsPages,
   } = useAppSelector((state: RootState) => state.users.sentFriendRequests)
 
-  const friendsPageFromUrl = Number(searchParams.get("friendsPage")) || 1
-  const requestsPageFromUrl = Number(searchParams.get("requestsPage")) || 1
-  const sentPageFromUrl = Number(searchParams.get("sentPage")) || 1
+  const friendsPageFromUrl = Number(searchParams?.get("friendsPage")) || 1
+  const requestsPageFromUrl = Number(searchParams?.get("requestsPage")) || 1
+  const sentPageFromUrl = Number(searchParams?.get("sentPage")) || 1
 
   //   const handlePageChange = (newPage: number) => {
   //     const params = new URLSearchParams(searchParams.toString())

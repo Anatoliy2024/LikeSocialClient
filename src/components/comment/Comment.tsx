@@ -1,10 +1,11 @@
-import { formatData } from "@/utils/formatData"
+// import { formatData } from "@/utils/formatData"
 // import Image from "next/image"
 import style from "./Comment.module.scss"
 import { userCommentType } from "@/store/slices/roomPostsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 // import Link from "next/link"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
+import { formatMessageTime } from "@/utils/formatMessageTime"
 export const Comment = ({
   data,
   playerId,
@@ -45,11 +46,12 @@ export const Comment = ({
             <div className={style.blockName}>{username}</div>
           </div>
         </Link> */}
-
-        <div className={style.blockContent}>{text}</div>
       </div>
-
-      <div className={style.blockData}>{formatData(createdAt)}</div>
+      <div className={style.commentContentBlock}>
+        {" "}
+        <div className={style.blockContent}>{text}</div>
+        <div className={style.blockData}>{formatMessageTime(createdAt)}</div>
+      </div>
     </div>
   )
 }
