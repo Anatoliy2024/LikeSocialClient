@@ -24,6 +24,7 @@ import { setRoomPage } from "@/store/slices/roomPostsSlice"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { RootState } from "@/store/store"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
+import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
 
 const Room = () => {
   const [addFriendsToRoom, setAddFriendsToRoom] = useState(false)
@@ -46,13 +47,15 @@ const Room = () => {
   // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)
   // const members = useAppSelector((state: RootState) => state.rooms.members)
   // const owner = useAppSelector((state: RootState) => state.rooms.owner)
-  const loading = useAppSelector((state) => state.rooms.loading)
+  // const loading = useAppSelector((state) => state.rooms.loading)
   const {
     users: friends,
     page: friendsPage,
     pages: friendsPages,
   } = useAppSelector((state) => state.users.friends)
-  const { posts, page, pages } = useAppSelector((state) => state.roomPost)
+  const { posts, page, pages, loading } = useAppSelector(
+    (state) => state.roomPost
+  )
   const dispatch = useAppDispatch()
   const params = useParams<{ id: string }>()
 
@@ -213,8 +216,8 @@ const Room = () => {
         {isOwner && (
           <div>
             <ButtonMenu
-              disabled={loading}
-              loading={loading}
+              // disabled={loading}
+              // loading={loading}
               onClick={handleAddMembersFromRoom}
             >
               Добавить участника
@@ -234,6 +237,7 @@ const Room = () => {
           isOwner={isOwner}
         />
       </Suspense>
+      {loading && <SpinnerWindow />}
     </>
   )
 }

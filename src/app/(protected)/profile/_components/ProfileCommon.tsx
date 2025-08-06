@@ -12,6 +12,7 @@ import {
 } from "@/store/thunks/userPostThunk"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { setUserPage } from "@/store/slices/userPostsSlice"
+import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
 
 type Props =
   | { isMyProfilePage: true; userId?: never }
@@ -80,6 +81,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
           loading={loading}
         />
       </Suspense>
+      {loading && <SpinnerWindow />}
     </div>
   )
 }

@@ -151,10 +151,10 @@ const PostsBlock = ({
                     }
                     const isMyPost =
                       post.authorId._id === userId || isOwner || false
-                    console.log("isMyPost", isMyPost)
-                    console.log(" post.authorId._id", post.authorId._id)
-                    console.log("userId", userId)
-                    console.log("isOwner", isOwner)
+                    // console.log("isMyPost", isMyPost)
+                    // console.log(" post.authorId._id", post.authorId._id)
+                    // console.log("userId", userId)
+                    // console.log("isOwner", isOwner)
                     return (
                       <Post
                         key={post._id}

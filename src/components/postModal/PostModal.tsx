@@ -147,7 +147,7 @@ const PostModal = ({
         },
       }
       const res = await voiceAPI.createVoice(dataToSend)
-      console.log("res.voices", res)
+      // console.log("res.voices", res)
       setVotes(res.votes)
       setIsEditing(false)
       // if (roomId) {
@@ -156,14 +156,14 @@ const PostModal = ({
       //   dispatch(createVoiceThunk(dataToSend)).unwrap()
       // }
       // тут вызови свой голосующий thunk
-      console.log("Отправка голосования:", dataToSend)
+      // console.log("Отправка голосования:", dataToSend)
       reset() // очистка формы
     } catch (err) {
       console.error("Ошибка при голосовании:", err)
     }
   }
-  console.log("playerId", playerId)
-  console.log("authorId", authorId)
+  // console.log("playerId", playerId)
+  // console.log("authorId", authorId)
 
   // const handleChangeAvatarPost=()=>{
   //   if(playerId ===authorId){
