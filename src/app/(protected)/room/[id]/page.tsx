@@ -38,7 +38,7 @@ const Room = () => {
     Number(searchParams?.get("pageUserFriends")) || 1
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
-  console.log("userId", userId)
+  // console.log("userId", userId)
   const room = useAppSelector((state: RootState) => state.rooms.room)
   // const members = useAppSelector((state: RootState) => state.rooms.room?.members)
 
@@ -116,7 +116,7 @@ const Room = () => {
     }
   }, [addFriendsToRoom, dispatch, pageUserFriendsFromUrl])
 
-  console.log("owner", room?.owner)
+  // console.log("owner", room?.owner)
   if (typeof id !== "string") return <div>Неверный ID</div>
   if (!userId) return <div>Юзер не найден</div>
 

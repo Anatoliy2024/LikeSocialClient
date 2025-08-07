@@ -55,7 +55,7 @@ const PostModal = ({
   onClose: () => void
   playerId: string
 }) => {
-  console.log("post", post)
+  // console.log("post", post)
   const [loading, setLoading] = useState(false)
   const dispatch = useAppDispatch()
   // const loading = useAppSelector(
@@ -66,13 +66,13 @@ const PostModal = ({
   const [isEditing, setIsEditing] = useState(false)
   // const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const myVoice = votes.find((v) => v.userId._id === playerId)
-  console.log("votes***", votes)
+  // console.log("votes***", votes)
   useEffect(() => {
     const fetchVoices = async () => {
       try {
         const res = await voiceAPI.getVoice(post._id)
         // console.log("res.data", res)
-        console.log("res.voices", res.voices)
+        // console.log("res.voices", res.voices)
 
         setVotes(res.votes)
       } catch (err) {
@@ -150,61 +150,13 @@ const PostModal = ({
       // console.log("res.voices", res)
       setVotes(res.votes)
       setIsEditing(false)
-      // if (roomId) {
-      //   dispatch(createRoomVoiceThunk(dataToSend)).unwrap()
-      // } else {
-      //   dispatch(createVoiceThunk(dataToSend)).unwrap()
-      // }
-      // тут вызови свой голосующий thunk
-      // console.log("Отправка голосования:", dataToSend)
+
       reset() // очистка формы
     } catch (err) {
       console.error("Ошибка при голосовании:", err)
     }
   }
-  // console.log("playerId", playerId)
-  // console.log("authorId", authorId)
 
-  // const handleChangeAvatarPost=()=>{
-  //   if(playerId ===authorId){
-  //     if (roomId) {
-  //       uploadRoomPostAvatarThunk()
-  //       //диспатч рум
-
-  //     }
-  //     else{}
-  //   }
-  // }
-
-  // const handleCloseModal = () => {
-  //   setChangeAvatarModal(false)
-  // }
-  // const handleOpenModal = () => {
-  //   if (playerId === authorId._id) {
-  //     setChangeAvatarModal(true)
-  //   }
-  // }
-
-  // const handleAvatarPostUpload = async (
-  //   file: File,
-  //   context?: { postId?: string; roomId?: string }
-  // ) => {
-  //   try {
-  //     if (!context?.postId) return
-  //     if (context.roomId) {
-  //       await dispatch(
-  //         uploadRoomPostAvatarThunk({ file, postId: context.postId })
-  //       ).unwrap()
-  //     } else {
-  //       await dispatch(
-  //         uploadUserPostAvatarThunk({ file, postId: context.postId })
-  //       ).unwrap()
-  //     }
-  //     handleCloseModal()
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
   const showEditPost = () => {
     setEditPost(true)
   }
@@ -227,17 +179,9 @@ const PostModal = ({
       _id: post._id || "",
     }
   }
-  console.log("post", post)
+  // console.log("post", post)
   return (
     <>
-      {/* {changeAvatarModal && (
-        <ChangeAvatarModal
-          handleCloseModal={handleCloseModal}
-          loading={loading}
-          onUpload={handleAvatarPostUpload}
-          context={{ roomId, postId }}
-        />
-      )} */}
       {authorId._id === playerId && editPost && (
         <PostForm
           isProfile={!roomId}
