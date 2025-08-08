@@ -25,6 +25,7 @@ import { ArrowBack } from "@/assets/icons/arrowBack"
 import { SendMessage } from "@/assets/icons/sendMessage"
 import { useHideOnScroll } from "@/hooks/useHideOnScroll"
 import { formatData } from "@/utils/formatData"
+// import SpinnerWindow from "../ui/spinner/SpinnerWindow"
 
 export const MessageBlock = () => {
   const [textMessage, setTextMessage] = useState("")
@@ -193,87 +194,92 @@ export const MessageBlock = () => {
   }
 
   return (
-    <div className={style.container}>
-      <div
-        className={`${style.userInfo}
+    <>
+      {/* {loading && <SpinnerWindow />} */}
+      <div className={style.container}>
+        <div
+          className={`${style.userInfo}
           ${!optionHeaderMessage ? style.moveHeaderMessage : ""}`}
-      >
-        <Link href={"/dialogs/"} className={style.buttonBackBlock}>
-          <ArrowBack />
-        </Link>
-        <ProfileLink userId={recipientId._id} currentUserId={userId}>
-          <div className={style.userImgOnlineBlock}>
-            <div className={style.blockImg}>
-              <CloudinaryImage
-                src={recipientId.avatar}
-                alt="avatar"
-                width={200}
-                height={200}
-              />
+        >
+          <Link href={"/dialogs/"} className={style.buttonBackBlock}>
+            <ArrowBack />
+          </Link>
+          <ProfileLink userId={recipientId._id} currentUserId={userId}>
+            <div className={style.userImgOnlineBlock}>
+              <div className={style.blockImg}>
+                <CloudinaryImage
+                  src={recipientId.avatar}
+                  alt="avatar"
+                  width={200}
+                  height={200}
+                />
+              </div>
+              {usersOnline[recipientId._id]?.isOnline && (
+                <div className={style.onlineBlock}></div>
+              )}
             </div>
-            {usersOnline[recipientId._id]?.isOnline && (
-              <div className={style.onlineBlock}></div>
+          </ProfileLink>
+          <div>
+            <div>{recipientId.username}</div>
+
+            {!status.isOnline && status.lastSeen && (
+              <div className={style.lastSeen}>
+                <span>был(а):</span> <span>{formatData(status.lastSeen)}</span>
+              </div>
             )}
           </div>
-        </ProfileLink>
-        <div>
-          <div>{recipientId.username}</div>
+        </div>
 
-          {!status.isOnline && status.lastSeen && (
-            <div className={style.lastSeen}>
-              <span>был(а):</span> <span>{formatData(status.lastSeen)}</span>
+        {/* <h2>dialog</h2> */}
+        <div className={style.contentMessageBlock}>
+          {messages.length > 0 && (
+            <div className={style.messagesList}>
+              {messages.map((message, i) => {
+                const isLast = i === messages.length - 1
+                return (
+                  <div
+                    key={message._id}
+                    className={`${style.messageList} ${
+                      message.senderId._id !== userId
+                        ? style.recipient
+                        : style.me
+                    }`}
+                    ref={isLast ? lastMessageRef : null}
+                  >
+                    <div>{message.text}</div>
+                    <div>{formatMessageTime(message.createdAt)}</div>
+                  </div>
+                )
+              })}
+              {loading && <Spinner />}
             </div>
           )}
-        </div>
-      </div>
 
-      {/* <h2>dialog</h2> */}
-      <div className={style.contentMessageBlock}>
-        {messages.length > 0 && (
-          <div className={style.messagesList}>
-            {messages.map((message, i) => {
-              const isLast = i === messages.length - 1
-              return (
-                <div
-                  key={message._id}
-                  className={`${style.messageList} ${
-                    message.senderId._id !== userId ? style.recipient : style.me
-                  }`}
-                  ref={isLast ? lastMessageRef : null}
-                >
-                  <div>{message.text}</div>
-                  <div>{formatMessageTime(message.createdAt)}</div>
-                </div>
-              )
-            })}
-            {loading && <Spinner />}
-          </div>
-        )}
-
-        {/* <div ref={messagesEndRef} /> */}
-      </div>
-      <div
-        className={`${style.newMessageBlock} ${
-          !optionHeaderMessage ? style.moveHeaderMessage : ""
-        }`}
-      >
-        <div className={style.newMessageBlockInput}>
-          <input
-            type="text"
-            placeholder="Сообщение"
-            onChange={(e) => setTextMessage(e.target.value)}
-            value={textMessage}
-            onKeyDown={handleKeyDown}
-          />
+          {/* <div ref={messagesEndRef} /> */}
         </div>
         <div
-          onClick={handleSendMessage}
-          title="Отправить сообщение"
-          className={style.newMessageButtonBlock}
+          className={`${style.newMessageBlock} ${
+            !optionHeaderMessage ? style.moveHeaderMessage : ""
+          }`}
         >
-          <SendMessage />
+          <div className={style.newMessageBlockInput}>
+            <input
+              type="text"
+              placeholder="Сообщение"
+              onChange={(e) => setTextMessage(e.target.value)}
+              value={textMessage}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+          <div
+            onClick={handleSendMessage}
+            title="Отправить сообщение"
+            className={style.newMessageButtonBlock}
+          >
+            <SendMessage />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

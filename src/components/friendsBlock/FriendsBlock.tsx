@@ -8,6 +8,7 @@ import Link from "next/link"
 import { useEffect } from "react"
 import style from "./FriendsBlock.module.scss"
 import { useSearchParams } from "next/navigation"
+import SpinnerWindow from "../ui/spinner/SpinnerWindow"
 
 export function FriendsBlock() {
   // const router = useRouter()
@@ -20,6 +21,7 @@ export function FriendsBlock() {
     // total: friendRequestsTotal,
     pages: friendRequestsPages,
   } = useAppSelector((state: RootState) => state.users.friendRequests)
+  const loading = useAppSelector((state: RootState) => state.users.loading)
 
   const {
     users: friendsUsers,
@@ -39,15 +41,6 @@ export function FriendsBlock() {
   const requestsPageFromUrl = Number(searchParams?.get("requestsPage")) || 1
   const sentPageFromUrl = Number(searchParams?.get("sentPage")) || 1
 
-  //   const handlePageChange = (newPage: number) => {
-  //     const params = new URLSearchParams(searchParams.toString())
-  //     params.set("page", String(newPage))
-
-  //     router.push(`${pathname}?${params.toString()}`, { scroll: false })
-
-  //     // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
-  //   }
-  // const users = useAppSelector((state: RootState) => state.users.users)
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const dispatch = useAppDispatch()
   useEffect(() => {
@@ -68,55 +61,44 @@ export function FriendsBlock() {
     sentPageFromUrl,
   ])
 
-  // const handlePageChange = (newPage: number,type:string) => {
-  //   const pageType = {
-  //     friendRequests: "friendsPage",
-  //     friends: "requestsPage",
-  //     sentFriendRequests: "sentPage",
-  //   }
-  //   const params = new URLSearchParams(searchParams.toString())
-  //   params.set(pageType[type], String(newPage))
-
-  //   router.push(`${pathname}?${params.toString()}`, { scroll: false })
-
-  //   // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
-  // }
-
   return (
-    <div className={style.wrapper}>
-      <Link href="/friends/search">
-        <div className={style.buttonBlock}>
-          <ButtonMenu>Поиск друзей</ButtonMenu>
-        </div>
-      </Link>
-      <FriendsList
-        type={"friendRequests"}
-        users={friendRequestsUsers}
-        page={friendRequestsPage}
-        pages={friendRequestsPages}
-        // handlePageChange={handlePageChange}
-        // urlPage={requestsPageFromUrl}
-      />
-      <FriendsList
-        type={"friends"}
-        users={friendsUsers}
-        page={friendsPage}
-        pages={friendsPages}
-        // handlePageChange={handlePageChange}
+    <>
+      {loading && <SpinnerWindow />}
+      <div className={style.wrapper}>
+        <Link href="/friends/search">
+          <div className={style.buttonBlock}>
+            <ButtonMenu>Поиск друзей</ButtonMenu>
+          </div>
+        </Link>
+        <FriendsList
+          type={"friendRequests"}
+          users={friendRequestsUsers}
+          page={friendRequestsPage}
+          pages={friendRequestsPages}
+          // handlePageChange={handlePageChange}
+          // urlPage={requestsPageFromUrl}
+        />
+        <FriendsList
+          type={"friends"}
+          users={friendsUsers}
+          page={friendsPage}
+          pages={friendsPages}
+          // handlePageChange={handlePageChange}
 
-        // urlPage={friendsPageFromUrl}
-      />
-      <FriendsList
-        type={"sentFriendRequests"}
-        users={sentFriendRequestsUsers}
-        page={sentRequestsPage}
-        pages={sentRequestsPages}
-        // handlePageChange={handlePageChange}
+          // urlPage={friendsPageFromUrl}
+        />
+        <FriendsList
+          type={"sentFriendRequests"}
+          users={sentFriendRequestsUsers}
+          page={sentRequestsPage}
+          pages={sentRequestsPages}
+          // handlePageChange={handlePageChange}
 
-        // urlPage={sentPageFromUrl}
-      />
-      {/* Friends <FriendsList type={"sentFriendRequests"}/> */}
-      {/* <FriendsList/> */}
-    </div>
+          // urlPage={sentPageFromUrl}
+        />
+        {/* Friends <FriendsList type={"sentFriendRequests"}/> */}
+        {/* <FriendsList/> */}
+      </div>
+    </>
   )
 }

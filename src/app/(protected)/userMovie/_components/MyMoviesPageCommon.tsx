@@ -20,6 +20,7 @@ import CreateMovieWantToSee from "../CreateMovieWantToSee/CreateMovieWantToSee"
 import { ModalUserMovie } from "../modalUserMovie/modalUserMovie"
 import UserMovieList from "@/components/userMovieList/UserMovieList"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
 
 type Props =
   | { myMoviesPage: true; userId?: never }
@@ -194,6 +195,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
 
   return (
     <>
+      {loading && <SpinnerWindow />}
       {showModalUserMovie && selectedMovie && (
         <ModalUserMovie
           handleCloseModalUserMovie={handleCloseModalUserMovie}

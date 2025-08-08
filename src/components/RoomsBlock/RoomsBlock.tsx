@@ -14,10 +14,11 @@ import { AddRoomBlock } from "@/components/addRoomBlock/AddRoomBlock"
 import { RoomCard } from "@/components/roomCard/RoomCard"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Paginator } from "@/components/Paginator/Paginator"
+import SpinnerWindow from "../ui/spinner/SpinnerWindow"
 
 export default function RoomsBlock() {
   const [showAddBlock, setShowAddBlock] = useState(false)
-  const { rooms, pages, page } = useAppSelector(
+  const { rooms, pages, page, loading } = useAppSelector(
     (state: RootState) => state.rooms
   )
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
@@ -53,42 +54,49 @@ export default function RoomsBlock() {
 
     // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
   }
-  console.log("rooms", rooms)
+  // console.log("rooms", rooms)
   return (
-    <div className={style.wrapper}>
-      {/* <input
+    <>
+      <div className={style.wrapper}>
+        {/* <input
         type="text"
         onChange={(e) => setName(e.target.value)}
         value={name}
       /> */}
-      {showAddBlock && <AddRoomBlock handleCloseBlock={handleCloseBlock} />}
-      <div className={style.buttonBlock}>
-        <ButtonMenu
-          onClick={() => {
-            setShowAddBlock(true)
-            // dispatch(createRoomThunk(name))
-          }}
-        >
-          создать комнату
-        </ButtonMenu>
-      </div>
-      {pages > 1 && (
-        <Paginator pages={pages} onPageChange={handlePageChange} page={page} />
-      )}
+        {showAddBlock && <AddRoomBlock handleCloseBlock={handleCloseBlock} />}
+        {loading && <SpinnerWindow />}
+        <div className={style.buttonBlock}>
+          <ButtonMenu
+            onClick={() => {
+              setShowAddBlock(true)
+              // dispatch(createRoomThunk(name))
+            }}
+          >
+            создать комнату
+          </ButtonMenu>
+        </div>
+        {pages > 1 && (
+          <Paginator
+            pages={pages}
+            onPageChange={handlePageChange}
+            page={page}
+          />
+        )}
 
-      <div className={style.containerRooms}>
-        {rooms.length > 0
-          ? rooms.map((room) => (
-              <RoomCard
-                key={room._id}
-                data={room}
-                userId={userId as string}
-                delRoom={delRoom}
-                leaveRoom={leaveRoom}
-              />
-            ))
-          : "Нет комнат"}
+        <div className={style.containerRooms}>
+          {rooms.length > 0
+            ? rooms.map((room) => (
+                <RoomCard
+                  key={room._id}
+                  data={room}
+                  userId={userId as string}
+                  delRoom={delRoom}
+                  leaveRoom={leaveRoom}
+                />
+              ))
+            : "Нет комнат"}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
