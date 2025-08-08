@@ -14,7 +14,7 @@ import {
   updateRoomPostThunk,
 } from "@/store/thunks/roomPostThunk"
 import { RootState } from "@/store/store"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { compressImage } from "@/utils/compressImage"
 
@@ -63,20 +63,6 @@ const PostForm = ({
   const handleSave = async (dataForm: FormCreatePost) => {
     console.log("dataForm", dataForm)
     try {
-      // const dataToSend = {
-      //   title: dataForm.title,
-      //   content: dataForm.content,
-      //   roomId: roomId ? roomId : undefined,
-      //   ratings: {
-      //     stars: dataForm.stars,
-      //     acting: dataForm.acting,
-      //     specialEffects: dataForm.specialEffects,
-      //     story: dataForm.story,
-      //   },
-      //   genres: dataForm.genres ? [...dataForm.genres] : [],
-      //   avatarFile: dataForm?.avatarFile?.[0] ? dataForm.avatarFile[0] : null,
-      // }
-
       const formData = new FormData()
 
       formData.append("title", dataForm.title)
@@ -130,21 +116,7 @@ const PostForm = ({
           // setIsLoadingLocal(false)
         }
       }
-      // console.log(
-      //   "JSON.stringify(formData) === JSON.stringify(initialData)",
-      //   JSON.stringify(formData) === JSON.stringify(initialData)
-      // )
-      // if (JSON.stringify(formData) === JSON.stringify(initialData)) {
-      //   return hiddenBlock()
-      // }
-      // if (editMode && initialData?.id) {
-      //   dispatch(updatePostThunk({ id: initialData.id, formData }))
-      // } else {
-      //   dispatch(createRoomPostThunk(formData))
-      // }
-      console.log("editMode", editMode)
-      console.log("isProfile", isProfile)
-      console.log("roomId", !roomId)
+
       if (isProfile) {
         if (!editMode) {
           dispatch(createUserPostThunk(formData))
@@ -202,6 +174,19 @@ const PostForm = ({
   useEffect(() => {
     console.log("Ошибки валидации формы:", errors)
   }, [errors])
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const handleInput = () => {
+    const el = textareaRef.current
+    if (el) {
+      el.style.height = "auto"
+      el.style.height = el.scrollHeight + "px"
+    }
+  }
+  useEffect(() => {
+    handleInput()
+  }, [watch("content")])
 
   return (
     <div
@@ -308,9 +293,15 @@ const PostForm = ({
           <div className={style.textareaBlock}>
             <label htmlFor="content">Описание:</label>
             <textarea
-              id="content"
+              // id="content"
               {...register("content")}
               placeholder={"Введите описание"}
+              // ref={textareaRef}
+              ref={(e) => {
+                register("content").ref(e) // связываем с react-hook-form
+                textareaRef.current = e // сохраняем в свой ref
+              }}
+              onInput={handleInput}
             />
             {errors.content && <p>{errors.content?.message as string}</p>}
             {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
