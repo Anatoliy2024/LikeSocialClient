@@ -86,8 +86,8 @@ const PostModal = ({
   const {
     genres,
     title,
-
-    avatar,
+    imageId,
+    // avatar,
     ratings,
     comments,
     content,
@@ -95,6 +95,7 @@ const PostModal = ({
     _id: postId,
     authorId,
   } = post
+
   const authorName = post.authorId.username
   const [comment, setComment] = useState("")
   const [editPost, setEditPost] = useState(false)
@@ -175,7 +176,7 @@ const PostModal = ({
       specialEffects: post.ratings?.specialEffects || 0,
       story: post.ratings?.story || 0,
       avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
-      avatar: post.avatar || "",
+      avatar: post.imageId?.url || "",
       _id: post._id || "",
     }
   }
@@ -221,7 +222,7 @@ const PostModal = ({
             <div className={style.imageStarsBlock}>
               <div className={style.blockImg}>
                 <CloudinaryImage
-                  src={avatar}
+                  src={imageId?.url || "/images/monkey.jpg"}
                   alt="avatar"
                   width={800}
                   height={800}

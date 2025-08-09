@@ -20,12 +20,19 @@ export type authorIdType = {
   avatar: string
   _id: string
 }
+export type imageIdType = {
+  _id: string
+  url: string
+  publicId: string
+}
 
 export type roomPostType = {
   _id: string
   authorId: authorIdType
   avatar: string
   avatarPublicId: string
+  imageId: imageIdType | null
+
   // roomId: string | null
   title: string
   content: string | null

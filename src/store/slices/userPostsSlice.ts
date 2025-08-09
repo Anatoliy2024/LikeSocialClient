@@ -21,6 +21,11 @@ export type authorIdType = {
   avatar: string
   _id: string
 }
+export type imageIdType = {
+  _id: string
+  url: string
+  publicId: string
+}
 
 export type userPostType = {
   _id: string
@@ -40,6 +45,8 @@ export type userPostType = {
   authorName?: string
   avatar: string
   avatarPublicId: string
+  imageId: imageIdType | null
+  // avatarPublicId: string
 }
 
 type userCommentType = {

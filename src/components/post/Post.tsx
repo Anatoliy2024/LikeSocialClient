@@ -21,7 +21,7 @@ type PostType = {
   title: string
   content: string | null
   authorName: string | null
-  avatar: string
+  avatar: string | undefined | null
   // avatarPublicId: string
   ratings: {
     acting: number
@@ -151,21 +151,12 @@ const Post = ({
             
           </div> */}
           <div className={style.blockImg}>
-            {avatar && (
-              <CloudinaryImage
-                src={avatar}
-                alt="postImage"
-                width={800}
-                height={800}
-              />
-              // <Image
-              //   src={avatar}
-              //   alt="postImage"
-              //   width={200}
-              //   height={200}
-              //   priority
-              // />
-            )}
+            <CloudinaryImage
+              src={avatar || "/images/monkey.jpg"}
+              alt="postImage"
+              width={800}
+              height={800}
+            />
 
             {/* <Image src={imagePost} alt="postImage" width={200} height={200} /> */}
           </div>
