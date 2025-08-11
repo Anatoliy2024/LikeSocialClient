@@ -41,7 +41,7 @@ export const ModalUserMovie = ({
   // const dispatch = useAppDispatch()
 
   const loading = useAppSelector((state: RootState) => state.userMovies.loading)
-
+  console.log("loading", loading)
   // const handleCloseModal = () => {
   //   setChangeAvatarModal(false)
   // }
