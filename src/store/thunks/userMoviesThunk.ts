@@ -7,6 +7,10 @@ export type createUserMovieType = {
   title: string
   content: string
   genres: string[]
+  avatarFile: FileList | null
+  avatar?: string
+  _id?: string
+  // imagePost?: string
 }
 // type userMovie = {
 //   _id: string
@@ -35,7 +39,8 @@ export const createUserMovieThunk = createAsyncThunk<
   // Тип данных, которые возвращает thunk (например, массив фильмов)
   UserMovieResponseType,
   // Тип параметра, который передаётся в thunk
-  createUserMovieType,
+  // createUserMovieType,
+  FormData,
   // Типы для thunkAPI (опционально)
   { rejectValue: string }
 >("userMovie/create", async (dataMovie, thunkAPI) => {
@@ -53,6 +58,32 @@ export const createUserMovieThunk = createAsyncThunk<
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue(
       "Ошибка при создании поста в createUserMovieThunk"
+    )
+  }
+})
+export const updateUserMovieThunk = createAsyncThunk<
+  // Тип данных, которые возвращает thunk (например, массив фильмов)
+  UserMovieResponseType,
+  // Тип параметра, который передаётся в thunk
+  // createUserMovieType,
+  { dataMovie: FormData; userMovieId: string },
+  // Типы для thunkAPI (опционально)
+  { rejectValue: string }
+>("userMovie/update", async ({ dataMovie, userMovieId }, thunkAPI) => {
+  try {
+    const response = await userMovieAPI.updateUserMovie(dataMovie, userMovieId)
+    // В ответе ожидаем список всех своих фильмов
+
+    return response
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue(
+      "Ошибка при изменении поста в createUserMovieThunk"
     )
   }
 })

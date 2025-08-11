@@ -1,7 +1,7 @@
 import instance from "./instance"
 
 import { ProfileType } from "@/store/thunks/profileThunk"
-import { createUserMovieType } from "@/store/thunks/userMoviesThunk"
+// import { createUserMovieType } from "@/store/thunks/userMoviesThunk"
 
 export const authAPI = {
   register(
@@ -312,9 +312,12 @@ export const fileAPI = {
   },
 }
 export const userMovieAPI = {
-  createUserMovie(data: createUserMovieType) {
+  createUserMovie(data: FormData) {
+    return instance.post("user-movie/create", data).then((res) => res.data)
+  },
+  updateUserMovie(data: FormData, userMovieId: string) {
     return instance
-      .post("user-movie/create-user-movie", data)
+      .put(`user-movie/update/${userMovieId}`, data)
       .then((res) => res.data)
   },
 

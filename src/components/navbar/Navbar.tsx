@@ -63,9 +63,9 @@ export default function Navbar({
       <Link href="/friends" onClick={handleLinkClick} prefetch={false}>
         <div>Friends</div>
       </Link>
-      <Link href="/userMovie" onClick={handleLinkClick} prefetch={false}>
-        <div>Want To See</div>
-      </Link>
+      {/* <Link href="/userMovie" onClick={handleLinkClick} prefetch={false}> */}
+      <div>Want To See</div>
+      {/* </Link> */}
 
       {showScrollTop && (
         <button onClick={scrollToTop} className={style.scrollTopBtn}>

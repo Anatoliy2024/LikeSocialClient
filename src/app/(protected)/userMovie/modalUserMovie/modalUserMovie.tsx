@@ -7,42 +7,50 @@ import { translatorGenres } from "@/utils/translatorGenres"
 import { useEffect, useState } from "react"
 import CloseButton from "@/components/ui/closeButton/CloseButton"
 import {
+  createUserMovieType,
   deleteUserMovieThunk,
   toggleUserMovieStatusThunk,
-  uploadUserMovieAvatarThunk,
+  // uploadUserMovieAvatarThunk,
 } from "@/store/thunks/userMoviesThunk"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
-import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
+// import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
+import FormMovieWantToSee from "../FormMovieWantToSee/FormMovieWantToSee"
+import { Edit } from "@/assets/icons/edit"
 export const ModalUserMovie = ({
   handleCloseModalUserMovie,
   selectedMovie,
   myMoviesPage,
-  setSelectedMovie,
+  // setSelectedMovie,
   page,
-}: {
+}: // closeFormMovieWantToSee,
+{
   handleCloseModalUserMovie: () => void
+  closeFormMovieWantToSee: () => void
+
   selectedMovie: UserMovieType
   myMoviesPage: boolean
   setSelectedMovie: (movie: UserMovieType) => void
   page: number
 }) => {
   const dispatch = useAppDispatch()
-  const [changeAvatarModal, setChangeAvatarModal] = useState(false)
+  const [editPost, setEditPost] = useState(false)
+
+  // const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   // const dispatch = useAppDispatch()
 
   const loading = useAppSelector((state: RootState) => state.userMovies.loading)
 
-  const handleCloseModal = () => {
-    setChangeAvatarModal(false)
-  }
-  const handleOpenModal = () => {
-    console.log("myMoviesPage", myMoviesPage)
-    if (myMoviesPage) {
-      setChangeAvatarModal(true)
-    }
-  }
+  // const handleCloseModal = () => {
+  //   setChangeAvatarModal(false)
+  // }
+  // const handleOpenModal = () => {
+  //   console.log("myMoviesPage", myMoviesPage)
+  //   if (myMoviesPage) {
+  //     setChangeAvatarModal(true)
+  //   }
+  // }
   // const { myMovies, publicMovies, loading, error } = useAppSelector(
   //    (state: RootState) => state.userMovies
   //  )
@@ -79,28 +87,34 @@ export const ModalUserMovie = ({
       console.log(error)
     }
   }
-
-  const handleAvatarPostUpload = async (
-    file: File,
-    context?: { userMovieId?: string; status?: string }
-  ) => {
-    try {
-      if (!context?.userMovieId || !context.status) return
-
-      const updatedMovie = await dispatch(
-        uploadUserMovieAvatarThunk({
-          file,
-          userMovieId: context.userMovieId,
-          status: context.status,
-        })
-      ).unwrap()
-      setSelectedMovie(updatedMovie.userMovie)
-
-      handleCloseModal()
-    } catch (error) {
-      console.log(error)
-    }
+  const showEditPost = () => {
+    setEditPost(true)
   }
+  const closeEditPost = () => {
+    setEditPost(false)
+  }
+
+  // const handleAvatarPostUpload = async (
+  //   file: File,
+  //   context?: { userMovieId?: string; status?: string }
+  // ) => {
+  //   try {
+  //     if (!context?.userMovieId || !context.status) return
+
+  //     const updatedMovie = await dispatch(
+  //       uploadUserMovieAvatarThunk({
+  //         file,
+  //         userMovieId: context.userMovieId,
+  //         status: context.status,
+  //       })
+  //     ).unwrap()
+  //     setSelectedMovie(updatedMovie.userMovie)
+
+  //     handleCloseModal()
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   useEffect(() => {
     // при монтировании — запрещаем прокрутку
@@ -111,9 +125,26 @@ export const ModalUserMovie = ({
       document.body.style.overflow = ""
     }
   }, [])
+
+  function adaptPostToForm(post: UserMovieType): createUserMovieType {
+    return {
+      title: post.title || "",
+      content: post.content || "",
+      // roomId: post.roomId || null,
+      genres: post.genres || [],
+      // stars: post.ratings?.stars || 0,
+      // acting: post.ratings?.acting || 0,
+      // specialEffects: post.ratings?.specialEffects || 0,
+      // story: post.ratings?.story || 0,
+      avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
+      avatar: post.imageId?.url || "",
+      _id: post._id || "",
+    }
+  }
+
   return (
     <>
-      {changeAvatarModal && (
+      {/* {changeAvatarModal && (
         <ChangeAvatarModal
           handleCloseModal={handleCloseModal}
           loading={loading}
@@ -122,6 +153,13 @@ export const ModalUserMovie = ({
             userMovieId: selectedMovie._id,
             status: selectedMovie.status,
           }}
+        />
+      )} */}
+      {myMoviesPage && editPost && (
+        <FormMovieWantToSee
+          hiddenBlock={closeEditPost}
+          editMode={true}
+          initialData={adaptPostToForm(selectedMovie)}
         />
       )}
 
@@ -133,13 +171,23 @@ export const ModalUserMovie = ({
           >
             <div className={style.headerModule}>
               <h2>{selectedMovie.title}</h2>
-              <CloseButton onClick={handleCloseModalUserMovie} />
+              <div>
+                {myMoviesPage && (
+                  <div className={style.buttonBlockEdit} onClick={showEditPost}>
+                    <Edit />
+                  </div>
+                )}
+                <CloseButton onClick={handleCloseModalUserMovie} />
+              </div>
             </div>
             {/* <h3>{selectedMovie.title}</h3> */}
             <div className={style.imgAndGenreBlock}>
-              <div className={style.imgBlock} onClick={handleOpenModal}>
+              <div
+                className={style.imgBlock}
+                // onClick={handleOpenModal}
+              >
                 <CloudinaryImage
-                  src={selectedMovie.avatar}
+                  src={selectedMovie.imageId?.url || "/images/monkey.jpg"}
                   alt={"Avatar"}
                   width={600}
                   height={600}

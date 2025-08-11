@@ -16,11 +16,12 @@ import { RootState } from "@/store/store"
 // import MovieCard from "@/components/MovieCard/MovieCard"
 import styles from "./MyMoviesPage.module.scss"
 import ButtonMenu from "@/components/ui/button/Button"
-import CreateMovieWantToSee from "../CreateMovieWantToSee/CreateMovieWantToSee"
+
 import { ModalUserMovie } from "../modalUserMovie/modalUserMovie"
 import UserMovieList from "@/components/userMovieList/UserMovieList"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
+import FormMovieWantToSee from "../FormMovieWantToSee/FormMovieWantToSee"
 
 type Props =
   | { myMoviesPage: true; userId?: never }
@@ -31,7 +32,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
   const [activeTab, setActiveTab] = useState<"wantToSee" | "watched">(
     "wantToSee"
   )
-  const [isCreateMovieWantToSee, setIsCreateMovieWantToSee] = useState(false)
+  const [isFormMovieWantToSee, setIsFormMovieWantToSee] = useState(false)
   const [showModalUserMovie, setShowModalUserMovie] = useState(false)
   const [selectedMovie, setSelectedMovie] = useState<UserMovieType | null>(null)
 
@@ -62,19 +63,6 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
   const searchParams = useSearchParams()
 
   const pageFromUrl = Number(searchParams?.get("page")) || 1
-
-  // useEffect(() => {
-  //   if (isAuth && typeof id === "string") {
-  //     dispatch(setRoomPage(pageFromUrl))
-  //     dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
-  //   }
-  // }, [isAuth, dispatch, id, pageFromUrl])
-
-  // useEffect(() => {
-  //   if (isAuth && typeof id === "string") {
-  //     dispatch(getRoomByIdThunk(id))
-  //   }
-  // }, [isAuth, dispatch, id])
 
   useEffect(() => {
     if (isAuth) {
@@ -108,61 +96,15 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
     : myMovies.watched
   console.log("movie", movies)
 
-  // const renderMovies = () => {
-  //   const movies = userId
-  //     ? activeTab === "wantToSee"
-  //       ? publicMovies.wantToSee
-  //       : publicMovies.watched
-  //     : activeTab === "wantToSee"
-  //     ? myMovies.wantToSee
-  //     : myMovies.watched
-  //   console.log("movie", movies)
-
-  //   if (loading) return <p>Загрузка...</p>
-  //   if (error) return <p className={styles.error}>{error}</p>
-  //   if (!movies?.length) return <p>Фильмов нет</p>
-  //   return (
-  //     <div className={styles.grid}>
-  //       {pages > 1 && (
-  //           <div style={{ marginTop: 20 }}>
-  //             {Array.from({ length: pages }, (_, i) => i + 1).map((num) => (
-  //               <button
-  //                 key={num}
-  //                 disabled={num === page}
-  //                 onClick={() => onPageChange(num)}
-  //                 style={{
-  //                   marginRight: 5,
-  //                   padding: "5px 10px",
-  //                   fontWeight: num === page ? "bold" : "normal",
-  //                   cursor: num === page ? "default" : "pointer",
-  //                 }}
-  //               >
-  //                 {num}
-  //               </button>
-  //             ))}
-  //           </div>
-  //         )}
-  //       {movies.map((movie) => (
-  //         <MovieCard
-  //           myMoviesPage={myMoviesPage}
-  //           key={movie._id}
-  //           movie={movie}
-  //           onClick={() => handleShowModalUserMovie(movie)}
-  //         />
-  //       ))}
-  //     </div>
-  //   )
-  // }
-
-  const showCreateMovieWantToSee = () => {
-    setIsCreateMovieWantToSee(true)
+  const showFormMovieWantToSee = () => {
+    setIsFormMovieWantToSee(true)
     setActiveTab("wantToSee")
 
-    console.log("setIsCreateMovieWantToSee", isCreateMovieWantToSee)
+    console.log("setIsCreateMovieWantToSee", isFormMovieWantToSee)
   }
-  const closeCreateMovieWantToSee = () => {
-    setIsCreateMovieWantToSee(false)
-    console.log("closeCreateMovieWantToSee", isCreateMovieWantToSee)
+  const closeFormMovieWantToSee = () => {
+    setIsFormMovieWantToSee(false)
+    console.log("closeCreateMovieWantToSee", isFormMovieWantToSee)
   }
   const handleShowModalUserMovie = (movie: UserMovieType) => {
     setSelectedMovie(movie)
@@ -202,13 +144,12 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
           selectedMovie={selectedMovie}
           myMoviesPage={myMoviesPage}
           setSelectedMovie={setSelectedMovie}
+          closeFormMovieWantToSee={closeFormMovieWantToSee}
           page={page}
         />
       )}
-      {isCreateMovieWantToSee && (
-        <CreateMovieWantToSee
-          closeCreateMovieWantToSee={closeCreateMovieWantToSee}
-        />
+      {isFormMovieWantToSee && (
+        <FormMovieWantToSee hiddenBlock={closeFormMovieWantToSee} />
       )}
       <div className={styles.wrapper}>
         <h1 className={styles.title}>
@@ -216,7 +157,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
         </h1>
         {myMoviesPage && (
           <div className={styles.createMovieButton}>
-            <ButtonMenu onClick={showCreateMovieWantToSee}>Создать</ButtonMenu>
+            <ButtonMenu onClick={showFormMovieWantToSee}>Создать</ButtonMenu>
           </div>
         )}
 

@@ -9,6 +9,11 @@ import {
   toggleUserMovieStatusThunk,
   uploadUserMovieAvatarThunk,
 } from "../thunks/userMoviesThunk"
+export type imageIdType = {
+  _id: string
+  url: string
+  publicId: string
+}
 
 export type UserMovieType = {
   _id: string
@@ -18,6 +23,7 @@ export type UserMovieType = {
   content?: string
   status: "wantToSee" | "watched"
   addedAt: string
+  imageId: imageIdType | null
 }
 
 type userMoviesSliceType = {

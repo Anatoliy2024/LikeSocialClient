@@ -18,7 +18,8 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
       <div className={style.card} onClick={onClick}>
         <div className={style.imgBlock}>
           <CloudinaryImage
-            src={movie.avatar}
+            src={movie.imageId?.url || "/images/monkey.jpg"}
+            // src={movie.avatar}
             alt={movie.title}
             className={style.image}
             height={600}
