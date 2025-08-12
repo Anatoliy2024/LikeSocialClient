@@ -2,13 +2,15 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 
 import { userMovieAPI, fileAPI } from "@/api/api"
-import { UserMovieType } from "../slices/userMoviesSlice"
+import { imageIdType, UserMovieType } from "../slices/userMoviesSlice"
 export type createUserMovieType = {
   title: string
   content: string
   genres: string[]
   avatarFile: FileList | null
-  avatar?: string
+  imageId?: imageIdType | null
+  status?: string | null
+  // avatar?: string
   _id?: string
   // imagePost?: string
 }
@@ -63,7 +65,7 @@ export const createUserMovieThunk = createAsyncThunk<
 })
 export const updateUserMovieThunk = createAsyncThunk<
   // Тип данных, которые возвращает thunk (например, массив фильмов)
-  UserMovieResponseType,
+  { movie: UserMovieType; message: string },
   // Тип параметра, который передаётся в thunk
   // createUserMovieType,
   { dataMovie: FormData; userMovieId: string },
@@ -83,7 +85,33 @@ export const updateUserMovieThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue(
-      "Ошибка при изменении поста в createUserMovieThunk"
+      "Ошибка при изменении поста в updateUserMovieThunk"
+    )
+  }
+})
+export const addUserMovieThunk = createAsyncThunk<
+  // Тип данных, которые возвращает thunk (например, массив фильмов)
+  { message: string },
+  // Тип параметра, который передаётся в thunk
+  // createUserMovieType,
+  { postId: string; roomId?: string },
+  // Типы для thunkAPI (опционально)
+  { rejectValue: string }
+>("userMovie/add", async ({ postId, roomId }, thunkAPI) => {
+  try {
+    const response = await userMovieAPI.addUserMovie(postId, roomId)
+    // В ответе ожидаем список всех своих фильмов
+
+    return response
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue(
+      "Ошибка при изменении поста в addUserMovieThunk"
     )
   }
 })

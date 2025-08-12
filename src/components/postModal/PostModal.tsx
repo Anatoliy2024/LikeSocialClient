@@ -6,7 +6,7 @@ import StarRatingView from "../starRatingView/StarRatingView"
 import { translatorGenres } from "@/utils/translatorGenres"
 import { useEffect, useState } from "react"
 import ButtonMenu from "../ui/button/Button"
-import { useAppDispatch } from "@/store/hooks"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   createUserCommentThunk,
   // uploadUserPostAvatarThunk,
@@ -27,6 +27,8 @@ import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
 import { Edit } from "@/assets/icons/edit"
 import PostForm, { FormCreatePost } from "../postForm/PostForm"
+import { addUserMovieThunk } from "@/store/thunks/userMoviesThunk"
+import { RootState } from "@/store/store"
 // import { ProfileLink } from "../ProfileLink/ProfileLink"
 // import { RootState } from '@/store/store'
 
@@ -57,10 +59,11 @@ const PostModal = ({
 }) => {
   // console.log("post", post)
   const [loading, setLoading] = useState(false)
+  const [addMovie, setAddMovie] = useState(false)
   const dispatch = useAppDispatch()
-  // const loading = useAppSelector(
-  //   (state: RootState) => state.profile.profileLoading
-  // )
+  const loadingUserMovies = useAppSelector(
+    (state: RootState) => state.userMovies.loading
+  )
 
   const [votes, setVotes] = useState<VotesType[]>([])
   const [isEditing, setIsEditing] = useState(false)
@@ -176,10 +179,21 @@ const PostModal = ({
       specialEffects: post.ratings?.specialEffects || 0,
       story: post.ratings?.story || 0,
       avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
-      avatar: post.imageId?.url || "",
+      // avatar: post.imageId?.url || "",
+      imageId: post.imageId,
       _id: post._id || "",
     }
   }
+  const addUserMovie = async () => {
+    try {
+      await dispatch(addUserMovieThunk({ postId, roomId })).then(() => {
+        setAddMovie(true)
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   // console.log("post", post)
   return (
     <>
@@ -385,6 +399,18 @@ const PostModal = ({
                   </p>
                 ))}
             </div>
+            {authorId._id !== playerId && (
+              <ButtonMenu
+                disabled={addMovie}
+                loading={loadingUserMovies}
+                onClick={() => {
+                  addUserMovie()
+                }}
+              >
+                {!addMovie ? "Добавить в WantToSee" : "Добавлено!"}
+              </ButtonMenu>
+            )}
+
             {/* <div className={style.contentBlock}>{content}</div> */}
 
             <div className={style.commentsBlock}>

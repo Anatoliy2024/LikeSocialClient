@@ -9,7 +9,7 @@ import {
 import {
   clearUserMoviesError,
   clearPublicMovies,
-  UserMovieType,
+  // UserMovieType,
 } from "@/store/slices/userMoviesSlice"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
@@ -33,10 +33,6 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
     "wantToSee"
   )
   const [isFormMovieWantToSee, setIsFormMovieWantToSee] = useState(false)
-  const [showModalUserMovie, setShowModalUserMovie] = useState(false)
-  const [selectedMovie, setSelectedMovie] = useState<UserMovieType | null>(null)
-
-  // const { id: userId } = useParams()
 
   const {
     myMovies,
@@ -96,6 +92,12 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
     : myMovies.watched
   console.log("movie", movies)
 
+  const movieId = searchParams?.get("movieId")
+
+  const selectedMovie = Array.isArray(movies)
+    ? movies.find((movie) => movie._id === movieId)
+    : null
+
   const showFormMovieWantToSee = () => {
     setIsFormMovieWantToSee(true)
     setActiveTab("wantToSee")
@@ -106,15 +108,33 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
     setIsFormMovieWantToSee(false)
     console.log("closeCreateMovieWantToSee", isFormMovieWantToSee)
   }
-  const handleShowModalUserMovie = (movie: UserMovieType) => {
-    setSelectedMovie(movie)
-    setShowModalUserMovie(true)
-    // console.log("setIsCreateMovieWantToSee", isCreateMovieWantToSee)
+
+  const openMovieModal = (id: string, page: number) => {
+    const searchParams = new URLSearchParams()
+    searchParams.set("movieId", id)
+
+    searchParams.set("page", page.toString())
+
+    // }
+    // pageRoom=2
+    // console.log("searchParams", searchParams)
+
+    const url = `/userMovie?${searchParams.toString()}`
+
+    router.push(url, { scroll: false }) // <--- ВАЖНО!
   }
-  const handleCloseModalUserMovie = () => {
-    setShowModalUserMovie(false)
-    setSelectedMovie(null)
-    // console.log("closeCreateMovieWantToSee", isCreateMovieWantToSee)
+  const closeModal = () => {
+    const searchParams = new URLSearchParams()
+
+    // if (page !== 1) {
+
+    searchParams.set("page", page.toString())
+
+    // }
+
+    const url = `/userMovie?${searchParams.toString()}`
+
+    router.push(url, { scroll: false })
   }
 
   const handlePageChange = (newPage: number) => {
@@ -138,12 +158,12 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
   return (
     <>
       {loading && <SpinnerWindow />}
-      {showModalUserMovie && selectedMovie && (
+      {selectedMovie && (
         <ModalUserMovie
-          handleCloseModalUserMovie={handleCloseModalUserMovie}
+          closeModal={closeModal}
           selectedMovie={selectedMovie}
           myMoviesPage={myMoviesPage}
-          setSelectedMovie={setSelectedMovie}
+          // setSelectedMovie={setSelectedMovie}
           closeFormMovieWantToSee={closeFormMovieWantToSee}
           page={page}
         />
@@ -187,7 +207,8 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
           myMoviesPage={myMoviesPage}
           page={page}
           pages={pages}
-          onClickMovie={handleShowModalUserMovie}
+          openMovieModal={openMovieModal}
+          // onClickMovie={handleShowModalUserMovie}
           onPageChange={handlePageChange}
         />
       </div>

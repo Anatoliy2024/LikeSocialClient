@@ -17,6 +17,7 @@ import { RootState } from "@/store/store"
 import { useEffect, useRef, useState } from "react"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { compressImage } from "@/utils/compressImage"
+import { imageIdType } from "@/store/slices/userPostsSlice"
 
 export type FormCreatePost = {
   title: string
@@ -29,6 +30,7 @@ export type FormCreatePost = {
   story: number
   avatarFile: FileList | null
   avatar?: string
+  imageId?: imageIdType | null
   _id?: string
 }
 
@@ -166,11 +168,14 @@ const PostForm = ({
   }, [watch("avatarFile")])
 
   useEffect(() => {
-    if (initialData?.avatar && typeof initialData.avatar === "string") {
-      setPreview(initialData.avatar)
-      console.log("initialData.avatar", initialData.avatar)
+    if (
+      initialData?.imageId?.url &&
+      typeof initialData?.imageId?.url === "string"
+    ) {
+      setPreview(initialData?.imageId?.url)
+      console.log("initialData.avatar", initialData?.imageId?.url)
     }
-  }, [initialData])
+  }, [initialData?.imageId?.url])
   useEffect(() => {
     console.log("Ошибки валидации формы:", errors)
   }, [errors])

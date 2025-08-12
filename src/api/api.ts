@@ -320,6 +320,11 @@ export const userMovieAPI = {
       .put(`user-movie/update/${userMovieId}`, data)
       .then((res) => res.data)
   },
+  addUserMovie(postId: string, roomId?: string) {
+    return instance
+      .post(`user-movie/add`, { postId, roomId })
+      .then((res) => res.data)
+  },
 
   deleteUserMovie(
     userMovieId: string,

@@ -19,41 +19,28 @@ import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import FormMovieWantToSee from "../FormMovieWantToSee/FormMovieWantToSee"
 import { Edit } from "@/assets/icons/edit"
 export const ModalUserMovie = ({
-  handleCloseModalUserMovie,
+  // handleCloseModalUserMovie,
   selectedMovie,
   myMoviesPage,
   // setSelectedMovie,
   page,
+  closeModal,
 }: // closeFormMovieWantToSee,
 {
-  handleCloseModalUserMovie: () => void
+  // handleCloseModalUserMovie: () => void
   closeFormMovieWantToSee: () => void
 
   selectedMovie: UserMovieType
   myMoviesPage: boolean
-  setSelectedMovie: (movie: UserMovieType) => void
+  closeModal: () => void
+  // setSelectedMovie: (movie: UserMovieType) => void
   page: number
 }) => {
   const dispatch = useAppDispatch()
   const [editPost, setEditPost] = useState(false)
 
-  // const [changeAvatarModal, setChangeAvatarModal] = useState(false)
-  // const dispatch = useAppDispatch()
-
   const loading = useAppSelector((state: RootState) => state.userMovies.loading)
   console.log("loading", loading)
-  // const handleCloseModal = () => {
-  //   setChangeAvatarModal(false)
-  // }
-  // const handleOpenModal = () => {
-  //   console.log("myMoviesPage", myMoviesPage)
-  //   if (myMoviesPage) {
-  //     setChangeAvatarModal(true)
-  //   }
-  // }
-  // const { myMovies, publicMovies, loading, error } = useAppSelector(
-  //    (state: RootState) => state.userMovies
-  //  )
 
   const changeStatusMovie = async () => {
     try {
@@ -66,7 +53,7 @@ export const ModalUserMovie = ({
         })
       )
 
-      handleCloseModalUserMovie()
+      closeModal()
     } catch (error) {
       console.log(error)
     }
@@ -82,7 +69,7 @@ export const ModalUserMovie = ({
           page,
         })
       )
-      handleCloseModalUserMovie()
+      closeModal()
     } catch (error) {
       console.log(error)
     }
@@ -94,28 +81,6 @@ export const ModalUserMovie = ({
     setEditPost(false)
   }
 
-  // const handleAvatarPostUpload = async (
-  //   file: File,
-  //   context?: { userMovieId?: string; status?: string }
-  // ) => {
-  //   try {
-  //     if (!context?.userMovieId || !context.status) return
-
-  //     const updatedMovie = await dispatch(
-  //       uploadUserMovieAvatarThunk({
-  //         file,
-  //         userMovieId: context.userMovieId,
-  //         status: context.status,
-  //       })
-  //     ).unwrap()
-  //     setSelectedMovie(updatedMovie.userMovie)
-
-  //     handleCloseModal()
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
-
   useEffect(() => {
     // при монтировании — запрещаем прокрутку
     document.body.style.overflow = "hidden"
@@ -126,35 +91,25 @@ export const ModalUserMovie = ({
     }
   }, [])
 
-  function adaptPostToForm(post: UserMovieType): createUserMovieType {
+  function adaptPostToForm(movie: UserMovieType): createUserMovieType {
     return {
-      title: post.title || "",
-      content: post.content || "",
+      title: movie.title || "",
+      content: movie.content || "",
       // roomId: post.roomId || null,
-      genres: post.genres || [],
+      genres: movie.genres || [],
+      status: movie.status || null,
       // stars: post.ratings?.stars || 0,
       // acting: post.ratings?.acting || 0,
       // specialEffects: post.ratings?.specialEffects || 0,
       // story: post.ratings?.story || 0,
       avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
-      avatar: post.imageId?.url || "",
-      _id: post._id || "",
+      imageId: movie.imageId,
+      _id: movie._id || "",
     }
   }
 
   return (
     <>
-      {/* {changeAvatarModal && (
-        <ChangeAvatarModal
-          handleCloseModal={handleCloseModal}
-          loading={loading}
-          onUpload={handleAvatarPostUpload}
-          context={{
-            userMovieId: selectedMovie._id,
-            status: selectedMovie.status,
-          }}
-        />
-      )} */}
       {myMoviesPage && editPost && (
         <FormMovieWantToSee
           hiddenBlock={closeEditPost}
@@ -163,7 +118,7 @@ export const ModalUserMovie = ({
         />
       )}
 
-      <div className={style.wrapper} onClick={handleCloseModalUserMovie}>
+      <div className={style.wrapper} onClick={closeModal}>
         <div className={style.container}>
           <div
             className={style.containerWrapper}
@@ -177,7 +132,7 @@ export const ModalUserMovie = ({
                     <Edit />
                   </div>
                 )}
-                <CloseButton onClick={handleCloseModalUserMovie} />
+                <CloseButton onClick={closeModal} />
               </div>
             </div>
             {/* <h3>{selectedMovie.title}</h3> */}
@@ -232,10 +187,3 @@ export const ModalUserMovie = ({
     </>
   )
 }
-// _id: string
-// title: string
-// genres: string[]
-// avatar: string
-// content?: string
-// status: "wantToSee" | "watched"
-// addedAt: string

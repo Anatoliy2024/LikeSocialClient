@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 import {
+  addUserMovieThunk,
   createUserMovieThunk,
   deleteUserMovieThunk,
   fetchMyWantToSeeMoviesThunk,
@@ -7,6 +8,7 @@ import {
   fetchPublicWantToSeeMoviesThunk,
   fetchPublicWatchedMoviesThunk,
   toggleUserMovieStatusThunk,
+  updateUserMovieThunk,
   uploadUserMovieAvatarThunk,
 } from "../thunks/userMoviesThunk"
 export type imageIdType = {
@@ -19,11 +21,12 @@ export type UserMovieType = {
   _id: string
   title: string
   genres: string[]
-  avatar: string
+  // avatar: string
+
   content?: string
   status: "wantToSee" | "watched"
   addedAt: string
-  imageId: imageIdType | null
+  imageId?: imageIdType | null
 }
 
 type userMoviesSliceType = {
@@ -90,6 +93,38 @@ const userMoviesSlice = createSlice({
           action.error.message || "Ошибка при создании поста хочу посмотреть"
 
         state.loading = false
+      })
+
+      .addCase(updateUserMovieThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateUserMovieThunk.fulfilled, (state, action) => {
+        state.loading = false
+        const postData = action.payload.movie
+        const listName =
+          postData.status === "wantToSee" ? "wantToSee" : "watched"
+
+        state.myMovies[listName] = state.myMovies[listName].map((movie) => {
+          return movie._id === postData._id ? postData : movie
+        })
+      })
+      .addCase(updateUserMovieThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error =
+          action.error.message || "Ошибка при изменении поста хочу посмотреть"
+      })
+      .addCase(addUserMovieThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(addUserMovieThunk.fulfilled, (state) => {
+        state.loading = false
+      })
+      .addCase(addUserMovieThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error =
+          action.error.message || "Ошибка при добавлении поста хочу посмотреть"
       })
 
       .addCase(deleteUserMovieThunk.pending, (state) => {

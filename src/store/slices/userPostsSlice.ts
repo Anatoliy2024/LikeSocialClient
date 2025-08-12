@@ -45,7 +45,7 @@ export type userPostType = {
   authorName?: string
   avatar: string
   avatarPublicId: string
-  imageId: imageIdType | null
+  imageId?: imageIdType | null
   // avatarPublicId: string
 }
 

@@ -7,7 +7,8 @@ type Props = {
   movies: UserMovieType[]
   loading: boolean
   error: string | null
-  onClickMovie: (movie: UserMovieType) => void
+  openMovieModal: (id: string, page: number) => void
+  // onClickMovie: (movie: UserMovieType) => void
   myMoviesPage: boolean
   page: number
   pages: number
@@ -18,7 +19,7 @@ const UserMovieList = ({
   movies,
   loading,
   error,
-  onClickMovie,
+  openMovieModal,
   myMoviesPage,
   page,
   pages,
@@ -39,7 +40,7 @@ const UserMovieList = ({
             key={movie._id}
             movie={movie}
             myMoviesPage={myMoviesPage}
-            onClick={() => onClickMovie(movie)}
+            onClick={() => openMovieModal(movie._id, page)}
           />
         ))}
       </div>

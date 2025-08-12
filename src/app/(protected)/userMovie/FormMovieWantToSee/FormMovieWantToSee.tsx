@@ -42,6 +42,9 @@ export default function FormMovieWantToSee({
       const formData = new FormData()
 
       formData.append("title", dataForm.title)
+      if (dataForm.status) {
+        formData.append("status", dataForm.status)
+      }
 
       if (dataForm.avatarFile?.[0]) {
         const file = dataForm.avatarFile?.[0]
@@ -73,9 +76,9 @@ export default function FormMovieWantToSee({
           formData.append("genres[]", genre)
         })
       }
-      if (editMode && dataForm._id) {
-        formData.append("userMovieId", dataForm._id)
-      }
+      // if (editMode && dataForm._id) {
+      //   formData.append("userMovieId", dataForm._id)
+      // }
 
       formData.append("content", dataForm.content)
       if (!editMode) {
@@ -109,18 +112,21 @@ export default function FormMovieWantToSee({
   }, [watch("avatarFile")])
 
   useEffect(() => {
-    if (initialData?.avatar && typeof initialData.avatar === "string") {
-      setPreview(initialData.avatar)
-      console.log("initialData.avatar", initialData.avatar)
+    if (
+      initialData?.imageId?.url &&
+      typeof initialData?.imageId?.url === "string"
+    ) {
+      console.log("initialData?.imageId?.url", initialData?.imageId?.url)
+      setPreview(initialData?.imageId?.url)
     }
-  }, [initialData])
+  }, [initialData?.imageId?.url])
 
-  useEffect(() => {
-    if (initialData?.avatar && typeof initialData.avatar === "string") {
-      setPreview(initialData.avatar)
-      console.log("initialData.avatar", initialData.avatar)
-    }
-  }, [initialData])
+  // useEffect(() => {
+  //   if (initialData?.imageId?.url && typeof initialData?.imageId?.url === "string") {
+  //     setPreview(initialData?.imageId?.url)
+  //     // console.log("initialData.avatar", initialData.avatar)
+  //   }
+  // }, [initialData])
   useEffect(() => {
     console.log("Ошибки валидации формы:", errors)
   }, [errors])
@@ -137,150 +143,152 @@ export default function FormMovieWantToSee({
 
   return (
     <div className={style.wrapper}>
-      <div className={style.container}>
-        <h3>Want to Watch</h3>
-        <div>
-          <form
-            onSubmit={handleSubmit(handleSave)}
-            className={style.ratingForm}
-          >
-            <div>
-              <label htmlFor="title">Заголовок:</label>
-              <input
-                id="title"
-                {...register("title", { required: "Заголовок обязателен" })}
-                placeholder={"Введите заголовок"}
-              />
-              {errors.title && <p>{errors.title?.message as string}</p>}
-              {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
-            </div>
-            <div className={style.formImageBlock}>
-              <label className={style.customFileUpload}>
-                Загрузить аватарку
-                <input
-                  type="file"
-                  accept="image/*"
-                  {...register("avatarFile")}
-                />
-              </label>
-              {preview && (
-                <div className={style.preview}>
-                  <CloudinaryImage
-                    src={preview}
-                    alt="Предпросмотр аватара"
-                    className={style.preview}
-                    width={200}
-                    height={200}
-                  />
-                </div>
-              )}
-            </div>
-            <div>
-              <label>Жанры:</label>
+      <div className={style.containerScroll}>
+        <div className={style.container}>
+          <h3>Want to Watch</h3>
+          <div>
+            <form
+              onSubmit={handleSubmit(handleSave)}
+              className={style.ratingForm}
+            >
               <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="drama"
-                    {...register("genres")}
-                  />{" "}
-                  Драма
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="comedy"
-                    {...register("genres")}
-                  />{" "}
-                  Комедия
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="action"
-                    {...register("genres")}
-                  />{" "}
-                  Боевик
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="thriller"
-                    {...register("genres")}
-                  />{" "}
-                  Триллер
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="fantasy"
-                    {...register("genres")}
-                  />{" "}
-                  Фэнтези
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="sciFi"
-                    {...register("genres")}
-                  />{" "}
-                  Научная фантастика
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="horror"
-                    {...register("genres")}
-                  />{" "}
-                  Ужасы
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="romance"
-                    {...register("genres")}
-                  />{" "}
-                  Романтика
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="adventure"
-                    {...register("genres")}
-                  />{" "}
-                  Приключения
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="mystery"
-                    {...register("genres")}
-                  />{" "}
-                  Детектив
-                </label>
+                <label htmlFor="title">Заголовок:</label>
+                <input
+                  id="title"
+                  {...register("title", { required: "Заголовок обязателен" })}
+                  placeholder={"Введите заголовок"}
+                />
+                {errors.title && <p>{errors.title?.message as string}</p>}
+                {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
               </div>
-            </div>
-            <div className={style.textareaBlock}>
-              <label htmlFor="content">Описание:</label>
-              <textarea
-                id="content"
-                {...register("content")}
-                placeholder={"Введите описание"}
-              />
-              {errors.content && <p>{errors.content?.message as string}</p>}
-              {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
-            </div>
+              <div className={style.formImageBlock}>
+                <label className={style.customFileUpload}>
+                  Загрузить аватарку
+                  <input
+                    type="file"
+                    accept="image/*"
+                    {...register("avatarFile")}
+                  />
+                </label>
+                {preview && (
+                  <div className={style.preview}>
+                    <CloudinaryImage
+                      src={preview}
+                      alt="Предпросмотр аватара"
+                      className={style.preview}
+                      width={200}
+                      height={200}
+                    />
+                  </div>
+                )}
+              </div>
+              <div>
+                <label>Жанры:</label>
+                <div>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="drama"
+                      {...register("genres")}
+                    />{" "}
+                    Драма
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="comedy"
+                      {...register("genres")}
+                    />{" "}
+                    Комедия
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="action"
+                      {...register("genres")}
+                    />{" "}
+                    Боевик
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="thriller"
+                      {...register("genres")}
+                    />{" "}
+                    Триллер
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="fantasy"
+                      {...register("genres")}
+                    />{" "}
+                    Фэнтези
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="sciFi"
+                      {...register("genres")}
+                    />{" "}
+                    Научная фантастика
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="horror"
+                      {...register("genres")}
+                    />{" "}
+                    Ужасы
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="romance"
+                      {...register("genres")}
+                    />{" "}
+                    Романтика
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="adventure"
+                      {...register("genres")}
+                    />{" "}
+                    Приключения
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="mystery"
+                      {...register("genres")}
+                    />{" "}
+                    Детектив
+                  </label>
+                </div>
+              </div>
+              <div className={style.textareaBlock}>
+                <label htmlFor="content">Описание:</label>
+                <textarea
+                  id="content"
+                  {...register("content")}
+                  placeholder={"Введите описание"}
+                />
+                {errors.content && <p>{errors.content?.message as string}</p>}
+                {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
+              </div>
 
-            <div className={style.buttonBlock}>
-              {/* <ButtonMenu type="submit" disabled={loading} loading={loading}>
+              <div className={style.buttonBlock}>
+                {/* <ButtonMenu type="submit" disabled={loading} loading={loading}>
                 Опубликовать
               </ButtonMenu> */}
-              <ButtonMenu type="submit" disabled={loading} loading={loading}>
-                {!editMode ? "Опубликовать" : "Сохранить"}
-              </ButtonMenu>
-              <ButtonMenu onClick={() => hiddenBlock()}>Отмена</ButtonMenu>
-            </div>
-          </form>
+                <ButtonMenu type="submit" disabled={loading} loading={loading}>
+                  {!editMode ? "Опубликовать" : "Сохранить"}
+                </ButtonMenu>
+                <ButtonMenu onClick={() => hiddenBlock()}>Отмена</ButtonMenu>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

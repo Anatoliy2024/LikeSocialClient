@@ -9,68 +9,76 @@
   align-items: center;
   background-color: rgba(0, 0, 0, 0.452);
   z-index: 999;
-  .container {
-    background-color: #6943bc;
+  .containerScroll {
     width: 80vw;
     height: 80vh;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     padding: 20px;
-    h3 {
-      text-align: center;
-    }
-    .ratingForm {
-      .formImageBlock {
-        justify-content: center;
-        padding: 10px 0;
-        .customFileUpload {
-          display: inline-block;
-          padding: 10px;
-          cursor: pointer;
-          border-radius: 8px;
-          background-color: #4f46e5;
-          color: white;
-          // max-width: 10px;
-          // font-weight: bold;
-          transition: background-color 0.3s;
-          &:hover {
-            background-color: #3729ca;
+
+    background-color: #6943bc;
+    border-radius: 20px;
+    .container {
+      overflow-y: auto;
+      width: 100%;
+      height: 100%;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      // padding: 20px;
+      h3 {
+        text-align: center;
+      }
+      .ratingForm {
+        .formImageBlock {
+          justify-content: center;
+          padding: 10px 0;
+          .customFileUpload {
+            display: inline-block;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            background-color: #4f46e5;
+            color: white;
+            // max-width: 10px;
+            // font-weight: bold;
+            transition: background-color 0.3s;
+            &:hover {
+              background-color: #3729ca;
+            }
+          }
+          // max-width: calc(100vw - 100px);
+
+          input {
+            display: none;
+            // max-width: calc(100% - 100px);
+          }
+          .preview {
+            width: 200px;
+            height: 200px;
+
+            border-radius: 50%;
           }
         }
-        // max-width: calc(100vw - 100px);
-
-        input {
-          display: none;
-          // max-width: calc(100% - 100px);
+        .textareaBlock {
+          display: flex;
+          align-items: baseline;
+          gap: 20px;
+          textarea {
+            width: 100%;
+            height: 150px;
+            resize: none;
+          }
         }
-        .preview {
-          width: 200px;
-          height: 200px;
-
-          border-radius: 50%;
-        }
-      }
-      .textareaBlock {
-        display: flex;
-        align-items: baseline;
-        gap: 20px;
-        textarea {
-          width: 100%;
-          height: 150px;
-          resize: none;
+        .buttonBlock {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          padding: 20px;
         }
       }
-      .buttonBlock {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        padding: 20px;
-      }
+      // display: flex;
+      // justify-content: center;
+      // align-items: center;
     }
-    // display: flex;
-    // justify-content: center;
-    // align-items: center;
   }
 }

@@ -75,9 +75,17 @@ const PostsBlock = ({
     // console.log("selectedPost", selectedPost)
     // const isMyPost = !userId || playerId === userId
 
-    const openPostModal = (id: string) => {
+    const openPostModal = (id: string, page: number) => {
       const searchParams = new URLSearchParams()
       searchParams.set("postId", id)
+      // if (page !== 1) {
+      if (roomId) {
+        searchParams.set("pageRoom", page.toString())
+      } else {
+        searchParams.set("page", page.toString())
+      }
+      // }
+      // pageRoom=2
       // console.log("searchParams", searchParams)
 
       const url = roomId
@@ -89,11 +97,21 @@ const PostsBlock = ({
       router.push(url, { scroll: false }) // <--- ВАЖНО!
     }
     const closeModal = () => {
+      const searchParams = new URLSearchParams()
+
+      // if (page !== 1) {
+      if (roomId) {
+        searchParams.set("pageRoom", page.toString())
+      } else {
+        searchParams.set("page", page.toString())
+      }
+      // }
+
       const url = roomId
-        ? `/room/${roomId}`
+        ? `/room/${roomId}?${searchParams}`
         : profileUserId
-        ? `/profile/${profileUserId}`
-        : `/profile?`
+        ? `/profile/${profileUserId}?${searchParams}`
+        : `/profile?${searchParams}`
 
       router.push(url, { scroll: false })
     }
@@ -169,7 +187,7 @@ const PostsBlock = ({
                         isProfile={isProfile}
                         roomId={roomId}
                         genres={post.genres}
-                        onClick={() => openPostModal(post._id)}
+                        onClick={() => openPostModal(post._id, page)}
                         comments={post.comments}
                         votesCount={post.votesCount}
                         // avatarPublicId={post.avatarPublicId}
