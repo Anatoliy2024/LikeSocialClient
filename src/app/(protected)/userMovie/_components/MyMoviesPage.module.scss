@@ -1,10 +1,10 @@
 .wrapper {
   padding: 20px;
   // max-width: 1200px;
+  margin: 0 auto;
   @media (max-width: 500px) {
     padding: 5px;
   }
-  margin: 0 auto;
   .createMovieButton {
     padding-bottom: 10px;
   }

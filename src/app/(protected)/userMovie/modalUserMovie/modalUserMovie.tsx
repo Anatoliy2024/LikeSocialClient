@@ -18,6 +18,8 @@ import { RootState } from "@/store/store"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import FormMovieWantToSee from "../FormMovieWantToSee/FormMovieWantToSee"
 import { Edit } from "@/assets/icons/edit"
+import PostForm, { FormCreatePost } from "@/components/postForm/PostForm"
+import { ModalLocation } from "../modalLocation/modalLocation"
 export const ModalUserMovie = ({
   // handleCloseModalUserMovie,
   selectedMovie,
@@ -38,7 +40,9 @@ export const ModalUserMovie = ({
 }) => {
   const dispatch = useAppDispatch()
   const [editPost, setEditPost] = useState(false)
-
+  // const [createPost, setCreatePost] = useState(false)
+  const [modalLocation, setModalLocation] = useState(false)
+  const [location, setLocation] = useState<null | string>(null)
   const loading = useAppSelector((state: RootState) => state.userMovies.loading)
   console.log("loading", loading)
 
@@ -91,7 +95,7 @@ export const ModalUserMovie = ({
     }
   }, [])
 
-  function adaptPostToForm(movie: UserMovieType): createUserMovieType {
+  function adaptMoviePostToEditForm(movie: UserMovieType): createUserMovieType {
     return {
       title: movie.title || "",
       content: movie.content || "",
@@ -108,13 +112,59 @@ export const ModalUserMovie = ({
     }
   }
 
+  const showModalLocation = () => {
+    setModalLocation(true)
+  }
+  const closeModalLocation = () => {
+    setModalLocation(false)
+  }
+  const changeLocation = (location: string) => {
+    setLocation(location)
+    closeModalLocation()
+  }
+
+  function adaptMoviePostToCreateForm(movie: UserMovieType): FormCreatePost {
+    return {
+      title: movie.title,
+      content: "",
+      roomId: location && location !== "profile" ? location : null,
+      genres: movie.genres || [],
+      stars: 0,
+      acting: 0,
+      specialEffects: 0,
+      story: 0,
+      avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
+      // avatar: post.imageId?.url || "",
+      imageId: movie.imageId,
+      // _id: post._id || "",
+    }
+  }
+
   return (
     <>
       {myMoviesPage && editPost && (
         <FormMovieWantToSee
           hiddenBlock={closeEditPost}
           editMode={true}
-          initialData={adaptPostToForm(selectedMovie)}
+          initialData={adaptMoviePostToEditForm(selectedMovie)}
+        />
+      )}
+      {myMoviesPage && location && (
+        <PostForm
+          hiddenBlock={() => {
+            closeModal()
+            setLocation(null)
+          }}
+          isProfile={location === "profile"}
+          roomId={location !== "profile" ? location : null}
+          editMode={false}
+          initialData={adaptMoviePostToCreateForm(selectedMovie)}
+        />
+      )}
+      {myMoviesPage && modalLocation && (
+        <ModalLocation
+          hiddenBlock={closeModalLocation}
+          changeLocation={changeLocation}
         />
       )}
 
@@ -125,8 +175,8 @@ export const ModalUserMovie = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className={style.headerModule}>
-              <h2>{selectedMovie.title}</h2>
-              <div>
+              <div className={style.titleBlock}>{selectedMovie.title}</div>
+              <div className={style.titleButtonBlock}>
                 {myMoviesPage && (
                   <div className={style.buttonBlockEdit} onClick={showEditPost}>
                     <Edit />
@@ -171,6 +221,9 @@ export const ModalUserMovie = ({
                   {selectedMovie.status === "wantToSee"
                     ? "Просмотрено"
                     : "В желаемое"}
+                </ButtonMenu>
+                <ButtonMenu onClick={showModalLocation}>
+                  Опубликовать
                 </ButtonMenu>
                 <ButtonMenu
                   onClick={() => {

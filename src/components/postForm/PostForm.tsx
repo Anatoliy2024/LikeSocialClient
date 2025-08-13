@@ -93,6 +93,11 @@ const PostForm = ({
           formData.append("genres[]", genre)
         })
       }
+      if (dataForm?.imageId && !editMode) {
+        formData.append("imageId", dataForm.imageId._id)
+        // formData.append("imageId.url", dataForm.imageId.url)
+        // formData.append("imageId.publicId", dataForm.imageId.publicId)
+      }
 
       if (dataForm.avatarFile?.[0]) {
         const file = dataForm.avatarFile?.[0]

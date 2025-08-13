@@ -9,7 +9,7 @@ import {
   updateUserMovieThunk,
 } from "@/store/thunks/userMoviesThunk"
 import { compressImage } from "@/utils/compressImage"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 // import { UserMovieType } from "@/store/slices/userMoviesSlice"
 
@@ -45,6 +45,9 @@ export default function FormMovieWantToSee({
       if (dataForm.status) {
         formData.append("status", dataForm.status)
       }
+      // if (dataForm?.imageId) {
+      //   formData.append("imageId", dataForm.imageId)
+      // }
 
       if (dataForm.avatarFile?.[0]) {
         const file = dataForm.avatarFile?.[0]
@@ -141,6 +144,19 @@ export default function FormMovieWantToSee({
     }
   }, [])
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const handleInput = () => {
+    const el = textareaRef.current
+    if (el) {
+      el.style.height = "auto"
+      el.style.height = el.scrollHeight + "px"
+    }
+  }
+  useEffect(() => {
+    handleInput()
+  }, [watch("content")])
+
   return (
     <div className={style.wrapper}>
       <div className={style.containerScroll}>
@@ -151,7 +167,7 @@ export default function FormMovieWantToSee({
               onSubmit={handleSubmit(handleSave)}
               className={style.ratingForm}
             >
-              <div>
+              <div className={style.titleBlock}>
                 <label htmlFor="title">Заголовок:</label>
                 <input
                   id="title"
@@ -271,7 +287,11 @@ export default function FormMovieWantToSee({
                 <label htmlFor="content">Описание:</label>
                 <textarea
                   id="content"
-                  {...register("content")}
+                  // {...register("content")}
+                  ref={(e) => {
+                    register("content").ref(e) // связываем с react-hook-form
+                    textareaRef.current = e // сохраняем в свой ref
+                  }}
                   placeholder={"Введите описание"}
                 />
                 {errors.content && <p>{errors.content?.message as string}</p>}
