@@ -14,6 +14,7 @@ import userMovies from "./slices/userMoviesSlice"
 import notifications from "./slices/notificationsSlice"
 import onlineStatus from "./slices/onlineStatusSlice"
 import dialogsReducer from "./slices/dialogsSlice"
+import callReducer from "./slices/callSlice"
 
 export const store = configureStore({
   reducer: {
@@ -29,6 +30,7 @@ export const store = configureStore({
     notifications: notifications,
     onlineStatus: onlineStatus,
     dialogs: dialogsReducer,
+    call: callReducer,
     // добавь другие редьюсеры здесь
   },
 })

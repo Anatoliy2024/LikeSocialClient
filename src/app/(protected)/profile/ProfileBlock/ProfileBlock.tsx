@@ -32,6 +32,10 @@ import { StarButton } from "@/assets/icons/starButton"
 // import { Trash } from "@/assets/icons/trash"
 import { ButtonUserStatus } from "@/components/buttonUserStatus/ButtonUserStatus"
 import { getUserStatusThunk } from "@/store/thunks/usersThunk"
+// import { getSocket } from "@/lib/socket"
+// import { startCall } from "@/store/slices/callSlice"
+import { useCall } from "@/hooks/useCall"
+// import { startCall } from "@/store/slices/callSlice"
 // import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 type FormProfileInfo = {
@@ -54,6 +58,9 @@ const ProfileBlock = ({
   const [isEdit, setIsEdit] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
+  const playerId = useAppSelector((state: RootState) => state.auth.userId)
+
+  const { callStart } = useCall(playerId)
   // const birthDate = watch("birthDate")
   // isMyProfilePage={isMyProfilePage} userId={userId}
   const dispatch = useAppDispatch()
@@ -175,6 +182,40 @@ const ProfileBlock = ({
   const handleCloseModalCreateMessage = () => {
     setShowModalCreateMessage(false)
   }
+
+  const handleCall = () => {
+    // const token = localStorage.getItem("accessToken")
+    // if (!token) return
+    // if (!userId) return
+    if (!userId) return
+    const targetUserId = userId
+    // const socket = getSocket()
+
+    // Создаём уникальный roomId для звонка
+    // const roomId = `${socket.id}_${targetUserId}_${Date.now()}`
+    // console.log("roomId", roomId)
+    // Отправляем событие на сервер, чтобы уведомить пользователя
+    // socket.emit("call:start", { toUserId: targetUserId })
+    callStart(targetUserId)
+    // Сохраняем локально, что звонок инициирован
+    // dispatch(startCall({ peerId: targetUserId }))
+  }
+  // const handleCall = () => {
+  //   const token = localStorage.getItem("accessToken")
+  //   if (!token) return
+  //   if (!userId) return
+  //   const targetUserId = userId
+  //   const socket = getSocket(token)
+
+  //   // Создаём уникальный roomId для звонка
+  //   const roomId = `${socket.id}_${targetUserId}_${Date.now()}`
+  //   console.log("roomId", roomId)
+  //   // Отправляем событие на сервер, чтобы уведомить пользователя
+  //   socket.emit("callUser", { toUserId: targetUserId, roomId })
+
+  //   // Сохраняем локально, что звонок инициирован
+  //   dispatch(startCall({ roomId, peerId: targetUserId }))
+  // }
 
   return (
     <>
@@ -408,6 +449,16 @@ const ProfileBlock = ({
                       Редактировать
                     </ButtonMenu>
                   )}
+                  {!isMyProfilePage && (
+                    <div
+                      className={style.button}
+                      onClick={handleCall}
+                      // className={style.linkWantToSee}
+                    >
+                      <div>📞</div>
+                      {/* <ButtonMenu>Список желаемого</ButtonMenu> */}
+                    </div>
+                  )}
                   {!profileData.isMyProfile && (
                     <Link
                       href={`/userMovie/${userId}`}
@@ -420,6 +471,7 @@ const ProfileBlock = ({
                       {/* <ButtonMenu>Список желаемого</ButtonMenu> */}
                     </Link>
                   )}
+
                   {!isMyProfilePage && (
                     <div
                       className={style.button}

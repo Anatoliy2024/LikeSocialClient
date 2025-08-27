@@ -59,6 +59,21 @@ body {
     grid-template-columns: 1fr;
   }
 }
+.callNotificationWrapper {
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.688);
+}
+.callNotificationWrapper .callNotification {
+  background-color: #896cf1;
+  color: white;
+}
 
 /* ::-webkit-scrollbar {
   width: 8px;
