@@ -265,7 +265,15 @@ export const useCall = (userId: string | null) => {
       localStreamRef.current.getAudioTracks().forEach((t) => (t.enabled = true))
       return localStreamRef.current
     }
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        sampleRate: 48000,
+        channelCount: 1,
+      },
+    })
     stream.getAudioTracks().forEach((t) => (t.enabled = true))
     localStreamRef.current = stream
     setLocalStreamState(stream)
@@ -293,7 +301,14 @@ export const useCall = (userId: string | null) => {
   const createPeer = (initiator: boolean, stream: MediaStream) => {
     if (peerRef.current) return peerRef.current
 
-    const p = new Peer({ initiator, trickle: false, stream })
+    const p = new Peer({
+      initiator,
+      trickle: false,
+      stream,
+      config: {
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      },
+    })
 
     p.on("stream", (remote) => {
       console.log("stream", remote)
