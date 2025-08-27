@@ -25,7 +25,8 @@ import { Loading } from "@/assets/loading/loading"
 import ButtonMenu from "@/components/ui/button/Button"
 
 // import { Socket } from "socket.io-client"
-import { useCall } from "@/hooks/useCall"
+// import { useCall } from "@/hooks/useCall"
+import { useCallContext } from "./CallContext"
 
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -41,23 +42,29 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
     (state: RootState) => state.call
   )
 
-  const {
-    localStream,
-    remoteStream,
+  // const {
+  //   localStream,
+  //   remoteStream,
 
-    callAccept,
-    endCall,
-  } = useCall(userId)
+  //   callAccept,
+  //   endCall,
+  //   // callerId,
+  //   // targetId,
+  //   // status,
+  // } = useCall(userId)
 
-  const localRef = useRef<HTMLAudioElement>(null)
+  const { endCall, callAccept, localStream, remoteStream } = useCallContext()
+
+  console.log("status", status)
+  // const localRef = useRef<HTMLAudioElement>(null)
   const remoteRef = useRef<HTMLAudioElement>(null)
 
-  useEffect(() => {
-    if (localRef.current && localStream) {
-      localRef.current.srcObject = localStream
-      // localRef.current.play().catch(console.error)
-    }
-  }, [localStream])
+  // useEffect(() => {
+  //   if (localRef.current && localStream) {
+  //     localRef.current.srcObject = localStream
+  //     // localRef.current.play().catch(console.error)
+  //   }
+  // }, [localStream])
 
   // useEffect(() => {
   //   if (remoteRef.current && remoteStream) {
@@ -70,6 +77,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
       remoteRef.current.srcObject = remoteStream
       remoteRef.current.muted = false
       remoteRef.current.play().catch(console.error)
+      console.log("remoteRef.current", remoteRef.current)
     }
   }, [remoteStream])
 
@@ -193,7 +201,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
         <div className="content">{children}</div>
         {/* Локальный звук */}
 
-        <audio ref={localRef} autoPlay muted />
+        {/* <audio ref={localRef} autoPlay muted /> */}
         <audio ref={remoteRef} autoPlay playsInline />
         {status && (
           <div

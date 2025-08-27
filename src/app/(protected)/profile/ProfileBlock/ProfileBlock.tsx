@@ -34,7 +34,8 @@ import { ButtonUserStatus } from "@/components/buttonUserStatus/ButtonUserStatus
 import { getUserStatusThunk } from "@/store/thunks/usersThunk"
 // import { getSocket } from "@/lib/socket"
 // import { startCall } from "@/store/slices/callSlice"
-import { useCall } from "@/hooks/useCall"
+// import { useCall } from "@/hooks/useCall"
+import { useCallContext } from "@/providers/CallContext"
 // import { startCall } from "@/store/slices/callSlice"
 // import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
@@ -58,9 +59,10 @@ const ProfileBlock = ({
   const [isEdit, setIsEdit] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
-  const playerId = useAppSelector((state: RootState) => state.auth.userId)
+  // const playerId = useAppSelector((state: RootState) => state.auth.userId)
 
-  const { callStart } = useCall(playerId)
+  // const { callStart } = useCall(playerId)
+  const { callStart } = useCallContext()
   // const birthDate = watch("birthDate")
   // isMyProfilePage={isMyProfilePage} userId={userId}
   const dispatch = useAppDispatch()
@@ -152,6 +154,13 @@ const ProfileBlock = ({
   //   if (!profileData.profile) {
   //     return <div>Профиль не найден</div>
   //   }
+
+  useEffect(() => {
+    console.log("Компонент смонтирован")
+    return () => {
+      console.log("Компонент размонтирован!")
+    }
+  }, [])
   if (!profileData || !profileData.address || profileData.profileLoading) {
     return <div>Загрузка профиля...</div>
   }
@@ -184,39 +193,13 @@ const ProfileBlock = ({
   }
 
   const handleCall = () => {
-    // const token = localStorage.getItem("accessToken")
-    // if (!token) return
-    // if (!userId) return
     if (!userId) return
     const targetUserId = userId
-    // const socket = getSocket()
 
-    // Создаём уникальный roomId для звонка
-    // const roomId = `${socket.id}_${targetUserId}_${Date.now()}`
-    // console.log("roomId", roomId)
-    // Отправляем событие на сервер, чтобы уведомить пользователя
-    // socket.emit("call:start", { toUserId: targetUserId })
     callStart(targetUserId)
-    // Сохраняем локально, что звонок инициирован
-    // dispatch(startCall({ peerId: targetUserId }))
   }
-  // const handleCall = () => {
-  //   const token = localStorage.getItem("accessToken")
-  //   if (!token) return
-  //   if (!userId) return
-  //   const targetUserId = userId
-  //   const socket = getSocket(token)
 
-  //   // Создаём уникальный roomId для звонка
-  //   const roomId = `${socket.id}_${targetUserId}_${Date.now()}`
-  //   console.log("roomId", roomId)
-  //   // Отправляем событие на сервер, чтобы уведомить пользователя
-  //   socket.emit("callUser", { toUserId: targetUserId, roomId })
-
-  //   // Сохраняем локально, что звонок инициирован
-  //   dispatch(startCall({ roomId, peerId: targetUserId }))
-  // }
-
+  // console.log("Перерендер страницы")
   return (
     <>
       {changeAvatarModal && (
