@@ -113,7 +113,7 @@ const authSlice = createSlice({
       .addCase(logoutThunk.fulfilled, (state) => {
         state.authLoading = false
         state.isAuth = false
-        state.isAuth = false
+
         state.username = null
         state.avatar = null
         state.userId = null

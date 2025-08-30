@@ -22,11 +22,12 @@ import { Loading } from "@/assets/loading/loading"
 //   clearIncomingCall,
 //   setIncomingCall,
 // } from "@/store/slices/callSlice"
-import ButtonMenu from "@/components/ui/button/Button"
+// import ButtonMenu from "@/components/ui/button/Button"
 
 // import { Socket } from "socket.io-client"
 // import { useCall } from "@/hooks/useCall"
-import { useCallContext } from "./CallContext"
+// import { useCallContext } from "./CallContext"
+import { CallModal } from "@/components/CallModal/CallModal"
 
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -38,9 +39,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   const server = useAppSelector((state) => state.server) as ServerType
   const userId = useAppSelector((state: RootState) => state.auth.userId) // пример, где хранится user
 
-  const { status, callerId, targetId } = useAppSelector(
-    (state: RootState) => state.call
-  )
+  const status = useAppSelector((state: RootState) => state.call.status)
 
   // const {
   //   localStream,
@@ -53,11 +52,11 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   //   // status,
   // } = useCall(userId)
 
-  const { endCall, callAccept, localStream, remoteStream } = useCallContext()
+  // const { endCall, callAccept, localStream, remoteStream } = useCallContext()
 
-  console.log("status", status)
+  // console.log("status", status)
   // const localRef = useRef<HTMLAudioElement>(null)
-  const remoteRef = useRef<HTMLAudioElement>(null)
+  // const remoteRef = useRef<HTMLAudioElement>(null)
 
   // useEffect(() => {
   //   if (localRef.current && localStream) {
@@ -72,14 +71,14 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   //   }
   // }, [remoteStream])
 
-  useEffect(() => {
-    if (remoteRef.current && remoteStream) {
-      remoteRef.current.srcObject = remoteStream
-      remoteRef.current.muted = false
-      remoteRef.current.play().catch(console.error)
-      console.log("remoteRef.current", remoteRef.current)
-    }
-  }, [remoteStream])
+  // useEffect(() => {
+  //   if (remoteRef.current && remoteStream) {
+  //     remoteRef.current.srcObject = remoteStream
+  //     remoteRef.current.muted = false
+  //     remoteRef.current.play().catch(console.error)
+  //     console.log("remoteRef.current", remoteRef.current)
+  //   }
+  // }, [remoteStream])
 
   const handleShowToggleMenu = () => {
     setMenuOpen((prev) => !prev)
@@ -145,11 +144,11 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
     }
   }, [userId, dispatch])
 
-  useEffect(() => {
-    if (localStream) {
-      console.log("✅ localStream tracks:", localStream.getAudioTracks())
-    }
-  }, [localStream])
+  // useEffect(() => {
+  //   if (localStream) {
+  //     console.log("✅ localStream tracks:", localStream.getAudioTracks())
+  //   }
+  // }, [localStream])
 
   if (server?.loading) {
     return (
@@ -202,64 +201,67 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
         {/* Локальный звук */}
 
         {/* <audio ref={localRef} autoPlay muted /> */}
-        <audio ref={remoteRef} autoPlay playsInline />
-        {status && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              minHeight: "100vh",
-              minWidth: "100vw",
-              background: "#394d3e80",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <div style={{ background: "white", borderRadius: "20px" }}>
-              <div>{status}</div>
-              {callerId && <div>Кто:{callerId}</div>}
-              {targetId && <div>кому:{targetId}</div>}
-              {status === "calling" && (
-                <ButtonMenu
-                  onClick={() => {
-                    endCall()
-                  }}
-                >
-                  Отмена
-                </ButtonMenu>
-              )}
-              {status === "incoming" && (
-                <div>
-                  <ButtonMenu
-                    onClick={() => {
-                      callAccept()
-                    }}
-                  >
-                    Принять
-                  </ButtonMenu>
-                  <ButtonMenu
-                    onClick={() => {
-                      endCall()
-                    }}
-                  >
-                    Отказаться
-                  </ButtonMenu>
-                </div>
-              )}
-              {status === "inCall" && (
-                <ButtonMenu
-                  onClick={() => {
-                    endCall()
-                  }}
-                >
-                  завершить
-                </ButtonMenu>
-              )}
-            </div>
-          </div>
-        )}
+        {/* <audio ref={remoteRef} autoPlay playsInline /> */}
+        {
+          status && <CallModal />
+          // (
+          //   <div
+          //     style={{
+          //       position: "fixed",
+          //       top: 0,
+          //       left: 0,
+          //       minHeight: "100vh",
+          //       minWidth: "100vw",
+          //       background: "#394d3e80",
+          //       display: "flex",
+          //       justifyContent: "center",
+          //       alignItems: "center",
+          //     }}
+          //   >
+          //     <div style={{ background: "white", borderRadius: "20px" }}>
+          //       <div>{status}</div>
+          //       {callerId && <div>Кто:{callerId}</div>}
+          //       {targetId && <div>кому:{targetId}</div>}
+          //       {status === "calling" && (
+          //         <ButtonMenu
+          //           onClick={() => {
+          //             endCall()
+          //           }}
+          //         >
+          //           Отмена
+          //         </ButtonMenu>
+          //       )}
+          //       {status === "incoming" && (
+          //         <div>
+          //           <ButtonMenu
+          //             onClick={() => {
+          //               callAccept()
+          //             }}
+          //           >
+          //             Принять
+          //           </ButtonMenu>
+          //           <ButtonMenu
+          //             onClick={() => {
+          //               endCall()
+          //             }}
+          //           >
+          //             Отказаться
+          //           </ButtonMenu>
+          //         </div>
+          //       )}
+          //       {status === "inCall" && (
+          //         <ButtonMenu
+          //           onClick={() => {
+          //             endCall()
+          //           }}
+          //         >
+          //           завершить
+          //         </ButtonMenu>
+          //       )}
+          //     </div>
+          //   </div>
+          // )
+        }
       </div>
     </AuthProvider>
   )

@@ -1,0 +1,28 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-height: 100vh;
+  min-width: 100vw;
+  background: #0c0d1280;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container {
+  min-width: 30vw;
+  min-height: 50vh;
+  background-color: rgb(64, 64, 167);
+  border-radius: "20px";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 30px;
+  border-radius: 20px;
+  color: white;
+  .buttonBlock {
+    display: flex;
+    gap: 20px;
+  }
+}
