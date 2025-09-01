@@ -41,45 +41,6 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
   const status = useAppSelector((state: RootState) => state.call.status)
 
-  // const {
-  //   localStream,
-  //   remoteStream,
-
-  //   callAccept,
-  //   endCall,
-  //   // callerId,
-  //   // targetId,
-  //   // status,
-  // } = useCall(userId)
-
-  // const { endCall, callAccept, localStream, remoteStream } = useCallContext()
-
-  // console.log("status", status)
-  // const localRef = useRef<HTMLAudioElement>(null)
-  // const remoteRef = useRef<HTMLAudioElement>(null)
-
-  // useEffect(() => {
-  //   if (localRef.current && localStream) {
-  //     localRef.current.srcObject = localStream
-  //     // localRef.current.play().catch(console.error)
-  //   }
-  // }, [localStream])
-
-  // useEffect(() => {
-  //   if (remoteRef.current && remoteStream) {
-  //     remoteRef.current.srcObject = remoteStream
-  //   }
-  // }, [remoteStream])
-
-  // useEffect(() => {
-  //   if (remoteRef.current && remoteStream) {
-  //     remoteRef.current.srcObject = remoteStream
-  //     remoteRef.current.muted = false
-  //     remoteRef.current.play().catch(console.error)
-  //     console.log("remoteRef.current", remoteRef.current)
-  //   }
-  // }, [remoteStream])
-
   const handleShowToggleMenu = () => {
     setMenuOpen((prev) => !prev)
   }
@@ -144,12 +105,6 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
     }
   }, [userId, dispatch])
 
-  // useEffect(() => {
-  //   if (localStream) {
-  //     console.log("✅ localStream tracks:", localStream.getAudioTracks())
-  //   }
-  // }, [localStream])
-
   if (server?.loading) {
     return (
       <div
@@ -174,10 +129,6 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   if (server?.error) {
     return <div>Сервер не отвечает...</div>
   }
-  // console.log(
-  //   "console.log(localStream?.getAudioTracks());",
-  //   localStream?.getAudioTracks()
-  // )
 
   return (
     <AuthProvider>
@@ -198,70 +149,8 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
         />
 
         <div className="content">{children}</div>
-        {/* Локальный звук */}
 
-        {/* <audio ref={localRef} autoPlay muted /> */}
-        {/* <audio ref={remoteRef} autoPlay playsInline /> */}
-        {
-          status && <CallModal />
-          // (
-          //   <div
-          //     style={{
-          //       position: "fixed",
-          //       top: 0,
-          //       left: 0,
-          //       minHeight: "100vh",
-          //       minWidth: "100vw",
-          //       background: "#394d3e80",
-          //       display: "flex",
-          //       justifyContent: "center",
-          //       alignItems: "center",
-          //     }}
-          //   >
-          //     <div style={{ background: "white", borderRadius: "20px" }}>
-          //       <div>{status}</div>
-          //       {callerId && <div>Кто:{callerId}</div>}
-          //       {targetId && <div>кому:{targetId}</div>}
-          //       {status === "calling" && (
-          //         <ButtonMenu
-          //           onClick={() => {
-          //             endCall()
-          //           }}
-          //         >
-          //           Отмена
-          //         </ButtonMenu>
-          //       )}
-          //       {status === "incoming" && (
-          //         <div>
-          //           <ButtonMenu
-          //             onClick={() => {
-          //               callAccept()
-          //             }}
-          //           >
-          //             Принять
-          //           </ButtonMenu>
-          //           <ButtonMenu
-          //             onClick={() => {
-          //               endCall()
-          //             }}
-          //           >
-          //             Отказаться
-          //           </ButtonMenu>
-          //         </div>
-          //       )}
-          //       {status === "inCall" && (
-          //         <ButtonMenu
-          //           onClick={() => {
-          //             endCall()
-          //           }}
-          //         >
-          //           завершить
-          //         </ButtonMenu>
-          //       )}
-          //     </div>
-          //   </div>
-          // )
-        }
+        {status && <CallModal />}
       </div>
     </AuthProvider>
   )

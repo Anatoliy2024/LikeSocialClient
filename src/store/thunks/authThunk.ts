@@ -38,7 +38,6 @@ export const registerThunk = createAsyncThunk(
     try {
       const data = await authAPI.register(username, email, password, inviteKey)
       // console.log(data)
-
       // Распаковываем accessToken
       const decoded = jwtDecode<DecodedToken>(data.accessToken)
 
