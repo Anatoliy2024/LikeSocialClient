@@ -4,13 +4,15 @@ import { RootState } from "@/store/store"
 import ButtonMenu from "../ui/button/Button"
 import { useEffect, useRef } from "react"
 import style from "./CallModal.module.scss"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 export const CallModal = () => {
   const remoteRef = useRef<HTMLAudioElement>(null)
   const { endCall, callAccept, remoteStream } = useCallContext()
 
-  const { status, callerId, targetId } = useAppSelector(
-    (state: RootState) => state.call
-  )
+  const { status, callerId, targetId, avatarCaller, usernameCaller } =
+    useAppSelector((state: RootState) => state.call)
+  const avatar = useAppSelector((state: RootState) => state.profile.avatar)
+  const name = useAppSelector((state: RootState) => state.profile.name)
 
   useEffect(() => {
     if (remoteRef.current && remoteStream) {
@@ -41,8 +43,32 @@ export const CallModal = () => {
       >
         <div className={style.container}>
           <div>{status}</div>
-          {callerId && <div>Кто:{callerId}</div>}
-          {targetId && <div>кому:{targetId}</div>}
+          {callerId && (
+            <div className={style.infoCallBlock}>
+              <div className={style.imageContainer}>
+                <CloudinaryImage
+                  src={avatarCaller || ""}
+                  alt="avatar"
+                  width={300}
+                  height={300}
+                />
+              </div>
+              {usernameCaller}
+            </div>
+          )}
+          {targetId && (
+            <div className={style.infoCallBlock}>
+              <div className={style.imageContainer}>
+                <CloudinaryImage
+                  src={avatar || ""}
+                  alt="avatar"
+                  width={300}
+                  height={300}
+                />
+              </div>
+              {name}
+            </div>
+          )}
           {status === "calling" && (
             <ButtonMenu
               onClick={() => {

@@ -21,6 +21,16 @@
   gap: 30px;
   border-radius: 20px;
   color: white;
+  .infoCallBlock {
+    text-align: center;
+
+    color: rgb(209, 175, 235);
+    .imageContainer {
+      width: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+  }
   .buttonBlock {
     display: flex;
     gap: 20px;

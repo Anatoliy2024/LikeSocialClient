@@ -4,12 +4,16 @@ export type CallStatus = "calling" | "incoming" | "inCall" | ""
 interface CallState {
   status: CallStatus
   callerId: string | null
+  avatarCaller: string | null // кто звонит,,
+  usernameCaller: string | null // кто звонит,,
   targetId: string | null
 }
 
 const initialState: CallState = {
   status: "",
   callerId: null, // кто звонит,,
+  avatarCaller: null, // кто звонит,,
+  usernameCaller: null, // кто звонит,
   targetId: null, // кому звоним
 }
 
@@ -24,11 +28,15 @@ const callSlice = createSlice({
     setIncomingCall: (state, action) => {
       state.status = "incoming"
       state.callerId = action.payload.callerId
+      state.avatarCaller = action.payload.avatar
+      state.usernameCaller = action.payload.username
     },
     clearIncomingCall: (state) => {
       state.status = ""
       state.targetId = null
       state.callerId = null
+      state.avatarCaller = null
+      state.usernameCaller = null
     },
     acceptCall: (state) => {
       console.log("inCall")

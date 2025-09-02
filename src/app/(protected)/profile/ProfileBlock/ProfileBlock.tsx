@@ -76,6 +76,12 @@ const ProfileBlock = ({
   )
 
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
+  const username = useAppSelector(
+    (state: RootState) => state.auth.username
+  ) as string
+  const avatar = useAppSelector(
+    (state: RootState) => state.auth.avatar
+  ) as string
   // const playerId = useAppSelector((state: RootState) => state.auth.userId)
   const loading = useAppSelector(
     (state: RootState) => state.profile.profileLoading
@@ -196,7 +202,7 @@ const ProfileBlock = ({
     if (!userId) return
     const targetUserId = userId
 
-    callStart(targetUserId)
+    callStart(targetUserId, avatar, username)
   }
 
   // console.log("Перерендер страницы")
