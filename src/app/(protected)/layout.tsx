@@ -37,7 +37,7 @@ export default function ProtectedLayout({
         }
       })
       .catch(() => {
-        router.push("/register")
+        router.push("/auth")
       })
   }, [router])
 
