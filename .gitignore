@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+
+# Игнорировать сгенерированные CSS модули
+*.module.css
+*.module.css.map
+*.css.map
+reset.css
