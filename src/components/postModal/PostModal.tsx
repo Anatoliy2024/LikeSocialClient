@@ -29,6 +29,7 @@ import { Edit } from "@/assets/icons/edit"
 import PostForm, { FormCreatePost } from "../postForm/PostForm"
 import { addUserMovieThunk } from "@/store/thunks/userMoviesThunk"
 import { RootState } from "@/store/store"
+import Spinner from "../ui/spinner/Spinner"
 // import { ProfileLink } from "../ProfileLink/ProfileLink"
 // import { RootState } from '@/store/store'
 
@@ -60,7 +61,7 @@ const PostModal = ({
   // console.log("post", post)
   const [loading, setLoading] = useState(false)
   const [addMovie, setAddMovie] = useState(false)
-  // const [ reqestVoic, setReqestVoic] = useState(false)
+  // const [ sendingVoice, setSendingVoice] = useState(false)
   const dispatch = useAppDispatch()
   const loadingUserMovies = useAppSelector(
     (state: RootState) => state.userMovies.loading
@@ -106,6 +107,7 @@ const PostModal = ({
 
   const handleSendComment = async () => {
     setLoading(true)
+    // setSendingVoice(true)
     try {
       if (roomId) {
         await dispatch(
@@ -296,6 +298,7 @@ const PostModal = ({
                     </>
                   ) : (
                     <form onSubmit={handleSubmit(handleVoteSubmit)}>
+                      {loading && <Spinner />}
                       <div>
                         <span>Звёзды:</span>
                         <StarRating
