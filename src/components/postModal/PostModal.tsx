@@ -60,6 +60,7 @@ const PostModal = ({
   // console.log("post", post)
   const [loading, setLoading] = useState(false)
   const [addMovie, setAddMovie] = useState(false)
+  // const [ reqestVoic, setReqestVoic] = useState(false)
   const dispatch = useAppDispatch()
   const loadingUserMovies = useAppSelector(
     (state: RootState) => state.userMovies.loading
@@ -373,7 +374,7 @@ const PostModal = ({
                             <StarRatingView value={v.ratings.stars} />
                           </div>
                           <div>
-                            <div>Экшен: </div>
+                            <div>Актерская игра: </div>
                             <StarRatingView value={v.ratings.acting} />
                           </div>
                           <div>
