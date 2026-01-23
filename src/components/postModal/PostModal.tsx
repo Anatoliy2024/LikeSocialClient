@@ -61,7 +61,7 @@ const PostModal = ({
   // console.log("post", post)
   const [loading, setLoading] = useState(false)
   const [addMovie, setAddMovie] = useState(false)
-  // const [ sendingVoice, setSendingVoice] = useState(false)
+  const [sendingVoice, setSendingVoice] = useState(false)
   const dispatch = useAppDispatch()
   const loadingUserMovies = useAppSelector(
     (state: RootState) => state.userMovies.loading
@@ -142,6 +142,8 @@ const PostModal = ({
     specialEffects: number | undefined
     story: number | undefined
   }) => {
+    setSendingVoice(true)
+
     try {
       const dataToSend = {
         postId,
@@ -161,6 +163,8 @@ const PostModal = ({
       reset() // очистка формы
     } catch (err) {
       console.error("Ошибка при голосовании:", err)
+    } finally {
+      setSendingVoice(false)
     }
   }
 
@@ -298,7 +302,11 @@ const PostModal = ({
                     </>
                   ) : (
                     <form onSubmit={handleSubmit(handleVoteSubmit)}>
-                      {loading && <Spinner />}
+                      {sendingVoice && (
+                        <div className={style.spinnerWrapper}>
+                          <Spinner />
+                        </div>
+                      )}
                       <div>
                         <span>Звёзды:</span>
                         <StarRating

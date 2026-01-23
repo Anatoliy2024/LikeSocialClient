@@ -86,6 +86,29 @@
           }
         }
         .starsBlock {
+          form {
+            position: relative;
+            .spinnerWrapper {
+              // box-sizing: content-box;
+              top: -5%;
+              left: -5%;
+              // padding: 5px 10px;
+              min-width: 110%;
+              min-height: 110%;
+              background: rgba(17, 29, 42, 0.512);
+              position: absolute;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 10px;
+              div {
+                width: 70px;
+                height: 70px;
+              }
+              // top: 50%;
+              // left: 50%;
+            }
+          }
         }
         .othersStars {
           max-height: 370px;
