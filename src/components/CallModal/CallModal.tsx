@@ -17,7 +17,7 @@ export const CallModal = () => {
   useEffect(() => {
     if (remoteRef.current && remoteStream) {
       remoteRef.current.srcObject = remoteStream
-      remoteRef.current.muted = false
+      // remoteRef.current.muted = false //убрал
       remoteRef.current.play().catch(console.error)
       console.log("remoteRef.current", remoteRef.current)
     }

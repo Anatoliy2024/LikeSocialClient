@@ -44,6 +44,13 @@ export const useCall = (userId: string | null) => {
         channelCount: 1,
       },
     })
+
+    // Проверка
+    const audioTrack = stream.getAudioTracks()[0]
+    const settings = audioTrack.getSettings()
+    console.log("🎤 Echo cancellation:", settings.echoCancellation) // должно быть true
+    console.log("🎤 Noise suppression:", settings.noiseSuppression) // должно быть true
+
     stream.getAudioTracks().forEach((t) => (t.enabled = true))
     localStreamRef.current = stream
     setLocalStreamState(stream)
