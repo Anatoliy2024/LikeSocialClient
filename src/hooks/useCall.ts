@@ -136,10 +136,17 @@ export const useCall = (userId: string | null) => {
 
   //обновили hardCleanup
   const hardCleanup = () => {
-    try {
-      peerRef.current?.destroy()
-    } catch {}
-    peerRef.current = null
+    // try {
+    //   peerRef.current?.destroy()
+    // } catch {}
+    // peerRef.current = null
+    if (peerRef.current) {
+      peerRef.current.removeAllListeners()
+      try {
+        peerRef.current.destroy()
+      } catch {}
+      peerRef.current = null
+    }
 
     // Закрываем audioContext ПЕРЕД остановкой треков
     if (audioContextRef.current) {
@@ -149,9 +156,9 @@ export const useCall = (userId: string | null) => {
 
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((t) => t.stop())
+      localStreamRef.current = null
     }
 
-    localStreamRef.current = null
     setLocalStreamState(null)
     setRemoteStream(null)
   }

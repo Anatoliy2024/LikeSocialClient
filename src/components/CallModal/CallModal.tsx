@@ -14,12 +14,20 @@ export const CallModal = () => {
   const avatar = useAppSelector((state: RootState) => state.profile.avatar)
   const name = useAppSelector((state: RootState) => state.profile.name)
 
+  // useEffect(() => {
+  //   if (remoteRef.current && remoteStream) {
+  //     remoteRef.current.srcObject = remoteStream
+  //     // remoteRef.current.muted = false //убрал
+  //     remoteRef.current.play().catch(console.error)
+  //     console.log("remoteRef.current", remoteRef.current)
+  //   }
+  // }, [remoteStream])
   useEffect(() => {
-    if (remoteRef.current && remoteStream) {
-      remoteRef.current.srcObject = remoteStream
-      // remoteRef.current.muted = false //убрал
-      remoteRef.current.play().catch(console.error)
-      console.log("remoteRef.current", remoteRef.current)
+    if (remoteRef.current) {
+      remoteRef.current.srcObject = remoteStream ?? null
+      if (remoteStream) {
+        remoteRef.current.play().catch(console.error)
+      }
     }
   }, [remoteStream])
 
