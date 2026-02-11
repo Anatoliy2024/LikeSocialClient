@@ -22,12 +22,24 @@ export const CallModal = () => {
   //     console.log("remoteRef.current", remoteRef.current)
   //   }
   // }, [remoteStream])
+  // useEffect(() => {
+  //   if (remoteRef.current) {
+  //     remoteRef.current.srcObject = remoteStream ?? null
+  //     if (remoteStream) {
+  //       remoteRef.current.play().catch(console.error)
+  //     }
+  //   }
+  // }, [remoteStream])
+
   useEffect(() => {
-    if (remoteRef.current) {
-      remoteRef.current.srcObject = remoteStream ?? null
-      if (remoteStream) {
-        remoteRef.current.play().catch(console.error)
-      }
+    if (!remoteRef.current) return
+
+    // Устанавливаем поток или null
+    remoteRef.current.srcObject = remoteStream ?? null
+
+    // Если есть поток, проигрываем
+    if (remoteStream) {
+      remoteRef.current.play().catch(console.error)
     }
   }, [remoteStream])
 

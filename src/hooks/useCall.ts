@@ -142,9 +142,7 @@ export const useCall = (userId: string | null) => {
     // peerRef.current = null
     if (peerRef.current) {
       peerRef.current.removeAllListeners()
-      try {
-        peerRef.current.destroy()
-      } catch {}
+      peerRef.current.destroy()
       peerRef.current = null
     }
 
