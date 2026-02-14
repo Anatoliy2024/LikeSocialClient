@@ -51,6 +51,7 @@
 
     .genresBlockSlider {
       display: flex;
+
       gap: 12px;
       // animation: scrollGenres 20s linear infinite;
       width: max-content;
@@ -146,13 +147,13 @@
 
 @keyframes scrollBackAndForth {
   0% {
-    transform: translateX(0);
+    transform: translateX(5%);
   }
   50% {
-    transform: translateX(calc(-100% + 100vw));
+    transform: translateX(-80%);
   } /* ширина текста минус ширина контейнера */
   100% {
-    transform: translateX(0);
+    transform: translateX(5%);
   }
 }
 
