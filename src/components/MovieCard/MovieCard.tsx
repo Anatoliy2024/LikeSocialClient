@@ -1,5 +1,5 @@
 "use client"
-import React from "react"
+import React, { useEffect, useRef, useState } from "react"
 import style from "./MovieCard.module.scss"
 // import Image from "next/image"
 import { UserMovieType } from "@/store/slices/userMoviesSlice"
@@ -13,6 +13,18 @@ export type MovieCardProps = {
 }
 
 const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const sliderRef = useRef<HTMLDivElement>(null)
+  const [needsScroll, setNeedsScroll] = useState(false)
+
+  useEffect(() => {
+    if (containerRef.current && sliderRef.current) {
+      setNeedsScroll(
+        sliderRef.current.scrollWidth > containerRef.current.offsetWidth
+      )
+    }
+  }, [movie.genres])
+
   return (
     <>
       <div className={style.card} onClick={onClick}>
@@ -30,10 +42,17 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
           <h3 className={style.title}>{movie.title}</h3>
           {movie.genres?.length > 0 ? (
             <div className={style.genresBlockContainer}>
-              <div className={style.genresBlockWindow}>
-                <div className={style.genresBlockSlider}>
+              <div className={style.genresBlockWindow} ref={containerRef}>
+                <div
+                  className={`${style.genresBlockSlider} ${
+                    needsScroll ? style.scroll : ""
+                  }`}
+                  ref={sliderRef}
+                >
                   {movie.genres.map((genre, index) => (
-                    <div key={index}>{translatorGenres(genre)}</div>
+                    <div key={index} className={style.genreItem}>
+                      {translatorGenres(genre)}
+                    </div>
                   ))}
                 </div>
               </div>
