@@ -1,0 +1,12 @@
+.modalAddGroup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.556);
+  z-index: 100;
+}

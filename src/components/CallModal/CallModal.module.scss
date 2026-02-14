@@ -10,10 +10,11 @@
   align-items: center;
 }
 .container {
-  min-width: 30vw;
+  min-width: clamp(300px, 25vw, 500px);
+  // width: clamp(400px, ,500px);
   min-height: 50vh;
   background-color: rgb(64, 64, 167);
-  border-radius: "20px";
+  border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;

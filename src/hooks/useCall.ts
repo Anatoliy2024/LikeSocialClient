@@ -14,6 +14,7 @@ import type { SignalData } from "simple-peer"
 type Maybe<T> = T | null
 
 export const useCall = (userId: string | null) => {
+  const [loadingConnect, setLoadingConnect] = useState(false)
   console.log("useCall init", userId)
   const dispatch = useAppDispatch()
   const { callerId, targetId } = useAppSelector((s: RootState) => s.call)
@@ -159,6 +160,7 @@ export const useCall = (userId: string | null) => {
 
     setLocalStreamState(null)
     setRemoteStream(null)
+    setLoadingConnect(false)
   }
   // ---- Создание Peer ----
   const createPeer = (initiator: boolean, stream: MediaStream) => {
@@ -208,16 +210,11 @@ export const useCall = (userId: string | null) => {
         console.log("from", from)
         s?.emit("call:signal", { to: from, signal })
       })
-      const onConnect = () => dispatch(acceptCall())
+      const onConnect = () => {
+        dispatch(acceptCall())
+        setLoadingConnect(false)
+      }
       peer.on("connect", onConnect)
-
-      // if (!targetId) return
-      // const stream = await getOrCreateLocalStream()
-      // const peer = createPeer(true, stream)
-      // peer.on("signal", (signal) =>
-      //   s.emit("call:signal", { to: targetId, signal })
-      // )
-      // dispatch(acceptCall())
     })
 
     const onSignal = async ({
@@ -233,8 +230,6 @@ export const useCall = (userId: string | null) => {
       if (signal.type === "offer") {
         if (!peerRef.current) {
           console.log("Incoming offer, show accept UI")
-          // dispatch(setIncomingCall({ callerId: from }))
-          // offerSignalRef.current = signal
 
           const stream = await getOrCreateLocalStream()
           const peer = createPeer(false, stream)
@@ -268,8 +263,7 @@ export const useCall = (userId: string | null) => {
       s.off("call:end")
     }
   }, [userId])
-  // console.log("peerRef.current******************************", peerRef.current)
-  // ---- Публичные экшены ----
+
   const callStart = async (toId: string, avatar: string, username: string) => {
     dispatch(startCall({ peerId: toId }))
 
@@ -279,40 +273,12 @@ export const useCall = (userId: string | null) => {
       avatar,
       username,
     })
-
-    // const stream = await getOrCreateLocalStream()
-    // const peer = createPeer(true, stream)
-
-    // peerRef2.current = true
-    // console.log(" peerRef2.current callAccept", peerRef2.current)
-
-    // peer.on("signal", (signal) => {
-    //   console.log("callee generated callStart", signal)
-    //   socket?.emit("call:signal", { to: toId, signal })
-    // })
-    // const onConnect = () => dispatch(acceptCall())
-    // peer.on("connect", onConnect)
   }
 
   const callAccept = async () => {
+    setLoadingConnect(true)
     socket?.emit("call:accept", { to: callerId })
     console.log("Нажал принять")
-    // dispatch(acceptCall())
-
-    // if (!callerId || !offerSignalRef.current) return
-
-    // const stream = await getOrCreateLocalStream()
-    // const peer = createPeer(false, stream)
-
-    // peer.on("signal", (signal) => {
-    //   console.log("callee generated callAccept", signal)
-
-    //   socket?.emit("call:signal", { to: callerId, signal })
-    // })
-    // const onConnect = () => dispatch(acceptCall())
-    // peer.on("connect", onConnect)
-
-    // peer.signal(offerSignalRef.current)
   }
 
   const endCall = () => {
@@ -325,15 +291,7 @@ export const useCall = (userId: string | null) => {
       hardCleanup()
     }
     dispatch(clearIncomingCall())
-    //удаление данных
-    // offerSignalRef.current = null
   }
-
-  // const setMuted = (muted: boolean) => {
-  //   localStreamRef.current
-  //     ?.getAudioTracks()
-  //     .forEach((t) => (t.enabled = !muted))
-  // }
 
   return {
     localStream: localStreamState,
@@ -341,6 +299,6 @@ export const useCall = (userId: string | null) => {
     callStart,
     callAccept,
     endCall,
-    // setMuted,
+    loadingConnect,
   }
 }

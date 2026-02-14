@@ -47,13 +47,13 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
         </span> */}
           {movie?.watchedAt && (
             <span className={style.date}>
-              Просмотрено
+              watch:
               {new Date(movie.watchedAt).toLocaleDateString()}
             </span>
           )}
 
           <span className={style.date}>
-            Добавлено
+            add:
             {new Date(movie.addedAt).toLocaleDateString()}
           </span>
         </div>

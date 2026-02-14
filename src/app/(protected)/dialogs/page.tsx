@@ -1,5 +1,5 @@
 "use client"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import style from "./Dialogs.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { getUserDialogsThunk } from "@/store/thunks/dialogsThunk"
@@ -10,13 +10,17 @@ import { useRouter } from "next/navigation"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
+import ButtonMenu from "@/components/ui/button/Button"
+import { ModalAddGroup } from "@/components/ModalAddGroup/ModalAddGroup"
 
 export default function Dialogs() {
+  const [showAddGroup, setShowAddGroup] = useState(false)
   const dispatch = useAppDispatch()
   const dialogs = useAppSelector((state: RootState) => state.dialogs.dialogs)
   const loading = useAppSelector((state: RootState) => state.dialogs.loading)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
+
   const router = useRouter()
   const handleLinkDialog = (dialogId: string) => {
     router.push(`/dialog/${dialogId}`)
@@ -25,11 +29,29 @@ export default function Dialogs() {
   useEffect(() => {
     dispatch(getUserDialogsThunk())
   }, [dispatch])
-  console.log("dialogs", dialogs)
+  // console.log("dialogs", dialogs)
+
+  const closeModalAddGroup = () => {
+    setShowAddGroup(false)
+  }
+
   return (
     <>
       {loading && <SpinnerWindow />}
       <div className={style.containerDialogs}>
+        {showAddGroup && (
+          <ModalAddGroup closeModalAddGroup={closeModalAddGroup} />
+        )}
+        <div className={style.buttonBlock}>
+          <ButtonMenu
+            onClick={() => {
+              setShowAddGroup(true)
+              // dispatch(createRoomThunk(name))
+            }}
+          >
+            Создать группу
+          </ButtonMenu>
+        </div>
         {/* <h2>Dialogs</h2> */}
         {dialogs.map.length > 0 ? (
           <ul className={style.dialogLists}>
