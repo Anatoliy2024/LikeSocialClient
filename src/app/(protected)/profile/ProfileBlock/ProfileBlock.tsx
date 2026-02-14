@@ -36,6 +36,7 @@ import { getUserStatusThunk } from "@/store/thunks/usersThunk"
 // import { startCall } from "@/store/slices/callSlice"
 // import { useCall } from "@/hooks/useCall"
 import { useCallContext } from "@/providers/CallContext"
+import { IconCall } from "@/assets/icons/IconCall"
 // import { startCall } from "@/store/slices/callSlice"
 // import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
@@ -444,7 +445,9 @@ const ProfileBlock = ({
                       onClick={handleCall}
                       // className={style.linkWantToSee}
                     >
-                      <div>📞</div>
+                      <div className={style.iconCall}>
+                        <IconCall />
+                      </div>
                       {/* <ButtonMenu>Список желаемого</ButtonMenu> */}
                     </div>
                   )}
