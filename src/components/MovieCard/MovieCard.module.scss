@@ -71,6 +71,7 @@
     padding: 1rem;
     display: flex;
     flex-direction: column;
+    flex: 1 1 1fr;
     gap: 0.5rem;
     width: 100%;
     @media (max-width: 500px) {
