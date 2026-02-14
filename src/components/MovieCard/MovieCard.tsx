@@ -45,7 +45,15 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
           {/* <span className={style.status}>
           {movie.status === "wantToSee" ? "Хочу посмотреть" : "Просмотрено"}
         </span> */}
+          {movie?.watchedAt && (
+            <span className={style.date}>
+              Просмотрено
+              {new Date(movie.watchedAt).toLocaleDateString()}
+            </span>
+          )}
+
           <span className={style.date}>
+            Добавлено
             {new Date(movie.addedAt).toLocaleDateString()}
           </span>
         </div>

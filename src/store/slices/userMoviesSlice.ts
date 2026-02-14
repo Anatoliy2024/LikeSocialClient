@@ -25,7 +25,8 @@ export type UserMovieType = {
 
   content?: string
   status: "wantToSee" | "watched"
-  addedAt: string
+  addedAt: Date
+  watchedAt?: Date | null
   imageId?: imageIdType | null
 }
 
