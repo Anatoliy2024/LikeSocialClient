@@ -42,42 +42,44 @@ export function ModalAddGroup({
   }, [, dispatch, pageUserFriendsFromUrl])
   return (
     <div className={style.modalAddGroup}>
-      <div>
-        <input type="text" id="group-name" />
-        <label htmlFor="group-name">Название группы</label>
-      </div>
-      <div>
-        {friendsUsers.length > 0 &&
-          friendsUsers.map((user, i) => <div key={i}>{user.username}</div>)}
-        {friendsPages > 1 && (
-          <Paginator
-            pages={friendsPages}
-            onPageChange={handlePageChange}
-            page={friendsPage}
-          />
-        )}
-      </div>
+      <div className={style.modalAddGroup__wrapper}>
+        <div>
+          <input type="text" id="group-name" />
+          <label htmlFor="group-name">Название группы</label>
+        </div>
+        <div>
+          {friendsUsers.length > 0 &&
+            friendsUsers.map((user, i) => <div key={i}>{user.username}</div>)}
+          {friendsPages > 1 && (
+            <Paginator
+              pages={friendsPages}
+              onPageChange={handlePageChange}
+              page={friendsPage}
+            />
+          )}
+        </div>
 
-      <div className={style.buttonBlock}>
-        <ButtonMenu
-          onClick={() => {
-            // closeModalAddGroup()
-            console.log("Группа создана")
-            // dispatch(createRoomThunk(name))
-          }}
-        >
-          Создать
-        </ButtonMenu>
-      </div>
-      <div className={style.buttonBlock}>
-        <ButtonMenu
-          onClick={() => {
-            closeModalAddGroup()
-            // dispatch(createRoomThunk(name))
-          }}
-        >
-          Отмена
-        </ButtonMenu>
+        <div className={style.buttonBlock}>
+          <ButtonMenu
+            onClick={() => {
+              // closeModalAddGroup()
+              console.log("Группа создана")
+              // dispatch(createRoomThunk(name))
+            }}
+          >
+            Создать
+          </ButtonMenu>
+        </div>
+        <div className={style.buttonBlock}>
+          <ButtonMenu
+            onClick={() => {
+              closeModalAddGroup()
+              // dispatch(createRoomThunk(name))
+            }}
+          >
+            Отмена
+          </ButtonMenu>
+        </div>
       </div>
     </div>
   )
