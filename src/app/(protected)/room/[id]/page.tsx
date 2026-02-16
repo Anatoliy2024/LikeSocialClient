@@ -16,7 +16,7 @@ import {
 } from "@/store/thunks/roomsThunk"
 import { MemberInfo } from "@/components/memberInfo/MemberInfo"
 import ButtonMenu from "@/components/ui/button/Button"
-import { AddMembersToRoom } from "../addMembersToRoom/AddMembersToRoom"
+// import { AddMembersToRoom } from "../addMembersToRoom/AddMembersToRoom"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 // import Image from "next/image"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
@@ -25,6 +25,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { RootState } from "@/store/store"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
+import { AddMembers } from "@/components/AddMembers/AddMembers"
 
 const Room = () => {
   const [addFriendsToRoom, setAddFriendsToRoom] = useState(false)
@@ -160,10 +161,10 @@ const Room = () => {
   return (
     <>
       {addFriendsToRoom && (
-        <AddMembersToRoom
+        <AddMembers
           members={room?.members as []}
           friends={friends}
-          handleCloseAddMembersFromRoom={handleCloseAddMembersFromRoom}
+          handleCloseAddMembers={handleCloseAddMembersFromRoom}
           onSubmitMembers={onSubmitMembers}
           onChangePageFriends={handleChangeUrlFriendsPage}
           page={friendsPage}

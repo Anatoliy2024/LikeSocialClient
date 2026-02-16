@@ -1,0 +1,9 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  .member {
+    .checkboxLabel {
+      display: flex;
+    }
+  }
+}

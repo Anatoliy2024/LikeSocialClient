@@ -34,6 +34,7 @@ export default function Dialogs() {
   const closeModalAddGroup = () => {
     setShowAddGroup(false)
   }
+  console.log("dialog")
 
   return (
     <>
@@ -59,7 +60,6 @@ export default function Dialogs() {
               const member = dialog.members.filter(
                 (member) => member._id !== userId
               )[0]
-              console.log("dialog", dialog)
 
               return (
                 <li

@@ -15,6 +15,7 @@ import notifications from "./slices/notificationsSlice"
 import onlineStatus from "./slices/onlineStatusSlice"
 import dialogsReducer from "./slices/dialogsSlice"
 import callReducer from "./slices/callSlice"
+import groupsReducer from "./slices/groupsSlice"
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +32,7 @@ export const store = configureStore({
     onlineStatus: onlineStatus,
     dialogs: dialogsReducer,
     call: callReducer,
+    groups: groupsReducer,
     // добавь другие редьюсеры здесь
   },
 })

@@ -1,0 +1,65 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  background: #00000066;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(195, 195, 205);
+  z-index: 5;
+  .container {
+    min-width: 70vw;
+    min-height: 60vh;
+    background: rgb(50, 46, 81);
+    border-radius: 20px;
+    padding: 20px;
+
+    @media (max-width: 850px) {
+      min-width: 90vw;
+      min-height: 80vh;
+    }
+
+    h3 {
+      text-align: center;
+    }
+  }
+}
+
+// .wrapper {
+//   padding: 16px;
+//   background-color: #fff;
+//   border-radius: 8px;
+// }
+
+// .container {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 16px;
+// }
+
+// .list {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 8px;
+//   max-height: 300px;
+//   overflow-y: auto;
+// }
+
+// .member {
+//   display: flex;
+//   align-items: center;
+// }
+
+// .checkboxLabel {
+//   display: flex;
+//   align-items: center;
+//   gap: 10px;
+// }
+
+// .buttons {
+//   display: flex;
+//   justify-content: space-between;
+// }
