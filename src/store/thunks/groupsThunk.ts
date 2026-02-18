@@ -1,44 +1,78 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import {
-  // DialogShortType,
-  DialogType,
-  MessageType,
-} from "../slices/dialogsSlice"
-import { dialogsAPI } from "@/api/api"
+
+import { groupsAPI } from "@/api/api"
 import axios from "axios"
+import { GroupType, MessageGroupType } from "../slices/groupsSlice"
+
+type TypeCreateGroup = {
+  name: string
+  selectedMember: string[]
+  description: string
+}
 
 // ✅ Получить все диалоги
-export const getUserDialogsThunk = createAsyncThunk<
-  DialogType[],
-  void,
+export const createUserGroupsThunk = createAsyncThunk<
+  GroupType[],
+  TypeCreateGroup,
   { rejectValue: string }
->("dialogs/getAll", async (_, thunkAPI) => {
+>("groups/create", async ({ name, selectedMember, description }, thunkAPI) => {
   try {
-    const data = await dialogsAPI.getUserDialog()
+    const data = await groupsAPI.createGroups(name, selectedMember, description)
     return data
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
-    return thunkAPI.rejectWithValue("Не удалось загрузить диалоги")
+    return thunkAPI.rejectWithValue("Не удалось создать группу группы")
   }
 })
+// ✅ Получить все диалоги
+export const getUserGroupsThunk = createAsyncThunk<
+  GroupType[],
+  void,
+  { rejectValue: string }
+>("groups/getAll", async (_, thunkAPI) => {
+  try {
+    const data = await groupsAPI.getAllGroups()
+    return data
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+    return thunkAPI.rejectWithValue("Не удалось загрузить группы")
+  }
+})
+// export const getUserDialogsThunk = createAsyncThunk<
+//   DialogType[],
+//   void,
+//   { rejectValue: string }
+// >("dialogs/getAll", async (_, thunkAPI) => {
+//   try {
+//     const data = await dialogsAPI.getUserDialog()
+//     return data
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
+//     }
+//     return thunkAPI.rejectWithValue("Не удалось загрузить диалоги")
+//   }
+// })
 
 // ✅ Получить сообщения по dialogId
 export const getUserMessagesThunk = createAsyncThunk<
   {
-    messages: MessageType[]
-    dialog: DialogType
+    messages: MessageGroupType[]
+    group: GroupType
     totalCount: number
     pages: number
-    isOnline?: boolean
-    lastSeen?: string | null
+    // isOnline?: boolean
+    // lastSeen?: string | null
   },
-  { dialogId: string; page: number },
+  { groupId: string; page: number },
   { rejectValue: string }
->("dialogs/getMessages", async ({ dialogId, page }, thunkAPI) => {
+>("dialogs/getMessages", async ({ groupId, page }, thunkAPI) => {
   try {
-    const data = await dialogsAPI.getUserMessage(dialogId, page)
+    const data = await groupsAPI.getMessagesGroup(groupId, page)
     return data
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {

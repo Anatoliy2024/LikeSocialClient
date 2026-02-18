@@ -9,10 +9,11 @@ import { RootState } from "@/store/store"
 // import { AddMembers } from "../AddMembers/AddMembers"
 import { MembersSelectList } from "../MembersSelectList/MembersSelectList"
 import { useForm } from "react-hook-form"
+import { createUserGroupsThunk } from "@/store/thunks/groupsThunk"
 
 type FormData = {
-  groupName: string | null
-  description: string | null
+  groupName: string
+  description: string
   selected: string[]
 }
 
@@ -34,8 +35,8 @@ export function ModalAddGroup({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      groupName: null,
-      description: null,
+      groupName: "",
+      description: "",
       selected: [], // массив id выбранных друзей
     },
   })
@@ -60,8 +61,15 @@ export function ModalAddGroup({
   }
 
   const onSubmit = (data: FormData) => {
+    if (!data.groupName) return
+    const newData = {
+      groupName: data.groupName,
+      selectedMember: selected,
+      description: data.description,
+    }
     // data.selected будет массивом id выбранных друзей
     // onSubmitMembers(data.selected)
+    dispatch(createUserGroupsThunk(newData))
     console.log("data", data)
   }
 

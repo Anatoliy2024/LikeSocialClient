@@ -4,11 +4,11 @@ import {
 } from "@reduxjs/toolkit"
 
 import {
-  getUserDialogsThunk,
-  //   getUserMessagesThunk,
-} from "../thunks/dialogsThunk"
+  createUserGroupsThunk,
+  getUserGroupsThunk,
+} from "../thunks/groupsThunk"
 
-export interface MessageType {
+export interface MessageGroupType {
   _id: string
   senderId: {
     _id: string
@@ -20,14 +20,14 @@ export interface MessageType {
   createdAt: string
 }
 
-export interface DialogType {
+export interface GroupType {
   _id: string
   members: {
     _id: string
     username: string
     avatar: string
   }[]
-  lastMessageId?: MessageType
+  lastMessageId?: MessageGroupType
 }
 // export interface DialogShortType {
 //   _id: string
@@ -36,9 +36,9 @@ export interface DialogType {
 // }
 
 interface GroupsState {
-  // dialogs: DialogType[]
-  // messages: MessageType[]
-  // currentDialog: DialogType | null
+  groups: GroupType[]
+  messages: MessageGroupType[]
+  currentGroup: GroupType | null
   loading: boolean
   error: string | null
   // totalCount: number
@@ -50,9 +50,9 @@ interface GroupsState {
 }
 
 const initialState: GroupsState = {
-  // dialogs: [],
-  // messages: [],
-  // currentDialog: null,
+  groups: [],
+  messages: [],
+  currentGroup: null,
   loading: false,
   error: null,
   // totalCount: 0,
@@ -64,7 +64,7 @@ const initialState: GroupsState = {
 }
 
 const groupsSlice = createSlice({
-  name: "dialogs",
+  name: "groups",
   initialState,
   reducers: {
     // // setCurrentDialog(state, action: PayloadAction<string>) {
@@ -93,17 +93,30 @@ const groupsSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(getUserDialogsThunk.pending, (state) => {
+      .addCase(createUserGroupsThunk.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(getUserDialogsThunk.fulfilled, (state) => {
-        // state.dialogs = action.payload
+      .addCase(createUserGroupsThunk.fulfilled, (state, action) => {
+        state.groups = action.payload
         state.loading = false
       })
-      .addCase(getUserDialogsThunk.rejected, (state, action) => {
+      .addCase(createUserGroupsThunk.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || "Ошибка загрузки диалогов"
+        state.error = action.error.message || "Ошибка создания групп"
+      })
+
+      .addCase(getUserGroupsThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(getUserGroupsThunk.fulfilled, (state, action) => {
+        state.groups = action.payload
+        state.loading = false
+      })
+      .addCase(getUserGroupsThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Ошибка загрузки групп"
       })
 
     // .addCase(getUserMessagesThunk.pending, (state) => {

@@ -51,6 +51,18 @@ export const useCall = (userId: string | null) => {
     console.log("🎤 Echo cancellation:", settings.echoCancellation) // должно быть true
     console.log("🎤 Noise suppression:", settings.noiseSuppression) // должно быть true
 
+    // Проверяем возможности
+    const capabilities = audioTrack.getCapabilities?.()
+    console.group("🎤 Audio Track Diagnostics")
+    console.log("Echo cancellation supported:", capabilities?.echoCancellation)
+    console.log(
+      "Echo cancellation active:",
+      audioTrack.getSettings().echoCancellation
+    )
+    console.log("Noise suppression:", audioTrack.getSettings().noiseSuppression)
+    console.log("Sample rate:", audioTrack.getSettings().sampleRate)
+    console.groupEnd()
+
     stream.getAudioTracks().forEach((t) => (t.enabled = true))
     localStreamRef.current = stream
     setLocalStreamState(stream)

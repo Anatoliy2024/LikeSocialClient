@@ -22,9 +22,25 @@ export const CallModal = () => {
 
     // Если есть поток, проигрываем
     if (remoteStream) {
-      remoteRef.current.play().catch(console.error)
+      remoteRef.current.play().catch((err) => {
+        console.warn("⚠️ Autoplay blocked, waiting for interaction:", err)
+        // Можно показать пользователю кнопку "Включить звук"
+      })
     }
+    // // Если есть поток, проигрываем
+    // if (remoteStream) {
+    //   remoteRef.current.play().catch(console.error)
+    // }
   }, [remoteStream])
+
+  useEffect(() => {
+    return () => {
+      if (remoteRef.current?.srcObject) {
+        remoteRef.current.srcObject = null
+        remoteRef.current.pause()
+      }
+    }
+  }, [])
 
   return (
     <>
