@@ -1,3 +1,7 @@
+export default function Dialogs() {
+  return <div></div>
+}
+
 // "use client"
 // import { useEffect, useState } from "react"
 // import style from "./Dialogs.module.scss"
