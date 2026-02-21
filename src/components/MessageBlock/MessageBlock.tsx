@@ -14,7 +14,6 @@ import {
   addMessageFromSocket,
   incrementPage,
   clearMessages,
-  MessageType,
 } from "@/store/slices/conversationsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
@@ -29,6 +28,7 @@ import { formatData } from "@/utils/formatData"
 import { TrashThree } from "@/assets/icons/trashThree"
 import { Clear } from "@/assets/icons/clear"
 import { OptionIcon } from "@/assets/icons/optionIcon"
+import { MessageType } from "@/types/conversation.types"
 
 export const MessageBlock = () => {
   const router = useRouter()
