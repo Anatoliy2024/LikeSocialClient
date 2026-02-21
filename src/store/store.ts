@@ -13,9 +13,10 @@ import server from "./slices/serverSlice"
 import userMovies from "./slices/userMoviesSlice"
 import notifications from "./slices/notificationsSlice"
 import onlineStatus from "./slices/onlineStatusSlice"
-import dialogsReducer from "./slices/dialogsSlice"
+// import dialogsReducer from "./slices/dialogsSlice"
 import callReducer from "./slices/callSlice"
-import groupsReducer from "./slices/groupsSlice"
+import conversationsReducer from "./slices/conversationsSlice"
+// import messagesReducer from "./slices/messagesSlice"
 
 export const store = configureStore({
   reducer: {
@@ -30,9 +31,10 @@ export const store = configureStore({
     userMovies: userMovies,
     notifications: notifications,
     onlineStatus: onlineStatus,
-    dialogs: dialogsReducer,
+    // dialogs: dialogsReducer,
     call: callReducer,
-    groups: groupsReducer,
+    conversations: conversationsReducer,
+    // messages: messagesReducer,
     // добавь другие редьюсеры здесь
   },
 })

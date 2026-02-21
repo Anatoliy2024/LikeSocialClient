@@ -223,110 +223,113 @@ export const toggleUserMovieStatusThunk = createAsyncThunk<
   }
 )
 
-// Получить свои фильмы по статусу "wantToSee"
-export const fetchMyWantToSeeMoviesThunk = createAsyncThunk<
+export const fetchUserMoviesThunk = createAsyncThunk<
   UserMovieResponseType,
-  number,
+  {
+    status: "wantToSee" | "watched"
+    page: number
+    limit?: number
+    userId?: string
+  },
   { rejectValue: string }
->("userMovie/fetchMyWantToSee", async (page, thunkAPI) => {
+>("userMovie/fetchUserMovies", async (params, thunkAPI) => {
   try {
-    const movies = await userMovieAPI.getMyWantToSeeMovies(page)
-    console.log("fetchMyWantToSeeMoviesThunk", movies)
+    const movies = await userMovieAPI.getUserMovies(params)
     return movies
   } catch (error: unknown) {
-    // Проверка, является ли ошибка ошибкой Axios
     if (axios.isAxiosError(error) && error.response?.data?.message) {
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
 
-    // если это вообще не ошибка axios или нет message
-    return thunkAPI.rejectWithValue(
-      "Ошибка при получении моих хочу посмотреть фильмов fetchMyWantToSeeMoviesThunk"
-    )
+    return thunkAPI.rejectWithValue("Ошибка при получении фильмов")
   }
 })
 
-// Получить свои фильмы по статусу "watched"
-export const fetchMyWatchedMoviesThunk = createAsyncThunk<
-  UserMovieResponseType, // тип данных, которые вернутся — массив пользователей
-  number, // параметр тип данных которые отправляю
-  { rejectValue: string }
->("userMovie/fetchMyWatched", async (page, thunkAPI) => {
-  try {
-    const movies = await userMovieAPI.getMyWatchedMovies(page)
-    return movies
-  } catch (error: unknown) {
-    // Проверка, является ли ошибка ошибкой Axios
-    if (axios.isAxiosError(error) && error.response?.data?.message) {
-      return thunkAPI.rejectWithValue(error.response.data.message)
-    }
-
-    // если это вообще не ошибка axios или нет message
-    return thunkAPI.rejectWithValue(
-      "Ошибка при получении моих просмотренных фильмов fetchMyWatchedMoviesThunk"
-    )
-  }
-})
-
-// Получить публичные фильмы другого пользователя "wantToSee"
-export const fetchPublicWantToSeeMoviesThunk = createAsyncThunk<
-  UserMovieResponseType, // тип данных, которые вернутся — массив пользователей
-  { userId: string; page: number }, // параметр тип данных которые отправляю
-  { rejectValue: string }
->("userMovie/fetchPublicWantToSee", async ({ userId, page }, thunkAPI) => {
-  try {
-    const movies = await userMovieAPI.getPublicWantToSeeMovies(userId, page)
-    return movies
-  } catch (error: unknown) {
-    // Проверка, является ли ошибка ошибкой Axios
-    if (axios.isAxiosError(error) && error.response?.data?.message) {
-      return thunkAPI.rejectWithValue(error.response.data.message)
-    }
-
-    // если это вообще не ошибка axios или нет message
-    return thunkAPI.rejectWithValue(
-      "Ошибка при получении фильмов юзера хочу посмотреть фильмов fetchPublicWantToSeeMoviesThunk"
-    )
-  }
-})
-
-// Получить публичные фильмы другого пользователя "watched"
-export const fetchPublicWatchedMoviesThunk = createAsyncThunk<
-  UserMovieResponseType, // тип данных, которые вернутся — массив пользователей
-  { userId: string; page: number }, // параметр тип данных которые отправляю
-  { rejectValue: string }
->("userMovie/fetchPublicWatched", async ({ userId, page }, thunkAPI) => {
-  try {
-    const movies = await userMovieAPI.getPublicWatchedMovies(userId, page)
-    return movies
-  } catch (error: unknown) {
-    // Проверка, является ли ошибка ошибкой Axios
-    if (axios.isAxiosError(error) && error.response?.data?.message) {
-      return thunkAPI.rejectWithValue(error.response.data.message)
-    }
-
-    // если это вообще не ошибка axios или нет message
-    return thunkAPI.rejectWithValue(
-      "Ошибка при получении  просмотренных фильмов юзера  fetchPublicWatchedMoviesThunk"
-    )
-  }
-})
-
-// export const getUserMovieThunk = createAsyncThunk(
-//   "post/createPost",
-//   async (userId: string, thunkAPI) => {
-//     try {
-//       const data = await userMovieAPI.getUserMovie(userId)
-
-//       return data
-//     } catch (error: unknown) {
-//       // Проверка, является ли ошибка ошибкой Axios
-//       if (axios.isAxiosError(error) && error.response?.data?.message) {
-//         return thunkAPI.rejectWithValue(error.response.data.message)
-//       }
-
-//       // если это вообще не ошибка axios или нет message
-//       return thunkAPI.rejectWithValue("Ошибка при createUserMovie")
+// // Получить свои фильмы по статусу "wantToSee"
+// export const fetchMyWantToSeeMoviesThunk = createAsyncThunk<
+//   UserMovieResponseType,
+//   number,
+//   { rejectValue: string }
+// >("userMovie/fetchMyWantToSee", async (page, thunkAPI) => {
+//   try {
+//     const movies = await userMovieAPI.getMyWantToSeeMovies(page)
+//     console.log("fetchMyWantToSeeMoviesThunk", movies)
+//     return movies
+//   } catch (error: unknown) {
+//     // Проверка, является ли ошибка ошибкой Axios
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
 //     }
+
+//     // если это вообще не ошибка axios или нет message
+//     return thunkAPI.rejectWithValue(
+//       "Ошибка при получении моих хочу посмотреть фильмов fetchMyWantToSeeMoviesThunk"
+//     )
 //   }
-// )
+// })
+
+// // Получить свои фильмы по статусу "watched"
+// export const fetchMyWatchedMoviesThunk = createAsyncThunk<
+//   UserMovieResponseType, // тип данных, которые вернутся — массив пользователей
+//   number, // параметр тип данных которые отправляю
+//   { rejectValue: string }
+// >("userMovie/fetchMyWatched", async (page, thunkAPI) => {
+//   try {
+//     const movies = await userMovieAPI.getMyWatchedMovies(page)
+//     return movies
+//   } catch (error: unknown) {
+//     // Проверка, является ли ошибка ошибкой Axios
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
+//     }
+
+//     // если это вообще не ошибка axios или нет message
+//     return thunkAPI.rejectWithValue(
+//       "Ошибка при получении моих просмотренных фильмов fetchMyWatchedMoviesThunk"
+//     )
+//   }
+// })
+
+// // Получить публичные фильмы другого пользователя "wantToSee"
+// export const fetchPublicWantToSeeMoviesThunk = createAsyncThunk<
+//   UserMovieResponseType, // тип данных, которые вернутся — массив пользователей
+//   { userId: string; page: number }, // параметр тип данных которые отправляю
+//   { rejectValue: string }
+// >("userMovie/fetchPublicWantToSee", async ({ userId, page }, thunkAPI) => {
+//   try {
+//     const movies = await userMovieAPI.getPublicWantToSeeMovies(userId, page)
+//     return movies
+//   } catch (error: unknown) {
+//     // Проверка, является ли ошибка ошибкой Axios
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
+//     }
+
+//     // если это вообще не ошибка axios или нет message
+//     return thunkAPI.rejectWithValue(
+//       "Ошибка при получении фильмов юзера хочу посмотреть фильмов fetchPublicWantToSeeMoviesThunk"
+//     )
+//   }
+// })
+
+// // Получить публичные фильмы другого пользователя "watched"
+// export const fetchPublicWatchedMoviesThunk = createAsyncThunk<
+//   UserMovieResponseType, // тип данных, которые вернутся — массив пользователей
+//   { userId: string; page: number }, // параметр тип данных которые отправляю
+//   { rejectValue: string }
+// >("userMovie/fetchPublicWatched", async ({ userId, page }, thunkAPI) => {
+//   try {
+//     const movies = await userMovieAPI.getPublicWatchedMovies(userId, page)
+//     return movies
+//   } catch (error: unknown) {
+//     // Проверка, является ли ошибка ошибкой Axios
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
+//     }
+
+//     // если это вообще не ошибка axios или нет message
+//     return thunkAPI.rejectWithValue(
+//       "Ошибка при получении  просмотренных фильмов юзера  fetchPublicWatchedMoviesThunk"
+//     )
+//   }
+// })

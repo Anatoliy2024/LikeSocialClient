@@ -3,25 +3,45 @@ import { useState } from "react"
 import style from "./CreateUserMessageModal.module.scss"
 import ButtonMenu from "../ui/button/Button"
 import { getSocket } from "@/lib/socket"
+import { useRouter } from "next/navigation"
 // import CloseButton from "../ui/closeButton/CloseButton"
 export const CreateUserMessageModal = ({
   onClose,
   userId,
-  dialogId,
+  conversationId,
 }: {
   onClose: () => void
   userId?: string
-  dialogId?: string
+  conversationId?: string
 }) => {
   const [messageText, setMessageText] = useState("")
+  const router = useRouter()
   const socket = getSocket()
   const handleSendMessage = async () => {
     try {
-      socket.emit("sendMessage", {
-        recipientUserId: userId,
-        text: messageText,
-        dialogId,
-      })
+      socket.emit(
+        "message:send",
+        {
+          recipientId: userId,
+          type: "text",
+          text: messageText,
+          conversationId,
+        },
+        ({
+          conversationId,
+          error,
+        }: {
+          conversationId?: string
+          error?: string
+        }) => {
+          // console.log("conversationId******:", conversationId)
+          if (conversationId) {
+            router.push(`/conversation/${conversationId}`)
+          } else if (error) {
+            console.log("error:", error)
+          }
+        }
+      )
 
       onClose()
     } catch (error) {

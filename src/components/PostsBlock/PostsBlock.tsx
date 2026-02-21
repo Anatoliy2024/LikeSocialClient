@@ -131,14 +131,15 @@ const PostsBlock = ({
       <>
         <div className={style.wrapper}>
           {/* <h2>PostsBlock</h2> */}
-
-          <ButtonMenu
-            onClick={() => {
-              setActiveCreateNewPost(true)
-            }}
-          >
-            Add new post
-          </ButtonMenu>
+          {!roomId && !profileUserId && (
+            <ButtonMenu
+              onClick={() => {
+                setActiveCreateNewPost(true)
+              }}
+            >
+              Add new post
+            </ButtonMenu>
+          )}
 
           {activeCreateNewPost && (
             <PostForm

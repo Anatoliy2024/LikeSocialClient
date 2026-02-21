@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 // import { useParams } from "react-router-dom"
-import {
-  fetchMyWantToSeeMoviesThunk,
-  fetchMyWatchedMoviesThunk,
-  fetchPublicWantToSeeMoviesThunk,
-  fetchPublicWatchedMoviesThunk,
-} from "@/store/thunks/userMoviesThunk"
+// import {
+//   fetchMyWantToSeeMoviesThunk,
+//   fetchMyWatchedMoviesThunk,
+//   fetchPublicWantToSeeMoviesThunk,
+//   fetchPublicWatchedMoviesThunk,
+// } from "@/store/thunks/userMoviesThunk"
 import {
   clearUserMoviesError,
   clearPublicMovies,
@@ -22,6 +22,7 @@ import UserMovieList from "@/components/userMovieList/UserMovieList"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
 import FormMovieWantToSee from "../FormMovieWantToSee/FormMovieWantToSee"
+import { fetchUserMoviesThunk } from "@/store/thunks/userMoviesThunk"
 
 type Props =
   | { myMoviesPage: true; userId?: never }
@@ -64,21 +65,57 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
     if (isAuth) {
       dispatch(clearUserMoviesError())
       if (myMoviesPage) {
-        if (activeTab === "wantToSee") {
-          dispatch(fetchMyWantToSeeMoviesThunk(pageFromUrl))
-        } else {
-          dispatch(fetchMyWatchedMoviesThunk(pageFromUrl))
-        }
+        dispatch(
+          fetchUserMoviesThunk({
+            status: activeTab === "wantToSee" ? "wantToSee" : "watched",
+            page: pageFromUrl,
+          })
+        )
+        // if (activeTab === "wantToSee") {
+        //   dispatch(
+        //     fetchUserMoviesThunk({ status: "wantToSee", page: pageFromUrl })
+        //   )
+        //   // dispatch(fetchMyWantToSeeMoviesThunk(pageFromUrl))
+        // } else {
+        //   dispatch(
+        //     fetchUserMoviesThunk({ status: "watched", page: pageFromUrl })
+        //   )
+
+        //   // dispatch(fetchMyWatchedMoviesThunk(pageFromUrl))
+        // }
       } else {
         if (!userId) return
         dispatch(clearPublicMovies())
-        if (activeTab === "wantToSee") {
-          dispatch(
-            fetchPublicWantToSeeMoviesThunk({ userId, page: pageFromUrl })
-          )
-        } else {
-          dispatch(fetchPublicWatchedMoviesThunk({ userId, page: pageFromUrl }))
-        }
+        dispatch(
+          fetchUserMoviesThunk({
+            status: activeTab === "wantToSee" ? "wantToSee" : "watched",
+            page: pageFromUrl,
+            userId,
+          })
+        )
+        // if (activeTab === "wantToSee") {
+        //   dispatch(
+        //     fetchUserMoviesThunk({
+        //       status: "wantToSee",
+        //       page: pageFromUrl,
+        //       userId,
+        //     })
+        //   )
+
+        //   // dispatch(
+        //   // fetchPublicWantToSeeMoviesThunk({ userId, page: pageFromUrl })
+        //   // )
+        // } else {
+        //   dispatch(
+        //     fetchUserMoviesThunk({
+        //       status: "watched",
+        //       page: pageFromUrl,
+        //       userId,
+        //     })
+        //   )
+
+        //   // dispatch(fetchPublicWatchedMoviesThunk({ userId, page: pageFromUrl }))
+        // }
       }
     }
   }, [dispatch, userId, myMoviesPage, activeTab, isAuth, pageFromUrl])

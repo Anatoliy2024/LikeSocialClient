@@ -354,30 +354,64 @@ export const userMovieAPI = {
       .then((res) => res.data)
   },
 
-  getMyWantToSeeMovies(page: number, limit?: number) {
-    return instance
-      .get("user-movie/my/want-to-see", { params: { page, limit } })
-      .then((res) => res.data)
-  },
+  // getMyWantToSeeMovies(page: number, limit?: number) {
+  //   return instance
+  //     .get("user-movie/my/want-to-see", { params: { page, limit } })
+  //     .then((res) => res.data)
+  // },
 
-  getMyWatchedMovies(page: number, limit?: number) {
-    return instance
-      .get("user-movie/my/watched", { params: { page, limit } })
-      .then((res) => res.data)
-  },
+  // getMyWatchedMovies(page: number, limit?: number) {
+  //   return instance
+  //     .get("user-movie/my/watched", { params: { page, limit } })
+  //     .then((res) => res.data)
+  // },
 
-  getPublicWantToSeeMovies(userId: string, page: number, limit?: number) {
-    return instance
-      .get(`user-movie/${userId}/public/want-to-see`, {
-        params: { page, limit },
-      })
-      .then((res) => res.data)
-  },
+  // getPublicWantToSeeMovies(userId: string, page: number, limit?: number) {
+  //   return instance
+  //     .get(`user-movie/${userId}/public/want-to-see`, {
+  //       params: { page, limit },
+  //     })
+  //     .then((res) => res.data)
+  // },
 
-  getPublicWatchedMovies(userId: string, page: number, limit?: number) {
-    return instance
-      .get(`user-movie/${userId}/public/watched`, { params: { page, limit } })
-      .then((res) => res.data)
+  // getPublicWatchedMovies(userId: string, page: number, limit?: number) {
+  //   return instance
+  //     .get(`user-movie/${userId}/public/watched`, { params: { page, limit } })
+  //     .then((res) => res.data)
+  // },
+
+  // getMyWantToSeeMovies(
+  //   status: "wantToSee" | "watched",
+  //   page: number,
+  //   limit?: number
+  // ) {
+  //   return instance
+  //     .get("user-movie/my-movies", { params: { status, page, limit } })
+  //     .then((res) => res.data)
+  // },
+
+  // getPublicWantToSeeMovies(
+  //   userId: string,
+  //   status: "wantToSee" | "watched",
+  //   page: number,
+  //   limit?: number
+  // ) {
+  //   return instance
+  //     .get(`user-movie/${userId}`, { params: { status, page, limit } })
+  //     .then((res) => res.data)
+  // },
+
+  getUserMovies(params: {
+    status: "wantToSee" | "watched"
+    page: number
+    limit?: number
+    userId?: string
+  }) {
+    const { userId, ...query } = params
+
+    const url = userId ? `user-movie/${userId}` : "user-movie/my-movies"
+
+    return instance.get(url, { params: query }).then((res) => res.data)
   },
 }
 

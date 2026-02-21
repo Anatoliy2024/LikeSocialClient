@@ -28,6 +28,7 @@ import { Loading } from "@/assets/loading/loading"
 // import { useCall } from "@/hooks/useCall"
 // import { useCallContext } from "./CallContext"
 import { CallModal } from "@/components/CallModal/CallModal"
+// import { addMessageFromSocket } from "@/store/slices/conversationsSlice"
 
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -102,6 +103,8 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
       socket.off("user-status-changed")
       socket.off("online-users")
       socket.off("new-notification")
+
+      socket.disconnect()
     }
   }, [userId, dispatch])
 

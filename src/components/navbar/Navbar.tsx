@@ -57,8 +57,8 @@ export default function Navbar({
       <Link href="/rooms" onClick={handleLinkClick} prefetch={false}>
         <div>Rooms</div>
       </Link>
-      <Link href="/dialogs" onClick={handleLinkClick} prefetch={false}>
-        <div>Dialogs</div>
+      <Link href="/conversations" onClick={handleLinkClick} prefetch={false}>
+        <div>Messages</div>
       </Link>
       <Link href="/friends" onClick={handleLinkClick} prefetch={false}>
         <div>Friends</div>
