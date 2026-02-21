@@ -63,7 +63,7 @@ export function ModalAddGroup({
   const onSubmit = (data: FormData) => {
     if (!data.groupName) return
     const newData = {
-      groupName: data.groupName,
+      name: data.groupName,
       selectedMember: selected,
       description: data.description,
     }
