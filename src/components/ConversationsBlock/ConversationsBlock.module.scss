@@ -4,13 +4,17 @@
   @media (max-width: 600px) {
     padding: 10px 5px;
   }
+  &__buttonBlock {
+    padding-bottom: 10px;
+  }
   h2 {
     text-align: center;
   }
-  &__list {
+  &__lists {
     display: flex;
+
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
     // gap: 20px;
   }
 

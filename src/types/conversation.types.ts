@@ -34,8 +34,8 @@ export interface MemberFullType {
 export interface ConversationType {
   _id: string
   type: "private" | "group"
-  name?: string // для групп
-  avatar?: string // для групп
+  title: string // для групп
+  avatar: string // для групп
   members: MemberFullType[]
   lastMessageId?: MessageType
   updatedAt: string

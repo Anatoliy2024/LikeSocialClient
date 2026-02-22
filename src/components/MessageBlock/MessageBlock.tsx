@@ -212,55 +212,64 @@ export const MessageBlock = () => {
             !optionHeaderMessage ? style.messageBlock__moveHeaderMessage : ""
           }`}
         >
-          <Link
-            href={"/conversations/"}
-            className={style.messageBlock__buttonBackBlock}
-          >
-            <ArrowBack />
-          </Link>
+          <div className={style.messageBlock__userInfoContainer}>
+            <Link
+              href={"/conversations/"}
+              className={style.messageBlock__buttonBackBlock}
+            >
+              <ArrowBack />
+            </Link>
 
-          {isGroup && (
-            <div className={style.messageBlock__userImgOnlineBlock}>
-              <div className={style.messageBlock__blockImg}>
-                <CloudinaryImage
-                  src={currentConversation.avatar || ""}
-                  alt="avatar"
-                  width={200}
-                  height={200}
-                />
-              </div>
-              <div>{currentConversation.name || "Группа"}</div>
-            </div>
-          )}
-
-          {currentConversation?.type === "private" && recipientId && (
-            <>
-              <ProfileLink userId={recipientId._id} currentUserId={userId}>
-                <div className={style.messageBlock__userImgOnlineBlock}>
-                  <div className={style.messageBlock__blockImg}>
-                    <CloudinaryImage
-                      src={recipientId.avatar}
-                      alt="avatar"
-                      width={200}
-                      height={200}
-                    />
+            {isGroup && (
+              <div className={style.messageBlock__groupInfo}>
+                <div className={style.messageBlock__blockImg}>
+                  <CloudinaryImage
+                    src={currentConversation.avatar || ""}
+                    alt="avatar"
+                    width={200}
+                    height={200}
+                  />
+                </div>
+                <div className={style.messageBlock__groupInfoMain}>
+                  <div className={style.messageBlock__groupInfoTitle}>
+                    {currentConversation.title}
                   </div>
-                  {usersOnline[recipientId._id]?.isOnline && (
-                    <div className={style.messageBlock__onlineBlock}></div>
+                  <div className={style.messageBlock__groupInfoMemberCount}>
+                    {currentConversation.members.length} участника(ов)
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentConversation?.type === "private" && recipientId && (
+              <>
+                <ProfileLink userId={recipientId._id} currentUserId={userId}>
+                  <div className={style.messageBlock__userImgOnlineBlock}>
+                    <div className={style.messageBlock__blockImg}>
+                      <CloudinaryImage
+                        src={recipientId.avatar}
+                        alt="avatar"
+                        width={200}
+                        height={200}
+                      />
+                    </div>
+                    {usersOnline[recipientId._id]?.isOnline && (
+                      <div className={style.messageBlock__onlineBlock}></div>
+                    )}
+                  </div>
+                </ProfileLink>
+                <div>
+                  <div>{recipientId.username}</div>
+                  {!status.isOnline && status.lastSeen && (
+                    <div className={style.messageBlock__lastSeen}>
+                      <span>был(а):</span>{" "}
+                      <span>{formatData(status.lastSeen)}</span>
+                    </div>
                   )}
                 </div>
-              </ProfileLink>
-              <div>
-                <div>{recipientId.username}</div>
-                {!status.isOnline && status.lastSeen && (
-                  <div className={style.messageBlock__lastSeen}>
-                    <span>был(а):</span>{" "}
-                    <span>{formatData(status.lastSeen)}</span>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
 
           <div className={style.messageBlock__optionConversation}>
             <button
@@ -275,44 +284,14 @@ export const MessageBlock = () => {
                   onClick={delConversation}
                   title={`Удалить ${isGroup ? "группу" : "беседу"}`}
                 >
-                  <TrashThree />
+                  <TrashThree /> Удалить {isGroup ? "группу" : "беседу"}
                 </li>
                 <li onClick={delHistoryMessages} title="Очистить историю">
-                  <Clear />
+                  <Clear /> Очистить историю
                 </li>
               </ul>
             )}
           </div>
-        </div>
-
-        <div className={style.messageBlock__contentMessageBlock}>
-          {messages.length > 0 && (
-            <div className={style.messageBlock__messagesList}>
-              {messages.map((message, i) => {
-                const isLast = i === messages.length - 1
-                return (
-                  <div
-                    key={message._id}
-                    className={`${style.messageBlock__messageList} ${
-                      message.senderId._id !== userId
-                        ? style.messageBlock__recipient
-                        : style.messageBlock__me
-                    }`}
-                    ref={isLast ? lastMessageRef : null}
-                  >
-                    {isGroup && message.senderId._id !== userId && (
-                      <div className={style.messageBlock__senderName}>
-                        {message.senderId.username}
-                      </div>
-                    )}
-                    <div>{message.text}</div>
-                    <div>{formatMessageTime(message.createdAt)}</div>
-                  </div>
-                )
-              })}
-              {loading && <Spinner />}
-            </div>
-          )}
         </div>
 
         <div
@@ -336,6 +315,54 @@ export const MessageBlock = () => {
           >
             <SendMessage />
           </div>
+        </div>
+
+        <div className={style.messageBlock__contentMessageBlock}>
+          {messages.length > 0 && (
+            <div className={style.messageBlock__messagesList}>
+              {messages.map((message, i) => {
+                const isLast = i === messages.length - 1
+                return (
+                  <div
+                    key={message._id}
+                    className={style.messageBlock__messageListWrapper}
+                    // className={`${style.messageBlock__messageList} ${
+                    //   message.senderId._id !== userId
+                    //     ? style.messageBlock__recipient
+                    //     : style.messageBlock__me
+                    // }
+                    // `}
+                    ref={isLast ? lastMessageRef : null}
+                  >
+                    {isGroup && message.senderId._id !== userId && (
+                      // <div className={style.messageBlock__senderImage}>
+                      <div className={style.messageBlock__senderImage}>
+                        <CloudinaryImage
+                          src={message.senderId.avatar}
+                          alt="avatar"
+                          width={200}
+                          height={200}
+                        />
+                      </div>
+
+                      // </div>
+                    )}
+                    <div
+                      className={`${style.messageBlock__messageList} ${
+                        message.senderId._id !== userId
+                          ? style.messageBlock__recipient
+                          : style.messageBlock__me
+                      }`}
+                    >
+                      <div>{message.text}</div>
+                      <div>{formatMessageTime(message.createdAt)}</div>
+                    </div>
+                  </div>
+                )
+              })}
+              {loading && <Spinner />}
+            </div>
+          )}
         </div>
       </div>
     </>

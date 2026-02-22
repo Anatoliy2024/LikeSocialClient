@@ -6,6 +6,7 @@
   // padding-top: 70px;
   // display: flex;
   // flex-direction: column;
+
   &__userInfo {
     // flex: 0 0 60px;
     // height: 60px;
@@ -13,6 +14,7 @@
     position: fixed;
     // top: 0;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 20px;
     background-color: #4571be;
@@ -21,13 +23,36 @@
     min-width: calc(100% - 250px);
     transition: all 0.3s ease;
     height: 60px;
-    z-index: 20;
+    z-index: 25;
     padding: 10px;
 
     @media (max-width: 768px) {
       min-width: 100%;
     }
   }
+  &__userInfoContainer {
+    display: flex;
+    gap: 10px;
+  }
+  &__groupInfo {
+    display: flex;
+    // width: 50px;
+    height: 50px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__groupInfoMain {
+    // display: flex;
+  }
+  &__groupInfoTitle {
+  }
+  &__groupInfoMemberCount {
+    text-wrap: nowrap;
+    font-size: 0.7rem;
+    // display: flex;
+  }
+
   &__moveHeaderMessage {
     transform: translateY(-200%);
   }
@@ -171,7 +196,10 @@
     gap: 2px;
     padding: 10px;
   }
-
+  &__messageListWrapper {
+    display: flex;
+    gap: 15px;
+  }
   &__messageList {
     // align-items: center;
     // flex: 1 1 auto;
@@ -180,8 +208,10 @@
     gap: 10px;
     padding: 10px;
     // border: 1px solid rgb(87, 60, 182);
-    max-width: 80%;
-    min-width: 30%;
+    // flex: 0 0 70%;
+    max-width: 65%;
+    // width: 70%;
+    // min-width: 30%;
     border-radius: 20px;
     // justify-content: flex-start;
 
@@ -198,6 +228,20 @@
       display: flex;
       align-self: flex-end;
       justify-items: end;
+    }
+  }
+  &__senderImage {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   }
 

@@ -8,11 +8,12 @@ import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
 import ButtonMenu from "@/components/ui/button/Button"
-import { ModalAddGroup } from "@/components/ModalAddGroup/ModalAddGroup"
+// import { ModalAddGroup } from "@/components/ModalAddGroup/ModalCreateGroup"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Paginator } from "@/components/Paginator/Paginator"
 import { fetchConversationsThunk } from "@/store/thunks/conversationsThunk"
 import { clearMessages } from "@/store/slices/conversationsSlice"
+import { ModalCreateGroup } from "../ModalAddGroup/ModalCreateGroup"
 
 export function ConversationsBlock() {
   const router = useRouter()
@@ -25,6 +26,10 @@ export function ConversationsBlock() {
   const conversations = useAppSelector(
     (state: RootState) => state.conversations.conversations
   )
+  // const currentConversation = useAppSelector(
+  //   (state: RootState) => state.conversations.currentConversation
+  // )
+
   const pagination = useAppSelector(
     (state: RootState) => state.conversations.pagination
   )
@@ -55,12 +60,17 @@ export function ConversationsBlock() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
+  // useEffect(() => {
+  //   if (!currentConversation) return
+  //   router.push(`/conversation/${currentConversation._id}`)
+  // }, [router, currentConversation])
+
   return (
     <>
       {loading && <SpinnerWindow />}
       <div className={style.conversation}>
         {showAddGroup && (
-          <ModalAddGroup closeModalAddGroup={closeModalAddGroup} />
+          <ModalCreateGroup closeModalAddGroup={closeModalAddGroup} />
         )}
         <div className={style.conversation__buttonBlock}>
           <ButtonMenu
@@ -82,9 +92,11 @@ export function ConversationsBlock() {
         {conversations.length > 0 ? (
           <ul className={style.conversation__lists}>
             {conversations.map((conversation) => {
+              const isGroup = conversation.type === "group"
               // console.log("conversation****", conversation)
-              if (conversation.type === "private") {
-              }
+              // let dataConversation
+              // if (conversation.type === "private") {
+              // }
               const member = conversation.members.filter(
                 (member) => member.user._id !== userId
               )[0].user
@@ -100,20 +112,27 @@ export function ConversationsBlock() {
                   <div className={style.conversation__containerImage}>
                     <div className={style.conversation__blockImage}>
                       <CloudinaryImage
-                        src={member.avatar}
+                        src={isGroup ? conversation.avatar : member.avatar}
                         width={200}
                         height={200}
                         alt="userAvatar"
                       />
                     </div>
-                    {usersOnline[member._id]?.isOnline && (
+                    {!isGroup && usersOnline[member._id]?.isOnline && (
                       <div className={style.conversation__onlineBlock}></div>
                     )}
                   </div>
                   <div className={style.conversation__info}>
-                    <div className={style.conversation__userName}>
-                      {member.username}
-                    </div>
+                    {!isGroup && (
+                      <div className={style.conversation__userName}>
+                        {member.username}
+                      </div>
+                    )}
+                    {isGroup && (
+                      <div className={style.conversation__userName}>
+                        {conversation.title}
+                      </div>
+                    )}
 
                     {conversation?.lastMessageId && (
                       <div className={style.conversation__lastMessage}>

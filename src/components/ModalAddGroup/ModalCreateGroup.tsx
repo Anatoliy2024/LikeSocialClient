@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import ButtonMenu from "../ui/button/Button"
-import style from "./ModalAddGroup.module.scss"
+import style from "./ModalCreateGroup.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
@@ -9,7 +9,8 @@ import { RootState } from "@/store/store"
 // import { AddMembers } from "../AddMembers/AddMembers"
 import { MembersSelectList } from "../MembersSelectList/MembersSelectList"
 import { useForm } from "react-hook-form"
-import { createUserGroupsThunk } from "@/store/thunks/groupsThunk"
+
+import { createGroupConversationThunk } from "@/store/thunks/conversationsThunk"
 
 type FormData = {
   groupName: string
@@ -17,7 +18,7 @@ type FormData = {
   selected: string[]
 }
 
-export function ModalAddGroup({
+export function ModalCreateGroup({
   closeModalAddGroup,
 }: {
   closeModalAddGroup: () => void
@@ -42,6 +43,7 @@ export function ModalAddGroup({
   })
 
   const dispatch = useAppDispatch()
+
   const selected = watch("selected")
   const {
     users: friendsUsers,
@@ -60,17 +62,23 @@ export function ModalAddGroup({
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
-  const onSubmit = (data: FormData) => {
-    if (!data.groupName) return
-    const newData = {
-      name: data.groupName,
-      selectedMember: selected,
-      description: data.description,
+  const onSubmit = async (data: FormData) => {
+    try {
+      if (!data.groupName) return
+      const newData = {
+        title: data.groupName,
+        memberIds: selected,
+        description: data.description,
+      }
+
+      const dataReq = await dispatch(
+        createGroupConversationThunk(newData)
+      ).unwrap()
+
+      router.push(`/conversation/${dataReq.conversation._id}`)
+    } catch (error) {
+      console.log(error)
     }
-    // data.selected будет массивом id выбранных друзей
-    // onSubmitMembers(data.selected)
-    dispatch(createUserGroupsThunk(newData))
-    console.log("data", data)
   }
 
   useEffect(() => {

@@ -91,10 +91,14 @@ const conversationSlice = createSlice({
         state.error = null
       })
       .addCase(createGroupConversationThunk.fulfilled, (state, action) => {
-        state.conversations = [
-          action.payload.conversation,
-          ...state.conversations,
-        ]
+        if (action.payload.success) {
+          // state.conversations = [
+          //   action.payload.conversation,
+          //   ...state.conversations,
+          // ]
+
+          state.currentConversation = action.payload.conversation
+        }
         // state.currentId = action.payload.conversation._id
 
         state.loading = false
