@@ -1,0 +1,86 @@
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 16px;
+  background: #0d2b0d;
+  border: 1px solid #1a4a1a;
+  border-radius: 10px;
+  gap: 10px;
+  // margin-bottom: 12px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.text {
+  font-size: 14px;
+  color: #86efac;
+  font-weight: 500;
+}
+
+.count {
+  font-size: 13px;
+  color: #4ade80;
+  opacity: 0.7;
+}
+
+.right {
+  display: flex;
+  gap: 8px;
+}
+
+.btnJoin {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #22c55e;
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #16a34a;
+  }
+}
+
+.btnLeave {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #ef444444;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #3a1a1a;
+  }
+}

@@ -29,12 +29,15 @@ import { TrashThree } from "@/assets/icons/trashThree"
 import { Clear } from "@/assets/icons/clear"
 import { OptionIcon } from "@/assets/icons/optionIcon"
 import { MessageType } from "@/types/conversation.types"
+import { StartGroupCallButton } from "../StartGroupCallButton/StartGroupCallButton"
+import { GroupCallBanner } from "../GroupCallBanner/GroupCallBanner"
 
 export const MessageBlock = () => {
   const router = useRouter()
   const [textMessage, setTextMessage] = useState("")
   const [showOption, setShowOption] = useState(false)
 
+  const optionRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
   // Защита от двойного монтирования в React StrictMode
   const initializedIdRef = useRef<string | null>(null)
@@ -125,6 +128,16 @@ export const MessageBlock = () => {
       isLoadingMoreRef.current = false
     }
   }, [loading])
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (optionRef.current && !optionRef.current.contains(e.target as Node)) {
+        setShowOption(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   // ───────────────────────────────────────────────
   // IntersectionObserver для пагинации
@@ -269,9 +282,14 @@ export const MessageBlock = () => {
                 </div>
               </>
             )}
+
+            <GroupCallBanner groupId={currentConversation._id} />
           </div>
 
-          <div className={style.messageBlock__optionConversation}>
+          <div
+            className={style.messageBlock__optionConversation}
+            ref={optionRef}
+          >
             <button
               onClick={handleShowOption}
               className={showOption ? style.messageBlock__ButtonOptionShow : ""}
@@ -284,11 +302,18 @@ export const MessageBlock = () => {
                   onClick={delConversation}
                   title={`Удалить ${isGroup ? "группу" : "беседу"}`}
                 >
-                  <TrashThree /> Удалить {isGroup ? "группу" : "беседу"}
+                  <TrashThree />{" "}
+                  <span>Удалить {isGroup ? "группу" : "беседу"}</span>
                 </li>
                 <li onClick={delHistoryMessages} title="Очистить историю">
-                  <Clear /> Очистить историю
+                  <Clear /> <span>Очистить историю</span>
                 </li>
+
+                {isGroup && (
+                  <li>
+                    <StartGroupCallButton groupId={currentConversation._id} />
+                  </li>
+                )}
               </ul>
             )}
           </div>

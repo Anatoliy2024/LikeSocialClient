@@ -28,6 +28,8 @@ import { Loading } from "@/assets/loading/loading"
 // import { useCall } from "@/hooks/useCall"
 // import { useCallContext } from "./CallContext"
 import { CallModal } from "@/components/CallModal/CallModal"
+import { GroupCallProvider } from "./GroupCallProvider"
+import { GroupCallPanel } from "@/components/GroupCallPanel/GroupCallPanel"
 // import { addMessageFromSocket } from "@/store/slices/conversationsSlice"
 
 export default function InnerApp({ children }: { children: React.ReactNode }) {
@@ -135,26 +137,29 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthProvider>
-      <div className="containerMain">
-        <HeaderContainer
-          handleShowToggleMenu={handleShowToggleMenu}
-          showButton={showButton}
-          menuOpen={menuOpen}
-        />
-        {/* 👉 Оверлей для мобильного меню */}
-        {menuOpen && showButton && (
-          <div className={style.overlay} onClick={() => setMenuOpen(false)} />
-        )}
-        <Navbar
-          isOpen={menuOpen}
-          navRef={navRef}
-          onClose={() => setMenuOpen(false)}
-        />
+      <GroupCallProvider>
+        <div className="containerMain">
+          <HeaderContainer
+            handleShowToggleMenu={handleShowToggleMenu}
+            showButton={showButton}
+            menuOpen={menuOpen}
+          />
+          {/* 👉 Оверлей для мобильного меню */}
+          {menuOpen && showButton && (
+            <div className={style.overlay} onClick={() => setMenuOpen(false)} />
+          )}
+          <Navbar
+            isOpen={menuOpen}
+            navRef={navRef}
+            onClose={() => setMenuOpen(false)}
+          />
 
-        <div className="content">{children}</div>
+          <div className="content">{children}</div>
 
-        {status && <CallModal />}
-      </div>
+          {status && <CallModal />}
+          <GroupCallPanel />
+        </div>
+      </GroupCallProvider>
     </AuthProvider>
   )
 }

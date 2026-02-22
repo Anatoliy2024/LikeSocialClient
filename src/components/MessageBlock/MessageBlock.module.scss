@@ -156,6 +156,7 @@
   &__optionConversation {
     display: flex;
     gap: 10px;
+    position: relative;
     button {
       padding: 8px;
       border-radius: 50%;
@@ -166,16 +167,27 @@
       }
     }
     ul {
+      position: absolute;
+      top: 60px;
+      right: 0;
       display: flex;
+      flex-direction: column;
       gap: 5px;
-
+      background: rgba(165, 176, 215, 0.927);
+      border-radius: 20px;
+      padding: 5px;
+      font-size: 1rem;
       li {
         padding: 8px;
-        border-radius: 50%;
+        border-radius: 12px;
         cursor: pointer;
+        display: flex;
+        // justify-content: space-between;
+        gap: 5px;
+        align-items: center;
 
         &:hover {
-          background: rgba(0, 0, 0, 0.605);
+          // background: rgba(0, 0, 0, 0.605);
           color: white;
         }
       }
