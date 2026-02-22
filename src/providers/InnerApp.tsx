@@ -35,6 +35,7 @@ import { GroupCallPanel } from "@/components/GroupCallPanel/GroupCallPanel"
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [showButton, setShowButton] = useState(false)
+  const [timerCount, setTimerCount] = useState(30)
   // const [socket, setSocket] = useState<Socket | null>(null)
   const navRef = useRef<HTMLDivElement | null>(null)
 
@@ -55,14 +56,25 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
       setMenuOpen(e.matches) // true — открыть, false — закрыть
       setShowButton(!e.matches)
     }
-
     // Установить состояние сразу при монтировании
     setMenuOpen(mediaQuery.matches)
     setShowButton(!mediaQuery.matches)
 
     mediaQuery.addEventListener("change", handleChange)
-    return () => mediaQuery.removeEventListener("change", handleChange)
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange)
+    }
   }, [])
+
+  useEffect(() => {
+    if (timerCount === 0) return
+
+    const intervalId = setTimeout(() => {
+      setTimerCount((prev) => prev - 1)
+    }, 1000)
+
+    return () => clearInterval(intervalId)
+  }, [timerCount])
 
   useEffect(() => {
     dispatch(getStatusServerThunk())
@@ -122,7 +134,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          Сервер просыпается, пожалуйста подождите...
+          Сервер просыпается, пожалуйста подождите {timerCount}...
         </div>
         <div>
           <Loading />
