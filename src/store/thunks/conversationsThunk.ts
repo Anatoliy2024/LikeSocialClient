@@ -2,7 +2,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { conversationAPI } from "@/api/conversationAPI"
-import { ConversationType, MessageType } from "@/types/conversation.types"
+import {
+  ConversationType,
+  MemberFullType,
+  MessageType,
+} from "@/types/conversation.types"
 
 // ===== Создание группы =====
 export const createGroupConversationThunk = createAsyncThunk<
@@ -45,6 +49,23 @@ export const fetchConversationsThunk = createAsyncThunk<
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
     return thunkAPI.rejectWithValue("Не удалось загрузить список чатов")
+  }
+})
+// ===== Получение всех конверсейшенов =====
+export const fetchItemConversationThunk = createAsyncThunk<
+  { success: boolean; conversation: ConversationType },
+  // ConversationType[],
+  string,
+  { rejectValue: string }
+>("conversations/fetchItemConversation", async (conversationId, thunkAPI) => {
+  try {
+    const data = await conversationAPI.getCurrentConversation(conversationId)
+    return data
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+    return thunkAPI.rejectWithValue("Не удалось загрузить выбранную беседу")
   }
 })
 
@@ -113,9 +134,32 @@ export const delHistoryMessagesThunk = createAsyncThunk<
     if (axios.isAxiosError(error) && error.response?.data?.message) {
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
-    return thunkAPI.rejectWithValue("Не удалось удалить беседу")
+    return thunkAPI.rejectWithValue("Не удалось удалить историю")
   }
 })
+// ===== удаление беседы =====
+export const addMemberToGroupThunk = createAsyncThunk<
+  { success: boolean; members: MemberFullType[] },
+  { conversationId: string; members: string[] },
+  { rejectValue: string }
+>(
+  "conversations/addMemberToGroup",
+  async ({ conversationId, members }, thunkAPI) => {
+    try {
+      const data = await conversationAPI.addMemberToGroup(
+        conversationId,
+        members
+      )
+
+      return data
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+      return thunkAPI.rejectWithValue("Не удалось добавить участников")
+    }
+  }
+)
 
 // ===== Опционально: маркер прочитанных =====
 export const markConversationAsReadThunk = createAsyncThunk<

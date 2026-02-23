@@ -7,11 +7,13 @@ import {
 // import { api } from '../api' // ваш axios-инстанс
 // import { socket } from '../socket' // ваш socket.io-client
 import {
+  addMemberToGroupThunk,
   createGroupConversationThunk,
   delConversationThunk,
   delHistoryMessagesThunk,
   // fetchConversationMessagesThunk,
   fetchConversationsThunk,
+  fetchItemConversationThunk,
   fetchMessagesThunk,
 } from "../thunks/conversationsThunk"
 import { ConversationsState, MessageType } from "@/types/conversation.types"
@@ -84,6 +86,21 @@ const conversationSlice = createSlice({
         state.loading = false
         state.error = action.error.message || "Ошибка получения всех бесед"
       })
+      .addCase(fetchItemConversationThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchItemConversationThunk.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          state.currentConversation = action.payload?.conversation
+        }
+        state.loading = false
+      })
+      .addCase(fetchItemConversationThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error =
+          action.error.message || "Ошибка получения выбранной группы"
+      })
 
       // createGroupConversationThunk
       .addCase(createGroupConversationThunk.pending, (state) => {
@@ -133,7 +150,7 @@ const conversationSlice = createSlice({
       })
       .addCase(delHistoryMessagesThunk.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || "Ошибка создания беседы"
+        state.error = action.error.message || "Ошибка удаления беседы"
       })
 
       // delConversationThunk
@@ -159,7 +176,7 @@ const conversationSlice = createSlice({
       })
       .addCase(delConversationThunk.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || "Ошибка создания беседы"
+        state.error = action.error.message || "Ошибка удаления беседы"
       })
 
       // fetchMessagesThunk
@@ -194,6 +211,23 @@ const conversationSlice = createSlice({
       .addCase(fetchMessagesThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка загрузки сообщений"
+      })
+      .addCase(addMemberToGroupThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(addMemberToGroupThunk.fulfilled, (state, action) => {
+        if (action.payload.success && state.currentConversation) {
+          state.currentConversation.members = [
+            ...action.payload.members,
+            ...state.currentConversation.members,
+          ]
+        }
+        state.loading = false
+      })
+      .addCase(addMemberToGroupThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Ошибка добавления участников"
       })
   },
 })

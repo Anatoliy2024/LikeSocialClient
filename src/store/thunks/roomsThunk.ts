@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { FormValuesAddRooms } from "../../components/addRoomBlock/AddRoomBlock"
 import { fileAPI, roomAPI } from "@/api/api"
+import { BaseMember } from "@/types/base"
 type AddFriends = {
   users: string[]
   roomId: string
@@ -31,11 +32,12 @@ export type RespRoomType = {
   pages: number
 }
 
-export type RoomMemberType = {
-  _id?: string
-  username: string
-  avatar: string
-}
+export type RoomMemberType = BaseMember
+// export type RoomMemberType = {
+//   _id?: string
+//   username: string
+//   avatar: string
+// }
 
 export const createRoomThunk = createAsyncThunk<
   RespRoomType, // тип данных, которые вернутся — массив пользователей

@@ -1,3 +1,5 @@
+import { BaseMember } from "./base"
+
 export interface AttachmentType {
   url: string
   mimeType: string
@@ -20,11 +22,12 @@ export interface MessageType {
   createdAt: string
 }
 
-export interface MemberType {
-  _id: string
-  username: string
-  avatar: string
-}
+export type MemberType = BaseMember
+// export interface MemberType {
+//   _id: string
+//   username: string
+//   avatar: string
+// }
 
 export interface MemberFullType {
   user: MemberType
@@ -38,6 +41,7 @@ export interface ConversationType {
   avatar: string // для групп
   members: MemberFullType[]
   lastMessageId?: MessageType
+  description: string
   updatedAt: string
 }
 

@@ -33,6 +33,12 @@ export const conversationAPI = {
       })
       .then((res) => res.data)
   },
+  // Получение всех чатов
+  getCurrentConversation(conversationId: string) {
+    return instance
+      .get(`conversations/${conversationId}/conversation`)
+      .then((res) => res.data)
+  },
 
   // Получение сообщений чата с пагинацией
   getMessages(conversationId: string, page: number, limit?: number) {
@@ -59,6 +65,12 @@ export const conversationAPI = {
       .then((res) => res.data)
   },
 
+  addMemberToGroup(conversationId: string, members: string[]) {
+    // console.log("getMessages***", conversationId)
+    return instance
+      .post(`conversations/${conversationId}/members`, { members })
+      .then((res) => res.data)
+  },
   // Маркер "прочитано" (опционально)
   markAsRead(conversationId: string, messageId: string) {
     return instance
