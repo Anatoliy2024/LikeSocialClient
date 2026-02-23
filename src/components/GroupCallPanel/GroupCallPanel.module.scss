@@ -54,9 +54,6 @@
 .count {
   font-size: 12px;
   color: #666;
-  @media (max-width: 500px) {
-    display: none;
-  }
 }
 
 .streams {

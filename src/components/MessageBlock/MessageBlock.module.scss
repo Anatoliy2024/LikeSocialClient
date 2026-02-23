@@ -43,6 +43,9 @@
   }
 
   &__groupInfoMain {
+    @media (max-width: 500px) {
+      display: none;
+    }
     // display: flex;
   }
   &__groupInfoTitle {
@@ -157,12 +160,14 @@
     display: flex;
     gap: 10px;
     position: relative;
+
     button {
       padding: 8px;
-      border-radius: 50%;
+      // border-radius: 50%;
       cursor: pointer;
+      width: 100%;
       &:hover {
-        background: rgba(0, 0, 0, 0.605);
+        // background: rgba(0, 0, 0, 0.605);
         color: white;
       }
     }
@@ -185,6 +190,7 @@
         // justify-content: space-between;
         gap: 5px;
         align-items: center;
+        text-wrap: nowrap;
 
         &:hover {
           // background: rgba(0, 0, 0, 0.605);
@@ -192,6 +198,9 @@
         }
       }
     }
+  }
+  &__ButtonOption {
+    border-radius: 50%;
   }
   &__ButtonOptionShow {
     background: rgba(0, 0, 0, 0.445);
@@ -217,13 +226,14 @@
     // flex: 1 1 auto;
     // overflow-y: auto;
     display: flex;
+    flex-direction: column;
     gap: 10px;
     padding: 10px;
     // border: 1px solid rgb(87, 60, 182);
     // flex: 0 0 70%;
-    max-width: 65%;
+    max-width: 80%;
     // width: 70%;
-    // min-width: 30%;
+    min-width: max(200px, 20%);
     border-radius: 20px;
     // justify-content: flex-start;
 

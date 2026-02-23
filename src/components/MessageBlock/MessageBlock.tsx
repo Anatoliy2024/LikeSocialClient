@@ -31,11 +31,21 @@ import { OptionIcon } from "@/assets/icons/optionIcon"
 import { MessageType } from "@/types/conversation.types"
 import { StartGroupCallButton } from "../StartGroupCallButton/StartGroupCallButton"
 import { GroupCallBanner } from "../GroupCallBanner/GroupCallBanner"
+import ConfirmModal from "../ConfirmModal/ConfirmModal"
 
 export const MessageBlock = () => {
   const router = useRouter()
   const [textMessage, setTextMessage] = useState("")
   const [showOption, setShowOption] = useState(false)
+
+  const [confirmConfig, setConfirmConfig] = useState<{
+    title: string
+    message: string
+    onConfirm: () => void
+  } | null>(null)
+
+  const openConfirm = (config: typeof confirmConfig) => setConfirmConfig(config)
+  const closeConfirm = () => setConfirmConfig(null)
 
   const optionRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -218,179 +228,203 @@ export const MessageBlock = () => {
   }
 
   return (
-    <>
-      <div className={style.messageBlock}>
-        <div
-          className={`${style.messageBlock__userInfo} ${
-            !optionHeaderMessage ? style.messageBlock__moveHeaderMessage : ""
-          }`}
-        >
-          <div className={style.messageBlock__userInfoContainer}>
-            <Link
-              href={"/conversations/"}
-              className={style.messageBlock__buttonBackBlock}
-            >
-              <ArrowBack />
-            </Link>
+    <div className={style.messageBlock}>
+      <ConfirmModal
+        isOpen={!!confirmConfig}
+        onCancel={closeConfirm}
+        onConfirm={() => {
+          confirmConfig?.onConfirm()
+          closeConfirm()
+        }}
+        title={confirmConfig?.title}
+        message={confirmConfig?.message}
+      />
+      <div
+        className={`${style.messageBlock__userInfo} ${
+          !optionHeaderMessage ? style.messageBlock__moveHeaderMessage : ""
+        }`}
+      >
+        <div className={style.messageBlock__userInfoContainer}>
+          <Link
+            href={"/conversations/"}
+            className={style.messageBlock__buttonBackBlock}
+          >
+            <ArrowBack />
+          </Link>
 
-            {isGroup && (
-              <div className={style.messageBlock__groupInfo}>
-                <div className={style.messageBlock__blockImg}>
-                  <CloudinaryImage
-                    src={currentConversation.avatar || ""}
-                    alt="avatar"
-                    width={200}
-                    height={200}
-                  />
+          {isGroup && (
+            <div className={style.messageBlock__groupInfo}>
+              <div className={style.messageBlock__blockImg}>
+                <CloudinaryImage
+                  src={currentConversation.avatar || ""}
+                  alt="avatar"
+                  width={200}
+                  height={200}
+                />
+              </div>
+              <div className={style.messageBlock__groupInfoMain}>
+                <div className={style.messageBlock__groupInfoTitle}>
+                  {currentConversation.title}
                 </div>
-                <div className={style.messageBlock__groupInfoMain}>
-                  <div className={style.messageBlock__groupInfoTitle}>
-                    {currentConversation.title}
-                  </div>
-                  <div className={style.messageBlock__groupInfoMemberCount}>
-                    {currentConversation.members.length} участника(ов)
-                  </div>
+                <div className={style.messageBlock__groupInfoMemberCount}>
+                  {currentConversation.members.length} участника(ов)
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {currentConversation?.type === "private" && recipientId && (
-              <>
-                <ProfileLink userId={recipientId._id} currentUserId={userId}>
-                  <div className={style.messageBlock__userImgOnlineBlock}>
-                    <div className={style.messageBlock__blockImg}>
+          {currentConversation?.type === "private" && recipientId && (
+            <>
+              <ProfileLink userId={recipientId._id} currentUserId={userId}>
+                <div className={style.messageBlock__userImgOnlineBlock}>
+                  <div className={style.messageBlock__blockImg}>
+                    <CloudinaryImage
+                      src={recipientId.avatar}
+                      alt="avatar"
+                      width={200}
+                      height={200}
+                    />
+                  </div>
+                  {usersOnline[recipientId._id]?.isOnline && (
+                    <div className={style.messageBlock__onlineBlock}></div>
+                  )}
+                </div>
+              </ProfileLink>
+              <div>
+                <div>{recipientId.username}</div>
+                {!status.isOnline && status.lastSeen && (
+                  <div className={style.messageBlock__lastSeen}>
+                    <span>был(а):</span>{" "}
+                    <span>{formatData(status.lastSeen)}</span>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          <GroupCallBanner groupId={currentConversation._id} />
+        </div>
+
+        <div className={style.messageBlock__optionConversation} ref={optionRef}>
+          <button
+            onClick={handleShowOption}
+            className={`${style.messageBlock__ButtonOption} ${
+              showOption ? style.messageBlock__ButtonOptionShow : ""
+            }`}
+          >
+            <OptionIcon />
+          </button>
+          {showOption && (
+            <ul>
+              <li
+                onClick={() =>
+                  openConfirm({
+                    title: `Удалить ${isGroup ? "группу" : "беседу"}`,
+                    message: "Вы уверены? Это действие нельзя отменить.",
+                    onConfirm: delConversation,
+                  })
+                }
+                // onClick={delConversation}
+                // title={`Удалить ${isGroup ? "группу" : "беседу"}`}
+              >
+                <TrashThree />{" "}
+                <span>Удалить {isGroup ? "группу" : "беседу"}</span>
+              </li>
+              <li
+                onClick={() =>
+                  openConfirm({
+                    title: "Очистить историю",
+                    message: "Вы уверены? История будет удалена безвозвратно.",
+                    onConfirm: delHistoryMessages,
+                  })
+                }
+                //  onClick={delHistoryMessages}
+                // title="Очистить историю"
+              >
+                <Clear /> <span>Очистить историю</span>
+              </li>
+
+              {isGroup && (
+                <li>
+                  <StartGroupCallButton groupId={currentConversation._id} />
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      <div
+        className={`${style.messageBlock__newMessageBlock} ${
+          !optionHeaderMessage ? style.messageBlock__moveHeaderMessage : ""
+        }`}
+      >
+        <div className={style.messageBlock__newMessageBlockInput}>
+          <input
+            type="text"
+            placeholder="Сообщение"
+            onChange={(e) => setTextMessage(e.target.value)}
+            value={textMessage}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+        <div
+          onClick={handleSendMessage}
+          title="Отправить сообщение"
+          className={style.messageBlock__newMessageButtonBlock}
+        >
+          <SendMessage />
+        </div>
+      </div>
+
+      <div className={style.messageBlock__contentMessageBlock}>
+        {messages.length > 0 && (
+          <div className={style.messageBlock__messagesList}>
+            {messages.map((message, i) => {
+              const isLast = i === messages.length - 1
+              return (
+                <div
+                  key={message._id}
+                  className={style.messageBlock__messageListWrapper}
+                  // className={`${style.messageBlock__messageList} ${
+                  //   message.senderId._id !== userId
+                  //     ? style.messageBlock__recipient
+                  //     : style.messageBlock__me
+                  // }
+                  // `}
+                  ref={isLast ? lastMessageRef : null}
+                >
+                  {isGroup && message.senderId._id !== userId && (
+                    // <div className={style.messageBlock__senderImage}>
+                    <div className={style.messageBlock__senderImage}>
                       <CloudinaryImage
-                        src={recipientId.avatar}
+                        src={message.senderId.avatar}
                         alt="avatar"
                         width={200}
                         height={200}
                       />
                     </div>
-                    {usersOnline[recipientId._id]?.isOnline && (
-                      <div className={style.messageBlock__onlineBlock}></div>
-                    )}
-                  </div>
-                </ProfileLink>
-                <div>
-                  <div>{recipientId.username}</div>
-                  {!status.isOnline && status.lastSeen && (
-                    <div className={style.messageBlock__lastSeen}>
-                      <span>был(а):</span>{" "}
-                      <span>{formatData(status.lastSeen)}</span>
-                    </div>
+
+                    // </div>
                   )}
-                </div>
-              </>
-            )}
-
-            <GroupCallBanner groupId={currentConversation._id} />
-          </div>
-
-          <div
-            className={style.messageBlock__optionConversation}
-            ref={optionRef}
-          >
-            <button
-              onClick={handleShowOption}
-              className={showOption ? style.messageBlock__ButtonOptionShow : ""}
-            >
-              <OptionIcon />
-            </button>
-            {showOption && (
-              <ul>
-                <li
-                  onClick={delConversation}
-                  title={`Удалить ${isGroup ? "группу" : "беседу"}`}
-                >
-                  <TrashThree />{" "}
-                  <span>Удалить {isGroup ? "группу" : "беседу"}</span>
-                </li>
-                <li onClick={delHistoryMessages} title="Очистить историю">
-                  <Clear /> <span>Очистить историю</span>
-                </li>
-
-                {isGroup && (
-                  <li>
-                    <StartGroupCallButton groupId={currentConversation._id} />
-                  </li>
-                )}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        <div
-          className={`${style.messageBlock__newMessageBlock} ${
-            !optionHeaderMessage ? style.messageBlock__moveHeaderMessage : ""
-          }`}
-        >
-          <div className={style.messageBlock__newMessageBlockInput}>
-            <input
-              type="text"
-              placeholder="Сообщение"
-              onChange={(e) => setTextMessage(e.target.value)}
-              value={textMessage}
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-          <div
-            onClick={handleSendMessage}
-            title="Отправить сообщение"
-            className={style.messageBlock__newMessageButtonBlock}
-          >
-            <SendMessage />
-          </div>
-        </div>
-
-        <div className={style.messageBlock__contentMessageBlock}>
-          {messages.length > 0 && (
-            <div className={style.messageBlock__messagesList}>
-              {messages.map((message, i) => {
-                const isLast = i === messages.length - 1
-                return (
                   <div
-                    key={message._id}
-                    className={style.messageBlock__messageListWrapper}
-                    // className={`${style.messageBlock__messageList} ${
-                    //   message.senderId._id !== userId
-                    //     ? style.messageBlock__recipient
-                    //     : style.messageBlock__me
-                    // }
-                    // `}
-                    ref={isLast ? lastMessageRef : null}
+                    className={`${style.messageBlock__messageList} ${
+                      message.senderId._id !== userId
+                        ? style.messageBlock__recipient
+                        : style.messageBlock__me
+                    }`}
                   >
-                    {isGroup && message.senderId._id !== userId && (
-                      // <div className={style.messageBlock__senderImage}>
-                      <div className={style.messageBlock__senderImage}>
-                        <CloudinaryImage
-                          src={message.senderId.avatar}
-                          alt="avatar"
-                          width={200}
-                          height={200}
-                        />
-                      </div>
-
-                      // </div>
-                    )}
-                    <div
-                      className={`${style.messageBlock__messageList} ${
-                        message.senderId._id !== userId
-                          ? style.messageBlock__recipient
-                          : style.messageBlock__me
-                      }`}
-                    >
-                      <div>{message.text}</div>
-                      <div>{formatMessageTime(message.createdAt)}</div>
-                    </div>
+                    <div>{message.text}</div>
+                    <div>{formatMessageTime(message.createdAt)}</div>
                   </div>
-                )
-              })}
-              {loading && <Spinner />}
-            </div>
-          )}
-        </div>
+                </div>
+              )
+            })}
+            {loading && <Spinner />}
+          </div>
+        )}
       </div>
-    </>
+    </div>
   )
 }
 

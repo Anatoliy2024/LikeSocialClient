@@ -7,8 +7,8 @@ import { useGroupCallContext } from "@/providers/GroupCallProvider"
 
 const PhoneIcon = () => (
   <svg
-    width="18"
-    height="18"
+    width="30"
+    height="30"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -51,7 +51,7 @@ export const StartGroupCallButton = ({ groupId }: Props) => {
       }`}
     >
       <PhoneIcon />
-      {isInThisCall ? "В беседе" : "Беседа"}
+      {isInThisCall ? "В беседе" : "Голосовая Беседа"}
     </button>
   )
 }

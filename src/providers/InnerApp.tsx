@@ -66,6 +66,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  //Таймер включения сервера
   useEffect(() => {
     if (timerCount === 0) return
 
