@@ -32,6 +32,9 @@ import { MessageType } from "@/types/conversation.types"
 import { StartGroupCallButton } from "../StartGroupCallButton/StartGroupCallButton"
 import { GroupCallBanner } from "../GroupCallBanner/GroupCallBanner"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
+import { compressImage } from "@/utils/compressImage"
+import { fileAPI } from "@/api/api"
+import Image from "next/image"
 
 export const MessageBlock = () => {
   const router = useRouter()
@@ -43,6 +46,12 @@ export const MessageBlock = () => {
     message: string
     onConfirm: () => void
   } | null>(null)
+
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [fullImage, setFullImage] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const openConfirm = (config: typeof confirmConfig) => setConfirmConfig(config)
   const closeConfirm = () => setConfirmConfig(null)
@@ -66,6 +75,7 @@ export const MessageBlock = () => {
 
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
   const userId = useAppSelector((state) => state.auth.userId)
+
   const optionHeaderMessage = useHideOnScroll()
 
   const params = useParams<{ id: string }>()
@@ -108,6 +118,7 @@ export const MessageBlock = () => {
   // ───────────────────────────────────────────────
   useEffect(() => {
     const messageHandler = (data: { message: MessageType }) => {
+      // console.log("message:new получен:", data.message.type, data.message)
       dispatch(addMessageFromSocket(data.message))
     }
 
@@ -188,17 +199,79 @@ export const MessageBlock = () => {
 
   if (!currentConversation) return <div>Беседа не найдена</div>
 
+  // const handleSendMessage = async () => {
+  //   if (!textMessage.trim()) return
+  //   try {
+  //     socket.emit("message:send", {
+  //       conversationId: id,
+  //       type: "text",
+  //       text: textMessage,
+  //     })
+  //     window.scrollTo({ top: 0, behavior: "smooth" })
+  //     setTextMessage("")
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const compressed = await compressImage(file)
+
+    console.log(
+      `***********************************************До: ${(
+        file.size / 1024
+      ).toFixed(2)} KB | После: ${(compressed.size / 1024).toFixed(2)} KB`
+    )
+
+    setSelectedImage(compressed as File)
+    setImagePreview(URL.createObjectURL(compressed))
+  }
+
   const handleSendMessage = async () => {
-    if (!textMessage.trim()) return
+    if (!textMessage.trim() && !selectedImage) return
+
     try {
-      socket.emit("message:send", {
-        conversationId: id,
-        type: "text",
-        text: textMessage,
-      })
-      window.scrollTo({ top: 0, behavior: "smooth" })
+      if (selectedImage) {
+        setIsUploading(true)
+        // console.log(
+        //   "1. Начало загрузки, размер файла:",
+        //   selectedImage.size / 1024,
+        //   "kb"
+        // )
+        const data = await fileAPI.uploadChatImage(selectedImage)
+        // console.log("2. Загрузка завершена:", data)
+        setIsUploading(false)
+
+        // console.log("3. Отправка через socket:", {
+        //   conversationId: id,
+        //   type: "image",
+        //   attachments: [data],
+        // })
+
+        socket.emit("message:send", {
+          conversationId: id,
+          type: "image",
+          attachments: [data], // url, publicId, fileName, fileSize, mimeType, expiresAt
+          text: textMessage || undefined,
+        })
+        // console.log("4. socket.emit выполнен")
+      } else {
+        socket.emit("message:send", {
+          conversationId: id,
+          type: "text",
+          text: textMessage,
+        })
+      }
+
       setTextMessage("")
+      setSelectedImage(null)
+      setImagePreview(null)
+      window.scrollTo({ top: 0, behavior: "smooth" })
     } catch (error) {
+      setIsUploading(false)
       console.log(error)
     }
   }
@@ -229,6 +302,36 @@ export const MessageBlock = () => {
 
   return (
     <div className={style.messageBlock}>
+      {/* Модалка просмотра */}
+      {fullImage && (
+        <div
+          onClick={() => setFullImage(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            cursor: "zoom-out",
+          }}
+        >
+          <CloudinaryImage
+            src={fullImage}
+            alt="full"
+            width={1200}
+            height={1200}
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              width: "auto",
+              height: "auto",
+              borderRadius: "8px",
+            }}
+          />
+        </div>
+      )}
       <ConfirmModal
         isOpen={!!confirmConfig}
         onCancel={closeConfirm}
@@ -368,13 +471,86 @@ export const MessageBlock = () => {
             onKeyDown={handleKeyDown}
           />
         </div>
-        <div
+
+        <div className={style.messageBlock__newMessageBlockButtons}>
+          {/* скрытый input — просто кидаем здесь */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleImageSelect}
+          />
+
+          {/* превью — над инпутом, видно только когда выбрана картинка */}
+
+          {/* кнопка скрепка + инпут текста + кнопка отправить — в одну строку */}
+          {/* <div className={style.messageBlock__newMessageBlockInput}>
+            <button onClick={() => fileInputRef.current?.click()}>📎</button>
+            <input
+              type="text"
+              placeholder="Сообщение"
+              onChange={(e) => setTextMessage(e.target.value)}
+              value={textMessage}
+              onKeyDown={handleKeyDown}
+            />
+          </div> */}
+          <div
+            className={style.messageBlock__newMessageUploadImage}
+            // onClick={() => fileInputRef.current?.click()}
+          >
+            {imagePreview && (
+              <div className={style.messageBlock__imagePreview}>
+                <Image
+                  src={imagePreview}
+                  width={200}
+                  height={200}
+                  alt="preview"
+                />
+                <button
+                  className={style.messageBlock__imagePreviewCloseWrapper}
+                  onClick={() => {
+                    setSelectedImage(null)
+                    setImagePreview(null)
+                  }}
+                >
+                  <div>✕</div>
+                </button>
+              </div>
+            )}
+            <div
+              className={style.messageBlock__newMessageUploadImageButton}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              📎
+            </div>
+          </div>
+          <div
+            onClick={!isUploading ? handleSendMessage : undefined}
+            title="Отправить сообщение"
+            className={style.messageBlock__newMessageButtonBlock}
+            style={{
+              opacity: isUploading ? 0.5 : 1,
+              cursor: isUploading ? "not-allowed" : "pointer",
+            }}
+          >
+            {isUploading ? "..." : <SendMessage />}
+          </div>
+          {/* <div
+            onClick={handleSendMessage}
+            className={style.messageBlock__newMessageButtonBlock}
+          >
+            <SendMessage />
+          </div> */}
+        </div>
+
+        {/* <div
           onClick={handleSendMessage}
           title="Отправить сообщение"
           className={style.messageBlock__newMessageButtonBlock}
         >
           <SendMessage />
-        </div>
+        </div> */}
       </div>
 
       <div className={style.messageBlock__contentMessageBlock}>
@@ -414,7 +590,26 @@ export const MessageBlock = () => {
                         : style.messageBlock__me
                     }`}
                   >
-                    <div>{message.text}</div>
+                    {/* картинка */}
+                    {message.type === "image" &&
+                      message.attachments?.map((att) => (
+                        <CloudinaryImage
+                          key={att.url}
+                          src={att.url}
+                          alt="image"
+                          width={400}
+                          height={400}
+                          style={{
+                            maxWidth: "250px",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => setFullImage(att.url)}
+                        />
+                      ))}
+
+                    {message.text && <div>{message.text}</div>}
+                    {/* <div>{message.text}</div> */}
                     <div>{formatMessageTime(message.createdAt)}</div>
                   </div>
                 </div>

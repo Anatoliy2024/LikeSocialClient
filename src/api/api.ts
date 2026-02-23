@@ -310,6 +310,15 @@ export const fileAPI = {
       .post("file/uploadUserMovieAvatar", formData)
       .then((res) => res.data)
   },
+
+  uploadChatImage(file: File) {
+    const formData = new FormData()
+    formData.append("image", file)
+
+    return instance
+      .post("file/uploadChatImage", formData)
+      .then((res) => res.data)
+  },
 }
 export const userMovieAPI = {
   createUserMovie(data: FormData) {

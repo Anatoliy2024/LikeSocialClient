@@ -1,3 +1,13 @@
+@mixin button-new-message {
+  cursor: pointer;
+  flex: 0 0 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  height: 50px;
+}
+
 .messageBlock {
   // padding: 10px;
   position: relative;
@@ -323,15 +333,62 @@
     // min-width: 100px;
     // width: auto;
   }
-  &__newMessageButtonBlock {
-    border-radius: 50%;
-    flex: 0 0 50px;
-    height: 50px;
+  &__newMessageBlockButtons {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    gap: 20px;
+  }
+  &__newMessageUploadImage {
+    flex: 0 0 50px;
 
+    // cursor: pointer;
+    // flex: 0 0 50px;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // border-radius: 50%;
+    position: relative;
+  }
+  &__imagePreviewCloseWrapper {
+    div {
+      padding: 15px;
+      border-radius: 50%;
+      background: #11386d;
+      color: rgb(174, 173, 203);
+      cursor: pointer;
+
+      &:hover {
+        background-color: #11376d96;
+        color: white;
+      }
+    }
+  }
+  &__newMessageUploadImageButton {
+    @include button-new-message;
+
+    &:hover {
+      background-color: #11386d;
+      color: white;
+    }
+  }
+
+  &__imagePreview {
+    position: absolute;
+    width: 200px;
+    // height: 200px;
+    top: 50px;
+    right: 0;
+    display: flex;
+    gap: 20px;
+  }
+  &__newMessageButtonBlock {
+    @include button-new-message;
+    // border-radius: 50%;
+    // flex: 0 0 50px;
+    // height: 50px;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // cursor: pointer;
     &:hover {
       background-color: #11386d;
       color: white;

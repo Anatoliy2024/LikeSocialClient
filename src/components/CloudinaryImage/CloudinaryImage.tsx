@@ -9,6 +9,7 @@ type Props = {
   priority?: boolean
   width: number
   height: number
+  onClick?: () => void
 }
 const cloudinaryLoader = ({ src, width }: { src: string; width: number }) => {
   // Если это локальный файл или другой источник, возвращаем как есть
@@ -28,6 +29,7 @@ export const CloudinaryImage = ({
   className,
   style,
   priority = false,
+  onClick,
 }: Props) => {
   // console.log("CloudinaryImage***", src)
   const url = cloudinaryLoader({ src, width })
@@ -44,6 +46,7 @@ export const CloudinaryImage = ({
       loading={priority ? undefined : "lazy"}
       unoptimized // отключаем оптимизацию Next.js, чтоб не менять URL
       sizes={`${width}px`}
+      onClick={onClick}
     />
   )
 }
