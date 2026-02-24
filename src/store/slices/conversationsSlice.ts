@@ -10,6 +10,7 @@ import {
   addMemberToGroupThunk,
   createGroupConversationThunk,
   delConversationThunk,
+  deleteMemberToGroupThunk,
   delHistoryMessagesThunk,
   // fetchConversationMessagesThunk,
   fetchConversationsThunk,
@@ -228,6 +229,23 @@ const conversationSlice = createSlice({
       .addCase(addMemberToGroupThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка добавления участников"
+      })
+      .addCase(deleteMemberToGroupThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(deleteMemberToGroupThunk.fulfilled, (state, action) => {
+        if (action.payload.success && state.currentConversation) {
+          state.currentConversation.members =
+            state.currentConversation.members.filter(
+              (member) => member.user._id !== action.payload.memberId
+            )
+        }
+        state.loading = false
+      })
+      .addCase(deleteMemberToGroupThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Ошибка удаления участника"
       })
   },
 })

@@ -11,6 +11,7 @@ import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   addMemberToGroupThunk,
+  deleteMemberToGroupThunk,
   fetchItemConversationThunk,
 } from "@/store/thunks/conversationsThunk"
 import { useEffect, useState } from "react"
@@ -28,10 +29,10 @@ export function SettingsGroup() {
   const currentConversation = useAppSelector(
     (state) => state.conversations.currentConversation
   )
+  const userId = useAppSelector((state) => state.auth.userId)
   const {
     users: friendsUsers,
     page: friendsPage,
-
     pages: friendsPages,
   } = useAppSelector((state: RootState) => state.users.friends)
 
@@ -52,11 +53,11 @@ export function SettingsGroup() {
     dispatch(
       getUserRelationsThunk({ type: "friends", page: pageUserFriendsFromUrl })
     )
-  }, [, dispatch, pageUserFriendsFromUrl])
+  }, [dispatch, pageUserFriendsFromUrl])
 
   useEffect(() => {
     dispatch(fetchItemConversationThunk(id))
-  }, [dispatch])
+  }, [dispatch, id])
 
   const handleShowAddMembers = () => {
     setShowAddMemberModal(true)
@@ -74,6 +75,20 @@ export function SettingsGroup() {
       console.log(error)
     } finally {
       handleCloseAddMembers()
+    }
+  }
+
+  const handleDeleteMember = async (memberId: string) => {
+    if (!currentConversation) return
+    try {
+      dispatch(
+        deleteMemberToGroupThunk({
+          conversationId: currentConversation._id,
+          memberId,
+        })
+      )
+    } catch (error) {
+      console.log(error)
     }
   }
   if (!currentConversation) return
@@ -109,7 +124,9 @@ export function SettingsGroup() {
               height={600}
             />
           </div>
-          <ButtonMenu onClick={handleShowAddMembers}>Add members</ButtonMenu>
+          {userId === currentConversation.owner && (
+            <ButtonMenu onClick={handleShowAddMembers}>Add members</ButtonMenu>
+          )}
         </div>
         <div className={style.settingsGroup__groupInfo}>
           <div className={style.settingsGroup__groupInfoName}>
@@ -127,18 +144,27 @@ export function SettingsGroup() {
             <ul>
               {currentConversation.members.map((el) => (
                 <li key={el.user._id}>
-                  <Link
-                    href={`/profile/${el.user._id}`}
-                    className={style.settingsGroup__memberAvatarWrapper}
+                  <div>
+                    <Link
+                      href={`/profile/${el.user._id}`}
+                      className={style.settingsGroup__memberAvatarWrapper}
+                    >
+                      <CloudinaryImage
+                        src={el.user.avatar}
+                        alt="avatar"
+                        width={200}
+                        height={200}
+                      />
+                    </Link>
+                    <span>{el.user.username}</span>
+                  </div>
+
+                  <div
+                    className={style.settingsGroup__delMember}
+                    onClick={() => handleDeleteMember(el.user._id)}
                   >
-                    <CloudinaryImage
-                      src={el.user.avatar}
-                      alt="avatar"
-                      width={200}
-                      height={200}
-                    />
-                  </Link>
-                  <span>{el.user.username}</span>
+                    X
+                  </div>
                 </li>
               ))}
             </ul>

@@ -137,7 +137,7 @@ export const delHistoryMessagesThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue("Не удалось удалить историю")
   }
 })
-// ===== удаление беседы =====
+
 export const addMemberToGroupThunk = createAsyncThunk<
   { success: boolean; members: MemberFullType[] },
   { conversationId: string; members: string[] },
@@ -157,6 +157,29 @@ export const addMemberToGroupThunk = createAsyncThunk<
         return thunkAPI.rejectWithValue(error.response.data.message)
       }
       return thunkAPI.rejectWithValue("Не удалось добавить участников")
+    }
+  }
+)
+
+export const deleteMemberToGroupThunk = createAsyncThunk<
+  { success: boolean; memberId: string },
+  { conversationId: string; memberId: string },
+  { rejectValue: string }
+>(
+  "conversations/deleteMemberToGroup",
+  async ({ conversationId, memberId }, thunkAPI) => {
+    try {
+      const data = await conversationAPI.deleteMemberToGroup(
+        conversationId,
+        memberId
+      )
+
+      return data
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+      return thunkAPI.rejectWithValue("Не удалось удалить участника")
     }
   }
 )

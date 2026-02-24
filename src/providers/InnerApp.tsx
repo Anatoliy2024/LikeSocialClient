@@ -32,12 +32,15 @@ import { GroupCallProvider } from "./GroupCallProvider"
 import { GroupCallPanel } from "@/components/GroupCallPanel/GroupCallPanel"
 // import { addMessageFromSocket } from "@/store/slices/conversationsSlice"
 
+const TIMER = 30
+
 export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [showButton, setShowButton] = useState(false)
-  const [timerCount, setTimerCount] = useState(30)
+  const [timerCount, setTimerCount] = useState(TIMER)
   // const [socket, setSocket] = useState<Socket | null>(null)
   const navRef = useRef<HTMLDivElement | null>(null)
+  const countRef = useRef<number>(0)
 
   const dispatch = useAppDispatch()
   const server = useAppSelector((state) => state.server) as ServerType
@@ -68,14 +71,18 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
   //Таймер включения сервера
   useEffect(() => {
-    if (timerCount === 0) return
+    if (timerCount === 0) {
+      countRef.current++
+      if (countRef.current === 2) return
+      setTimerCount(TIMER)
+    }
 
     const intervalId = setTimeout(() => {
       setTimerCount((prev) => prev - 1)
     }, 1000)
 
     return () => clearInterval(intervalId)
-  }, [timerCount])
+  }, [timerCount, countRef])
 
   useEffect(() => {
     dispatch(getStatusServerThunk())
@@ -135,7 +142,13 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          Сервер просыпается, пожалуйста подождите {timerCount}...
+          {timerCount > 0 && countRef.current === 0 && (
+            <div>Сервер просыпается, пожалуйста подождите: {timerCount}...</div>
+          )}
+          {timerCount > 0 && countRef.current === 1 && (
+            <div>Разбираемся c причиной задержки: {timerCount}...</div>
+          )}
+          {timerCount === 0 && <div>Подключаем дополнительные мощности...</div>}
         </div>
         <div>
           <Loading />

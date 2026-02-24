@@ -86,6 +86,7 @@ export const MessageBlock = () => {
   )?.user
 
   const isGroup = currentConversation?.type === "group"
+  const isOwner = userId === currentConversation?.owner
 
   const status = usersOnline[recipientId?._id as string] ?? {
     isOnline: false,
@@ -424,29 +425,34 @@ export const MessageBlock = () => {
           </button>
           {showOption && (
             <ul>
-              <li
-                onClick={() =>
-                  openConfirm({
-                    title: `Удалить ${isGroup ? "группу" : "беседу"}`,
-                    message: "Вы уверены? Это действие нельзя отменить.",
-                    onConfirm: delConversation,
-                  })
-                }
-              >
-                <TrashThree />{" "}
-                <span>Удалить {isGroup ? "группу" : "беседу"}</span>
-              </li>
-              <li
-                onClick={() =>
-                  openConfirm({
-                    title: "Очистить историю",
-                    message: "Вы уверены? История будет удалена безвозвратно.",
-                    onConfirm: delHistoryMessages,
-                  })
-                }
-              >
-                <Clear /> <span>Очистить историю</span>
-              </li>
+              {(isOwner || !isGroup) && (
+                <>
+                  <li
+                    onClick={() =>
+                      openConfirm({
+                        title: `Удалить ${isGroup ? "группу" : "беседу"}`,
+                        message: "Вы уверены? Это действие нельзя отменить.",
+                        onConfirm: delConversation,
+                      })
+                    }
+                  >
+                    <TrashThree />
+                    <span>Удалить {isGroup ? "группу" : "беседу"}</span>
+                  </li>
+                  <li
+                    onClick={() =>
+                      openConfirm({
+                        title: "Очистить историю",
+                        message:
+                          "Вы уверены? История будет удалена безвозвратно.",
+                        onConfirm: delHistoryMessages,
+                      })
+                    }
+                  >
+                    <Clear /> <span>Очистить историю</span>
+                  </li>
+                </>
+              )}
 
               {isGroup && (
                 <li>

@@ -14,11 +14,15 @@
   }
   &__content {
     display: flex;
+    // flex-wrap: wrap;
     gap: 20px;
+    // @media(max-width:600px){
+    //   dis
+    // }
   }
   &__avatarWrapper {
-    width: 300px;
-    height: 300px;
+    max-width: 300px;
+    max-height: 300px;
   }
 
   &__groupInfo {
@@ -38,6 +42,13 @@
       li {
         display: flex;
         gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        div {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
       }
     }
   }
@@ -50,6 +61,20 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+  }
+
+  &__delMember {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    background: rgb(45, 42, 148);
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(46, 42, 148, 0.638);
     }
   }
 }

@@ -71,6 +71,12 @@ export const conversationAPI = {
       .post(`conversations/${conversationId}/members`, { members })
       .then((res) => res.data)
   },
+  deleteMemberToGroup(conversationId: string, memberId: string) {
+    // console.log("getMessages***", conversationId)
+    return instance
+      .delete(`conversations/${conversationId}/members/${memberId}`)
+      .then((res) => res.data)
+  },
   // Маркер "прочитано" (опционально)
   markAsRead(conversationId: string, messageId: string) {
     return instance
