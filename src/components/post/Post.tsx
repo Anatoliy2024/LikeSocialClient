@@ -5,7 +5,7 @@ import style from "./Post.module.scss"
 import { delUserPostsThunk } from "@/store/thunks/userPostThunk"
 import CloseButton from "../ui/closeButton/CloseButton"
 import { formatData } from "@/utils/formatData"
-// import Image from "next/image"
+
 import { delRoomPostsThunk } from "@/store/thunks/roomPostThunk"
 import { translatorGenres } from "@/utils/translatorGenres"
 import { Comments } from "@/assets/icons/comments"
@@ -14,8 +14,6 @@ import { userCommentType } from "@/store/slices/roomPostsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { useState } from "react"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
-// import { FixedSizeCloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
-// import { useRouter } from "next/navigation"
 
 type PostType = {
   title: string
@@ -61,14 +59,6 @@ const Post = ({
 }: PostType) => {
   const dispatch = useAppDispatch()
   const [isConfirmOpen, setConfirmOpen] = useState(false)
-  // const router = useRouter()
-  // const date = new Date(createdAt)
-  // const formatted = `${String(date.getDate()).padStart(2, "0")}.${String(
-  //   date.getMonth() + 1
-  // ).padStart(2, "0")}.${date.getFullYear()} ${String(date.getHours()).padStart(
-  //   2,
-  //   "0"
-  // )}:${String(date.getMinutes()).padStart(2, "0")}`
 
   const handleDelete = async (postId: string) => {
     try {
@@ -84,14 +74,6 @@ const Post = ({
       setConfirmOpen(false)
     }
   }
-
-  // const handleLinkToPagePost = (postId: string, roomId: string) => {
-  //   if (roomId) {
-  //     router.push(`/room/${roomId}?postId=${postId}`)
-  //   } else {
-  //     router.push(`postId=${postId}`)
-  //   }
-  // }
 
   return (
     <>
@@ -131,25 +113,6 @@ const Post = ({
           </div>
         )}
         <div className={style.imageStarsContainer}>
-          {/* <div className={style.blockImg}>
-            {avatar && (
-              <FixedSizeCloudinaryImage
-                src={avatar}
-                alt="postImage"
-                width={200}
-                height={200}
-              />
-              // <Image
-              //   src={avatar}
-              //   alt="postImage"
-              //   width={200}
-              //   height={200}
-              //   priority
-              // />
-            )}
-
-            
-          </div> */}
           <div className={style.blockImg}>
             <CloudinaryImage
               src={avatar || "/images/monkey.jpg"}
@@ -157,8 +120,6 @@ const Post = ({
               width={800}
               height={800}
             />
-
-            {/* <Image src={imagePost} alt="postImage" width={200} height={200} /> */}
           </div>
           <div className={style.blockStars}>
             <div>
@@ -191,7 +152,7 @@ const Post = ({
               ))}
           </div>
         )}
-        {/* {content && <div className={style.contentPost}>{content}</div>} */}
+
         <div className={style.dataTimeAndStars}>
           <div>{formatData(createdAt)}</div>
           <div className={style.starCommentBlock}>
@@ -206,12 +167,7 @@ const Post = ({
           </div>
         </div>
       </div>
-      {/* {id && selectedPost && (
-        <PostModal
-          post={selectedPost}
-          onClose={() => router.push(`/room/${roomId}`)}
-        />
-      )} */}
+
       <ConfirmModal
         isOpen={isConfirmOpen}
         onCancel={() => setConfirmOpen(false)}

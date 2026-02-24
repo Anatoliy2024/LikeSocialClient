@@ -228,12 +228,14 @@ const ProfileBlock = ({
           <div className={style.imageContainer}>
             <div className={style.userImgOnlineBlock}>
               <div className={style.blockImg} onClick={handleOpenModal}>
-                <CloudinaryImage
-                  src={profileData.avatar || ""}
-                  alt="avatar"
-                  width={600}
-                  height={600}
-                />
+                {profileData.avatar && (
+                  <CloudinaryImage
+                    src={profileData.avatar}
+                    alt="avatar"
+                    width={600}
+                    height={600}
+                  />
+                )}
               </div>
               {status?.isOnline && <div className={style.onlineBlock}></div>}
             </div>

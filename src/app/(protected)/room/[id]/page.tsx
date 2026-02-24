@@ -157,12 +157,14 @@ const Room = () => {
     // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
   }
 
+  if (!room) return
+
   // console.log("posts", posts)
   return (
     <>
       {addFriendsToRoom && (
         <AddMembers
-          members={room?.members as []}
+          members={room.members as []}
           friends={friends}
           handleCloseAddMembers={handleCloseAddMembersFromRoom}
           onSubmitMembers={onSubmitMembers}
@@ -182,34 +184,36 @@ const Room = () => {
       <div className={style.containerMembers}>
         <div className={style.blockRoomMainInfo}>
           <div className={style.blockAvatarRoom} onClick={handleOpenModal}>
-            <CloudinaryImage
-              src={room?.avatar || ""}
-              alt="roomAvatar"
-              width={600}
-              height={600}
-            />
+            {room.avatar && (
+              <CloudinaryImage
+                src={room.avatar}
+                alt="roomAvatar"
+                width={600}
+                height={600}
+              />
+            )}
           </div>
           <div className={style.blockNameAndDescription}>
             <div>
               <span>Название комнаты:</span>
-              <span>{room?.name}</span>
+              <span>{room.name}</span>
             </div>
             <div>
               <span>Описание комнаты:</span>
-              <span>{room?.description}</span>
+              <span>{room.description}</span>
             </div>
           </div>
         </div>
         <h3>Участники</h3>
         <div className={style.membersBlock}>
-          {room?.members.map((member) => (
+          {room.members.map((member) => (
             <MemberInfo
               key={member._id}
               id={member._id as string}
               name={member.username}
               avatar={member.avatar}
               delMember={delMember}
-              owner={(room?.owner as RoomMemberType)._id || ""}
+              owner={(room.owner as RoomMemberType)._id || ""}
               isOwner={isOwner}
             />
           ))}
