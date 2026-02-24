@@ -6,10 +6,12 @@ import throttle from "lodash.throttle"
 export default function Navbar({
   isOpen,
   navRef,
+  role,
   onClose,
 }: {
   isOpen: boolean
   navRef: RefObject<HTMLDivElement | null>
+  role: "user" | "admin" | null
   onClose: () => void
 }) {
   const [showScrollTop, setShowScrollTop] = useState(false)
@@ -34,18 +36,6 @@ export default function Navbar({
     }
   }
 
-  // useEffect(() => {
-  //   // при монтировании — запрещаем прокрутку
-  //   const originalOverflow = document.body.style.overflow
-
-  //   if (isOpen) {
-  //     document.body.style.overflow = "hidden"
-  //   }
-
-  //   return () => {
-  //     document.body.style.overflow = originalOverflow
-  //   }
-  // }, [isOpen])
   return (
     <div
       ref={navRef}
@@ -66,6 +56,11 @@ export default function Navbar({
       <Link href="/userMovie" onClick={handleLinkClick} prefetch={false}>
         <div>Want To See</div>
       </Link>
+      {role === "admin" && (
+        <Link href="/admin" onClick={handleLinkClick} prefetch={false}>
+          <div>Admin</div>
+        </Link>
+      )}
 
       {showScrollTop && (
         <button onClick={scrollToTop} className={style.scrollTopBtn}>

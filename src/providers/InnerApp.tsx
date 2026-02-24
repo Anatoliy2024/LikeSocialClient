@@ -45,6 +45,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch()
   const server = useAppSelector((state) => state.server) as ServerType
   const userId = useAppSelector((state: RootState) => state.auth.userId) // пример, где хранится user
+  const role = useAppSelector((state: RootState) => state.auth.role) // пример, где хранится user
 
   const status = useAppSelector((state: RootState) => state.call.status)
 
@@ -177,6 +178,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
           <Navbar
             isOpen={menuOpen}
             navRef={navRef}
+            role={role}
             onClose={() => setMenuOpen(false)}
           />
 

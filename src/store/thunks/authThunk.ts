@@ -25,6 +25,7 @@ interface DecodedToken {
   email: string
   avatar?: string | null
   isVerified: boolean
+  role: "admin" | "user"
   exp: number
   iat: number
 }

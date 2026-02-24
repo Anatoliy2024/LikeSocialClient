@@ -17,6 +17,7 @@ import onlineStatus from "./slices/onlineStatusSlice"
 import callReducer from "./slices/callSlice"
 import conversationsReducer from "./slices/conversationsSlice"
 import groupCallReducer from "./slices/groupCallSlice"
+import adminReducer from "./slices/adminSlice"
 // import messagesReducer from "./slices/messagesSlice"
 
 export const store = configureStore({
@@ -36,6 +37,7 @@ export const store = configureStore({
     call: callReducer,
     groupCall: groupCallReducer,
     conversations: conversationsReducer,
+    admin: adminReducer,
     // messages: messagesReducer,
     // добавь другие редьюсеры здесь
   },

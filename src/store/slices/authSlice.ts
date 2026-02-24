@@ -15,6 +15,7 @@ type AuthAState = {
   authLoading: boolean
   authError: string | null
   isVerified: boolean
+  role: "user" | "admin" | null
 }
 
 const initialState: AuthAState = {
@@ -25,6 +26,7 @@ const initialState: AuthAState = {
   authLoading: false,
   authError: null,
   isVerified: false,
+  role: null,
 }
 
 const authSlice = createSlice({
@@ -50,6 +52,7 @@ const authSlice = createSlice({
         state.userId = action.payload.userId
         state.isVerified = action.payload.isVerified
         state.avatar = action.payload.avatar
+        state.role = action.payload.role
       })
       .addCase(registerThunk.rejected, (state, action) => {
         state.authLoading = false
@@ -70,6 +73,7 @@ const authSlice = createSlice({
         state.avatar = action.payload.avatar
         state.userId = action.payload.userId
         state.isVerified = action.payload.isVerified
+        state.role = action.payload.role
       })
       .addCase(authThunk.rejected, (state, action) => {
         state.authLoading = false
@@ -100,6 +104,7 @@ const authSlice = createSlice({
         state.avatar = action.payload.avatar
         state.userId = action.payload.userId
         state.isVerified = action.payload.isVerified
+        state.role = action.payload.role
       })
       .addCase(authCheckThunk.rejected, (state, action) => {
         state.authLoading = false
@@ -118,6 +123,7 @@ const authSlice = createSlice({
         state.avatar = null
         state.userId = null
         state.isVerified = false
+        state.role = null
       })
       .addCase(logoutThunk.rejected, (state, action) => {
         state.authLoading = false
