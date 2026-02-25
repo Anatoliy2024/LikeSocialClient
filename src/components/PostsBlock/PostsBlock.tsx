@@ -131,7 +131,7 @@ const PostsBlock = ({
       <>
         <div className={style.wrapper}>
           {/* <h2>PostsBlock</h2> */}
-          {!roomId && !profileUserId && (
+          {(!profileUserId || roomId) && (
             <ButtonMenu
               onClick={() => {
                 setActiveCreateNewPost(true)
