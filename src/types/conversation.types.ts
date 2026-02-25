@@ -1,9 +1,15 @@
+import { EmojiId } from "@/constants/reactions"
 import { BaseMember } from "./base"
 
 export interface AttachmentType {
   url: string
   mimeType: string
   fileName: string
+}
+
+export type ReactionType = {
+  user: { _id: string; username: string; avatar: string }
+  emoji: EmojiId
 }
 
 export interface MessageType {
@@ -19,8 +25,21 @@ export interface MessageType {
   attachments?: AttachmentType[]
   sticker?: string
   replyTo?: MessageType | null
+  reactions: ReactionType[]
   createdAt: string
 }
+// reactions: [
+//   {
+//     user: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "User",
+//     },
+//     emoji: {
+//       type: String, // "😂" или "laugh" (id кастомного)
+//       required: true,
+//     },
+//   },
+// ],
 
 export type MemberType = BaseMember
 // export interface MemberType {

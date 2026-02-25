@@ -14,6 +14,7 @@ import {
   addMessageFromSocket,
   incrementPage,
   clearMessages,
+  reactionUpdateFromSocket,
 } from "@/store/slices/conversationsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
@@ -34,6 +35,9 @@ import ConfirmModal from "../ConfirmModal/ConfirmModal"
 import { compressImage } from "@/utils/compressImage"
 import { fileAPI } from "@/api/api"
 import Image from "next/image"
+import { MessageReactions } from "../MessageReactions/MessageReactions"
+import { BackgroundModal } from "../BackgroundModal/BackgroundModal"
+import { ModalCurrentMessage } from "../ModalCurrentMessage/ModalCurrentMessage"
 
 export const MessageBlock = () => {
   const router = useRouter()
@@ -50,6 +54,7 @@ export const MessageBlock = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [fullImage, setFullImage] = useState<string | null>(null)
+  const [currentMessage, setCurrentMessage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const openConfirm = (config: typeof confirmConfig) => setConfirmConfig(config)
@@ -121,13 +126,22 @@ export const MessageBlock = () => {
       // console.log("message:new получен:", data.message.type, data.message)
       dispatch(addMessageFromSocket(data.message))
     }
+    const reactionHandler = (data: {
+      messageId: string
+      reactions: MessageType["reactions"]
+    }) => {
+      // console.log("message:new получен:", data.message.type, data.message)
+      dispatch(reactionUpdateFromSocket(data))
+    }
 
     socket.emit("conversation:join", id)
     socket.on("message:new", messageHandler)
+    socket.on("message:reaction:updated", reactionHandler)
 
     return () => {
       socket.emit("conversation:leave", id)
       socket.off("message:new", messageHandler)
+      socket.off("message:reaction:updated", reactionHandler)
     }
   }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -303,8 +317,28 @@ export const MessageBlock = () => {
     setShowOption((prev) => !prev)
   }
 
+  const handleCurrentMessage = (messageId: string) => {
+    setCurrentMessage(messageId)
+  }
+  const handleCloseCurrentMessage = () => {
+    setCurrentMessage(null)
+    // console.log("handleCloseCurrentMessage", currentMessage)
+  }
+
+  const handleReaction = (messageId: string, reactionId: string) => {
+    socket.emit("message:reaction", {
+      messageId,
+      reactionId,
+    })
+    setCurrentMessage(null)
+  }
+
+  console.log("messages", messages)
   return (
     <div className={style.messageBlock}>
+      {currentMessage && (
+        <BackgroundModal onClose={handleCloseCurrentMessage} />
+      )}
       {/* Модалка просмотра */}
       {fullImage && (
         <div
@@ -535,11 +569,14 @@ export const MessageBlock = () => {
           <div className={style.messageBlock__messagesList}>
             {messages.map((message, i) => {
               const isLast = i === messages.length - 1
+              console.log("message*******", message)
+              // console.log("message.reactions*******", message.reactions)
               return (
                 <div
                   key={message._id}
                   className={style.messageBlock__messageListWrapper}
                   ref={isLast ? lastMessageRef : null}
+                  onClick={() => handleCurrentMessage(message._id)}
                 >
                   {isGroup && message.senderId._id !== userId && (
                     // <div className={style.messageBlock__senderImage}>
@@ -561,7 +598,13 @@ export const MessageBlock = () => {
                         : style.messageBlock__me
                     }`}
                   >
-                    {/* картинка */}
+                    {currentMessage === message._id && (
+                      <ModalCurrentMessage
+                        messageId={message._id}
+                        handleReaction={handleReaction}
+                      />
+                    )}
+
                     {message.type === "image" &&
                       message.attachments?.map((att) => (
                         <CloudinaryImage
@@ -575,13 +618,22 @@ export const MessageBlock = () => {
                             borderRadius: "8px",
                             cursor: "pointer",
                           }}
-                          onClick={() => setFullImage(att.url)}
+                          onClick={(e) => {
+                            if (e) {
+                              e.stopPropagation() // добавь это
+                            }
+                            setFullImage(att.url)
+                          }}
                         />
                       ))}
 
                     {message.text && <div>{message.text}</div>}
-                    {/* <div>{message.text}</div> */}
-                    <div>{formatMessageTime(message.createdAt)}</div>
+
+                    <div className={style.messageBlock__otherInfoMessage}>
+                      <MessageReactions reactions={message.reactions} />
+
+                      <span>{formatMessageTime(message.createdAt)}</span>
+                    </div>
                   </div>
                 </div>
               )

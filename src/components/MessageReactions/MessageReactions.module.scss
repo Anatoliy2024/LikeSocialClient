@@ -1,0 +1,52 @@
+// MessageReactions.module.scss
+
+.reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.reaction {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #f3f4f6;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #e5e7eb;
+  }
+  span {
+    font-size: 20px;
+    // transform: ;
+  }
+}
+
+.avatars {
+  // height: 30px;
+  // width: 30px;
+  display: flex;
+
+  .avatar {
+    height: 35px;
+    width: 35px;
+    margin-left: -4px;
+    border-radius: 50%;
+    border: 1px solid #fff;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.extra {
+  font-size: 12px;
+  color: #6b7280;
+}

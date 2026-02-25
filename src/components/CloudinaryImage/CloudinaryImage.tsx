@@ -9,7 +9,7 @@ type Props = {
   priority?: boolean
   width: number
   height: number
-  onClick?: () => void
+  onClick?: (e?: React.MouseEvent<HTMLImageElement>) => void
 }
 const cloudinaryLoader = ({ src, width }: { src: string; width: number }) => {
   // Если это локальный файл или другой источник, возвращаем как есть

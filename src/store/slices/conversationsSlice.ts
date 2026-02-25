@@ -54,6 +54,20 @@ const conversationSlice = createSlice({
       //   conv.updatedAt = action.payload.createdAt
       // }
     },
+    reactionUpdateFromSocket(
+      state,
+      action: PayloadAction<{
+        messageId: string
+        reactions: MessageType["reactions"]
+      }>
+    ) {
+      const message = state.messages.find(
+        (m) => m._id === action.payload.messageId
+      )
+      if (message) {
+        message.reactions = action.payload.reactions
+      }
+    },
 
     // Сброс при смене беседы
     clearMessages(state) {
@@ -252,6 +266,7 @@ const conversationSlice = createSlice({
 
 export const {
   addMessageFromSocket,
+  reactionUpdateFromSocket,
   clearMessages,
   incrementPage,
   // setCurrentConversation,

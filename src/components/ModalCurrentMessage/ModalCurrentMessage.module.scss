@@ -1,0 +1,46 @@
+.modalCurrentMessage {
+  max-width: 300px;
+  // width: 200px;
+  // height: 200px;
+  background: white;
+  position: absolute;
+  left: 10%;
+  z-index: 105;
+  top: 50%;
+  border-radius: 20px;
+  padding: 10px;
+  li {
+    cursor: pointer;
+  }
+  & > ul {
+    border-radius: 12px;
+    & > li {
+      &:hover {
+        color: rgb(136, 103, 226);
+      }
+    }
+  }
+  &__reactionWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    // display: block;
+    max-height: 150px;
+    overflow-y: auto;
+    li {
+      font-size: 25px;
+
+      // transform: scale(1.2);
+      border-radius: 12px;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      // padding: 5px;
+      &:hover {
+        background: rgb(136, 103, 226);
+      }
+    }
+  }
+}
