@@ -60,6 +60,9 @@ const ProfileBlock = ({
   const [isEdit, setIsEdit] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
+  // const renderCount = useRef(0)
+  // renderCount.current++
+  // console.log("ProfileBlock render #", renderCount.current)
   // const playerId = useAppSelector((state: RootState) => state.auth.userId)
 
   // const { callStart } = useCall(playerId)
@@ -87,10 +90,17 @@ const ProfileBlock = ({
   const loading = useAppSelector(
     (state: RootState) => state.profile.profileLoading
   )
-  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
-  const status = !isMyProfilePage
-    ? usersOnline[userId as string]
-    : { isOnline: true, lastSeen: null }
+  // const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
+  // const status = !isMyProfilePage
+  //   ? usersOnline[userId as string]
+  //   : { isOnline: true, lastSeen: null }
+
+  const userOnlineStatus = useAppSelector((state: RootState) =>
+    userId ? state.onlineStatus[userId] : undefined
+  )
+  const status = isMyProfilePage
+    ? { isOnline: true, lastSeen: null }
+    : userOnlineStatus
 
   const lastSeen = status?.isOnline ? null : status?.lastSeen ?? profileLastSeen
 
@@ -536,14 +546,14 @@ const ProfileBlock = ({
                   <SubBlock
                     subsData={profileData.subscriptions}
                     type={"subscriptions"}
-                    usersOnline={usersOnline}
+                    // usersOnline={usersOnline}
                   />
                 )}
                 {profileData.subscribers.length > 0 && (
                   <SubBlock
                     subsData={profileData.subscribers}
                     type={"subscribers"}
-                    usersOnline={usersOnline}
+                    // usersOnline={usersOnline}
                   />
                 )}
               </>

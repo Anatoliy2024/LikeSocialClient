@@ -48,6 +48,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   const role = useAppSelector((state: RootState) => state.auth.role) // пример, где хранится user
 
   const status = useAppSelector((state: RootState) => state.call.status)
+  // const callActive = useAppSelector((state: RootState) => !!state.call.status)
 
   const handleShowToggleMenu = () => {
     setMenuOpen((prev) => !prev)

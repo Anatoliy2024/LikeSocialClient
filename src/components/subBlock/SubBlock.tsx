@@ -2,18 +2,21 @@ import { UserType } from "@/store/thunks/usersThunk"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import style from "./SubBlock.module.scss"
 import Link from "next/link"
-import { OnlineStatusState } from "@/store/slices/onlineStatusSlice"
+// import { OnlineStatusState } from "@/store/slices/onlineStatusSlice"
+import { useAppSelector } from "@/store/hooks"
+import { RootState } from "@/store/store"
 // import { useRouter } from 'next/navigation'
 
 export const SubBlock = ({
   subsData,
   type,
-  usersOnline,
-}: {
+}: // usersOnline,
+{
   subsData: UserType[]
   type: string
-  usersOnline: OnlineStatusState
+  // usersOnline: OnlineStatusState
 }) => {
+  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
   // const router = useRouter()
   // const handleLinkUser = (userId: string) => {
   //     router.push(`/profile/${userId}`)
