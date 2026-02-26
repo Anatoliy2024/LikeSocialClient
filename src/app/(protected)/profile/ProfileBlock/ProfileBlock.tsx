@@ -454,13 +454,20 @@ const ProfileBlock = ({
                   {!isMyProfilePage && (
                     <div
                       className={style.button}
-                      onClick={handleCall}
-                      // className={style.linkWantToSee}
+                      onClick={userOnlineStatus ? handleCall : () => {}}
+                      title={
+                        userOnlineStatus ? "Позвонить юзеру" : "Юзер офлайн"
+                      }
                     >
-                      <div className={style.iconCall}>
+                      <div
+                        className={
+                          userOnlineStatus
+                            ? style.iconCall
+                            : style.iconCall_block
+                        }
+                      >
                         <IconCall />
                       </div>
-                      {/* <ButtonMenu>Список желаемого</ButtonMenu> */}
                     </div>
                   )}
                   {!profileData.isMyProfile && (
