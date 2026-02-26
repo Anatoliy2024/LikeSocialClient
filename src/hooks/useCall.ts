@@ -94,13 +94,19 @@ export const useCall = (userId: string | null) => {
 
       const p = new Peer({
         initiator,
-        trickle: false,
+        trickle: true,
+        // trickle: false,
         stream,
         config: { iceServers: ICE_SERVERS },
       })
 
       p.on("stream", (remote) => {
+        console.log("📹 remote stream tracks:", remote.getTracks())
         setRemoteStream(remote)
+      })
+      p.on("track", (track, stream) => {
+        console.log("📹 new track:", track.kind)
+        setRemoteStream(stream)
       })
 
       p.on("error", (err) => {
@@ -193,6 +199,31 @@ export const useCall = (userId: string | null) => {
 
     s.on("call:accept", onCallAccept)
 
+    // const onSignal = async ({
+    //   from,
+    //   signal,
+    // }: {
+    //   from: string
+    //   signal: SignalData
+    // }) => {
+    //   if (signal.type === "offer") {
+    //     if (!peerRef.current) {
+    //       const stream = await getOrCreateLocalStream()
+    //       const peer = createPeer(false, stream, from)
+
+    //       peer.on("signal", (sig) => {
+    //         s.emit("call:signal", { to: from, signal: sig })
+    //       })
+
+    //       peer.on("connect", () => dispatch(acceptCall()))
+    //       peer.signal(signal)
+    //     }
+    //   } else if (signal.type === "answer") {
+    //     if (peerRef.current) {
+    //       peerRef.current.signal(signal)
+    //     }
+    //   }
+    // }
     const onSignal = async ({
       from,
       signal,
@@ -211,8 +242,16 @@ export const useCall = (userId: string | null) => {
 
           peer.on("connect", () => dispatch(acceptCall()))
           peer.signal(signal)
+        } else {
+          // Peer уже есть — просто сигналим (renegotiation для видео)
+          peerRef.current.signal(signal)
         }
       } else if (signal.type === "answer") {
+        if (peerRef.current) {
+          peerRef.current.signal(signal)
+        }
+      } else {
+        // ICE кандидат — передаём существующему peer
         if (peerRef.current) {
           peerRef.current.signal(signal)
         }
