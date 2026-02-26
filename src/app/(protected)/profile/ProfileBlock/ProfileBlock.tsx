@@ -454,14 +454,14 @@ const ProfileBlock = ({
                   {!isMyProfilePage && (
                     <div
                       className={style.button}
-                      onClick={userOnlineStatus ? handleCall : () => {}}
+                      onClick={status?.isOnline ? handleCall : () => {}}
                       title={
-                        userOnlineStatus ? "Позвонить юзеру" : "Юзер офлайн"
+                        status?.isOnline ? "Позвонить юзеру" : "Юзер офлайн"
                       }
                     >
                       <div
                         className={
-                          userOnlineStatus
+                          status?.isOnline
                             ? style.iconCall
                             : style.iconCall_block
                         }
