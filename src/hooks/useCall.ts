@@ -55,6 +55,7 @@ export const useCall = (userId: string | null) => {
         sampleRate: 48000,
         channelCount: 1,
         // Дополнительно если браузер поддерживает
+        voiceIsolation: true,
         googEchoCancellation: true,
         googAutoGainControl: false,
         googNoiseSuppression: true,
@@ -63,17 +64,17 @@ export const useCall = (userId: string | null) => {
       video: false,
     })
 
-    const audioTrack = stream.getAudioTracks()[0]
-    const settings = audioTrack.getSettings()
-    const capabilities = audioTrack.getCapabilities?.()
+    // const audioTrack = stream.getAudioTracks()[0]
+    // const settings = audioTrack.getSettings()
+    // const capabilities = audioTrack.getCapabilities?.()
 
-    console.group("🎤 Audio Track")
-    console.log("echoCancellation:", settings.echoCancellation)
-    console.log("noiseSuppression:", settings.noiseSuppression)
-    console.log("autoGainControl:", settings.autoGainControl)
-    console.log("sampleRate:", settings.sampleRate)
-    console.log("capabilities:", capabilities)
-    console.groupEnd()
+    // console.group("🎤 Audio Track")
+    // console.log("echoCancellation:", settings.echoCancellation)
+    // console.log("noiseSuppression:", settings.noiseSuppression)
+    // console.log("autoGainControl:", settings.autoGainControl)
+    // console.log("sampleRate:", settings.sampleRate)
+    // console.log("capabilities:", capabilities)
+    // console.groupEnd()
 
     stream.getAudioTracks().forEach((t) => (t.enabled = true))
     localStreamRef.current = stream
