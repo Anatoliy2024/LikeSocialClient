@@ -251,18 +251,18 @@
     flex-wrap: wrap;
     justify-content: space-between;
 
-    div:first-child {
-      // flex: 1;
-      word-break: break-word;
-    }
-    div:last-child {
-      font-size: 11px;
-      color: rgb(44, 32, 132);
-      display: flex;
-      // align-self: flex-end;
-      align-items: center;
-      // justify-content: space-between;
-    }
+    // div:first-child {
+    //   // flex: 1;
+    //   word-break: break-word;
+    // }
+    // div:last-child {
+    //   font-size: 11px;
+    //   color: rgb(44, 32, 132);
+    //   display: flex;
+    //   // align-self: flex-end;
+    //   align-items: center;
+    //   // justify-content: space-between;
+    // }
   }
   &__senderImage {
     width: 50px;
@@ -399,7 +399,16 @@
       color: white;
     }
   }
+  &____messageListText {
+    word-break: break-word;
+  }
   &__otherInfoMessage {
+    font-size: 11px;
+    color: rgb(44, 32, 132);
+    // display: flex;
+    // align-self: flex-end;
+    align-items: center;
+    // justify-content: space-between;
     display: flex;
     flex: 1;
     justify-content: space-between;

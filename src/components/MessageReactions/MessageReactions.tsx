@@ -5,6 +5,8 @@ import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 
 type Props = {
   reactions: ReactionType[]
+  messageId: string
+  handleReaction: (messageId: string, reactionId: string) => void
 }
 
 const groupReactions = (reactions: ReactionType[]) => {
@@ -18,11 +20,15 @@ const groupReactions = (reactions: ReactionType[]) => {
   return Array.from(map.entries()).map(([emoji, users]) => ({ emoji, users }))
 }
 
-export const MessageReactions = ({ reactions }: Props) => {
+export const MessageReactions = ({
+  reactions,
+  messageId,
+  handleReaction,
+}: Props) => {
   if (!reactions?.length) return <div></div>
   console.log("MessageReactions reactions", reactions)
   const grouped = groupReactions(reactions)
-  console.log("grouped", grouped)
+  console.log("grouped*****", grouped)
   return (
     <div className={styles.reactions}>
       {grouped.map(({ emoji, users }) => {
@@ -37,6 +43,10 @@ export const MessageReactions = ({ reactions }: Props) => {
             key={emoji}
             className={styles.reaction}
             title={users.map((u) => u.user.username).join(", ")}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleReaction(messageId, emoji)
+            }}
           >
             <span>{reaction.emoji}</span>
 

@@ -8,8 +8,10 @@ export interface AttachmentType {
 }
 
 export type ReactionType = {
+  _id: string
   user: { _id: string; username: string; avatar: string }
   emoji: EmojiId
+  createdAt: string
 }
 
 export interface MessageType {
@@ -24,7 +26,7 @@ export interface MessageType {
   text?: string
   attachments?: AttachmentType[]
   sticker?: string
-  replyTo?: MessageType | null
+  replyTo?: string | null
   reactions: ReactionType[]
   createdAt: string
 }

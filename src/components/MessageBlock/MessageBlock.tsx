@@ -330,7 +330,10 @@ export const MessageBlock = () => {
       messageId,
       reactionId,
     })
-    setCurrentMessage(null)
+    if (currentMessage) {
+      setCurrentMessage(null)
+    }
+    // console.log("currentMessage", currentMessage)
   }
 
   console.log("messages", messages)
@@ -603,7 +606,9 @@ export const MessageBlock = () => {
                     {currentMessage === message._id && (
                       <ModalCurrentMessage
                         messageId={message._id}
+                        reactions={message.reactions}
                         handleReaction={handleReaction}
+                        // message={message}
                       />
                     )}
 
@@ -629,10 +634,18 @@ export const MessageBlock = () => {
                         />
                       ))}
 
-                    {message.text && <div>{message.text}</div>}
+                    {message.text && (
+                      <div className={style.messageBlock__messageListText}>
+                        {message.text}
+                      </div>
+                    )}
 
                     <div className={style.messageBlock__otherInfoMessage}>
-                      <MessageReactions reactions={message.reactions} />
+                      <MessageReactions
+                        reactions={message.reactions}
+                        messageId={message._id}
+                        handleReaction={handleReaction}
+                      />
 
                       <span>{formatMessageTime(message.createdAt)}</span>
                     </div>
