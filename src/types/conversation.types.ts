@@ -58,6 +58,7 @@ export interface ConversationType {
   type: "private" | "group"
   title: string // для групп
   avatar: string // для групп
+  avatarPublicId: string
   owner: string
   members: MemberFullType[]
   lastMessageId?: MessageType

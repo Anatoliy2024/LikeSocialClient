@@ -8,6 +8,7 @@ import {
 // import { socket } from '../socket' // ваш socket.io-client
 import {
   addMemberToGroupThunk,
+  changeAvatarGroupThunk,
   createGroupConversationThunk,
   delConversationThunk,
   deleteMemberToGroupThunk,
@@ -260,6 +261,24 @@ const conversationSlice = createSlice({
       .addCase(deleteMemberToGroupThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка удаления участника"
+      })
+
+      .addCase(changeAvatarGroupThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(changeAvatarGroupThunk.fulfilled, (state, action) => {
+        state.loading = false
+
+        if (action.payload.success && state.currentConversation) {
+          state.currentConversation.avatar = action.payload.avatar
+          state.currentConversation.avatarPublicId =
+            action.payload.avatarPublicId
+        }
+      })
+      .addCase(changeAvatarGroupThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Ошибка при смене аватарки группы"
       })
   },
 })

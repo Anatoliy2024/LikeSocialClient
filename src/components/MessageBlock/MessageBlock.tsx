@@ -397,14 +397,16 @@ export const MessageBlock = () => {
               href={`/conversation/${id}/settings`}
               className={style.messageBlock__groupInfo}
             >
-              <div className={style.messageBlock__blockImg}>
-                <CloudinaryImage
-                  src={currentConversation.avatar || ""}
-                  alt="avatar"
-                  width={200}
-                  height={200}
-                />
-              </div>
+              {currentConversation.avatar && (
+                <div className={style.messageBlock__blockImg}>
+                  <CloudinaryImage
+                    src={currentConversation.avatar}
+                    alt="avatar"
+                    width={200}
+                    height={200}
+                  />
+                </div>
+              )}
               <div className={style.messageBlock__groupInfoMain}>
                 <div className={style.messageBlock__groupInfoTitle}>
                   {currentConversation.title}

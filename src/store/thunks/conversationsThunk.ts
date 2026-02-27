@@ -7,6 +7,7 @@ import {
   MemberFullType,
   MessageType,
 } from "@/types/conversation.types"
+import { fileAPI } from "@/api/api"
 
 // ===== Создание группы =====
 export const createGroupConversationThunk = createAsyncThunk<
@@ -199,5 +200,24 @@ export const markConversationAsReadThunk = createAsyncThunk<
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
     return thunkAPI.rejectWithValue("Не удалось отметить как прочитанное")
+  }
+})
+
+export const changeAvatarGroupThunk = createAsyncThunk<
+  { success: boolean; avatar: string; avatarPublicId: string }, // тип данных, которые вернутся — массив пользователей
+  { file: File; groupId: string }, // параметр тип данных которые отправляю
+  { rejectValue: string }
+>("conversations/changeAvatarGroup", async ({ file, groupId }, thunkAPI) => {
+  try {
+    const data = await fileAPI.uploadGroupAvatar(file, groupId)
+    return data
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue("Ошибка при изменении аватара группы")
   }
 })

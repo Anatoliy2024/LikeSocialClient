@@ -47,10 +47,16 @@ export const useGroupCall = (userId: string | null) => {
       audio: {
         echoCancellation: true,
         noiseSuppression: true,
-        autoGainControl: true,
+        autoGainControl: false,
         sampleRate: 48000,
         channelCount: 1,
-      },
+        // Дополнительно если браузер поддерживает
+        voiceIsolation: true,
+        googEchoCancellation: true,
+        googAutoGainControl: false,
+        googNoiseSuppression: true,
+        googHighpassFilter: true, // встроенный highpass фильтр
+      } as MediaTrackConstraints,
       video: withVideo
         ? { width: { ideal: 1280 }, height: { ideal: 720 } }
         : false,

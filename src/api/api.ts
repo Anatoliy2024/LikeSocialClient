@@ -300,6 +300,14 @@ export const fileAPI = {
       .post("file/uploadRoomAvatar", formData)
       .then((res) => res.data)
   },
+  uploadGroupAvatar(file: File, groupId: string) {
+    const formData = new FormData()
+    formData.append("image", file)
+    formData.append("groupId", groupId) // передаём roomId в FormData
+    return instance
+      .post("file/uploadGroupAvatar", formData)
+      .then((res) => res.data)
+  },
 
   uploadUserMovieAvatar(file: File, userMovieId: string, status: string) {
     const formData = new FormData()

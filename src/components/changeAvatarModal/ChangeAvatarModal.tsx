@@ -21,6 +21,7 @@ export const ChangeAvatarModal = ({
       postId?: string
       userMovieId?: string
       status?: string
+      groupId?: string
     }
   ) => Promise<void>
   loading: boolean
@@ -29,6 +30,7 @@ export const ChangeAvatarModal = ({
     postId?: string
     userMovieId?: string
     status?: string
+    groupId?: string
   }
 }) => {
   const [file, setFile] = useState<File | null>(null)

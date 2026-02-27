@@ -11,6 +11,7 @@ import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   addMemberToGroupThunk,
+  changeAvatarGroupThunk,
   deleteMemberToGroupThunk,
   fetchItemConversationThunk,
 } from "@/store/thunks/conversationsThunk"
@@ -19,8 +20,10 @@ import ButtonMenu from "../ui/button/Button"
 import { AddMembers } from "../AddMembers/AddMembers"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 import { RootState } from "@/store/store"
+import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
 
 export function SettingsGroup() {
+  const [changeAvatarGroup, setChangeAvatarGroup] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -29,6 +32,7 @@ export function SettingsGroup() {
   const currentConversation = useAppSelector(
     (state) => state.conversations.currentConversation
   )
+  const loading = useAppSelector((state) => state.conversations.loading)
   const userId = useAppSelector((state) => state.auth.userId)
   const {
     users: friendsUsers,
@@ -91,10 +95,38 @@ export function SettingsGroup() {
       console.log(error)
     }
   }
+
+  const handleCloseChangeAvatarModal = () => {
+    setChangeAvatarGroup(false)
+  }
+  const handleShowChangeAvatarModal = () => {
+    setChangeAvatarGroup(true)
+  }
+  // const handleGroupAvatarUpload=()=>{
+
+  // }
+  const handleGroupAvatarUpload = async (
+    file: File,
+    context?: { groupId?: string }
+  ) => {
+    if (!context?.groupId) return
+    await dispatch(
+      changeAvatarGroupThunk({ file, groupId: context.groupId })
+    ).unwrap()
+  }
+
   if (!currentConversation) return
 
   return (
     <div className={style.settingsGroup}>
+      {changeAvatarGroup && (
+        <ChangeAvatarModal
+          handleCloseModal={handleCloseChangeAvatarModal}
+          loading={loading}
+          onUpload={handleGroupAvatarUpload}
+          context={{ groupId: id }}
+        />
+      )}
       {showAddMemberModal && (
         <AddMembers
           members={currentConversation.members.map((member) => member.user)}
@@ -116,7 +148,10 @@ export function SettingsGroup() {
       </Link>
       <div className={style.settingsGroup__content}>
         <div>
-          <div className={style.settingsGroup__avatarWrapper}>
+          <div
+            className={style.settingsGroup__avatarWrapper}
+            onClick={handleShowChangeAvatarModal}
+          >
             <CloudinaryImage
               src={currentConversation.avatar}
               alt="avatar"
