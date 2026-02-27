@@ -25,6 +25,7 @@
   }
   &__userReactionButton {
     display: flex;
+    gap: 10px;
     justify-content: space-between;
     align-items: center;
     ul {
@@ -36,10 +37,14 @@
         overflow: hidden;
         border: 3px solid white;
         position: relative;
-        &:not(:first-child) {
-          margin-left: -15px;
-        }
+        margin-left: -15px;
+
+        // &:not(:first-child) {
+        //   margin-left: -15px;
+        // }
         &:nth-child(1) {
+          margin-left: 0;
+
           z-index: 3;
         }
         &:nth-child(2) {
@@ -52,6 +57,10 @@
         }
       }
     }
+  }
+  &__userReactionButtonInfo {
+    display: flex;
+    gap: 3px;
   }
 
   &__reactionWrapper {
@@ -102,6 +111,7 @@
 
   &__userInfoWrapper {
     display: flex;
+    align-items: center;
     gap: 10px;
   }
   &__imageWrapperUser {
@@ -113,12 +123,15 @@
 
   &__userReactionInfo {
     font-size: 0.7rem;
+    white-space: nowrap;
+
     // display: flex;
   }
   &__userReactionName {
     font-size: 1.1rem;
   }
   &__userReactionData {
+    // white-space: nowrap;
   }
   &__userReactionEmoji {
   }

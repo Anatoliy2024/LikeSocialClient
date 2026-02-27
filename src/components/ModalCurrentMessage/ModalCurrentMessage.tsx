@@ -43,7 +43,13 @@ export const ModalCurrentMessage = ({
                 className={style.modalCurrentMessage__userReactionButton}
                 onClick={toggleShowUserReaction}
               >
-                <div>❤️{reactions.length} реакции</div>
+                <div
+                  className={style.modalCurrentMessage__userReactionButtonInfo}
+                >
+                  <span>❤️</span>
+                  <span>{reactions.length}</span>
+                  <span>реакции</span>{" "}
+                </div>
 
                 <ul>
                   {reactions.slice(0, 3).map((reaction) => (
@@ -106,8 +112,8 @@ export const ModalCurrentMessage = ({
                       <CloudinaryImage
                         src={reaction.user.avatar}
                         alt="avatar"
-                        width={100}
-                        height={100}
+                        width={120}
+                        height={120}
                       />
                     </div>
                     <div className={style.usersListReaction__userReactionInfo}>
