@@ -1,0 +1,36 @@
+.messageModal {
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.26);
+    animation: fadeIn 0.15s ease;
+  }
+
+  &__container {
+    position: fixed;
+    z-index: 105;
+    width: 300px;
+    animation: slideIn 0.15s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

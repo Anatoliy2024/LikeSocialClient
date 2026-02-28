@@ -78,6 +78,8 @@ export const fetchMessagesThunk = createAsyncThunk<
     totalCount: number
     pages: number
     currentPage: number
+    lastReadMessageId: string | null
+    unreadCount: number
     isOnline?: boolean
     lastSeen?: Date
   },

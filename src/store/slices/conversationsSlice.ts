@@ -35,26 +35,31 @@ const initialState: ConversationsState = {
   loading: false,
   error: null,
   pagination: initialPagination,
+  lastReadMessageId: null, // для разделителя
+  unreadCount: 0, // для зелёного кружка
+  pendingNewMessages: 0, // для кнопки "↓ 3 новых"
 }
 
 const conversationSlice = createSlice({
   name: "conversations",
   initialState,
   reducers: {
-    // Новое сообщение пришло через сокет
     addMessageFromSocket(state, action: PayloadAction<MessageType>) {
-      console.log("addMessageFromSocket****", action.payload)
-      state.messages.unshift(action.payload)
-
-      // // Обновляем lastMessage в списке бесед
-      // const conv = state.conversations.find(
-      //   (c) => c._id === action.payload.conversationId
-      // )
-      // if (conv) {
-      //   conv.lastMessageId = action.payload
-      //   conv.updatedAt = action.payload.createdAt
-      // }
+      state.messages.push(action.payload)
+      // если юзер не доскроллил — показываем кнопку
+      state.pendingNewMessages += 1
     },
+
+    // вызываем когда юзер доскроллил до низа
+    clearPendingNewMessages(state) {
+      state.pendingNewMessages = 0
+    },
+    // // Новое сообщение пришло через сокет
+    // addMessageFromSocket(state, action: PayloadAction<MessageType>) {
+    //   console.log("addMessageFromSocket****", action.payload)
+    //   state.messages.unshift(action.payload)
+
+    // },
     reactionUpdateFromSocket(
       state,
       action: PayloadAction<{
@@ -201,22 +206,27 @@ const conversationSlice = createSlice({
         state.error = null
       })
       .addCase(fetchMessagesThunk.fulfilled, (state, action) => {
-        const { messages, conversation, totalCount, pages } = action.payload
+        const {
+          messages,
+          conversation,
+          totalCount,
+          pages,
+          lastReadMessageId,
+          unreadCount,
+        } = action.payload
         const { page } = state.pagination
 
         if (page === 1 && !state.pagination.hasLoaded) {
-          state.messages = messages
+          state.messages = messages // сервер отдаёт sort: 1 (старые первые)
           state.currentConversation = conversation
           state.pagination.hasLoaded = true
+          state.lastReadMessageId = lastReadMessageId ?? null
+          state.unreadCount = unreadCount ?? 0
         } else {
-          // // Докладываем старые сообщения в конец (они старше)
-          // state.messages = [...state.messages, ...messages]
-
-          // Следующие страницы: докладываем старые сообщения в конец.
-          // Фильтруем дубли на случай повторного запроса.
+          // подгрузка старых — кладём В НАЧАЛО
           const existingIds = new Set(state.messages.map((m) => m._id))
           const unique = messages.filter((m) => !existingIds.has(m._id))
-          state.messages = [...state.messages, ...unique]
+          state.messages = [...unique, ...state.messages]
         }
 
         state.pagination.total = totalCount
@@ -224,6 +234,25 @@ const conversationSlice = createSlice({
         state.pagination.hasMore = page < pages
         state.loading = false
       })
+      // .addCase(fetchMessagesThunk.fulfilled, (state, action) => {
+      //   const { messages, conversation, totalCount, pages } = action.payload
+      //   const { page } = state.pagination
+
+      //   if (page === 1 && !state.pagination.hasLoaded) {
+      //     state.messages = messages
+      //     state.currentConversation = conversation
+      //     state.pagination.hasLoaded = true
+      //   } else {
+      //     const existingIds = new Set(state.messages.map((m) => m._id))
+      //     const unique = messages.filter((m) => !existingIds.has(m._id))
+      //     state.messages = [...state.messages, ...unique]
+      //   }
+
+      //   state.pagination.total = totalCount
+      //   state.pagination.pages = pages
+      //   state.pagination.hasMore = page < pages
+      //   state.loading = false
+      // })
       .addCase(fetchMessagesThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Ошибка загрузки сообщений"
@@ -288,10 +317,7 @@ export const {
   reactionUpdateFromSocket,
   clearMessages,
   incrementPage,
-  // setCurrentConversation,
-  // addMessageToCurrent,
-  // conversationUpdated,
-  // clearConversations,
+  clearPendingNewMessages,
 } = conversationSlice.actions
 
 export default conversationSlice.reducer

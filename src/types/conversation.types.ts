@@ -28,6 +28,7 @@ export interface MessageType {
   sticker?: string
   replyTo?: string | null
   reactions: ReactionType[]
+  readCount: number
   createdAt: string
 }
 // reactions: [
@@ -81,4 +82,7 @@ export interface ConversationsState {
     hasMore: boolean
     hasLoaded: boolean
   }
+  lastReadMessageId: string | null // для разделителя
+  unreadCount: number // для зелёного кружка
+  pendingNewMessages: number // для кнопки "↓ 3 новых"
 }
