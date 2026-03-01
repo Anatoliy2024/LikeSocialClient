@@ -5,6 +5,7 @@ import { RootState } from "@/store/store"
 import { useEffect, useRef, useState } from "react"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import styles from "./CallModal.module.scss"
+import { closeAudioContext, playRemoteStream } from "@/utils/audioPlayback"
 
 // ---- Таймер длительности звонка ----
 const useCallTimer = (active: boolean, startedAt: number | null) => {
@@ -153,7 +154,7 @@ const useRingtone = (
 
 // ---- Основная модалка ----
 export const CallModal = () => {
-  const remoteAudioRef = useRef<HTMLAudioElement>(null)
+  // const remoteAudioRef = useRef<HTMLAudioElement>(null)
 
   const {
     endCall,
@@ -185,22 +186,32 @@ export const CallModal = () => {
   // Рингтон
   useRingtone(status)
 
-  // Удалённое аудио
+  // // Удалённое аудио
+  // useEffect(() => {
+  //   if (!remoteAudioRef.current) return
+  //   remoteAudioRef.current.srcObject = remoteStream ?? null
+  //   if (remoteStream)
+  //     remoteAudioRef.current
+  //       .play()
+  //       .catch((e) => console.warn("Autoplay blocked:", e))
+  // }, [remoteStream])
+
+  // useEffect(() => {
+  //   return () => {
+  //     if (remoteAudioRef.current?.srcObject) {
+  //       remoteAudioRef.current.srcObject = null
+  //       remoteAudioRef.current.pause()
+  //     }
+  //   }
+  // }, [])
+
   useEffect(() => {
-    if (!remoteAudioRef.current) return
-    remoteAudioRef.current.srcObject = remoteStream ?? null
-    if (remoteStream)
-      remoteAudioRef.current
-        .play()
-        .catch((e) => console.warn("Autoplay blocked:", e))
+    playRemoteStream(remoteStream)
   }, [remoteStream])
 
   useEffect(() => {
     return () => {
-      if (remoteAudioRef.current?.srcObject) {
-        remoteAudioRef.current.srcObject = null
-        remoteAudioRef.current.pause()
-      }
+      closeAudioContext()
     }
   }, [])
 
@@ -217,7 +228,7 @@ export const CallModal = () => {
   return (
     <>
       {/* Скрытый audio для удалённого потока */}
-      <audio ref={remoteAudioRef} autoPlay playsInline />
+      {/* <audio ref={remoteAudioRef} autoPlay playsInline /> */}
 
       <div className={styles.overlay}>
         <div

@@ -15,6 +15,7 @@ import Peer from "simple-peer"
 import type { RootState } from "@/store/store"
 import type { Socket } from "socket.io-client"
 import type { SignalData } from "simple-peer"
+import { getAudioContext } from "@/utils/audioPlayback"
 
 type Maybe<T> = T | null
 
@@ -51,32 +52,18 @@ export const useCall = (userId: string | null) => {
       audio: {
         echoCancellation: true,
         noiseSuppression: true,
-        autoGainControl: false,
+        autoGainControl: true,
         sampleRate: 48000,
         channelCount: 1,
-        // Дополнительно если браузер поддерживает
-        voiceIsolation: true,
-        googEchoCancellation: true,
-        googAutoGainControl: false,
-        googNoiseSuppression: true,
-        googHighpassFilter: true, // встроенный highpass фильтр
-      } as MediaTrackConstraints,
+      },
       video: false,
     })
 
-    // const audioTrack = stream.getAudioTracks()[0]
-    // const settings = audioTrack.getSettings()
-    // const capabilities = audioTrack.getCapabilities?.()
+    // Важно: "разбудить" AudioContext тем же жестом пользователя
+    // когда он нажал "принять" / "позвонить"
+    getAudioContext().resume()
 
-    // console.group("🎤 Audio Track")
-    // console.log("echoCancellation:", settings.echoCancellation)
-    // console.log("noiseSuppression:", settings.noiseSuppression)
-    // console.log("autoGainControl:", settings.autoGainControl)
-    // console.log("sampleRate:", settings.sampleRate)
-    // console.log("capabilities:", capabilities)
-    // console.groupEnd()
-
-    stream.getAudioTracks().forEach((t) => (t.enabled = true))
+    // stream.getAudioTracks().forEach((t) => (t.enabled = true))
     localStreamRef.current = stream
     setLocalStreamState(stream)
     return stream
