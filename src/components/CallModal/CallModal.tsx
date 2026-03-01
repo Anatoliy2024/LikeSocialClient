@@ -135,7 +135,7 @@ const useRingtone = (
     if (status === "calling") {
       const a = new Audio(outgoingSrc)
       a.loop = true
-      a.volume = 0.5
+      a.volume = 0.2
       a.play().catch(() => {})
       audioRef.current = a
     } else if (status === "incoming") {

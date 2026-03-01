@@ -15,6 +15,12 @@ import {
 } from "@/store/slices/groupCallSlice"
 import type { RootState } from "@/store/store"
 import type { SignalData } from "simple-peer"
+import {
+  getAudioContext,
+  playGroupRemoteStream,
+  stopAllGroupStreams,
+  stopGroupRemoteStream,
+} from "@/utils/audioPlayback"
 
 interface PeerEntry {
   peer: Peer.Instance
@@ -47,21 +53,16 @@ export const useGroupCall = (userId: string | null) => {
       audio: {
         echoCancellation: true,
         noiseSuppression: true,
-        autoGainControl: false,
+        autoGainControl: true,
         sampleRate: 48000,
         channelCount: 1,
-        // Дополнительно если браузер поддерживает
-        voiceIsolation: true,
-        googEchoCancellation: true,
-        googAutoGainControl: false,
-        googNoiseSuppression: true,
-        googHighpassFilter: true, // встроенный highpass фильтр
-      } as MediaTrackConstraints,
+      },
       video: withVideo
         ? { width: { ideal: 1280 }, height: { ideal: 720 } }
         : false,
     })
 
+    getAudioContext().resume()
     localStreamRef.current = stream
     return stream
   }
@@ -94,6 +95,7 @@ export const useGroupCall = (userId: string | null) => {
       peer.on("stream", (remoteStream) => {
         setRemoteStreams((prev) => ({ ...prev, [toSocketId]: remoteStream }))
         peersRef.current[toSocketId].stream = remoteStream
+        playGroupRemoteStream(toSocketId, remoteStream)
       })
 
       peer.on("error", (err) => {
@@ -135,6 +137,7 @@ export const useGroupCall = (userId: string | null) => {
         entry.peer.destroy()
         delete peersRef.current[socketId]
       }
+      stopGroupRemoteStream(socketId)
       setRemoteStreams((prev) => {
         const next = { ...prev }
         delete next[socketId]
@@ -275,6 +278,7 @@ export const useGroupCall = (userId: string | null) => {
     localStreamRef.current?.getTracks().forEach((t) => t.stop())
     localStreamRef.current = null
 
+    stopAllGroupStreams()
     dispatch(leaveGroupCall())
   }, [groupId, destroyPeer, dispatch])
 
