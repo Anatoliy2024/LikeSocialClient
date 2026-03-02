@@ -68,6 +68,7 @@ export const MessageBlock = () => {
     isOwn: boolean
   } | null>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
@@ -220,6 +221,7 @@ export const MessageBlock = () => {
 
     // Фиксируем текущее состояние для визуала (разделитель + выделение)
     initialLastReadIdRef.current = lastReadMessageId ?? null
+    setIsInitialized(true)
 
     // Сразу помечаем всё прочитанным если есть сообщения
     if (messages.length > 0) {
@@ -648,7 +650,12 @@ export const MessageBlock = () => {
           <div className={style.messageBlock__messagesList}>
             {loading && <Spinner />}
             {messages.map((message) => {
+              // const isUnread =
+              //   message.senderId._id !== userId &&
+              //   !!initialLastReadIdRef.current &&
+              //   message._id > initialLastReadIdRef.current
               const isUnread =
+                isInitialized &&
                 message.senderId._id !== userId &&
                 !!initialLastReadIdRef.current &&
                 message._id > initialLastReadIdRef.current
@@ -663,7 +670,15 @@ export const MessageBlock = () => {
 
               return (
                 <div key={message._id}>
-                  {isFirstUnread && (
+                  {/* {isFirstUnread && (
+                    <div
+                      ref={dividerRef}
+                      className={style.messageBlock__unreadDivider}
+                    >
+                      <span>Новые сообщения</span>
+                    </div>
+                  )} */}
+                  {isFirstUnread && isInitialized && (
                     <div
                       ref={dividerRef}
                       className={style.messageBlock__unreadDivider}
