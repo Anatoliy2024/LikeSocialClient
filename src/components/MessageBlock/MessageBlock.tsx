@@ -657,22 +657,9 @@ export const MessageBlock = () => {
                 message.senderId._id !== userId &&
                 !!initialLastReadIdRef.current &&
                 message._id > initialLastReadIdRef.current
-              // const isUnread =
-              //   isInitialized &&
-              //   message.senderId._id !== userId &&
-              //   !!initialLastReadIdRef.current &&
-              //   message._id > initialLastReadIdRef.current
-              // const isUnread =
-              //   message.senderId._id === userId
-              //     ? false
-              //     : fixedLastReadDate
-              //     ? new Date(message.createdAt) > fixedLastReadDate
-              //     : false
 
               const isFirstUnread = message._id === firstUnreadMessageId
-              console.log("message._id ", message._id)
-              console.log("firstUnreadMessageId", firstUnreadMessageId)
-              console.log("isFirstUnread", isFirstUnread)
+
               return (
                 <div key={message._id}>
                   {isFirstUnread && (
@@ -683,14 +670,7 @@ export const MessageBlock = () => {
                       <span>Новые сообщения</span>
                     </div>
                   )}
-                  {/* {isFirstUnread && isInitialized && (
-                    <div
-                      ref={dividerRef}
-                      className={style.messageBlock__unreadDivider}
-                    >
-                      <span>Новые сообщения</span>
-                    </div>
-                  )} */}
+
                   <div
                     className={style.messageBlock__messageListWrapper}
                     data-message-id={message._id}
