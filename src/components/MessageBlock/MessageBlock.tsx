@@ -449,6 +449,7 @@ export const MessageBlock = () => {
   const closeConfirm = () => setConfirmConfig(null)
 
   const firstUnreadMessageId = useMemo(() => {
+    if (!hasLoaded) return
     const fixedId = initialLastReadIdRef.current
     console.log("fixedId", fixedId)
     if (!fixedId) return null
@@ -458,7 +459,7 @@ export const MessageBlock = () => {
     )?._id
     console.log("result", result)
     return result ?? null
-  }, [messages, userId])
+  }, [messages, userId, hasLoaded])
 
   if (!currentConversation && loading) {
     return (
