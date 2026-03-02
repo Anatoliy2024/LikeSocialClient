@@ -447,12 +447,14 @@ export const MessageBlock = () => {
 
   const firstUnreadMessageId = useMemo(() => {
     const fixedId = initialLastReadIdRef.current
+    console.log("fixedId", fixedId)
     if (!fixedId) return null
-
-    return (
-      messages.find((m) => m.senderId._id !== userId && m._id > fixedId)?._id ??
-      null
-    )
+    console.log("messages", messages)
+    const result = messages.find(
+      (m) => m.senderId._id !== userId && m._id > fixedId
+    )?._id
+    console.log("result", result)
+    return result ?? null
   }, [messages, userId])
 
   if (!currentConversation && loading) {
