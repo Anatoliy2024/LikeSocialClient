@@ -68,7 +68,7 @@ export const MessageBlock = () => {
     isOwn: boolean
   } | null>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
-  const [isInitialized, setIsInitialized] = useState(false)
+  // const [isInitialized, setIsInitialized] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
@@ -221,7 +221,7 @@ export const MessageBlock = () => {
 
     // Фиксируем текущее состояние для визуала (разделитель + выделение)
     initialLastReadIdRef.current = lastReadMessageId ?? null
-    setIsInitialized(true)
+    // setIsInitialized(true)
 
     // Сразу помечаем всё прочитанным если есть сообщения
     if (messages.length > 0) {
@@ -650,15 +650,15 @@ export const MessageBlock = () => {
           <div className={style.messageBlock__messagesList}>
             {loading && <Spinner />}
             {messages.map((message) => {
-              // const isUnread =
-              //   message.senderId._id !== userId &&
-              //   !!initialLastReadIdRef.current &&
-              //   message._id > initialLastReadIdRef.current
               const isUnread =
-                isInitialized &&
                 message.senderId._id !== userId &&
                 !!initialLastReadIdRef.current &&
                 message._id > initialLastReadIdRef.current
+              // const isUnread =
+              //   isInitialized &&
+              //   message.senderId._id !== userId &&
+              //   !!initialLastReadIdRef.current &&
+              //   message._id > initialLastReadIdRef.current
               // const isUnread =
               //   message.senderId._id === userId
               //     ? false
@@ -667,18 +667,12 @@ export const MessageBlock = () => {
               //     : false
 
               const isFirstUnread = message._id === firstUnreadMessageId
-
+              console.log("message._id ", message._id)
+              console.log("firstUnreadMessageId", firstUnreadMessageId)
+              console.log("isFirstUnread", isFirstUnread)
               return (
                 <div key={message._id}>
-                  {/* {isFirstUnread && (
-                    <div
-                      ref={dividerRef}
-                      className={style.messageBlock__unreadDivider}
-                    >
-                      <span>Новые сообщения</span>
-                    </div>
-                  )} */}
-                  {isFirstUnread && isInitialized && (
+                  {isFirstUnread && (
                     <div
                       ref={dividerRef}
                       className={style.messageBlock__unreadDivider}
@@ -686,6 +680,14 @@ export const MessageBlock = () => {
                       <span>Новые сообщения</span>
                     </div>
                   )}
+                  {/* {isFirstUnread && isInitialized && (
+                    <div
+                      ref={dividerRef}
+                      className={style.messageBlock__unreadDivider}
+                    >
+                      <span>Новые сообщения</span>
+                    </div>
+                  )} */}
                   <div
                     className={style.messageBlock__messageListWrapper}
                     data-message-id={message._id}
