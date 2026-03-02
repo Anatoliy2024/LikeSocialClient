@@ -73,7 +73,7 @@
     // right: 0;
     // overflow-y: auto;
     // overflow-x: hidden;
-    padding: 60px 10px 60px;
+    padding: 60px 10px 90px;
     // margin: 60px 0 60px;
     display: flex;
     flex-direction: column;
@@ -126,23 +126,23 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 12px 0;
+    // margin: 12px 0;
 
     &::before,
     &::after {
       content: "";
       flex: 1;
       height: 1px;
-      background: #4571be;
+      background: #ffffff;
       opacity: 0.35;
     }
 
     span {
       font-size: 0.75rem;
-      color: #4571be;
+      color: #ffffff;
       white-space: nowrap;
       padding: 3px 12px;
-      border: 1px solid #4571be;
+      border: 1px solid #ffffff;
       border-radius: 20px;
       opacity: 0.75;
     }
@@ -167,6 +167,14 @@
     flex-wrap: wrap;
     justify-content: space-between;
     word-break: break-word;
+  }
+  &__unread {
+    // Для чужих непрочитанных сообщений
+    font-weight: 600; // жирный текст
+
+    // Или фон (опционально)
+    background: rgba(51, 144, 236, 0.08);
+    border-left: 5px solid #4338b4;
   }
 
   &__senderImage {

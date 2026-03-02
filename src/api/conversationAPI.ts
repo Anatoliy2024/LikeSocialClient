@@ -40,15 +40,27 @@ export const conversationAPI = {
       .then((res) => res.data)
   },
 
-  // Получение сообщений чата с пагинацией
-  getMessages(conversationId: string, page: number, limit?: number) {
-    // console.log("getMessages***", conversationId)
+  getMessages: (
+    conversationId: string,
+    direction = "initial",
+    cursor?: string,
+    limit = 20
+  ) => {
+    const params = new URLSearchParams({ direction, limit: String(limit) })
+    if (cursor) params.append("cursor", cursor)
     return instance
-      .get(`conversations/${conversationId}/messages`, {
-        params: { page, limit },
-      })
-      .then((res) => res.data)
+      .get(`/conversations/${conversationId}/messages?${params}`)
+      .then((r) => r.data)
   },
+  // // Получение сообщений чата с пагинацией
+  // getMessages(conversationId: string, page: number, limit?: number) {
+  //   // console.log("getMessages***", conversationId)
+  //   return instance
+  //     .get(`conversations/${conversationId}/messages`, {
+  //       params: { page, limit },
+  //     })
+  //     .then((res) => res.data)
+  // },
 
   delConversation(conversationId: string) {
     // console.log("getMessages***", conversationId)

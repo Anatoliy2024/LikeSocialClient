@@ -70,33 +70,40 @@ export const fetchItemConversationThunk = createAsyncThunk<
   }
 })
 
-// ===== Получение сообщений чата =====
 export const fetchMessagesThunk = createAsyncThunk<
   {
     messages: MessageType[]
     conversation: ConversationType
-    totalCount: number
-    pages: number
-    currentPage: number
-    lastReadMessageId: string | null
-    unreadCount: number
+    hasMoreOlder: boolean
+    hasMoreNewer: boolean
+    lastReadMessageId?: string | null
+    lastReadMessageDate: string | null
+    unreadCount?: number
     isOnline?: boolean
     lastSeen?: Date
+    direction?: "initial" | "older" | "newer"
   },
-  // MessagesResponse,
-  { conversationId: string; page: number; limit?: number },
+  {
+    conversationId: string
+    direction?: "initial" | "older" | "newer"
+    cursor?: string
+    limit?: number
+  },
   { rejectValue: string }
 >(
   "conversations/fetchMessages",
-  async ({ conversationId, page, limit }, thunkAPI) => {
+  async (
+    { conversationId, direction = "initial", cursor, limit },
+    thunkAPI
+  ) => {
     try {
       const data = await conversationAPI.getMessages(
         conversationId,
-        page,
+        direction,
+        cursor,
         limit
       )
-      console.log("data*****************", data)
-      return data
+      return { ...data, direction }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data?.message) {
         return thunkAPI.rejectWithValue(error.response.data.message)
@@ -105,6 +112,41 @@ export const fetchMessagesThunk = createAsyncThunk<
     }
   }
 )
+// // ===== Получение сообщений чата =====
+// export const fetchMessagesThunk = createAsyncThunk<
+//   {
+//     messages: MessageType[]
+//     conversation: ConversationType
+//     totalCount: number
+//     pages: number
+//     currentPage: number
+//     lastReadMessageId: string | null
+//     unreadCount: number
+//     isOnline?: boolean
+//     lastSeen?: Date
+//   },
+//   // MessagesResponse,
+//   { conversationId: string; page: number; limit?: number },
+//   { rejectValue: string }
+// >(
+//   "conversations/fetchMessages",
+//   async ({ conversationId, page, limit }, thunkAPI) => {
+//     try {
+//       const data = await conversationAPI.getMessages(
+//         conversationId,
+//         page,
+//         limit
+//       )
+//       console.log("data*****************", data)
+//       return data
+//     } catch (error) {
+//       if (axios.isAxiosError(error) && error.response?.data?.message) {
+//         return thunkAPI.rejectWithValue(error.response.data.message)
+//       }
+//       return thunkAPI.rejectWithValue("Не удалось загрузить сообщения")
+//     }
+//   }
+// )
 // ===== удаление беседы =====
 export const delConversationThunk = createAsyncThunk<
   { success: boolean; conversationId: string },

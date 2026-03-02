@@ -26,9 +26,9 @@ export const MessageReactions = ({
   handleReaction,
 }: Props) => {
   if (!reactions?.length) return <div></div>
-  console.log("MessageReactions reactions", reactions)
+  // console.log("MessageReactions reactions", reactions)
   const grouped = groupReactions(reactions)
-  console.log("grouped*****", grouped)
+  // console.log("grouped*****", grouped)
   return (
     <div className={styles.reactions}>
       {grouped.map(({ emoji, users }) => {

@@ -8,13 +8,15 @@ import { useGroupCallContext } from "@/providers/GroupCallProvider"
 
 export const GroupCallPanel = () => {
   const status = useAppSelector((s: RootState) => s.groupCall.status)
-  const { isAudioEnabled, isVideoEnabled, participants } = useAppSelector(
-    (s: RootState) => s.groupCall
-  )
+  const {
+    isAudioEnabled,
+    // isVideoEnabled,
+    participants,
+  } = useAppSelector((s: RootState) => s.groupCall)
   const {
     leaveCall,
     handleToggleAudio,
-    handleToggleVideo,
+    // handleToggleVideo,
     remoteStreams,
     // localStream,
   } = useGroupCallContext()
@@ -45,13 +47,13 @@ export const GroupCallPanel = () => {
           {isAudioEnabled ? <MicIcon /> : <MicOffIcon />}
         </button>
 
-        <button
+        {/* <button
           className={`${styles.btn} ${isVideoEnabled ? styles.btnActive : ""}`}
           onClick={handleToggleVideo}
           title={isVideoEnabled ? "Выключить камеру" : "Включить камеру"}
         >
           {isVideoEnabled ? <VideoIcon /> : <VideoOffIcon />}
-        </button>
+        </button>  */}
 
         <button
           className={`${styles.btn} ${styles.btnLeave}`}
@@ -108,34 +110,34 @@ const MicOffIcon = () => (
   </svg>
 )
 
-const VideoIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <polygon points="23 7 16 12 23 17 23 7" />
-    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-  </svg>
-)
+// const VideoIcon = () => (
+//   <svg
+//     width="20"
+//     height="20"
+//     viewBox="0 0 24 24"
+//     fill="none"
+//     stroke="currentColor"
+//     strokeWidth="2"
+//   >
+//     <polygon points="23 7 16 12 23 17 23 7" />
+//     <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+//   </svg>
+// )
 
-const VideoOffIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34" />
-    <path d="M23 7l-7 5 7 5V7z" />
-    <line x1="1" y1="1" x2="23" y2="23" />
-  </svg>
-)
+// const VideoOffIcon = () => (
+//   <svg
+//     width="20"
+//     height="20"
+//     viewBox="0 0 24 24"
+//     fill="none"
+//     stroke="currentColor"
+//     strokeWidth="2"
+//   >
+//     <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34" />
+//     <path d="M23 7l-7 5 7 5V7z" />
+//     <line x1="1" y1="1" x2="23" y2="23" />
+//   </svg>
+// )
 
 const PhoneOffIcon = () => (
   <svg

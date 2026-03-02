@@ -54,6 +54,7 @@ export type MemberType = BaseMember
 export interface MemberFullType {
   user: MemberType
   type: "admin" | "member"
+  unreadCount: number
 }
 
 export interface ConversationType {
@@ -76,13 +77,15 @@ export interface ConversationsState {
   loading: boolean
   error: string | null
   pagination: {
+    hasMoreOlder: boolean // есть ли старые сверху
+    // hasMoreNewer: boolean // есть ли новые снизу
+    hasLoaded: boolean
     page: number
     pages: number
-    total: number
-    hasMore: boolean
-    hasLoaded: boolean
   }
   lastReadMessageId: string | null // для разделителя
+  lastReadMessageDate: string | null
   unreadCount: number // для зелёного кружка
   pendingNewMessages: number // для кнопки "↓ 3 новых"
+  oldestMessageId: string | null
 }

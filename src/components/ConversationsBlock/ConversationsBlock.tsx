@@ -26,6 +26,7 @@ export function ConversationsBlock() {
   const conversations = useAppSelector(
     (state: RootState) => state.conversations.conversations
   )
+
   // const currentConversation = useAppSelector(
   //   (state: RootState) => state.conversations.currentConversation
   // )
@@ -60,11 +61,6 @@ export function ConversationsBlock() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
-  // useEffect(() => {
-  //   if (!currentConversation) return
-  //   router.push(`/conversation/${currentConversation._id}`)
-  // }, [router, currentConversation])
-
   return (
     <>
       {loading && <SpinnerWindow />}
@@ -97,6 +93,10 @@ export function ConversationsBlock() {
               // let dataConversation
               // if (conversation.type === "private") {
               // }
+              const unreadCount = conversation.members.find(
+                (member) => member.user._id === userId
+              )?.unreadCount
+              console.log("conversation.members.", conversation.members)
               const member = conversation.members.filter(
                 (member) => member.user._id !== userId
               )[0].user
@@ -123,7 +123,46 @@ export function ConversationsBlock() {
                     )}
                   </div>
                   <div className={style.conversation__info}>
-                    {!isGroup && (
+                    <div className={style.conversation__firstCol}>
+                      {!isGroup && (
+                        <div className={style.conversation__userName}>
+                          {member.username}
+                        </div>
+                      )}
+                      {isGroup && (
+                        <div className={style.conversation__userName}>
+                          {conversation.title}
+                        </div>
+                      )}
+                      {conversation?.lastMessageId && (
+                        <div className={style.conversation__lastMessage}>
+                          <div
+                            className={style.conversation__lastMessageContent}
+                          >
+                            <div>
+                              {conversation.lastMessageId.senderId.username}:
+                            </div>
+                            <div>{conversation.lastMessageId.text}</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {conversation?.lastMessageId && (
+                      <div className={style.conversation__secondCol}>
+                        <div className={style.conversation__timeBlock}>
+                          {formatMessageTime(
+                            conversation.lastMessageId.createdAt
+                          )}
+                        </div>
+                        {!!unreadCount && unreadCount > 0 && (
+                          <div className={style.conversation__newMessage}>
+                            {unreadCount}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* {!isGroup && (
                       <div className={style.conversation__userName}>
                         {member.username}
                       </div>
@@ -143,13 +182,19 @@ export function ConversationsBlock() {
                           <div>{conversation.lastMessageId.text}</div>
                         </div>
 
-                        <div className={style.conversation__timeBlock}>
-                          {formatMessageTime(
-                            conversation.lastMessageId.createdAt
-                          )}
+                        <div className={style.conversation__timeWrapper}>
+                          <div className={style.conversation__timeBlock}>
+                            {formatMessageTime(
+                              conversation.lastMessageId.createdAt
+                            )}
+                          </div>
+
+                          <div className={style.conversation__newMessage}>
+                            {unreadCount}
+                          </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </li>
               )

@@ -69,8 +69,9 @@
 
   &__info {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 20px;
+
     flex: 1;
   }
   &__userName {
@@ -111,7 +112,27 @@
     }
   }
 
+  &__secondCol {
+    // display: flex;
+    // flex-direction: column;
+    // flex: 0 0 100px;
+
+    // justify-content: space-between;
+  }
   &__timeBlock {
     white-space: nowrap;
+  }
+  &__newMessage {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    // width: 30px;
+    // padding: 5px;
+    color: white;
+    background: rgb(28, 166, 28);
+    border-radius: 50%;
   }
 }
