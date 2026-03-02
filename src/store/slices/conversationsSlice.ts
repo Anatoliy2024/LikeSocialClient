@@ -34,7 +34,7 @@ const initialState: ConversationsState = {
   messages: [],
   loading: false,
   error: null,
-  pagination: initialPagination,
+  pagination: { ...initialPagination },
   lastReadMessageId: null, // для разделителя
   lastReadMessageDate: null as string | null,
   unreadCount: 0, // для зелёного кружка
@@ -81,13 +81,7 @@ const conversationSlice = createSlice({
     clearMessages(state) {
       state.messages = []
       state.currentConversation = null
-      state.pagination = {
-        hasMoreOlder: false,
-        // hasMoreNewer: false,
-        hasLoaded: false,
-        page: 0,
-        pages: 0,
-      }
+      state.pagination = { ...initialPagination }
       state.oldestMessageId = null
       // state.newestMessageId = null
       state.lastReadMessageId = null

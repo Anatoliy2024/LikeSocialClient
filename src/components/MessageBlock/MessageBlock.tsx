@@ -220,7 +220,10 @@ export const MessageBlock = () => {
     if (initialLastReadIdRef.current !== undefined) return
 
     // Фиксируем текущее состояние для визуала (разделитель + выделение)
+    console.log("hasLoaded", hasLoaded)
+    console.log("lastReadMessageId", lastReadMessageId)
     initialLastReadIdRef.current = lastReadMessageId ?? null
+    console.log("initialLastReadIdRef.current", initialLastReadIdRef.current)
     // setIsInitialized(true)
 
     // Сразу помечаем всё прочитанным если есть сообщения
