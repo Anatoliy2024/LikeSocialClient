@@ -68,7 +68,7 @@ export const MessageBlock = () => {
     isOwn: boolean
   } | null>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
-  // const [isInitialized, setIsInitialized] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
@@ -220,11 +220,11 @@ export const MessageBlock = () => {
     if (initialLastReadIdRef.current !== undefined) return
 
     // Фиксируем текущее состояние для визуала (разделитель + выделение)
-    console.log("hasLoaded", hasLoaded)
-    console.log("lastReadMessageId", lastReadMessageId)
+    // console.log("hasLoaded", hasLoaded)
+    // console.log("lastReadMessageId", lastReadMessageId)
     initialLastReadIdRef.current = lastReadMessageId ?? null
-    console.log("initialLastReadIdRef.current", initialLastReadIdRef.current)
-    // setIsInitialized(true)
+    // console.log("initialLastReadIdRef.current", initialLastReadIdRef.current)
+    setIsInitialized(true)
 
     // Сразу помечаем всё прочитанным если есть сообщения
     if (messages.length > 0) {
@@ -449,7 +449,8 @@ export const MessageBlock = () => {
   const closeConfirm = () => setConfirmConfig(null)
 
   const firstUnreadMessageId = useMemo(() => {
-    if (!hasLoaded) return
+    if (!isInitialized) return null
+
     const fixedId = initialLastReadIdRef.current
     console.log("fixedId", fixedId)
     if (!fixedId) return null
@@ -459,7 +460,7 @@ export const MessageBlock = () => {
     )?._id
     console.log("result", result)
     return result ?? null
-  }, [messages, userId, hasLoaded])
+  }, [messages, userId, isInitialized])
 
   if (!currentConversation && loading) {
     return (
