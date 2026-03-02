@@ -219,11 +219,7 @@ export const MessageBlock = () => {
     if (!hasLoaded) return
     if (initialLastReadIdRef.current !== undefined) return
 
-    // Фиксируем текущее состояние для визуала (разделитель + выделение)
-    // console.log("hasLoaded", hasLoaded)
-    // console.log("lastReadMessageId", lastReadMessageId)
     initialLastReadIdRef.current = lastReadMessageId ?? null
-    // console.log("initialLastReadIdRef.current", initialLastReadIdRef.current)
     setIsInitialized(true)
 
     // Сразу помечаем всё прочитанным если есть сообщения
@@ -452,13 +448,13 @@ export const MessageBlock = () => {
     if (!isInitialized) return null
 
     const fixedId = initialLastReadIdRef.current
-    console.log("fixedId", fixedId)
+
     if (!fixedId) return null
-    console.log("messages", messages)
+
     const result = messages.find(
       (m) => m.senderId._id !== userId && m._id > fixedId
     )?._id
-    console.log("result", result)
+
     return result ?? null
   }, [messages, userId, isInitialized])
 
