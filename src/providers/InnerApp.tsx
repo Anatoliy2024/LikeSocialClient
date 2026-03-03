@@ -128,7 +128,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
       socket.off("online-users")
       socket.off("new-notification")
 
-      socket.disconnect()
+      // socket.disconnect()
     }
   }, [userId, dispatch])
 

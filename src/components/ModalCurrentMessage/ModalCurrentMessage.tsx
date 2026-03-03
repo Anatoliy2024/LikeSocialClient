@@ -20,20 +20,30 @@ import { RootState } from "@/store/store"
 export const ModalCurrentMessage = ({
   messageId,
   reactions,
-
+  senderId,
   handleReaction,
+  handleDeleteMessage,
+  handleShowEditMessage,
+  text,
 }: {
   messageId: string
   reactions: ReactionType[]
-
+  senderId: string
   handleReaction: (messageId: string, reactionId: string) => void
+  handleDeleteMessage: (messageId: string) => void
+  handleShowEditMessage: (messageId: string, text?: string) => void
+  text?: string
 }) => {
   const [showReaction, setShowReaction] = useState(false)
   const [showUserReaction, setShowUserReaction] = useState(false)
   const dispatch = useAppDispatch()
-  const { users } = useAppSelector(
-    (state: RootState) => state.conversations.messageViewers
+  const users = useAppSelector(
+    (state: RootState) => state.conversations.messageViewers.users
   )
+  const owner = useAppSelector(
+    (state: RootState) => state.conversations.currentConversation?.owner
+  )
+  const userId = useAppSelector((state: RootState) => state.auth.userId)
 
   const toggleShowReaction = () => {
     setShowReaction((prev) => !prev)
@@ -125,10 +135,16 @@ export const ModalCurrentMessage = ({
               </ul>
             )}
           </li>
-          <li>ответить</li>
-          <li>закрепить</li>
-          <li>изменить</li>
-          <li>удалить</li>
+          {/* <li>ответить</li> */}
+          {/* <li>закрепить</li> */}
+          {userId === senderId && (
+            <li onClick={() => handleShowEditMessage(messageId, text)}>
+              изменить
+            </li>
+          )}
+          {(userId === owner || userId === senderId) && (
+            <li onClick={() => handleDeleteMessage(messageId)}>удалить</li>
+          )}
         </ul>
       )}
 

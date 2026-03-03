@@ -1,15 +1,15 @@
 .stickersBlock {
-  height: 200px;
+  height: 350px;
   //   width: clamp(100px, 60vw, 600px);
   //   width: clamp(100px, 60vw, 600px);
   width: calc(100% - 250px);
   //   padding: 0 10px 0;
-
+  user-select: none;
   background: rebeccapurple;
   position: fixed;
   bottom: 60px;
   right: 0;
-  z-index: 35;
+  z-index: 100;
   display: flex;
   flex-wrap: wrap;
   gap: 5px;

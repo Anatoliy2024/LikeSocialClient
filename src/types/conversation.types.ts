@@ -27,6 +27,8 @@ export interface MessageType {
   attachments?: AttachmentType[]
   sticker?: string
   replyTo?: string | null
+  isEdited?: boolean
+  editedAt?: string
   reactions: ReactionType[]
   readCount: number
   createdAt: string

@@ -23,6 +23,8 @@ import {
   reactionUpdateFromSocket,
   clearPendingNewMessages,
   readUpdateFromSocket,
+  messageDeleteFromSocket,
+  messageEditedFromSocket,
   // updateLastReadMessageId,
 } from "@/store/slices/conversationsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
@@ -49,6 +51,8 @@ import { MessageModal } from "../MessageModal/MessageModal"
 import { StickersBlock } from "../StickersBlock/StickersBlock"
 import { Sticker } from "@/assets/icons/sticker"
 import { getStickerImage } from "@/utils/getStickerImage"
+import { CancelIcon } from "@/assets/icons/CancelIcon"
+import { ConfirmIcon } from "@/assets/icons/ConfirmIcon"
 
 export const MessageBlock = () => {
   const router = useRouter()
@@ -73,6 +77,11 @@ export const MessageBlock = () => {
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
   const [showStickers, setShowStickers] = useState(false)
+  const [isEditMessage, setIsEditMessage] = useState({
+    messageId: "",
+    isEdit: false,
+  })
+  // const [editText, setEditText] = useState("")
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
@@ -203,11 +212,24 @@ export const MessageBlock = () => {
     }) => {
       dispatch(readUpdateFromSocket(data))
     }
+    const deleteUpdateHandler = (data: { messageId: string }) => {
+      dispatch(messageDeleteFromSocket(data))
+    }
+    const editedUpdateHandler = (data: {
+      messageId: string
+      text: string
+      isEdited: boolean
+      editedAt: string
+    }) => {
+      dispatch(messageEditedFromSocket(data))
+    }
 
     socket.emit("conversation:join", id)
     socket.on("message:new", messageHandler)
     socket.on("message:reaction:updated", reactionHandler)
     socket.on("messages:read_update", readUpdateHandler)
+    socket.on("message:deleted_update", deleteUpdateHandler)
+    socket.on("message:edited_update", editedUpdateHandler)
     // socket.on("messages:read_confirmed", readConfirmedHandler)
 
     return () => {
@@ -215,6 +237,9 @@ export const MessageBlock = () => {
       socket.off("message:new", messageHandler)
       socket.off("message:reaction:updated", reactionHandler)
       socket.off("messages:read_update", readUpdateHandler)
+      socket.off("message:deleted_update", deleteUpdateHandler)
+      socket.off("message:edited_update", editedUpdateHandler)
+
       // socket.off("messages:read_confirmed", readConfirmedHandler)
     }
   }, [id, dispatch, socket])
@@ -365,6 +390,7 @@ export const MessageBlock = () => {
   }, [imagePreview])
 
   const handleSendMessage = async () => {
+    // console.log("handleSendMessage")
     if (!textMessage.trim() && !selectedImage) return
     try {
       if (selectedImage) {
@@ -399,7 +425,11 @@ export const MessageBlock = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault()
-      handleSendMessage()
+      if (!isEditMessage.isEdit) {
+        handleSendMessage()
+      } else {
+        handleEditMessage()
+      }
     }
   }
 
@@ -478,6 +508,40 @@ export const MessageBlock = () => {
     })
     handleCloseStickers()
   }
+  const handleDeleteMessage = (messageId: string) => {
+    // console.log("socket connected:", socket.connected)
+    socket.emit("messages:delete", {
+      messageId,
+    })
+    handleCloseCurrentMessage()
+  }
+  const handleEditMessage = () => {
+    // console.log("socket connected:", socket.connected)
+    // console.log("отправляю messages:edit", {
+    //   messageId: isEditMessage.messageId,
+    //   text: textMessage,
+    // })
+    socket.emit("messages:edit", {
+      messageId: isEditMessage.messageId,
+      text: textMessage,
+    })
+    // console.log("handleEditMessage", isEditMessage.messageId)
+    handleCloseEditMessage()
+    // handleCloseCurrentMessage()
+  }
+
+  const handleShowEditMessage = (messageId: string, text?: string) => {
+    if (text) {
+      // setEditText(text)
+      setTextMessage(text)
+    }
+    handleCloseCurrentMessage()
+    setIsEditMessage({ messageId, isEdit: true })
+  }
+  const handleCloseEditMessage = () => {
+    setIsEditMessage({ messageId: "", isEdit: false })
+    setTextMessage("")
+  }
 
   if (!currentConversation && loading) {
     return (
@@ -497,6 +561,8 @@ export const MessageBlock = () => {
           position={messagePosition}
           onClose={handleCloseCurrentMessage}
           handleReaction={handleReaction}
+          handleDeleteMessage={handleDeleteMessage}
+          handleShowEditMessage={handleShowEditMessage}
         />
       )}
 
@@ -794,7 +860,11 @@ export const MessageBlock = () => {
       )}
 
       {/* ── Инпут ── */}
+
       <div className={style.messageBlock__newMessageBlock}>
+        {isEditMessage.isEdit && (
+          <div className={style.messageBlock__editTitle}>редактирование</div>
+        )}
         <div className={style.messageBlock__newMessageBlockInput}>
           <input
             type="text"
@@ -805,73 +875,87 @@ export const MessageBlock = () => {
           />
         </div>
 
-        <div className={style.messageBlock__newMessageBlockButtons}>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleImageSelect}
-          />
+        {!isEditMessage.isEdit && (
+          <div className={style.messageBlock__newMessageBlockButtons}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleImageSelect}
+            />
 
-          <div className={style.messageBlock__stickers}>
-            <div
-              className={`${style.messageBlock__stickersButton} ${
-                showStickers ? style.messageBlock__stickersButtonActive : ""
-              }`}
-              onClick={handleOpenStickers}
-            >
-              <Sticker />
-            </div>
-            {showStickers && (
-              <StickersBlock
-                onClose={handleCloseStickers}
-                handleSendSticker={handleSendSticker}
-              />
-            )}
-          </div>
-
-          <div className={style.messageBlock__newMessageUploadImage}>
-            {imagePreview && (
-              <div className={style.messageBlock__imagePreview}>
-                <Image
-                  src={imagePreview}
-                  width={200}
-                  height={200}
-                  alt="preview"
-                />
-                <button
-                  className={style.messageBlock__imagePreviewCloseWrapper}
-                  onClick={() => {
-                    if (imagePreview) URL.revokeObjectURL(imagePreview)
-                    setSelectedImage(null)
-                    setImagePreview(null)
-                  }}
-                >
-                  <div>✕</div>
-                </button>
+            <div className={style.messageBlock__stickers}>
+              <div
+                className={`${style.messageBlock__stickersButton} ${
+                  showStickers ? style.messageBlock__stickersButtonActive : ""
+                }`}
+                onClick={handleOpenStickers}
+              >
+                <Sticker />
               </div>
-            )}
+              {showStickers && (
+                <StickersBlock
+                  onClose={handleCloseStickers}
+                  handleSendSticker={handleSendSticker}
+                />
+              )}
+            </div>
+
+            <div className={style.messageBlock__newMessageUploadImage}>
+              {imagePreview && (
+                <div className={style.messageBlock__imagePreview}>
+                  <Image
+                    src={imagePreview}
+                    width={200}
+                    height={200}
+                    alt="preview"
+                  />
+                  <button
+                    className={style.messageBlock__imagePreviewCloseWrapper}
+                    onClick={() => {
+                      if (imagePreview) URL.revokeObjectURL(imagePreview)
+                      setSelectedImage(null)
+                      setImagePreview(null)
+                    }}
+                  >
+                    <div>✕</div>
+                  </button>
+                </div>
+              )}
+              <div
+                className={style.messageBlock__newMessageUploadImageButton}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                📎
+              </div>
+            </div>
+
             <div
-              className={style.messageBlock__newMessageUploadImageButton}
-              onClick={() => fileInputRef.current?.click()}
+              onClick={!isUploading ? handleSendMessage : undefined}
+              title="Отправить сообщение"
+              className={style.messageBlock__newMessageButtonBlock}
+              style={{
+                opacity: isUploading ? 0.5 : 1,
+                cursor: isUploading ? "not-allowed" : "pointer",
+              }}
             >
-              📎
+              {isUploading ? "..." : <SendMessage />}
             </div>
           </div>
-
-          <div
-            onClick={!isUploading ? handleSendMessage : undefined}
-            title="Отправить сообщение"
-            className={style.messageBlock__newMessageButtonBlock}
-            style={{
-              opacity: isUploading ? 0.5 : 1,
-              cursor: isUploading ? "not-allowed" : "pointer",
-            }}
-          >
-            {isUploading ? "..." : <SendMessage />}
+        )}
+        {isEditMessage.isEdit && (
+          <div className={style.messageBlock__editButton}>
+            {/* <div>Редактирование</div>
+          <div>editText:{editText}</div> */}
+            <div onClick={handleCloseEditMessage}>
+              <CancelIcon />
+            </div>
+            <div onClick={handleEditMessage}>
+              <ConfirmIcon />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

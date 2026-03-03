@@ -83,6 +83,35 @@ const conversationSlice = createSlice({
         }
       })
     },
+    messageDeleteFromSocket(
+      state,
+      action: PayloadAction<{ messageId: string }>
+    ) {
+      state.messages = state.messages.filter(
+        (message) => message._id !== action.payload.messageId
+      )
+    },
+    messageEditedFromSocket(
+      state,
+      action: PayloadAction<{
+        messageId: string
+        text: string
+        isEdited: boolean
+        editedAt: string
+      }>
+    ) {
+      state.messages = state.messages.map((message) => {
+        if (message._id === action.payload.messageId) {
+          return {
+            ...message,
+            text: action.payload.text,
+            isEdited: action.payload.isEdited,
+            editedAt: action.payload.editedAt,
+          }
+        }
+        return message
+      })
+    },
 
     clearMessages(state) {
       state.messages = []
@@ -343,9 +372,9 @@ export const {
   addMessageFromSocket,
   reactionUpdateFromSocket,
   clearMessages,
-
+  messageDeleteFromSocket,
   readUpdateFromSocket,
-
+  messageEditedFromSocket,
   clearPendingNewMessages,
   clearMessageViewers,
 } = conversationSlice.actions

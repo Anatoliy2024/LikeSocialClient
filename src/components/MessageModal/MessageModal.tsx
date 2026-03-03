@@ -9,6 +9,8 @@ interface Props {
   position: { top: number; left: number; right: number; isOwn: boolean }
   onClose: () => void
   handleReaction: (messageId: string, reactionId: string) => void
+  handleDeleteMessage: (messageId: string) => void
+  handleShowEditMessage: (messageId: string, text?: string) => void
 }
 
 const MODAL_WIDTH = 300
@@ -49,6 +51,8 @@ export const MessageModal = ({
   position,
   onClose,
   handleReaction,
+  handleDeleteMessage,
+  handleShowEditMessage,
 }: Props) => {
   const { top, left } = getModalPosition(position)
 
@@ -59,7 +63,11 @@ export const MessageModal = ({
         <ModalCurrentMessage
           messageId={message._id}
           reactions={message.reactions}
+          senderId={message.senderId._id}
+          text={message?.text}
           handleReaction={handleReaction}
+          handleDeleteMessage={handleDeleteMessage}
+          handleShowEditMessage={handleShowEditMessage}
         />
       </div>
     </>,
