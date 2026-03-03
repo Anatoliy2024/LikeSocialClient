@@ -1,5 +1,5 @@
 "use client"
-import { STICKERS, StickersTypeList } from "@/constants/stickers"
+import { STICKERS, StickersTypeItem } from "@/constants/stickers"
 import style from "./StickersBlock.module.scss"
 import Image from "next/image"
 import { useEffect } from "react"
@@ -45,7 +45,7 @@ const StickerPack = ({
   stickers,
   handleSendSticker,
 }: {
-  stickers: StickersTypeList
+  stickers: StickersTypeItem[]
   handleSendSticker: (stickerId: string) => void
 }) => {
   return stickers.map((sticker) => (

@@ -54,9 +54,9 @@ const CTHULHU = [
   { id: "cthulhu-8", image: `${cthulhuPath}cthulhu-8.png` },
 ]
 
-export type StickersTypeList = { id: string; image: string }[]
+export type StickersTypeItem = { id: string; image: string }
 
-type StickersType = Record<string, StickersTypeList>
+type StickersType = Record<string, StickersTypeItem[]>
 
 export const STICKERS: StickersType = {
   mems: MEMS,
