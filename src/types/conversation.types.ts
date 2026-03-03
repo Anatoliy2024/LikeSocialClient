@@ -70,10 +70,26 @@ export interface ConversationType {
   updatedAt: string
 }
 
+export type messageViewersUserType = {
+  conversationId: string
+
+  messageId: string
+
+  readAt: string
+
+  userId: MemberType
+
+  _id: string
+}
+
 export interface ConversationsState {
   conversations: ConversationType[]
   currentConversation: ConversationType | null
   messages: MessageType[]
+  messageViewers: {
+    users: messageViewersUserType[]
+    isLoading: boolean
+  }
   loading: boolean
   error: string | null
   pagination: {

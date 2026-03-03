@@ -50,8 +50,14 @@ export const conversationAPI = {
     if (cursor) params.append("cursor", cursor)
     return instance
       .get(`/conversations/${conversationId}/messages?${params}`)
-      .then((r) => r.data)
+      .then((res) => res.data)
   },
+  getMessageViewers: (messageId: string) => {
+    return instance
+      .get(`/conversations/${messageId}/reads`)
+      .then((res) => res.data)
+  },
+  // /messages/:messageId/reads
   // // Получение сообщений чата с пагинацией
   // getMessages(conversationId: string, page: number, limit?: number) {
   //   // console.log("getMessages***", conversationId)
@@ -89,10 +95,10 @@ export const conversationAPI = {
       .delete(`conversations/${conversationId}/members/${memberId}`)
       .then((res) => res.data)
   },
-  // Маркер "прочитано" (опционально)
-  markAsRead(conversationId: string, messageId: string) {
-    return instance
-      .post(`conversations/${conversationId}/read`, { messageId })
-      .then((res) => res.data)
-  },
+  // // Маркер "прочитано" (опционально)
+  // markAsRead(conversationId: string, messageId: string) {
+  //   return instance
+  //     .post(`conversations/${conversationId}/read`, { messageId })
+  //     .then((res) => res.data)
+  // },
 }

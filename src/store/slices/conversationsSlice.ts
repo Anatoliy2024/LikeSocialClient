@@ -17,6 +17,8 @@ import {
   fetchConversationsThunk,
   fetchItemConversationThunk,
   fetchMessagesThunk,
+  // getMessagesReadThunk,
+  getMessageViewersThunk,
 } from "../thunks/conversationsThunk"
 import { ConversationsState, MessageType } from "@/types/conversation.types"
 
@@ -32,6 +34,10 @@ const initialState: ConversationsState = {
   conversations: [],
   currentConversation: null,
   messages: [],
+  messageViewers: {
+    users: [],
+    isLoading: false,
+  },
   loading: false,
   error: null,
   pagination: { ...initialPagination },
@@ -87,6 +93,12 @@ const conversationSlice = createSlice({
       state.lastReadMessageId = null
       state.unreadCount = 0
       state.pendingNewMessages = 0
+    },
+    clearMessageViewers(state) {
+      state.messageViewers = {
+        users: [],
+        isLoading: false,
+      }
     },
   },
   extraReducers: (builder) => {
@@ -302,6 +314,28 @@ const conversationSlice = createSlice({
         state.loading = false
         state.error = action.error.message || "Ошибка при смене аватарки группы"
       })
+      .addCase(getMessageViewersThunk.pending, (state) => {
+        state.messageViewers.isLoading = true
+        state.error = null
+      })
+      .addCase(getMessageViewersThunk.fulfilled, (state, action) => {
+        state.messageViewers.isLoading = false
+
+        state.messageViewers.users = action.payload.users
+        // state.messageViewers.messageId = action.payload.messageId
+
+        // if (action.payload.success && state.currentConversation) {
+        //   state.currentConversation.avatar = action.payload.avatar
+        //   state.currentConversation.avatarPublicId =
+        //     action.payload.avatarPublicId
+        // }
+      })
+      .addCase(getMessageViewersThunk.rejected, (state, action) => {
+        state.messageViewers.isLoading = false
+        state.error =
+          action.error.message ||
+          "Ошибка при получении списка прочитавших юзеров"
+      })
   },
 })
 
@@ -313,6 +347,7 @@ export const {
   readUpdateFromSocket,
 
   clearPendingNewMessages,
+  clearMessageViewers,
 } = conversationSlice.actions
 
 export default conversationSlice.reducer

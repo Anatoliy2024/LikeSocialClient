@@ -6,6 +6,7 @@ import {
   ConversationType,
   MemberFullType,
   MessageType,
+  messageViewersUserType,
 } from "@/types/conversation.types"
 import { fileAPI } from "@/api/api"
 
@@ -229,23 +230,39 @@ export const deleteMemberToGroupThunk = createAsyncThunk<
   }
 )
 
-// ===== Опционально: маркер прочитанных =====
-export const markConversationAsReadThunk = createAsyncThunk<
-  unknown,
+export const getMessageViewersThunk = createAsyncThunk<
+  { users: messageViewersUserType[] },
   // { success: true },
-  { conversationId: string; messageId: string },
+  string,
   { rejectValue: string }
->("conversations/markRead", async ({ conversationId, messageId }, thunkAPI) => {
+>("conversations/getMessageViewers", async (messageId, thunkAPI) => {
   try {
-    const data = await conversationAPI.markAsRead(conversationId, messageId)
+    const data = await conversationAPI.getMessageViewers(messageId)
     return data
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
-    return thunkAPI.rejectWithValue("Не удалось отметить как прочитанное")
+    return thunkAPI.rejectWithValue("Не удалось получить прочитавших сообщение")
   }
 })
+// // ===== Опционально: маркер прочитанных =====
+// export const markConversationAsReadThunk = createAsyncThunk<
+//   unknown,
+//   // { success: true },
+//   { conversationId: string; messageId: string },
+//   { rejectValue: string }
+// >("conversations/markRead", async ({ conversationId, messageId }, thunkAPI) => {
+//   try {
+//     const data = await conversationAPI.markAsRead(conversationId, messageId)
+//     return data
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
+//     }
+//     return thunkAPI.rejectWithValue("Не удалось отметить как прочитанное")
+//   }
+// })
 
 export const changeAvatarGroupThunk = createAsyncThunk<
   { success: boolean; avatar: string; avatarPublicId: string }, // тип данных, которые вернутся — массив пользователей
