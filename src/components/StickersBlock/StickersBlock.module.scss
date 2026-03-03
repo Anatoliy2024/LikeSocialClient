@@ -1,0 +1,37 @@
+.stickersBlock {
+  height: 200px;
+  //   width: clamp(100px, 60vw, 600px);
+  //   width: clamp(100px, 60vw, 600px);
+  width: calc(100% - 250px);
+  //   padding: 0 10px 0;
+
+  background: rebeccapurple;
+  position: fixed;
+  bottom: 60px;
+  right: 0;
+  z-index: 35;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  overflow-y: auto;
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+  img {
+    cursor: pointer;
+    border-radius: 12px;
+    &:hover {
+      background: rgba(0, 0, 0, 0.334);
+    }
+  }
+}
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-height: 100vh;
+  width: 100vw;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.356);
+}

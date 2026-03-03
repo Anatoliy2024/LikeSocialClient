@@ -46,6 +46,9 @@ import { fileAPI } from "@/api/api"
 import Image from "next/image"
 import { MessageReactions } from "../MessageReactions/MessageReactions"
 import { MessageModal } from "../MessageModal/MessageModal"
+import { StickersBlock } from "../StickersBlock/StickersBlock"
+import { Sticker } from "@/assets/icons/sticker"
+import { getStickerImage } from "@/utils/getStickerImage"
 
 export const MessageBlock = () => {
   const router = useRouter()
@@ -69,6 +72,7 @@ export const MessageBlock = () => {
   } | null>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [showStickers, setShowStickers] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
@@ -458,6 +462,23 @@ export const MessageBlock = () => {
     return result ?? null
   }, [messages, userId, isInitialized])
 
+  const handleOpenStickers = () => {
+    setShowStickers((prev) => !prev)
+    // setShowStickers(true)
+  }
+  const handleCloseStickers = () => {
+    setShowStickers(false)
+  }
+
+  const handleSendSticker = (stickerId: string) => {
+    socket.emit("message:send", {
+      conversationId: id,
+      type: "sticker",
+      sticker: stickerId,
+    })
+    handleCloseStickers()
+  }
+
   if (!currentConversation && loading) {
     return (
       <div style={{ paddingTop: "50px" }}>
@@ -719,6 +740,17 @@ export const MessageBlock = () => {
                             }}
                           />
                         ))}
+                      {message.type === "sticker" && message.sticker && (
+                        <Image
+                          src={
+                            getStickerImage(message.sticker) ||
+                            "/stickers/not-found.png"
+                          }
+                          width={200}
+                          height={200}
+                          alt={message._id}
+                        />
+                      )}
 
                       {message.text && (
                         <div className={style.messageBlock__messageListText}>
@@ -781,6 +813,23 @@ export const MessageBlock = () => {
             style={{ display: "none" }}
             onChange={handleImageSelect}
           />
+
+          <div className={style.messageBlock__stickers}>
+            <div
+              className={`${style.messageBlock__stickersButton} ${
+                showStickers ? style.messageBlock__stickersButtonActive : ""
+              }`}
+              onClick={handleOpenStickers}
+            >
+              <Sticker />
+            </div>
+            {showStickers && (
+              <StickersBlock
+                onClose={handleCloseStickers}
+                handleSendSticker={handleSendSticker}
+              />
+            )}
+          </div>
 
           <div className={style.messageBlock__newMessageUploadImage}>
             {imagePreview && (

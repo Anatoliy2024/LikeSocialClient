@@ -355,6 +355,40 @@
     }
   }
 
+  &__stickers {
+    // position: relative;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+
+    // width: 40px;
+  }
+  &__stickersButton {
+    width: 50px;
+    height: 50px;
+    // position: absolute;
+    // width: 100%;
+    // padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // width: 30px;
+    cursor: pointer;
+    &:hover {
+      background: #4338b4;
+      border-radius: 50%;
+      color: white;
+    }
+  }
+  &__stickersButtonActive {
+    background: #4338b4;
+    border-radius: 50%;
+    color: white;
+  }
+
   &__imagePreview {
     position: absolute;
     width: 200px;
@@ -391,6 +425,7 @@
 
   &__newMessageButtonBlock {
     @include button-new-message;
+    user-select: none;
 
     &:hover {
       background-color: #11386d;
@@ -505,424 +540,3 @@
     color: rgba(255, 255, 255, 0.685);
   }
 }
-
-// @mixin button-new-message {
-//   cursor: pointer;
-//   // flex: 0 0 50px;
-//   width: 50px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   border-radius: 50%;
-//   height: 50px;
-// }
-
-// .messageBlock {
-//   // padding: 10px;
-//   position: relative;
-//   // height: calc(100vh - 60px);
-//   // min-height: 2000px;
-//   // padding-top: 70px;
-//   // display: flex;
-//   // flex-direction: column;
-
-//   &__userInfo {
-//     // flex: 0 0 60px;
-//     // height: 60px;
-//     // font-size: 40px;
-//     position: fixed;
-//     // top: 0;
-//     display: flex;
-//     justify-content: space-between;
-//     align-items: center;
-//     gap: 20px;
-//     background-color: #4571be;
-//     // position: fixed;
-
-//     min-width: calc(100% - 250px);
-//     transition: all 0.3s ease;
-//     height: 60px;
-//     z-index: 25;
-//     padding: 10px;
-
-//     @media (max-width: 768px) {
-//       min-width: 100%;
-//     }
-//   }
-//   &__userInfoContainer {
-//     display: flex;
-//     gap: 10px;
-//   }
-//   &__groupInfo {
-//     display: flex;
-//     // width: 50px;
-//     height: 50px;
-//     align-items: center;
-//     gap: 10px;
-//   }
-
-//   &__groupInfoMain {
-//     @media (max-width: 500px) {
-//       display: none;
-//     }
-//     // display: flex;
-//   }
-//   &__groupInfoTitle {
-//   }
-//   &__groupInfoMemberCount {
-//     text-wrap: nowrap;
-//     font-size: 0.7rem;
-//     // display: flex;
-//   }
-
-//   &__moveHeaderMessage {
-//     transform: translateY(-200%);
-//   }
-
-//   &__contentMessageBlock {
-//     // display: flex;
-//     // flex-direction: column;
-//     // gap: 2px;
-//     // padding: 10px;
-
-//     padding: 120px 0 30px 0;
-//     // flex: 1 1 auto;
-//     // overflow-y: auto;
-//     display: flex;
-//     flex-direction: column;
-
-//     // justify-content: end;
-
-//     .buttonNextPage {
-//       text-align: center;
-//     }
-//   }
-//   &__newMessageBlock {
-//     // flex: 0 0 60px;
-//     position: fixed;
-//     top: 120px;
-//     height: 60px;
-//     // bottom: 0;
-//     // left: 0;
-//     // right: 0;
-//     // z-index: 1000;
-//     // padding-bottom: env(safe-area-inset-bottom);
-//     transition: all 0.3s ease;
-
-//     // width: 100%;
-//     min-width: calc(100% - 250px);
-
-//     // height: 60px;
-
-//     // right: 0;
-//     background-color: white;
-//     z-index: 20;
-//     display: flex;
-//     justify-content: space-between;
-//     padding: 0 20px;
-//     align-items: center;
-//     gap: 10px;
-//     @media (max-width: 768px) {
-//       min-width: 100%;
-//     }
-//     @media (max-width: 500px) {
-//       padding: 0 5px;
-//     }
-//   }
-//   &__buttonBackBlock {
-//     border-radius: 50%;
-//     padding: 5px;
-//     &:hover {
-//       background-color: #11386d;
-//       color: white;
-//     }
-//   }
-
-//   &__userImgOnlineBlock {
-//     // position: sticky;
-//     width: 50px;
-//     height: 50px;
-//     position: relative;
-//   }
-//   &__blockImg {
-//     width: 50px;
-//     height: 50px;
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     border-radius: 50%;
-//     overflow: hidden;
-
-//     img {
-//       object-fit: cover;
-//       width: 100%;
-//       height: 100%;
-//     }
-//   }
-
-//   &__onlineBlock {
-//     position: absolute;
-//     bottom: 2px;
-//     right: 2px;
-//     width: 10px;
-//     height: 10px;
-//     border-radius: 50%;
-//     background-color: #3edc00;
-//     border: 1px solid white; // для рамки, если надо
-//   }
-//   &__lastSeen {
-//     // color: white;
-//     font-size: 1rem;
-//   }
-
-//   &__optionConversation {
-//     display: flex;
-//     gap: 10px;
-//     position: relative;
-
-//     button {
-//       padding: 8px;
-//       // border-radius: 50%;
-//       cursor: pointer;
-//       width: 100%;
-//       &:hover {
-//         // background: rgba(0, 0, 0, 0.605);
-//         color: white;
-//       }
-//     }
-//     ul {
-//       position: absolute;
-//       top: 60px;
-//       right: 0;
-//       display: flex;
-//       flex-direction: column;
-//       gap: 5px;
-//       background: rgba(165, 176, 215, 0.927);
-//       border-radius: 20px;
-//       padding: 5px;
-//       font-size: 1rem;
-//       li {
-//         padding: 8px;
-//         border-radius: 12px;
-//         cursor: pointer;
-//         display: flex;
-//         // justify-content: space-between;
-//         gap: 5px;
-//         align-items: center;
-//         text-wrap: nowrap;
-
-//         &:hover {
-//           // background: rgba(0, 0, 0, 0.605);
-//           color: white;
-//         }
-//       }
-//     }
-//   }
-//   &__ButtonOption {
-//     border-radius: 50%;
-//   }
-//   &__ButtonOptionShow {
-//     background: rgba(0, 0, 0, 0.445);
-//     color: rgba(255, 255, 255, 0.685);
-//   }
-
-//   &__messagesList {
-//     // width: 100%;
-//     // flex: 1 1 auto;
-//     // justify-content: flex-end;
-//     // overflow-y: auto;
-//     display: flex;
-//     flex-direction: column;
-//     gap: 2px;
-//     padding: 10px;
-//   }
-//   &__messageListWrapper {
-//     display: flex;
-//     gap: 15px;
-//   }
-//   &__messageList {
-//     // align-items: center;
-//     // flex: 1 1 auto;
-//     // overflow-y: auto;
-//     display: flex;
-//     flex-direction: column;
-//     gap: 10px;
-//     padding: 10px;
-//     // border: 1px solid rgb(87, 60, 182);
-//     // flex: 0 0 70%;
-//     max-width: 80%;
-//     // width: 70%;
-//     min-width: max(200px, 20%);
-//     border-radius: 20px;
-//     // justify-content: flex-start;
-
-//     flex-wrap: wrap;
-//     justify-content: space-between;
-
-//     // div:first-child {
-//     //   // flex: 1;
-//     //   word-break: break-word;
-//     // }
-//     // div:last-child {
-//     //   font-size: 11px;
-//     //   color: rgb(44, 32, 132);
-//     //   display: flex;
-//     //   // align-self: flex-end;
-//     //   align-items: center;
-//     //   // justify-content: space-between;
-//     // }
-//   }
-//   &__senderImage {
-//     width: 50px;
-//     height: 50px;
-//     border-radius: 50%;
-//     overflow: hidden;
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     img {
-//       width: 100%;
-//       height: 100%;
-//       object-fit: cover;
-//     }
-//   }
-
-//   &__me {
-//     // justify-content: flex-end;
-//     background-color: #b5c7af;
-//     margin-left: auto;
-//     position: relative;
-//     border-bottom-right-radius: 0;
-//     &::after {
-//       content: "";
-//       position: absolute;
-//       right: -9px;
-//       bottom: 0;
-//       width: 0;
-//       height: 0;
-//       border-top: 10px solid transparent;
-//       border-left: 10px solid #b5c7af; // тот же цвет что и фон
-//     }
-
-//     // justify-items: right;
-//   }
-//   &__recipient {
-//     margin-right: auto;
-//     background-color: #f3e8ff;
-//     // border-bottom-right-radius: 0;
-//     position: relative;
-//     border-bottom-left-radius: 0;
-
-//     &::after {
-//       content: "";
-//       position: absolute;
-//       left: -9px;
-//       bottom: 0;
-//       width: 0;
-//       height: 0;
-//       border-top: 10px solid transparent;
-//       border-right: 10px solid #f3e8ff;
-//     }
-//   }
-//   &__senderName {
-//     //имя если группа
-//   }
-
-//   &__newMessageBlockInput {
-//     flex: 1 1 200px;
-//     padding: 8px;
-//     -webkit-text-fill-color: initial;
-//     input {
-//       width: 100%;
-//       &::placeholder {
-//         color: #999;
-//         opacity: 1;
-//       }
-//     }
-
-//     // min-width: 100px;
-//     // width: auto;
-//   }
-//   &__newMessageBlockButtons {
-//     // flex: 1 1 100px;
-
-//     // min-width: 120px;
-//     display: flex;
-//     gap: 20px;
-//   }
-//   &__newMessageUploadImage {
-//     // flex: 0 0 50px;
-
-//     // cursor: pointer;
-//     // flex: 0 0 50px;
-//     // display: flex;
-//     // align-items: center;
-//     // justify-content: center;
-//     // border-radius: 50%;
-//     position: relative;
-//   }
-//   &__imagePreviewCloseWrapper {
-//     div {
-//       padding: 15px;
-//       border-radius: 50%;
-//       background: #11386d;
-//       color: rgb(174, 173, 203);
-//       cursor: pointer;
-
-//       &:hover {
-//         background-color: #11376d96;
-//         color: white;
-//       }
-//     }
-//   }
-//   &__newMessageUploadImageButton {
-//     @include button-new-message;
-
-//     &:hover {
-//       background-color: #11386d;
-//       color: white;
-//     }
-//   }
-
-//   &__imagePreview {
-//     position: absolute;
-//     width: 200px;
-//     // height: 200px;
-//     top: 50px;
-//     right: 0;
-//     display: flex;
-//     gap: 20px;
-//   }
-//   &__newMessageButtonBlock {
-//     @include button-new-message;
-//     // border-radius: 50%;
-//     // flex: 0 0 50px;
-//     // height: 50px;
-//     // display: flex;
-//     // align-items: center;
-//     // justify-content: center;
-//     // cursor: pointer;
-//     &:hover {
-//       background-color: #11386d;
-//       color: white;
-//     }
-//   }
-//   &____messageListText {
-//     word-break: break-word;
-//   }
-//   &__otherInfoMessage {
-//     font-size: 11px;
-//     color: rgb(44, 32, 132);
-//     // display: flex;
-//     // align-self: flex-end;
-//     align-items: center;
-//     // justify-content: space-between;
-//     display: flex;
-//     flex: 1;
-//     justify-content: space-between;
-//     // span {
-//     //   display: flex;
-//     //   justify-content: end;
-//     // }
-//   }
-// }
