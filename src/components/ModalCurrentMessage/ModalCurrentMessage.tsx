@@ -15,12 +15,19 @@ import { getMessageViewersThunk } from "@/store/thunks/conversationsThunk"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { clearMessageViewers } from "@/store/slices/conversationsSlice"
 import { RootState } from "@/store/store"
+
+import { formatDateEditMessage } from "@/utils/formatDateEditMessage"
+import { HeartReactionMessage } from "@/assets/icons/heartReactionMessage"
+import { DeleteMessageIcon } from "@/assets/icons/deleteMessageIcon"
+import { EditMessageIcon } from "@/assets/icons/EditMessageIcon"
+import { DataEditMessageIcon } from "@/assets/icons/DataEditMessageIcon"
 // import { MessageType } from '@/types/conversation.types'
 
 export const ModalCurrentMessage = ({
   messageId,
   reactions,
   senderId,
+  editedAt,
   handleReaction,
   handleDeleteMessage,
   handleShowEditMessage,
@@ -29,6 +36,7 @@ export const ModalCurrentMessage = ({
   messageId: string
   reactions: ReactionType[]
   senderId: string
+  editedAt?: string
   handleReaction: (messageId: string, reactionId: string) => void
   handleDeleteMessage: (messageId: string) => void
   handleShowEditMessage: (messageId: string, text?: string) => void
@@ -86,37 +94,57 @@ export const ModalCurrentMessage = ({
     <div className={style.modalCurrentMessage}>
       {!showUserReaction && (
         <ul>
-          <li>
-            <ul className={style.modalCurrentMessage__userReaction}>
-              <div
-                className={style.modalCurrentMessage__userReactionButton}
-                onClick={toggleShowUserReaction}
-              >
+          {(users.length > 0 || reactions.length > 0) && (
+            <li className={style.modalCurrentMessage__clickableItem}>
+              <ul className={style.modalCurrentMessage__userReaction}>
                 <div
-                  className={style.modalCurrentMessage__userReactionButtonInfo}
+                  className={style.modalCurrentMessage__userReactionButton}
+                  onClick={toggleShowUserReaction}
                 >
-                  <span>❤️</span>
-                  {reactions.length > 0 && <span>{reactions.length}</span>}
-                  <span>реакции</span>
-                </div>
+                  <div
+                    className={
+                      style.modalCurrentMessage__userReactionButtonInfo
+                    }
+                  >
+                    <span>❤️</span>
+                    {reactions.length > 0 && <span>{reactions.length}</span>}
+                    <span>реакции</span>
+                  </div>
 
-                <ul>
-                  {reactions.slice(0, 3).map((reaction) => (
-                    <li key={reaction._id}>
-                      <CloudinaryImage
-                        src={reaction.user.avatar}
-                        alt="avatar"
-                        width={60}
-                        height={60}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </ul>
-          </li>
+                  <ul>
+                    {reactions.slice(0, 3).map((reaction) => (
+                      <li key={reaction._id}>
+                        <CloudinaryImage
+                          src={reaction.user.avatar}
+                          alt="avatar"
+                          width={60}
+                          height={60}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </ul>
+            </li>
+          )}
+          {editedAt && (
+            <li className={style.modalCurrentMessage__editDate}>
+              <DataEditMessageIcon />{" "}
+              <span>изменено {formatDateEditMessage(editedAt)}</span>
+            </li>
+          )}
+          {(users.length > 0 || reactions.length > 0 || editedAt) && (
+            <div className={style.modalCurrentMessage__dividedLine}></div>
+          )}
+
           <li>
-            <span onClick={toggleShowReaction}>реакция</span>
+            <span
+              onClick={toggleShowReaction}
+              className={style.modalCurrentMessage__clickableItem}
+            >
+              <HeartReactionMessage />
+              <span>реакция</span>
+            </span>
             {showReaction && (
               <ul className={style.modalCurrentMessage__reactionWrapper}>
                 {REACTIONS.map((item) => (
@@ -138,12 +166,22 @@ export const ModalCurrentMessage = ({
           {/* <li>ответить</li> */}
           {/* <li>закрепить</li> */}
           {userId === senderId && (
-            <li onClick={() => handleShowEditMessage(messageId, text)}>
-              изменить
+            <li
+              onClick={() => handleShowEditMessage(messageId, text)}
+              className={style.modalCurrentMessage__clickableItem}
+            >
+              <EditMessageIcon />
+              <span>изменить</span>
             </li>
           )}
           {(userId === owner || userId === senderId) && (
-            <li onClick={() => handleDeleteMessage(messageId)}>удалить</li>
+            <li
+              onClick={() => handleDeleteMessage(messageId)}
+              className={style.modalCurrentMessage__clickableItem}
+            >
+              <DeleteMessageIcon />
+              <span>удалить</span>
+            </li>
           )}
         </ul>
       )}

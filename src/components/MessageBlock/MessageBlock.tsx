@@ -86,7 +86,7 @@ export const MessageBlock = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  // const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   // 🔥 НОВЫЙ: sentinel для автоподгрузки старых сообщений сверху
   const topSentinelRef = useRef<HTMLDivElement>(null)
@@ -118,7 +118,7 @@ export const MessageBlock = () => {
     loading,
     pagination: { hasMoreOlder, hasLoaded },
     lastReadMessageId,
-    pendingNewMessages,
+
     oldestMessageId,
   } = useAppSelector((state) => state.conversations)
 
@@ -280,12 +280,11 @@ export const MessageBlock = () => {
   // Отслеживаем позицию скролла — внизу или нет
   // ─────────────────────────────────────────
   const handleScroll = useCallback(() => {
-    const container = messagesContainerRef.current
-    if (!container) return
-
-    const threshold = 100
+    const threshold = 700
     const atBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight <
+      document.documentElement.scrollHeight -
+        window.scrollY -
+        window.innerHeight <
       threshold
 
     setIsAtBottom(atBottom)
@@ -293,12 +292,30 @@ export const MessageBlock = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const container = messagesContainerRef.current
-    if (!container) return
-
-    container.addEventListener("scroll", handleScroll, { passive: true })
-    return () => container.removeEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [handleScroll])
+
+  // const handleScroll = useCallback(() => {
+  //   const container = messagesContainerRef.current
+  //   if (!container) return
+
+  //   const threshold = 100
+  //   const atBottom =
+  //     container.scrollHeight - container.scrollTop - container.clientHeight <
+  //     threshold
+
+  //   setIsAtBottom(atBottom)
+  //   if (atBottom) dispatch(clearPendingNewMessages())
+  // }, [dispatch])
+
+  // useEffect(() => {
+  //   const container = messagesContainerRef.current
+  //   if (!container) return
+
+  //   container.addEventListener("scroll", handleScroll, { passive: true })
+  //   return () => container.removeEventListener("scroll", handleScroll)
+  // }, [handleScroll])
 
   // ─────────────────────────────────────────
   // Click outside option menu
@@ -731,7 +748,7 @@ export const MessageBlock = () => {
       {/* ── Список сообщений ── */}
       <div
         className={style.messageBlock__contentMessageBlock}
-        ref={messagesContainerRef}
+        // ref={messagesContainerRef}
       >
         {/* 🔥 Sentinel для автоподгрузки старых сообщений (вместо кнопки) */}
         {hasMoreOlder && <div ref={topSentinelRef} style={{ height: 1 }} />}
@@ -830,12 +847,17 @@ export const MessageBlock = () => {
                           messageId={message._id}
                           handleReaction={handleReaction}
                         />
-                        <span>{formatMessageTime(message.createdAt)}</span>
-                        {message.senderId._id === userId && (
-                          <span className={style.messageBlock__readStatus}>
-                            {message.readCount > 0 ? "✓✓" : "✓"}
-                          </span>
-                        )}
+                        <div
+                          className={style.messageBlock__otherInfoMessageTest}
+                        >
+                          {message.isEdited && <span>изменено</span>}
+                          <span>{formatMessageTime(message.createdAt)}</span>
+                          {message.senderId._id === userId && (
+                            <span className={style.messageBlock__readStatus}>
+                              {message.readCount > 0 ? "✓✓" : "✓"}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -849,22 +871,21 @@ export const MessageBlock = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── Кнопка "↓ новые сообщения" ── */}
-      {pendingNewMessages > 0 && !isAtBottom && (
-        <button
-          className={style.messageBlock__scrollToBottom}
-          onClick={scrollToBottom}
-        >
-          ↓ {pendingNewMessages} новых
-        </button>
-      )}
-
       {/* ── Инпут ── */}
 
       <div className={style.messageBlock__newMessageBlock}>
         {isEditMessage.isEdit && (
           <div className={style.messageBlock__editTitle}>редактирование</div>
         )}
+        {!isAtBottom && (
+          <button
+            className={style.messageBlock__scrollToBottom}
+            onClick={scrollToBottom}
+          >
+            ↓ Вниз
+          </button>
+        )}
+
         <div className={style.messageBlock__newMessageBlockInput}>
           <input
             type="text"

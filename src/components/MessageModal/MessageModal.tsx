@@ -65,6 +65,7 @@ export const MessageModal = ({
           reactions={message.reactions}
           senderId={message.senderId._id}
           text={message?.text}
+          editedAt={message?.editedAt}
           handleReaction={handleReaction}
           handleDeleteMessage={handleDeleteMessage}
           handleShowEditMessage={handleShowEditMessage}

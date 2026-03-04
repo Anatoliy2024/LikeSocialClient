@@ -254,6 +254,10 @@
     justify-content: space-between;
     gap: 6px;
   }
+  &__otherInfoMessageTest {
+    display: flex;
+    gap: 5px;
+  }
 
   // Галочки ✓ / ✓✓
   &__readStatus {
@@ -265,9 +269,11 @@
 
   // ─── Кнопка скролла вниз / новые сообщения ───
   &__scrollToBottom {
-    position: fixed;
+    position: absolute;
     bottom: 80px;
-    right: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    // transform: rotateX(500px);
     background: #4571be;
     color: white;
     border-radius: 20px;
@@ -280,13 +286,13 @@
 
     &:hover {
       background: #11386d;
-      transform: translateY(-2px);
+      // transform: translateY(-2px);
     }
 
-    @media (max-width: 768px) {
-      right: 12px;
-      bottom: 72px;
-    }
+    // @media (max-width: 768px) {
+    //   right: 12px;
+    //   bottom: 72px;
+    // }
   }
 
   // ─── Инпут — fixed bottom ───

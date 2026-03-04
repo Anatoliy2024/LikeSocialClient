@@ -9,19 +9,27 @@
   // top: 50%;
   border-radius: 20px;
   padding: 10px;
-  li {
+  user-select: none;
+  &__clickableItem {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     cursor: pointer;
+
+    &:hover {
+      color: rgb(136, 103, 226);
+    }
   }
   & > ul {
     border-radius: 12px;
-    & > li {
-      &:hover {
-        color: rgb(136, 103, 226);
-      }
-    }
   }
 
   &__userReaction {
+  }
+  &__dividedLine {
+    height: 2px;
+    margin: 3px 0;
+    background: rgba(106, 33, 137, 0.404);
   }
   &__userReactionButton {
     display: flex;
@@ -72,6 +80,7 @@
     max-height: 150px;
     overflow-y: auto;
     li {
+      cursor: pointer;
       font-size: 25px;
 
       // transform: scale(1.2);
@@ -85,6 +94,14 @@
         background: rgb(136, 103, 226);
       }
     }
+  }
+  &__editDate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    // text-align: center;
+    font-size: 1rem;
   }
 }
 
