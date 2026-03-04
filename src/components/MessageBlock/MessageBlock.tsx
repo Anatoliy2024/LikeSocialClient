@@ -523,6 +523,9 @@ export const MessageBlock = () => {
       type: "sticker",
       sticker: stickerId,
     })
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    })
     handleCloseStickers()
   }
   const handleDeleteMessage = (messageId: string) => {
