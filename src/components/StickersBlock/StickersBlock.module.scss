@@ -18,6 +18,40 @@
   @media (max-width: 768px) {
     min-width: 100%;
   }
+  &__listPacket {
+    padding: 10px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    li {
+      border-radius: 12px;
+      cursor: pointer;
+      &:hover {
+        background: rgba(0, 0, 0, 0.334);
+      }
+    }
+  }
+  &__listPacketActive {
+    background: rgba(0, 0, 0, 0.395);
+  }
+
+  &__dividingLine {
+    width: 90%;
+    height: 2px;
+    background: rgb(137, 48, 209);
+    margin: 10px 0;
+    // border-bottom: 10px solid red;
+    // margin: 100px;
+    // padding: 10px 20px;
+  }
+}
+.stickersPackList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+
   img {
     cursor: pointer;
     border-radius: 12px;
