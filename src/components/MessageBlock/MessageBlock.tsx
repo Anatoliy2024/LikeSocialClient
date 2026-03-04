@@ -123,7 +123,7 @@ export const MessageBlock = () => {
   } = useAppSelector((state) => state.conversations)
 
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
-  const userId = useAppSelector((state) => state.auth.userId)
+  const userId = useAppSelector((state: RootState) => state.auth.userId)
   const optionHeaderMessage = useHideOnScroll()
 
   const params = useParams<{ id: string }>()

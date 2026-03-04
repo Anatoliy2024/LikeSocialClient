@@ -1,8 +1,13 @@
 "use client"
+import "swiper/css"
+import "swiper/css/navigation"
+import "swiper/css/pagination"
 import { STICKERS, StickersTypeItem } from "@/constants/stickers"
 import style from "./StickersBlock.module.scss"
 import Image from "next/image"
 import { useEffect, useState } from "react"
+
+import { Swiper, SwiperSlide } from "swiper/react"
 
 export function StickersBlock({
   onClose,
@@ -28,7 +33,35 @@ export function StickersBlock({
     <>
       <div className={style.background} onClick={onClose}></div>
       <div className={style.stickersBlock}>
-        <ul className={style.stickersBlock__listPacket}>
+        <Swiper
+          spaceBetween={20}
+          slidesPerView="auto"
+          navigation
+          pagination={{ clickable: true }}
+          loop={false}
+          className={style.stickersBlock__listPacket}
+        >
+          {keys.map((stickerKey, i) => (
+            <SwiperSlide key={stickerKey} style={{ width: "auto" }}>
+              <li
+                onClick={() => setStickerPack(stickerKey)}
+                className={
+                  stickerKey === stickerPack
+                    ? style.stickersBlock__listPacketActive
+                    : ""
+                }
+              >
+                <Image
+                  src={STICKERS[keys[i]][0].image}
+                  width={70}
+                  height={70}
+                  alt={stickerKey}
+                />
+              </li>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        {/* <ul className={style.stickersBlock__listPacket}>
           {keys.map((stickerKey, i) => (
             <li
               key={stickerKey}
@@ -47,11 +80,10 @@ export function StickersBlock({
               />
             </li>
           ))}
-        </ul>
+        </ul> */}
         <div className={style.stickersBlock__dividingLine}></div>
         <StickerPack
           stickers={STICKERS[stickerPack]}
-          // key={stickerKey}
           handleSendSticker={handleSendSticker}
         />
       </div>
