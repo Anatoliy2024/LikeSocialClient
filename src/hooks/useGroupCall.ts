@@ -8,7 +8,7 @@ import {
   addParticipant,
   removeParticipant,
   toggleAudio,
-  toggleVideo,
+  // toggleVideo,
   setGroupCallActive,
   setGroupCallEnded,
   updateGroupCallCount,
@@ -46,26 +46,28 @@ export const useGroupCall = (userId: string | null) => {
   const socketRef = useRef<ReturnType<typeof getSocket> | null>(null)
 
   // ---- Локальный стрим ----
-  const getOrCreateLocalStream = async (withVideo = false) => {
-    if (localStreamRef.current) return localStreamRef.current
+  const getOrCreateLocalStream = async () =>
+    // withVideo = false
+    {
+      if (localStreamRef.current) return localStreamRef.current
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        sampleRate: 48000,
-        channelCount: 1,
-      },
-      video: withVideo
-        ? { width: { ideal: 1280 }, height: { ideal: 720 } }
-        : false,
-    })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000,
+          channelCount: 1,
+        },
+        // video: withVideo
+        //   ? { width: { ideal: 1280 }, height: { ideal: 720 } }
+        //   : false,
+      })
 
-    getAudioContext().resume()
-    localStreamRef.current = stream
-    return stream
-  }
+      getAudioContext().resume()
+      localStreamRef.current = stream
+      return stream
+    }
 
   // ---- Создать peer (initiator = мы звоним первыми) ----
   const createPeer = useCallback(
@@ -80,10 +82,13 @@ export const useGroupCall = (userId: string | null) => {
 
       const peer = new Peer({
         initiator,
-        trickle: false,
+        trickle: true,
         stream,
         config: {
-          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+          iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "stun:stun1.l.google.com:19302" },
+          ],
         },
       })
 
@@ -292,37 +297,37 @@ export const useGroupCall = (userId: string | null) => {
     dispatch(toggleAudio())
   }, [dispatch])
 
-  // ---- Включить/выключить камеру ----
-  const handleToggleVideo = useCallback(async () => {
-    if (!localStreamRef.current) return
+  // // ---- Включить/выключить камеру ----
+  // const handleToggleVideo = useCallback(async () => {
+  //   if (!localStreamRef.current) return
 
-    const videoTracks = localStreamRef.current.getVideoTracks()
+  //   const videoTracks = localStreamRef.current.getVideoTracks()
 
-    if (videoTracks.length > 0) {
-      // Камера уже есть — просто включаем/выключаем
-      videoTracks.forEach((t) => {
-        t.enabled = !t.enabled
-      })
-    } else {
-      // Камеры нет — запрашиваем и добавляем трек всем peers
-      try {
-        const videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-        })
-        const videoTrack = videoStream.getVideoTracks()[0]
-        localStreamRef.current.addTrack(videoTrack)
+  //   if (videoTracks.length > 0) {
+  //     // Камера уже есть — просто включаем/выключаем
+  //     videoTracks.forEach((t) => {
+  //       t.enabled = !t.enabled
+  //     })
+  //   } else {
+  //     // Камеры нет — запрашиваем и добавляем трек всем peers
+  //     try {
+  //       const videoStream = await navigator.mediaDevices.getUserMedia({
+  //         video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+  //       })
+  //       const videoTrack = videoStream.getVideoTracks()[0]
+  //       localStreamRef.current.addTrack(videoTrack)
 
-        // Добавляем трек всем существующим peer соединениям
-        Object.values(peersRef.current).forEach(({ peer }) => {
-          peer.addTrack(videoTrack, localStreamRef.current!)
-        })
-      } catch (err) {
-        console.error("Не удалось получить камеру", err)
-      }
-    }
+  //       // Добавляем трек всем существующим peer соединениям
+  //       Object.values(peersRef.current).forEach(({ peer }) => {
+  //         peer.addTrack(videoTrack, localStreamRef.current!)
+  //       })
+  //     } catch (err) {
+  //       console.error("Не удалось получить камеру", err)
+  //     }
+  //   }
 
-    dispatch(toggleVideo())
-  }, [dispatch])
+  //   dispatch(toggleVideo())
+  // }, [dispatch])
 
   return {
     localStream: localStreamRef.current,
@@ -330,6 +335,6 @@ export const useGroupCall = (userId: string | null) => {
     joinCall,
     leaveCall,
     handleToggleAudio,
-    handleToggleVideo,
+    // handleToggleVideo,
   }
 }
