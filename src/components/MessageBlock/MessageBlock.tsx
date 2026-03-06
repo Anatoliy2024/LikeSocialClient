@@ -33,7 +33,7 @@ import Spinner from "../ui/spinner/Spinner"
 import Link from "next/link"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import { ArrowBack } from "@/assets/icons/arrowBack"
-import { SendMessage } from "@/assets/icons/sendMessage"
+// import { SendMessage } from "@/assets/icons/sendMessage"
 
 import { formatData } from "@/utils/formatData"
 import { TrashThree } from "@/assets/icons/trashThree"
@@ -43,29 +43,30 @@ import { MessageType } from "@/types/conversation.types"
 import { StartGroupCallButton } from "../StartGroupCallButton/StartGroupCallButton"
 import { GroupCallBanner } from "../GroupCallBanner/GroupCallBanner"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
-import { compressImage } from "@/utils/compressImage"
-import { fileAPI } from "@/api/api"
+// import { compressImage } from "@/utils/compressImage"
+// import { fileAPI } from "@/api/api"
 import Image from "next/image"
 import { MessageReactions } from "../MessageReactions/MessageReactions"
 import { MessageModal } from "../MessageModal/MessageModal"
-import { StickersBlock } from "../StickersBlock/StickersBlock"
-import { Sticker } from "@/assets/icons/sticker"
+// import { StickersBlock } from "../StickersBlock/StickersBlock"
+// import { Sticker } from "@/assets/icons/sticker"
 import { getStickerImage } from "@/utils/getStickerImage"
-import { CancelIcon } from "@/assets/icons/CancelIcon"
-import { ConfirmIcon } from "@/assets/icons/ConfirmIcon"
+import { MessageBlockInput } from "../MessageBlockInput/MessageBlockInput"
+// import { CancelIcon } from "@/assets/icons/CancelIcon"
+// import { ConfirmIcon } from "@/assets/icons/ConfirmIcon"
 
 export const MessageBlock = () => {
   const router = useRouter()
-  const [textMessage, setTextMessage] = useState("")
+  // const [textMessage, setTextMessage] = useState("")
   const [showOption, setShowOption] = useState(false)
   const [confirmConfig, setConfirmConfig] = useState<{
     title: string
     message: string
     onConfirm: () => void
   } | null>(null)
-  const [selectedImage, setSelectedImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
+  // const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  // const [imagePreview, setImagePreview] = useState<string | null>(null)
+  // const [isUploading, setIsUploading] = useState(false)
   const [fullImage, setFullImage] = useState<string | null>(null)
   const [currentMessage, setCurrentMessage] = useState<string | null>(null)
   const [messagePosition, setMessagePosition] = useState<{
@@ -76,13 +77,14 @@ export const MessageBlock = () => {
   } | null>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
-  const [showStickers, setShowStickers] = useState(false)
+  // const [showStickers, setShowStickers] = useState(false)
   const [isEditMessage, setIsEditMessage] = useState({
     messageId: "",
     isEdit: false,
+    text: "",
   })
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  // const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -396,65 +398,65 @@ export const MessageBlock = () => {
     // dispatch(clearPendingNewMessages())
   }
 
-  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  // const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0]
+  //   if (!file) return
 
-    if (imagePreview) URL.revokeObjectURL(imagePreview)
-    const compressed = await compressImage(file)
-    setSelectedImage(compressed as File)
-    setImagePreview(URL.createObjectURL(compressed))
-  }
+  //   if (imagePreview) URL.revokeObjectURL(imagePreview)
+  //   const compressed = await compressImage(file)
+  //   setSelectedImage(compressed as File)
+  //   setImagePreview(URL.createObjectURL(compressed))
+  // }
 
-  useEffect(() => {
-    return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview)
-    }
-  }, [imagePreview])
+  // useEffect(() => {
+  //   return () => {
+  //     if (imagePreview) URL.revokeObjectURL(imagePreview)
+  //   }
+  // }, [imagePreview])
 
-  const handleSendMessage = async () => {
-    // console.log("handleSendMessage")
-    if (!textMessage.trim() && !selectedImage) return
-    try {
-      if (selectedImage) {
-        setIsUploading(true)
-        const data = await fileAPI.uploadChatImage(selectedImage)
-        setIsUploading(false)
-        socket.emit("message:send", {
-          conversationId: id,
-          type: "image",
-          attachments: [data],
-          text: textMessage || undefined,
-        })
-      } else {
-        socket.emit("message:send", {
-          conversationId: id,
-          type: "text",
-          text: textMessage,
-        })
-      }
-      setTextMessage("")
-      setSelectedImage(null)
-      setImagePreview(null)
-      requestAnimationFrame(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-      })
-    } catch (error) {
-      setIsUploading(false)
-      console.log(error)
-    }
-  }
+  // const handleSendMessage = async () => {
+  //   // console.log("handleSendMessage")
+  //   if (!textMessage.trim() && !selectedImage) return
+  //   try {
+  //     if (selectedImage) {
+  //       setIsUploading(true)
+  //       const data = await fileAPI.uploadChatImage(selectedImage)
+  //       setIsUploading(false)
+  //       socket.emit("message:send", {
+  //         conversationId: id,
+  //         type: "image",
+  //         attachments: [data],
+  //         text: textMessage || undefined,
+  //       })
+  //     } else {
+  //       socket.emit("message:send", {
+  //         conversationId: id,
+  //         type: "text",
+  //         text: textMessage,
+  //       })
+  //     }
+  //     setTextMessage("")
+  //     setSelectedImage(null)
+  //     setImagePreview(null)
+  //     requestAnimationFrame(() => {
+  //       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  //     })
+  //   } catch (error) {
+  //     setIsUploading(false)
+  //     console.log(error)
+  //   }
+  // }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-      if (!isEditMessage.isEdit) {
-        handleSendMessage()
-      } else {
-        handleEditMessage()
-      }
-    }
-  }
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === "Enter") {
+  //     e.preventDefault()
+  //     if (!isEditMessage.isEdit) {
+  //       handleSendMessage()
+  //     } else {
+  //       handleEditMessage()
+  //     }
+  //   }
+  // }
 
   const delConversation = async () => {
     try {
@@ -515,25 +517,25 @@ export const MessageBlock = () => {
     return result ?? null
   }, [messages, userId, isInitialized])
 
-  const handleOpenStickers = () => {
-    setShowStickers((prev) => !prev)
-    // setShowStickers(true)
-  }
-  const handleCloseStickers = () => {
-    setShowStickers(false)
-  }
+  // const handleOpenStickers = () => {
+  //   setShowStickers((prev) => !prev)
+  //   // setShowStickers(true)
+  // }
+  // const handleCloseStickers = () => {
+  //   setShowStickers(false)
+  // }
 
-  const handleSendSticker = (stickerId: string) => {
-    socket.emit("message:send", {
-      conversationId: id,
-      type: "sticker",
-      sticker: stickerId,
-    })
-    requestAnimationFrame(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    })
-    handleCloseStickers()
-  }
+  // const handleSendSticker = (stickerId: string) => {
+  //   socket.emit("message:send", {
+  //     conversationId: id,
+  //     type: "sticker",
+  //     sticker: stickerId,
+  //   })
+  //   requestAnimationFrame(() => {
+  //     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  //   })
+  //   handleCloseStickers()
+  // }
   const handleDeleteMessage = (messageId: string) => {
     // console.log("socket connected:", socket.connected)
     socket.emit("messages:delete", {
@@ -541,32 +543,29 @@ export const MessageBlock = () => {
     })
     handleCloseCurrentMessage()
   }
-  const handleEditMessage = () => {
-    // console.log("socket connected:", socket.connected)
-    // console.log("отправляю messages:edit", {
-    //   messageId: isEditMessage.messageId,
-    //   text: textMessage,
-    // })
-    socket.emit("messages:edit", {
-      messageId: isEditMessage.messageId,
-      text: textMessage,
-    })
-    // console.log("handleEditMessage", isEditMessage.messageId)
-    handleCloseEditMessage()
-    // handleCloseCurrentMessage()
-  }
+  // const handleEditMessage = () => {
+
+  //   socket.emit("messages:edit", {
+  //     messageId: isEditMessage.messageId,
+  //     text: textMessage,
+  //   })
+
+  //   handleCloseEditMessage()
+
+  // }
 
   const handleShowEditMessage = (messageId: string, text?: string) => {
-    if (text) {
-      // setEditText(text)
-      setTextMessage(text)
-    }
+    // if (text) {
+    //   // setEditText(text)
+    //   setTextMessage(text)
+    // }
+
     handleCloseCurrentMessage()
-    setIsEditMessage({ messageId, isEdit: true })
+    setIsEditMessage({ messageId, isEdit: true, text: text || "" })
   }
   const handleCloseEditMessage = () => {
-    setIsEditMessage({ messageId: "", isEdit: false })
-    setTextMessage("")
+    setIsEditMessage({ messageId: "", isEdit: false, text: "" })
+    // setTextMessage("")
   }
   console.log("рендер")
   if (!currentConversation && loading) {
@@ -885,8 +884,13 @@ export const MessageBlock = () => {
       )}
 
       {/* ── Инпут ── */}
-
-      <div className={style.messageBlock__newMessageBlock}>
+      <MessageBlockInput
+        id={id}
+        isEditMessage={isEditMessage}
+        messagesEndRef={messagesEndRef}
+        handleCloseEditMessage={handleCloseEditMessage}
+      />
+      {/* <div className={style.messageBlock__newMessageBlock}>
         {isEditMessage.isEdit && (
           <div className={style.messageBlock__editTitle}>редактирование</div>
         )}
@@ -980,7 +984,7 @@ export const MessageBlock = () => {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -2,39 +2,29 @@ import { UserType } from "@/store/thunks/usersThunk"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import style from "./SubBlock.module.scss"
 import Link from "next/link"
-// import { OnlineStatusState } from "@/store/slices/onlineStatusSlice"
+
 import { useAppSelector } from "@/store/hooks"
 import { RootState } from "@/store/store"
-// import { useRouter } from 'next/navigation'
 
 export const SubBlock = ({
   subsData,
   type,
-}: // usersOnline,
-{
+}: {
   subsData: UserType[]
   type: string
-  // usersOnline: OnlineStatusState
 }) => {
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
-  // const router = useRouter()
-  // const handleLinkUser = (userId: string) => {
-  //     router.push(`/profile/${userId}`)
-  //   }
+
   const textControl: Record<string, string> = {
     subscriptions: "Мои подписки:",
     subscribers: "Мои подписчики:",
   }
-  // console.log("usersOnline", usersOnline)
+
   return (
     <div className={style.subBlock}>
       <h3>{textControl[type]}</h3>
       <div className={style.subList}>
         {subsData.map((sub) => {
-          // console.log(
-          //   "usersOnline[sub._id]?.isOnline",
-          //   usersOnline[sub._id]?.isOnline
-          // )
           return (
             <Link key={sub._id} href={`/profile/${sub._id}`}>
               <div className={style.subPerson}>

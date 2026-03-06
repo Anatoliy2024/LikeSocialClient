@@ -11,7 +11,7 @@ import {
 } from "@/store/thunks/profileThunk"
 import ButtonMenu from "@/components/ui/button/Button"
 import { RootState } from "@/store/store"
-// import Image from "next/image"
+
 import { getAgeFromBirthDate } from "@/utils/getAge"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
 import Link from "next/link"
@@ -26,19 +26,15 @@ import { formatData } from "@/utils/formatData"
 import { CreateUserMessageModal } from "@/components/createUserMessageModal/CreateUserMessageModal"
 import { UnSubButton } from "@/assets/icons/unSubButton"
 import { SubButton } from "@/assets/icons/subButton"
-// import { SendMessage } from "@/assets/icons/sendMessage"
+
 import { MessageText } from "@/assets/icons/messageText"
 import { StarButton } from "@/assets/icons/starButton"
-// import { Trash } from "@/assets/icons/trash"
+
 import { ButtonUserStatus } from "@/components/buttonUserStatus/ButtonUserStatus"
 import { getUserStatusThunk } from "@/store/thunks/usersThunk"
-// import { getSocket } from "@/lib/socket"
-// import { startCall } from "@/store/slices/callSlice"
-// import { useCall } from "@/hooks/useCall"
+
 import { useCallContext } from "@/providers/CallContext"
 import { IconCall } from "@/assets/icons/IconCall"
-// import { startCall } from "@/store/slices/callSlice"
-// import { FixedSizeCloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 type FormProfileInfo = {
   name: string
@@ -60,15 +56,9 @@ const ProfileBlock = ({
   const [isEdit, setIsEdit] = useState(false)
   const [changeAvatarModal, setChangeAvatarModal] = useState(false)
   const [showModalCreateMessage, setShowModalCreateMessage] = useState(false)
-  // const renderCount = useRef(0)
-  // renderCount.current++
-  // console.log("ProfileBlock render #", renderCount.current)
-  // const playerId = useAppSelector((state: RootState) => state.auth.userId)
 
-  // const { callStart } = useCall(playerId)
   const { callStart } = useCallContext()
-  // const birthDate = watch("birthDate")
-  // isMyProfilePage={isMyProfilePage} userId={userId}
+
   const dispatch = useAppDispatch()
 
   const profileData = useAppSelector((state: RootState) => state.profile)
@@ -86,14 +76,10 @@ const ProfileBlock = ({
   const avatar = useAppSelector(
     (state: RootState) => state.auth.avatar
   ) as string
-  // const playerId = useAppSelector((state: RootState) => state.auth.userId)
+
   const loading = useAppSelector(
     (state: RootState) => state.profile.profileLoading
   )
-  // const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
-  // const status = !isMyProfilePage
-  //   ? usersOnline[userId as string]
-  //   : { isOnline: true, lastSeen: null }
 
   const userOnlineStatus = useAppSelector((state: RootState) =>
     userId ? state.onlineStatus[userId] : undefined
@@ -157,20 +143,11 @@ const ProfileBlock = ({
         },
       },
     }
-    // console.log("dataToSend after", dataToSend)
+
     dispatch(changeMyProfileThunk(dataToSend))
     // здесь можно собрать данные и отправить на сервер
     setIsEdit(false)
   }
-  // console.log("profileData", profileData)
-
-  // if (profileData.profileLoading) {
-  //   return <div>Загрузка...</div>
-  // }
-
-  //   if (!profileData.profile) {
-  //     return <div>Профиль не найден</div>
-  //   }
 
   useEffect(() => {
     console.log("Компонент смонтирован")
@@ -270,7 +247,6 @@ const ProfileBlock = ({
                     placeholder={profileData.name || "Введите имя"}
                   />
                   {errors.name && <p>{errors.name?.message as string}</p>}
-                  {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
                 </div>
                 <div>
                   <label htmlFor="login">Фамилия:</label>
@@ -282,7 +258,6 @@ const ProfileBlock = ({
                   {errors.sureName && (
                     <p>{errors.sureName?.message as string}</p>
                   )}
-                  {/* Фамилия:{profileData.sureName && <div>{profileData.sureName}</div>} */}
                 </div>
 
                 <div>
@@ -293,22 +268,14 @@ const ProfileBlock = ({
                     placeholder={profileData.status || "Введите статус"}
                   />
                   {errors.status && <p>{errors.status?.message as string}</p>}
-                  {/* Статус:{profileData.status && <div>{profileData.status}</div>} */}
                 </div>
                 <div>
                   <label>Дата рождения:</label>
                   <input type="date" {...register("birthDate")} />
 
-                  {/* <label htmlFor="login">Возраст</label>
-                <input
-                  id="age"
-                  {...register("age")}
-                  placeholder={profileData.age || "Введите возраст"}
-                /> */}
                   {errors.birthDate && (
                     <p>{errors.birthDate?.message as string}</p>
                   )}
-                  {/* Возраст:{profileData.age && <div>{profileData.age}</div>} */}
                 </div>
                 <div>
                   <label htmlFor="login">Страна:</label>
@@ -320,10 +287,6 @@ const ProfileBlock = ({
                     }
                   />
                   {errors.country && <p>{errors.country?.message as string}</p>}
-                  {/* Страна:
-            {profileData.address?.country && (
-              <div>{profileData.address?.country}</div>
-            )} */}
                 </div>
                 <div>
                   <label htmlFor="login">Город:</label>
@@ -333,10 +296,6 @@ const ProfileBlock = ({
                     placeholder={profileData.address.city || "Введите город"}
                   />
                   {errors.city && <p>{errors.city?.message as string}</p>}
-                  {/* Город:
-            {profileData.address?.city && (
-              <div>{profileData.address?.city}</div>
-            )} */}
                 </div>
 
                 <div>
@@ -352,10 +311,6 @@ const ProfileBlock = ({
                   {errors.relationshipStatus && (
                     <p>{errors.relationshipStatus?.message as string}</p>
                   )}
-                  {/* Статус отношений:
-            {profileData.relationshipStatus && (
-              <div>{profileData.relationshipStatus}</div>
-            )} */}
                 </div>
                 <div>
                   <ButtonMenu
@@ -372,12 +327,6 @@ const ProfileBlock = ({
               </form>
             ) : (
               <>
-                {/* {(profileData.name || profileData.isMyProfile) && (
-                  <div>
-                    <span>Имя:</span>
-                    <span>{profileData.name || "Введите имя"}</span>
-                  </div>
-                )} */}
                 <div>
                   <span>Имя:</span>
                   <span>
@@ -418,14 +367,6 @@ const ProfileBlock = ({
                       (profileData.isMyProfile ? "Введите страну" : "пусто")}
                   </span>
                 </div>
-                {/* {(profileData.address?.country || profileData.isMyProfile) && (
-                  <div>
-                    <span>Страна:</span>
-                    <span>
-                      {profileData.address?.country || "Введите страну"}
-                    </span>
-                  </div>
-                )} */}
 
                 {(profileData.address?.city || profileData.isMyProfile) && (
                   <div>
@@ -454,7 +395,7 @@ const ProfileBlock = ({
                   {!isMyProfilePage && (
                     <div
                       className={style.button}
-                      onClick={status?.isOnline ? handleCall : () => {}}
+                      onClick={status?.isOnline ? handleCall : undefined}
                       title={
                         status?.isOnline ? "Позвонить юзеру" : "Юзер офлайн"
                       }
@@ -476,10 +417,8 @@ const ProfileBlock = ({
                       className={style.button}
                       title="Список желаемого"
                       prefetch={false}
-                      // className={style.linkWantToSee}
                     >
                       <StarButton />
-                      {/* <ButtonMenu>Список желаемого</ButtonMenu> */}
                     </Link>
                   )}
 
@@ -490,9 +429,6 @@ const ProfileBlock = ({
                     >
                       <MessageText />
                     </div>
-                    // <ButtonMenu >
-                    //   Написать сообщение
-                    // </ButtonMenu>
                   )}
 
                   {!isMyProfilePage &&
@@ -507,13 +443,6 @@ const ProfileBlock = ({
                         <UnSubButton />
                       </div>
                     ) : (
-                      // <ButtonMenu
-                      //   onClick={() => {
-                      //     if (userId) handleUnsubscribe(userId)
-                      //   }}
-                      // >
-                      //   Отписаться
-                      // </ButtonMenu>
                       <div
                         title="Подписаться"
                         onClick={() => {
@@ -523,31 +452,15 @@ const ProfileBlock = ({
                       >
                         <SubButton />
                       </div>
-                      // <ButtonMenu
-                      //   onClick={() => {
-                      //     if (userId) handleSubscribe(userId)
-                      //   }}
-                      // >
-                      //   Подписаться
-                      // </ButtonMenu>
                     ))}
-                  {
-                    !isMyProfilePage && userId && friendshipStatus && (
-                      <ButtonUserStatus
-                        status={friendshipStatus}
-                        id={userId}
-                        profile="true"
-                        className={style.button}
-                      />
-                    )
-
-                    // friendshipStatus(profileData.friendshipStatus)
-                    // (
-                    //   <div className={style.subButton}>
-                    //     <Trash />
-                    //   </div>
-                    // )
-                  }
+                  {!isMyProfilePage && userId && friendshipStatus && (
+                    <ButtonUserStatus
+                      status={friendshipStatus}
+                      id={userId}
+                      profile="true"
+                      className={style.button}
+                    />
+                  )}
                 </div>
                 {profileData.subscriptions.length > 0 && (
                   <SubBlock

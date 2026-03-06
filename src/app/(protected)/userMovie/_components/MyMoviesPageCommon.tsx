@@ -45,16 +45,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
     pages,
   } = useAppSelector((state: RootState) => state.userMovies)
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
-  console.log(
-    "state.userMovies*****************",
-    myMovies,
-    publicMovies,
-    loading,
-    error,
-    page,
 
-    pages
-  )
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -71,18 +62,6 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
             page: pageFromUrl,
           })
         )
-        // if (activeTab === "wantToSee") {
-        //   dispatch(
-        //     fetchUserMoviesThunk({ status: "wantToSee", page: pageFromUrl })
-        //   )
-        //   // dispatch(fetchMyWantToSeeMoviesThunk(pageFromUrl))
-        // } else {
-        //   dispatch(
-        //     fetchUserMoviesThunk({ status: "watched", page: pageFromUrl })
-        //   )
-
-        //   // dispatch(fetchMyWatchedMoviesThunk(pageFromUrl))
-        // }
       } else {
         if (!userId) return
         dispatch(clearPublicMovies())
@@ -93,29 +72,6 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
             userId,
           })
         )
-        // if (activeTab === "wantToSee") {
-        //   dispatch(
-        //     fetchUserMoviesThunk({
-        //       status: "wantToSee",
-        //       page: pageFromUrl,
-        //       userId,
-        //     })
-        //   )
-
-        //   // dispatch(
-        //   // fetchPublicWantToSeeMoviesThunk({ userId, page: pageFromUrl })
-        //   // )
-        // } else {
-        //   dispatch(
-        //     fetchUserMoviesThunk({
-        //       status: "watched",
-        //       page: pageFromUrl,
-        //       userId,
-        //     })
-        //   )
-
-        //   // dispatch(fetchPublicWatchedMoviesThunk({ userId, page: pageFromUrl }))
-        // }
       }
     }
   }, [dispatch, userId, myMoviesPage, activeTab, isAuth, pageFromUrl])
