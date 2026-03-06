@@ -12,7 +12,7 @@ import {
   markAllNotificationsReadThunk,
 } from "@/store/thunks/notificationsThunk"
 // import throttle from "lodash.throttle"
-import { useHideOnScroll } from "@/hooks/useHideOnScroll"
+// import { useHideOnScroll } from "@/hooks/useHideOnScroll"
 const HeaderContainer = ({
   handleShowToggleMenu,
   showButton,
@@ -55,7 +55,7 @@ const HeaderContainer = ({
     dispatch(markAllNotificationsReadThunk())
   }
 
-  const showHeader = useHideOnScroll()
+  // const showHeader = useHideOnScroll()
 
   return (
     <Header
@@ -71,7 +71,7 @@ const HeaderContainer = ({
       notifications={notifications}
       deleteAllNotifications={deleteAllNotifications}
       markAllNotificationsRead={markAllNotificationsRead}
-      showHeader={showHeader}
+      // showHeader={showHeader}
       // handleShowNotification={handleShowNotification}
       // handleCloseNotification={handleCloseNotification}
     />

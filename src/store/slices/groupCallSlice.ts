@@ -14,7 +14,7 @@ interface GroupCallState {
   groupId: string | null
   participants: Participant[]
   isAudioEnabled: boolean
-  isVideoEnabled: boolean
+  // isVideoEnabled: boolean
 
   activeGroupCalls: Record<string, number> // groupId -> participantsCount
 }
@@ -24,7 +24,7 @@ const initialState: GroupCallState = {
   groupId: null,
   participants: [],
   isAudioEnabled: true,
-  isVideoEnabled: false,
+  // isVideoEnabled: false,
   activeGroupCalls: {},
 }
 
@@ -35,13 +35,16 @@ const groupCallSlice = createSlice({
     joinGroupCall: (state, action: PayloadAction<{ groupId: string }>) => {
       state.status = "inCall"
       state.groupId = action.payload.groupId
+      // console.log("joinGroupCall", state)
     },
     leaveGroupCall: (state) => {
       state.status = "idle"
       state.groupId = null
       state.participants = []
       state.isAudioEnabled = true
-      state.isVideoEnabled = false
+      // console.log("leaveGroupCall", state)
+
+      // state.isVideoEnabled = false
     },
     addParticipant: (state, action: PayloadAction<Participant>) => {
       const exists = state.participants.find(
@@ -59,9 +62,9 @@ const groupCallSlice = createSlice({
     toggleAudio: (state) => {
       state.isAudioEnabled = !state.isAudioEnabled
     },
-    toggleVideo: (state) => {
-      state.isVideoEnabled = !state.isVideoEnabled
-    },
+    // toggleVideo: (state) => {
+    //   state.isVideoEnabled = !state.isVideoEnabled
+    // },
     // Добавь новые редюсеры:
     setGroupCallActive: (
       state,
@@ -69,6 +72,10 @@ const groupCallSlice = createSlice({
     ) => {
       state.activeGroupCalls[action.payload.groupId] =
         action.payload.participantsCount
+      // console.log(
+      //   "state.activeGroupCalls",
+      //   state.activeGroupCalls[action.payload.groupId]
+      // )
     },
     setGroupCallEnded: (state, action: PayloadAction<{ groupId: string }>) => {
       delete state.activeGroupCalls[action.payload.groupId]
@@ -77,10 +84,24 @@ const groupCallSlice = createSlice({
       state,
       action: PayloadAction<{ groupId: string; participantsCount: number }>
     ) => {
-      if (state.activeGroupCalls[action.payload.groupId] !== undefined) {
-        state.activeGroupCalls[action.payload.groupId] =
-          action.payload.participantsCount
-      }
+      const { groupId, participantsCount } = action.payload
+      // console.log("participantsCount", participantsCount)
+      // console.log("groupId", groupId)
+      // console.log("state.activeGroupCalls", state.activeGroupCalls)
+      // if (state.activeGroupCalls[groupId] !== participantsCount) {
+      state.activeGroupCalls[groupId] = participantsCount
+
+      // console.log(
+      //   "state.activeGroupCalls",
+      //   state.activeGroupCalls[action.payload.groupId]
+      // )
+
+      // }
+
+      // if (state.activeGroupCalls[action.payload.groupId] !== undefined) {
+      //   state.activeGroupCalls[action.payload.groupId] =
+      //     action.payload.participantsCount
+      // }
     },
   },
 })
@@ -91,7 +112,7 @@ export const {
   addParticipant,
   removeParticipant,
   toggleAudio,
-  toggleVideo,
+  // toggleVideo,
   setGroupCallActive,
   setGroupCallEnded,
   updateGroupCallCount,

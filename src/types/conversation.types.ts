@@ -104,6 +104,6 @@ export interface ConversationsState {
   lastReadMessageId: string | null // для разделителя
   lastReadMessageDate: string | null
   unreadCount: number // для зелёного кружка
-  pendingNewMessages: number // для кнопки "↓ 3 новых"
+  // pendingNewMessages: number // для кнопки "↓ 3 новых"
   oldestMessageId: string | null
 }

@@ -23,7 +23,7 @@ type HeaderData = {
   notifications: initialStateNotificationsType
   deleteAllNotifications: () => void
   markAllNotificationsRead: () => void
-  showHeader: boolean
+  // showHeader: boolean
   // handleShowNotification:() => void
   // handleCloseNotification:() => void
 }
@@ -42,14 +42,14 @@ export default function Header({
   notifications,
   deleteAllNotifications,
   markAllNotificationsRead,
-  showHeader,
-}: // handleShowNotification,
+}: // showHeader,
+// handleShowNotification,
 // handleCloseNotification
 HeaderData) {
   // console.log("avatar", avatar)
 
   return (
-    <div className={`${style.wrapper} ${!showHeader ? style.hidden : ""}`}>
+    <div className={style.wrapper}>
       <div className={style.logoWrapper}>
         <div>
           <Link href="/">

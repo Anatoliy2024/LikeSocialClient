@@ -1,11 +1,11 @@
 .wrapper {
-  height: 60px;
+  height: 45px;
   // height: min(60px, 30vh);
   background-color: #b687fe;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 5px 20px;
   color: #030032;
   grid-area: h;
   user-select: none;
@@ -16,7 +16,8 @@
   position: fixed;
   transition: transform 0.3s ease;
   width: 100%;
-
+  max-width: 1920px;
+  // margin: 0 auto;
   // .wrapper {
   //   position: fixed;
   //   top: 0;
@@ -35,8 +36,8 @@
     gap: 20px;
 
     img {
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
     }
 
     .hamburger {
@@ -70,8 +71,8 @@
       position: relative;
       .toggleButton {
         color: #28287266;
-        width: 45px;
-        height: 45px;
+        width: 35px;
+        height: 35px;
         // background-color: #ccc;
         display: flex;
         justify-content: center;
@@ -129,11 +130,13 @@
         }
       }
       .avatarBlock {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         overflow: hidden;
         img {
+          width: 100%;
+          height: 100%;
           object-fit: cover;
         }
       }
@@ -166,25 +169,6 @@
     display: flex;
   }
 }
-.hidden {
-  transform: translateY(-100%);
-}
-
-// .hamburger span {
-//   height: 3px;
-//   background-color: black;
-//   border-radius: 2px;
-//   transition: all 0.3s ease;
-// }
-
-// .hamburgerOpen span:nth-child(1) {
-//   transform: rotate(45deg) translate(6px, 6px);
-// }
-
-// .hamburgerOpen span:nth-child(2) {
-//   opacity: 0;
-// }
-
-// .hamburgerOpen span:nth-child(3) {
-//   transform: rotate(-45deg) translate(6px, -6px);
+// .hidden {
+//   transform: translateY(-100%);
 // }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import Peer from "simple-peer"
 import { getSocket } from "@/lib/socket"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
@@ -55,7 +55,7 @@ export const useGroupCall = (userId: string | null) => {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
+          autoGainControl: false,
           sampleRate: 48000,
           channelCount: 1,
         },
@@ -329,12 +329,30 @@ export const useGroupCall = (userId: string | null) => {
   //   dispatch(toggleVideo())
   // }, [dispatch])
 
-  return {
-    localStream: localStreamRef.current,
-    remoteStreams,
-    joinCall,
-    leaveCall,
-    handleToggleAudio,
-    // handleToggleVideo,
-  }
+  return useMemo(
+    () => ({
+      localStream: localStreamRef.current,
+      remoteStreams,
+      joinCall,
+      leaveCall,
+      handleToggleAudio,
+    }),
+    [
+      // 👇 Зависимости:
+      remoteStreams, // если стримы обновились — это честный ререндер
+      joinCall, // уже в useCallback ✅
+      leaveCall, // уже в useCallback ✅
+      handleToggleAudio, // уже в useCallback ✅
+      // localStreamRef.current — ref, не вызывает ререндер, в зависимости не нужен
+    ]
+  )
+
+  // return {
+  //   localStream: localStreamRef.current,
+  //   remoteStreams,
+  //   joinCall,
+  //   leaveCall,
+  //   handleToggleAudio,
+  //   // handleToggleVideo,
+  // }
 }

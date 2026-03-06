@@ -21,7 +21,7 @@ import {
   addMessageFromSocket,
   clearMessages,
   reactionUpdateFromSocket,
-  clearPendingNewMessages,
+  // clearPendingNewMessages,
   readUpdateFromSocket,
   messageDeleteFromSocket,
   messageEditedFromSocket,
@@ -34,7 +34,7 @@ import Link from "next/link"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import { ArrowBack } from "@/assets/icons/arrowBack"
 import { SendMessage } from "@/assets/icons/sendMessage"
-import { useHideOnScroll } from "@/hooks/useHideOnScroll"
+
 import { formatData } from "@/utils/formatData"
 import { TrashThree } from "@/assets/icons/trashThree"
 import { Clear } from "@/assets/icons/clear"
@@ -81,18 +81,15 @@ export const MessageBlock = () => {
     messageId: "",
     isEdit: false,
   })
-  // const [editText, setEditText] = useState("")
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const optionRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  // const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   // 🔥 НОВЫЙ: sentinel для автоподгрузки старых сообщений сверху
   const topSentinelRef = useRef<HTMLDivElement>(null)
 
-  // const lastVisibleMessageIdRef = useRef<string | null>(null)
-  // const readTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dividerRef = useRef<HTMLDivElement>(null)
   const initialScrollDoneRef = useRef(false)
   const initializedIdRef = useRef<string | null>(null)
@@ -124,7 +121,7 @@ export const MessageBlock = () => {
 
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
-  const optionHeaderMessage = useHideOnScroll()
+  // const optionHeaderMessage = useHideOnScroll()
 
   const params = useParams<{ id: string }>()
   if (!params || !params.id) throw new Error("Параметр id не найден")
@@ -169,11 +166,7 @@ export const MessageBlock = () => {
 
     initialScrollDoneRef.current = true
 
-    // if (lastReadMessageId && dividerRef.current) {
-    //   dividerRef.current.scrollIntoView({ block: "center" })
-    // } else {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" })
-    // }
   }, [hasLoaded, messages.length])
 
   // ─────────────────────────────────────────
@@ -194,7 +187,7 @@ export const MessageBlock = () => {
       if (isAtBottomRef.current) {
         requestAnimationFrame(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-          dispatch(clearPendingNewMessages())
+          // dispatch(clearPendingNewMessages())
         })
       }
     }
@@ -264,13 +257,17 @@ export const MessageBlock = () => {
   // Убираешь старый useEffect с restoreScrollRef и заменяешь на:
   useLayoutEffect(() => {
     if (!restoreScrollRef.current || messages.length === 0) return
+    const container = messagesContainerRef.current
+    if (!container) return
 
     const { top: prevTop, height: prevHeight } = restoreScrollRef.current
-    const newHeight = document.documentElement.scrollHeight
+    const newHeight = container.scrollHeight
+    // const newHeight = document.documentElement.scrollHeight
     const diff = newHeight - prevHeight
 
     if (diff !== 0) {
-      document.documentElement.scrollTop = prevTop + diff
+      container.scrollTop = prevTop + diff
+      // document.documentElement.scrollTop = prevTop + diff
     }
 
     restoreScrollRef.current = null
@@ -280,38 +277,44 @@ export const MessageBlock = () => {
   // Отслеживаем позицию скролла — внизу или нет
   // ─────────────────────────────────────────
   const handleScroll = useCallback(() => {
-    const threshold = 700
+    const container = messagesContainerRef.current
+    // console.log("container", container)
+    if (!container) return
+    // console.log("container after", container)
+
+    const threshold = 100
     const atBottom =
-      document.documentElement.scrollHeight -
-        window.scrollY -
-        window.innerHeight <
+      container.scrollHeight - container.scrollTop - container.clientHeight <
       threshold
+    // console.log("handleScroll")
+    // console.log({
+    //   scrollHeight: container.scrollHeight,
+    //   scrollTop: container.scrollTop,
+    //   clientHeight: container.clientHeight,
+    //   diff:
+    //     container.scrollHeight - container.scrollTop - container.clientHeight,
+    //   atBottom,
+    // })
 
     setIsAtBottom(atBottom)
-    if (atBottom) dispatch(clearPendingNewMessages())
-  }, [dispatch])
+    // if (atBottom) dispatch(clearPendingNewMessages())
+  }, [])
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [handleScroll])
-
-  // const handleScroll = useCallback(() => {
-  //   const container = messagesContainerRef.current
-  //   if (!container) return
-
-  //   const threshold = 100
-  //   const atBottom =
-  //     container.scrollHeight - container.scrollTop - container.clientHeight <
-  //     threshold
-
-  //   setIsAtBottom(atBottom)
-  //   if (atBottom) dispatch(clearPendingNewMessages())
-  // }, [dispatch])
+  const handleContainerRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      messagesContainerRef.current = node
+      if (!node) return
+      node.addEventListener("scroll", handleScroll, { passive: true })
+    },
+    [handleScroll]
+  )
 
   // useEffect(() => {
   //   const container = messagesContainerRef.current
+  //   console.log("container", container)
+
   //   if (!container) return
+  //   console.log("container after", container)
 
   //   container.addEventListener("scroll", handleScroll, { passive: true })
   //   return () => container.removeEventListener("scroll", handleScroll)
@@ -349,11 +352,12 @@ export const MessageBlock = () => {
   // ─────────────────────────────────────────
   const handleLoadOlder = useCallback(() => {
     if (!hasMoreOlder || loading || !oldestMessageId) return
-
+    const container = messagesContainerRef.current
+    if (!container) return
     // Сохраняем ДО диспатча
     restoreScrollRef.current = {
-      top: document.documentElement.scrollTop,
-      height: document.documentElement.scrollHeight,
+      top: container.scrollTop,
+      height: container.scrollHeight,
     }
 
     // Без await — просто запускаем, useLayoutEffect поймает изменение messages
@@ -368,6 +372,8 @@ export const MessageBlock = () => {
 
   useEffect(() => {
     if (!hasMoreOlder || !topSentinelRef.current) return
+    const container = messagesContainerRef.current
+    if (!container) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -376,8 +382,8 @@ export const MessageBlock = () => {
         }
       },
       {
+        root: container,
         threshold: 0.1,
-        rootMargin: "-120px 0px 0px 0px", // 🔥 Сработает только в верхней части экрана
       }
     )
 
@@ -387,7 +393,7 @@ export const MessageBlock = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    dispatch(clearPendingNewMessages())
+    // dispatch(clearPendingNewMessages())
   }
 
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -562,7 +568,7 @@ export const MessageBlock = () => {
     setIsEditMessage({ messageId: "", isEdit: false })
     setTextMessage("")
   }
-
+  console.log("рендер")
   if (!currentConversation && loading) {
     return (
       <div style={{ paddingTop: "50px" }}>
@@ -628,11 +634,7 @@ export const MessageBlock = () => {
       />
 
       {/* ── Шапка ── */}
-      <div
-        className={`${style.messageBlock__userInfo} ${
-          !optionHeaderMessage ? style.messageBlock__moveHeader : ""
-        }`}
-      >
+      <div className={style.messageBlock__userInfo}>
         <div className={style.messageBlock__userInfoContainer}>
           <Link
             href="/conversations/"
@@ -751,7 +753,7 @@ export const MessageBlock = () => {
       {/* ── Список сообщений ── */}
       <div
         className={style.messageBlock__contentMessageBlock}
-        // ref={messagesContainerRef}
+        ref={handleContainerRef}
       >
         {/* 🔥 Sentinel для автоподгрузки старых сообщений (вместо кнопки) */}
         {hasMoreOlder && <div ref={topSentinelRef} style={{ height: 1 }} />}
@@ -873,20 +875,20 @@ export const MessageBlock = () => {
         {/* Якорь для скролла вниз */}
         <div ref={messagesEndRef} />
       </div>
+      {!isAtBottom && (
+        <button
+          className={style.messageBlock__scrollToBottom}
+          onClick={scrollToBottom}
+        >
+          ↓ Вниз
+        </button>
+      )}
 
       {/* ── Инпут ── */}
 
       <div className={style.messageBlock__newMessageBlock}>
         {isEditMessage.isEdit && (
           <div className={style.messageBlock__editTitle}>редактирование</div>
-        )}
-        {!isAtBottom && (
-          <button
-            className={style.messageBlock__scrollToBottom}
-            onClick={scrollToBottom}
-          >
-            ↓ Вниз
-          </button>
         )}
 
         <div className={style.messageBlock__newMessageBlockInput}>
@@ -970,8 +972,6 @@ export const MessageBlock = () => {
         )}
         {isEditMessage.isEdit && (
           <div className={style.messageBlock__editButton}>
-            {/* <div>Редактирование</div>
-          <div>editText:{editText}</div> */}
             <div onClick={handleCloseEditMessage}>
               <CancelIcon />
             </div>

@@ -15,6 +15,8 @@ export const GroupCallProvider = ({
   const userId = useAppSelector((state: RootState) => state.auth.userId)
   const call = useGroupCall(userId)
 
+  // const contextValue = useMemo(() => call, [call])
+
   return (
     <GroupCallContext.Provider value={call}>
       {children}

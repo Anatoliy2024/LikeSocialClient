@@ -44,7 +44,7 @@ const initialState: ConversationsState = {
   lastReadMessageId: null, // для разделителя
   lastReadMessageDate: null as string | null,
   unreadCount: 0, // для зелёного кружка
-  pendingNewMessages: 0, // для кнопки "↓ 3 новых"
+  // pendingNewMessages: 0, // для кнопки "↓ 3 новых"
   oldestMessageId: null, // cursor для подгрузки старых
   // newestMessageId: null, // cursor для подгрузки новых
 }
@@ -55,13 +55,13 @@ const conversationSlice = createSlice({
   reducers: {
     addMessageFromSocket(state, action: PayloadAction<MessageType>) {
       state.messages.push(action.payload)
-      state.pendingNewMessages += 1
+      // state.pendingNewMessages += 1
       // state.newestMessageId = action.payload._id
     },
 
-    clearPendingNewMessages(state) {
-      state.pendingNewMessages = 0
-    },
+    // clearPendingNewMessages(state) {
+    //   state.pendingNewMessages = 0
+    // },
 
     reactionUpdateFromSocket(state, action) {
       const message = state.messages.find(
@@ -121,7 +121,7 @@ const conversationSlice = createSlice({
       // state.newestMessageId = null
       state.lastReadMessageId = null
       state.unreadCount = 0
-      state.pendingNewMessages = 0
+      // state.pendingNewMessages = 0
     },
     clearMessageViewers(state) {
       state.messageViewers = {
@@ -375,7 +375,7 @@ export const {
   messageDeleteFromSocket,
   readUpdateFromSocket,
   messageEditedFromSocket,
-  clearPendingNewMessages,
+  // clearPendingNewMessages,
   clearMessageViewers,
 } = conversationSlice.actions
 
