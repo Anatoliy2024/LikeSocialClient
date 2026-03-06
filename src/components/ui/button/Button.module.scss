@@ -1,13 +1,14 @@
 .button {
   cursor: pointer;
-  padding: 10px;
+  font-size: 1.1rem;
+  padding: 5px 10px;
   background-color: #9451f8;
   border-radius: 10px;
   min-width: 100px;
   text-align: center;
   // font-size: vw;
   @media (max-width: 400px) {
-    padding: 10px 5px;
+    // padding: 10px 5px;
     min-width: 0px;
   }
   // display: flex;
