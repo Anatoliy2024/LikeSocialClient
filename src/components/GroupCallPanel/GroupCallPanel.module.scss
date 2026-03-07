@@ -54,6 +54,55 @@
 .count {
   font-size: 12px;
   color: #666;
+  cursor: pointer;
+  border-radius: 12px;
+  position: relative;
+  padding: 5px;
+  user-select: none;
+  text-wrap: nowrap;
+  &:hover {
+    background-color: rgb(110, 110, 110);
+    color: white;
+  }
+  ul {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    top: calc(-100% - 20px);
+    left: 0;
+    background: white;
+    border-radius: 12px;
+    padding: 5px;
+    color: rgb(0, 0, 0);
+  }
+}
+.userInfo {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 3px;
+  border-radius: 12px;
+  &:hover {
+    background: rgba(0, 0, 0, 0.115);
+  }
+}
+.blockImg {
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 50%;
+  img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    object-fit: cover;
+  }
+}
+
+.active {
+  background: rgba(152, 152, 152, 0.459);
+  color: rgb(255, 255, 255);
 }
 
 .streams {

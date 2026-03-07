@@ -147,6 +147,25 @@ export const userAPI = {
   unsubscribeFromUser(userId: string) {
     return instance.post(`user/unsubscribe`, { userId }).then((res) => res.data)
   },
+  getCallParticipant(userIds: string[] | string) {
+    return instance
+      .get(`user/userIds`, {
+        params: { userIds },
+        paramsSerializer: (params) => {
+          return Object.entries(params)
+            .map(([key, value]) => {
+              if (Array.isArray(value)) {
+                return value
+                  .map((v) => `${key}=${encodeURIComponent(v)}`)
+                  .join("&")
+              }
+              return `${key}=${encodeURIComponent(value)}`
+            })
+            .join("&")
+        },
+      })
+      .then((res) => res.data)
+  },
 }
 
 export const postAPI = {

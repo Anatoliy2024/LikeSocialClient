@@ -4,6 +4,7 @@ import {
   acceptFriendThunk,
   cancelRequestFriendThunk,
   delFriendThunk,
+  fetchUsersBulkThunk,
   getAllUsersThunk,
   getMyFriendsIdThunk,
   getUserRelationsThunk,
@@ -11,6 +12,7 @@ import {
   // ProfileFriendResponse,
   RequestFriendResponse,
   requestFriendThunk,
+  // upsertCallParticipantThunk,
 } from "../thunks/usersThunk"
 
 import { UserTypeReq } from "../thunks/usersThunk"
@@ -23,6 +25,16 @@ type InitialStateUserType = {
   friends: UserTypeReq
   sentFriendRequests: UserTypeReq
   friendshipStatus: "friend" | "incoming" | "outgoing" | "none" | null
+
+  // 👇 НОВОЕ: Простой кэш для звонков (только то, что нужно для отображения)
+  callParticipantsCache: Record<
+    string,
+    {
+      _id: string
+      username: string
+      avatar?: string
+    }
+  >
 }
 
 const initialState: InitialStateUserType = {
@@ -46,6 +58,9 @@ const initialState: InitialStateUserType = {
   friends: { users: [], page: 1, limit: 10, total: 0, pages: 0 },
   sentFriendRequests: { users: [], page: 1, limit: 10, total: 0, pages: 0 },
   friendshipStatus: null,
+
+  // 👇 Инициализация пустого кэша
+  callParticipantsCache: {},
 }
 
 function isUserTypeReq(data: RequestFriendResponse): data is UserTypeReq {
@@ -55,7 +70,22 @@ function isUserTypeReq(data: RequestFriendResponse): data is UserTypeReq {
 const usersSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {},
+  reducers: {
+    // // 👇 НОВЫЙ: Добавить/обновить пользователя в кэше звонков
+    // upsertCallParticipant: (
+    //   state,
+    //   action: PayloadAction<{ id: string; name: string; avatar: string }>
+    // ) => {
+    //   const { id, name, avatar } = action.payload
+    //   // Просто перезаписываем или добавляем — ничего не удаляем
+    //   state.callParticipantsCache[id] = { id, name, avatar }
+    // },
+
+    // 👇 Опционально: очистить кэш (например, при логауте)
+    clearCallParticipantsCache: (state) => {
+      state.callParticipantsCache = {}
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getAllUsersThunk.pending, (state) => {
@@ -283,7 +313,30 @@ const usersSlice = createSlice({
           action.error.message ||
           "Ошибка при запрос на получении всех id friends"
       })
+      .addCase(fetchUsersBulkThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchUsersBulkThunk.fulfilled, (state, action) => {
+        state.loading = false
+        // const { _id, username, avatar } =
+        action.payload.users.map((user) => {
+          state.callParticipantsCache[user._id] = {
+            _id: user._id,
+            username: user.username,
+            avatar: user.avatar,
+          }
+        })
+        // console.log("upsertCallParticipantThunk", action.payload)
+        // state.friendshipStatus = action.payload.friendshipStatus
+      })
+      .addCase(fetchUsersBulkThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Ошибка при запросе Participants"
+      })
   },
 })
+
+export const { clearCallParticipantsCache } = usersSlice.actions
 
 export default usersSlice.reducer

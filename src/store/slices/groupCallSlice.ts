@@ -6,7 +6,7 @@ interface Participant {
   userId: string
   socketId: string
   audioEnabled: boolean
-  videoEnabled: boolean
+  // videoEnabled: boolean
 }
 
 interface GroupCallState {
@@ -85,23 +85,8 @@ const groupCallSlice = createSlice({
       action: PayloadAction<{ groupId: string; participantsCount: number }>
     ) => {
       const { groupId, participantsCount } = action.payload
-      // console.log("participantsCount", participantsCount)
-      // console.log("groupId", groupId)
-      // console.log("state.activeGroupCalls", state.activeGroupCalls)
-      // if (state.activeGroupCalls[groupId] !== participantsCount) {
+
       state.activeGroupCalls[groupId] = participantsCount
-
-      // console.log(
-      //   "state.activeGroupCalls",
-      //   state.activeGroupCalls[action.payload.groupId]
-      // )
-
-      // }
-
-      // if (state.activeGroupCalls[action.payload.groupId] !== undefined) {
-      //   state.activeGroupCalls[action.payload.groupId] =
-      //     action.payload.participantsCount
-      // }
     },
   },
 })

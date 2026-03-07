@@ -3,6 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 // import { userPostType } from "../slices/userPostsSlice"
 import { userAPI } from "@/api/api"
+import { RootState } from "../store"
 
 export type UserType = {
   username: string
@@ -173,5 +174,41 @@ export const getUserStatusThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue("Ошибка при запросе всех юзеров")
+  }
+})
+export const fetchUsersBulkThunk = createAsyncThunk<
+  { users: { _id: string; username: string; avatar: string }[] },
+  string[] | string,
+  { rejectValue: string; state: RootState }
+>("user/fetchUsersBulk", async (userIds, thunkAPI) => {
+  try {
+    // 🔹 1. Нормализуем вход: всегда массив строк
+    const idsArray = Array.isArray(userIds) ? userIds : [userIds]
+
+    // 🔹 2. Получаем стейт для проверки кэша
+    const state = thunkAPI.getState()
+    const cache = state.users.callParticipantsCache
+
+    // 🔹 3. Фильтруем: оставляем только тех, кого НЕТ в кэше
+    const missingIds = idsArray.filter(
+      (id) => id && !cache?.[id] // id должен быть и не должен быть в кэше
+    )
+
+    // 🔹 4. Если все уже в кэше — не делаем запрос, возвращаем пустой результат
+    if (missingIds.length === 0) {
+      return { users: [] }
+    }
+
+    const data = await userAPI.getCallParticipant(missingIds)
+
+    return data
+  } catch (error: unknown) {
+    // Проверка, является ли ошибка ошибкой Axios
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+
+    // если это вообще не ошибка axios или нет message
+    return thunkAPI.rejectWithValue("Ошибка при запросе CallParticipant")
   }
 })

@@ -1,13 +1,21 @@
 "use client"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useAppSelector } from "@/store/hooks"
 // import { useGroupCallContext } from "@/app/GroupCallProvider"
 import { RootState } from "@/store/store"
 import styles from "./GroupCallPanel.module.scss"
 import { useGroupCallContext } from "@/providers/GroupCallProvider"
+import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+import Link from "next/link"
 
 export const GroupCallPanel = () => {
+  const [showMembers, setShowMembers] = useState(false)
   const status = useAppSelector((s: RootState) => s.groupCall.status)
+
+  const callParticipantsCache = useAppSelector(
+    (s: RootState) => s.users.callParticipantsCache
+  )
+
   const {
     isAudioEnabled,
     // isVideoEnabled,
@@ -23,12 +31,50 @@ export const GroupCallPanel = () => {
 
   if (status !== "inCall") return null
 
+  const handleToggleMembers = () => {
+    setShowMembers((prev) => !prev)
+  }
+
   return (
     <div className={styles.panel}>
-      <div className={styles.info}>
+      <div className={styles.info} onClick={handleToggleMembers}>
         <span className={styles.dot} />
-        <span className={styles.label}>Voice</span>
-        <span className={styles.count}>{participants.length + 1} member</span>
+        <span className={styles.label}>Voice </span>
+        <span
+          className={`${styles.count} ${showMembers ? styles.active : ""}`}
+          title="Участники голосового чата"
+        >
+          {participants.length + 1} member
+          {showMembers && participants.length > 0 && (
+            <ul onClick={(e) => e.stopPropagation()}>
+              {participants.map((participant) => {
+                const user = callParticipantsCache[participant.userId]
+                if (!user) return
+                return (
+                  <li key={participant.userId}>
+                    <Link
+                      href={`/profile/${user._id}`}
+                      className={styles.userInfo}
+                    >
+                      {user?.avatar && (
+                        <div className={styles.blockImg}>
+                          <CloudinaryImage
+                            src={user.avatar}
+                            alt="avatar"
+                            width={100}
+                            height={100}
+                          />
+                        </div>
+                      )}
+
+                      <div className={styles.username}>{user.username}</div>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </span>
       </div>
 
       <div className={styles.streams}>
