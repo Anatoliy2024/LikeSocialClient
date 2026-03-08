@@ -135,7 +135,9 @@ HeaderData) {
             <ArrowBottom />
           </div>
           <div className={style.menu}>
-            <button>Настройки</button>
+            <button>
+              <Link href={"/user-options"}>Настройки</Link>
+            </button>
             <button
               onClick={() => {
                 logoutFn()

@@ -4,6 +4,7 @@ import { store } from "@/store/store"
 
 import InnerApp from "./InnerApp"
 import { CallProvider } from "./CallContext"
+import { SoundNotificationListener } from "@/components/SoundNotificationListener/SoundNotificationListener"
 
 export default function ReduxProvider({
   children,
@@ -14,6 +15,7 @@ export default function ReduxProvider({
     <Provider store={store}>
       <CallProvider>
         <InnerApp>{children}</InnerApp>
+        <SoundNotificationListener />
       </CallProvider>
     </Provider>
   )

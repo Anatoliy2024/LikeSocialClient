@@ -47,6 +47,7 @@ import { MessageModal } from "../MessageModal/MessageModal"
 
 import { getStickerImage } from "@/utils/getStickerImage"
 import { MessageBlockInput } from "../MessageBlockInput/MessageBlockInput"
+// import { SoundToggle } from "../SoundToggle/SoundToggle"
 
 export const MessageBlock = () => {
   const router = useRouter()
