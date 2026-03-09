@@ -110,6 +110,7 @@ export function useNotification() {
     } catch (err) {
       console.error("❌ Ошибка запроса разрешения:", err)
       setError("Произошла ошибка при настройке уведомлений")
+      alert("Произошла ошибка при настройке уведомлений")
     } finally {
       setLoading(false)
     }
@@ -120,9 +121,11 @@ export function useNotification() {
       await userAPI.dellAllFcmTokens()
       setToken(null)
       setPermission("default")
+
       console.log("✅ Токены очищены")
     } catch (err) {
       console.error("❌ Ошибка очистки токенов:", err)
+      alert("Ошибка очистки токенов")
     }
   }, [])
 
