@@ -2,7 +2,7 @@
 "use client"
 
 import { useNotification } from "@/hooks/useNotification"
-
+import style from "./NotificationToggleButton.module.scss"
 export default function NotificationToggleButton() {
   const { permission, loading, isReady, requestPermission } = useNotification()
 
@@ -16,7 +16,7 @@ export default function NotificationToggleButton() {
     <button
       onClick={requestPermission}
       disabled={loading}
-      className="text-sm text-blue-600 hover:underline disabled:opacity-50"
+      className={style.notificationToggleButton}
       aria-label="Включить пуш-уведомления"
     >
       {loading ? "⏳ Подключение..." : "🔔 Включить уведомления"}
