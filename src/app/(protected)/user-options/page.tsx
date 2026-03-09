@@ -1,24 +1,29 @@
 "use client"
-import NotificationToggleButton from "@/components/NotificationToggleButton/NotificationToggleButton"
+// import NotificationToggleButton from "@/components/NotificationToggleButton/NotificationToggleButton"
 import { SoundToggle } from "@/components/SoundToggle/SoundToggle"
-import { useNotification } from "@/hooks/useNotification"
+// import { useNotification } from "@/hooks/useNotification"
 import style from "./UserOptions.module.scss"
+import { PushNotificationToggle } from "@/components/PushNotificationToggle/PushNotificationToggle"
 
 export default function UserOption() {
-  const { permission, error, token, clearTokens } = useNotification()
+  // const { permission, error, token, clearTokens } = useNotification()
   return (
     <div className={style.userOption}>
       <h1>Настройки</h1>
       <div>
         <SoundToggle />
       </div>
-      <section className="space-y-4">
+      <div>
+        <h2>Уведомления</h2>
+        <PushNotificationToggle />
+      </div>
+      {/* <section className="space-y-4">
         <h2 className="text-xl font-semibold">🔔 Push-уведомления</h2>
 
-        {/* Кнопка включения (показывается только если ещё не решили) */}
+        Кнопка включения (показывается только если ещё не решили) 
         <NotificationToggleButton />
 
-        {/* Статус: разрешено */}
+     
         {permission === "granted" && (
           <div className="flex items-center gap-2 text-green-600">
             <span>✅</span>
@@ -31,7 +36,7 @@ export default function UserOption() {
           </div>
         )}
 
-        {/* Статус: заблокировано */}
+       
         {permission === "denied" && (
           <div className="flex items-center gap-2 text-red-600">
             <span>❌</span>
@@ -42,12 +47,12 @@ export default function UserOption() {
           </div>
         )}
 
-        {/* Ошибка */}
+      
         {error && (
           <div className="text-sm text-red-500 bg-red-50 p-2 rounded">
             ⚠️ {error}
           </div>
-        )}
+        )} 
 
         <button
           onClick={clearTokens}
@@ -55,7 +60,7 @@ export default function UserOption() {
         >
           удалить все уведомления
         </button>
-      </section>
+      </section> */}
     </div>
   )
 }

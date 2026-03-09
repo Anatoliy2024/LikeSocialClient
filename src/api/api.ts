@@ -1,5 +1,5 @@
 import instance from "./instance"
-
+import { PushSubscriptionJSON } from "@/lib/push-client"
 import { ProfileType } from "@/store/thunks/profileThunk"
 // import { createUserMovieType } from "@/store/thunks/userMoviesThunk"
 
@@ -166,13 +166,26 @@ export const userAPI = {
       })
       .then((res) => res.data)
   },
-  saveFcmToken(token: string, platform: string) {
+  // saveFcmToken(token: string, platform: string) {
+  //   return instance
+  //     .post(`user/fcm-token/save`, { token, platform })
+  //     .then((res) => res.data)
+  // },
+  // dellAllFcmTokens() {
+  //   return instance.post(`user/fcm-token/dell-all`).then((res) => res.data)
+  // },
+
+  savePushSubscription(subscription: PushSubscriptionJSON) {
     return instance
-      .post(`user/fcm-token/save`, { token, platform })
+      .post(`user/push-subscription/save`, { subscription })
       .then((res) => res.data)
   },
-  dellAllFcmTokens() {
-    return instance.post(`user/fcm-token/dell-all`).then((res) => res.data)
+
+  // Удаление подписки (отписка)
+  removePushSubscription() {
+    return instance
+      .post(`user/push-subscription/remove`)
+      .then((res) => res.data)
   },
 }
 

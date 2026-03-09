@@ -4,8 +4,8 @@ import axios from "axios"
 export const baseApiUrl = process.env.NEXT_PUBLIC_API_URL
   ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "") // убираем слеш в конце, если есть
   : process.env.NODE_ENV === "development"
-  ? "http://localhost:5000"
-  : "https://likesocial.onrender.com"
+    ? "http://localhost:5000"
+    : "https://likesocial.onrender.com"
 
 // Добавляем /api в конце
 export const baseURL = baseApiUrl + "/api"
@@ -59,7 +59,7 @@ instance.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  }
+  },
 )
 
 export default instance
