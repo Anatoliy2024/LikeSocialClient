@@ -55,8 +55,14 @@ export function useNotification() {
     }
 
     try {
+      // Явно регистрируем SW
+      await navigator.serviceWorker.register("/firebase-messaging-sw.js")
+      // ready возвращает готовый SW, используй его
+      const readyRegistration = await navigator.serviceWorker.ready
+
       const currentToken = await getToken(messaging, {
         vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+        serviceWorkerRegistration: readyRegistration, // вот так
       })
 
       if (currentToken) {
@@ -71,18 +77,6 @@ export function useNotification() {
     } catch (err) {
       console.error("❌ Ошибка получения токена:", err)
       setError("Не удалось получить токен уведомлений")
-
-      // // 🔥 Специальная обработка для AbortError
-      // if (
-      //   err.name === "AbortError" ||
-      //   err.message?.includes("push service error")
-      // ) {
-      //   setError(
-      //     "Браузер не может подключиться к сервису уведомлений. Проверь сеть и настройки.",
-      //   )
-      // } else {
-      //   setError("Не удалось получить токен: " + err.message)
-      // }
     }
   }, [])
 
