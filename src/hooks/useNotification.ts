@@ -1,0 +1,224 @@
+// hooks/useNotification.ts
+"use client"
+
+import { useEffect, useState, useCallback } from "react"
+import { messaging, getToken, onMessage } from "@/lib/firebase"
+import type { Unsubscribe } from "firebase/messaging"
+// import { fcmTokenAPI } from "@/api/fcmTokenAPI"
+import { getPlatform } from "@/utils/getPlatform"
+import { userAPI } from "@/api/api"
+
+export function useNotification() {
+  // 🔥 Стейты
+  const [token, setToken] = useState<string | null>(null)
+  const [permission, setPermission] =
+    useState<NotificationPermission>("default")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // 🔥 Флаг монтирования (для гидратации)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // 🔥 Подписка на сообщения (чтобы отписаться при размонтировании)
+  const [messageListener, setMessageListener] = useState<Unsubscribe | null>(
+    null,
+  )
+
+  // ✅ 1. После монтирования синхронизируемся с браузером
+  useEffect(() => {
+    setIsMounted(true)
+    if (typeof window !== "undefined" && "Notification" in window) {
+      // Читаем реальный статус разрешения
+      const currentPermission = Notification.permission
+      setPermission(currentPermission)
+
+      // Если уже разрешено — сразу получаем токен
+      if (currentPermission === "granted" && messaging) {
+        console.log("Сработал хук  с fetchAndSaveToken")
+        fetchAndSaveToken()
+      }
+    }
+
+    return () => {
+      // Чистим подписку при размонтировании
+      if (messageListener) {
+        messageListener()
+      }
+    }
+  }, [])
+
+  // ✅ 2. Функция получения и сохранения токена (вынесена отдельно)
+  const fetchAndSaveToken = useCallback(async () => {
+    if (!messaging) {
+      console.error("❌ Firebase Messaging не инициализирован")
+      return
+    }
+
+    try {
+      const currentToken = await getToken(messaging, {
+        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+      })
+
+      if (currentToken) {
+        setToken(currentToken)
+        console.log("🎫 FCM Token:", currentToken)
+
+        // 🚀 Отправляем на бэкенд
+        // await fcmTokenAPI.saveFcmToken(currentToken)
+        await userAPI.saveFcmToken(currentToken, getPlatform())
+        console.log("✅ Токен сохранён на сервере")
+      }
+    } catch (err) {
+      console.error("❌ Ошибка получения токена:", err)
+      setError("Не удалось получить токен уведомлений")
+
+      // // 🔥 Специальная обработка для AbortError
+      // if (
+      //   err.name === "AbortError" ||
+      //   err.message?.includes("push service error")
+      // ) {
+      //   setError(
+      //     "Браузер не может подключиться к сервису уведомлений. Проверь сеть и настройки.",
+      //   )
+      // } else {
+      //   setError("Не удалось получить токен: " + err.message)
+      // }
+    }
+  }, [])
+
+  // ✅ 3. Основная функция: запрос разрешения
+  const requestPermission = useCallback(async () => {
+    if (!messaging) {
+      setError("Firebase Messaging не доступен")
+      return
+    }
+
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Запрашиваем разрешение у браузера
+      const result = await Notification.requestPermission()
+      setPermission(result)
+
+      if (result === "granted") {
+        await fetchAndSaveToken()
+      } else if (result === "denied") {
+        console.warn("⚠️ Пользователь заблокировал уведомления")
+        setError("Уведомления заблокированы в настройках браузера")
+      }
+    } catch (err) {
+      console.error("❌ Ошибка запроса разрешения:", err)
+      setError("Произошла ошибка при настройке уведомлений")
+    } finally {
+      setLoading(false)
+    }
+  }, [fetchAndSaveToken])
+
+  const clearTokens = useCallback(async () => {
+    try {
+      await userAPI.dellAllFcmTokens()
+      setToken(null)
+      setPermission("default")
+      console.log("✅ Токены очищены")
+    } catch (err) {
+      console.error("❌ Ошибка очистки токенов:", err)
+    }
+  }, [])
+
+  // ✅ 4. Подписка на сообщения в фоне (когда вкладка активна)
+  useEffect(() => {
+    if (!messaging || permission !== "granted") return
+
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("📨 Получено сообщение в фоне:", payload)
+
+      // 🔔 Здесь можно показать кастомное уведомление в интерфейсе
+      // Например, через toast-библиотеку
+      if (payload.notification?.title) {
+        // new Toast({ title: payload.notification.title, ... })
+      }
+    })
+
+    setMessageListener(() => unsubscribe)
+
+    return () => {
+      unsubscribe()
+    }
+  }, [messaging, permission])
+
+  // ✅ 5. Возвращаем всё, что нужно компоненту
+  return {
+    token,
+    permission,
+    loading,
+    error,
+    isReady: isMounted && messaging !== null,
+    requestPermission,
+    // Экспортируем на случай, если нужно вызвать вручную
+    refreshToken: fetchAndSaveToken,
+    clearTokens,
+  }
+}
+// // hooks/useNotification.ts
+// import { useEffect, useState } from "react"
+// import { messaging, getToken, onMessage } from "@/lib/firebase"
+// import { fcmTokenAPI } from "@/api/fcmTokenAPI"
+
+// export function useNotification() {
+//   const [token, setToken] = useState<string | null>(null)
+//   // 🔥 Инициализируем реальным статусом браузера, а не 'default'
+//   const [permission, setPermission] = useState<NotificationPermission>(
+//     typeof window !== "undefined" ? Notification.permission : "default"
+//   )
+//   const [loading, setLoading] = useState(false)
+
+//   // 🔥 Проверяем, есть ли уже токен, если разрешение уже дано
+//   useEffect(() => {
+//     if (permission === "granted" && messaging) {
+//       // Пытаемся получить существующий токен
+//       getToken(messaging, {
+//         vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+//       })
+//         .then((currentToken) => {
+//           if (currentToken) {
+//             setToken(currentToken)
+//             console.log("🎫 Найден существующий FCM Token:", currentToken)
+//           }
+//         })
+//         .catch((err) => console.warn("⚠️ Не удалось получить токен:", err))
+//     }
+//   }, [permission])
+
+//   const requestPermission = async () => {
+//     if (!messaging) {
+//       console.error("❌ messaging не инициализирован")
+//       return
+//     }
+
+//     try {
+//       setLoading(true)
+//       const permission = await Notification.requestPermission()
+//       setPermission(permission) // Обновляем стейт
+
+//       if (permission === "granted") {
+//         const currentToken = await getToken(messaging, {
+//           vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+//         })
+
+//         if (currentToken) {
+//           setToken(currentToken)
+//           console.log("🎫 Новый FCM Token:", currentToken)
+//           // Отправка на сервер (когда будет готов)
+//           await fcmTokenAPI.saveFcmToken(currentToken)
+//         }
+//       }
+//     } catch (error) {
+//       console.error("❌ Ошибка:", error)
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   return { token, permission, requestPermission, loading }
+// }

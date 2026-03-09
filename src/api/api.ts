@@ -8,7 +8,7 @@ export const authAPI = {
     username: string,
     email: string,
     password: string,
-    inviteKey: string
+    inviteKey: string,
   ) {
     return instance
       .post("auth/register", {
@@ -90,13 +90,13 @@ export const userAPI = {
     userId: string,
     page?: number,
     profile?: string,
-    limit?: number
+    limit?: number,
   ) {
     return instance
       .post(
         "user/requestFriend",
         { userId },
-        { params: { page, limit, profile } }
+        { params: { page, limit, profile } },
       )
       .then((res) => res.data)
   },
@@ -104,13 +104,13 @@ export const userAPI = {
     userId: string,
     page?: number,
     profile?: string,
-    limit?: number
+    limit?: number,
   ) {
     return instance
       .post(
         "user/acceptFriend",
         { userId },
-        { params: { page, limit, profile } }
+        { params: { page, limit, profile } },
       )
       .then((response) => response.data)
   },
@@ -123,13 +123,13 @@ export const userAPI = {
     userId: string,
     page?: number,
     profile?: string,
-    limit?: number
+    limit?: number,
   ) {
     return instance
       .post(
         "user/cancelFriendRequest",
         { userId },
-        { params: { page, limit, profile } }
+        { params: { page, limit, profile } },
       )
       .then((response) => response.data)
   },
@@ -165,6 +165,14 @@ export const userAPI = {
         },
       })
       .then((res) => res.data)
+  },
+  saveFcmToken(token: string, platform: string) {
+    return instance
+      .post(`user/fcm-token:save`, { token, platform })
+      .then((res) => res.data)
+  },
+  dellAllFcmTokens() {
+    return instance.post(`user/fcm-token:dell-all`).then((res) => res.data)
   },
 }
 
@@ -228,7 +236,7 @@ export const roomPostAPI = {
     postId: string,
     roomId: string | null,
     page: number,
-    limit?: number
+    limit?: number,
   ) {
     return instance
       .delete(`roomPosts/post/${postId}?roomId=${roomId}`, {
@@ -366,7 +374,7 @@ export const userMovieAPI = {
     userMovieId: string,
     status: "wantToSee" | "watched",
     page: number,
-    limit?: number
+    limit?: number,
   ) {
     return instance
       .delete(`user-movie/delete/${userMovieId}`, {
@@ -380,7 +388,7 @@ export const userMovieAPI = {
     userMovieId: string,
     status: "wantToSee" | "watched",
     page: number,
-    limit?: number
+    limit?: number,
   ) {
     return instance
       .patch(`user-movie/update-status/${userMovieId}`, {

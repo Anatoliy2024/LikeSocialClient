@@ -6,7 +6,8 @@ import "@/styles/reset.scss"
 // import Navbar from "@/components/navbar/Navbar"
 // import Footer from "@/components/footer/Footer"
 
-import ReduxProvider from "@/providers/ReduxProvider"
+// import ReduxProvider from "@/providers/ReduxProvider"
+import NotificationProvider from "@/providers/NotificationProvider"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReduxProvider>{children}</ReduxProvider>
+        <NotificationProvider>{children}</NotificationProvider>
+        {/* <ReduxProvider>{children}</ReduxProvider> */}
       </body>
     </html>
   )

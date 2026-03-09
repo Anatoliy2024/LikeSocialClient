@@ -4,10 +4,25 @@
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { toggleSound } from "@/store/slices/settingsSlice"
 import style from "./SoundToggle.module.scss" // или используй inline-стили
+import { useEffect, useState } from "react"
 
 export const SoundToggle = () => {
   const dispatch = useAppDispatch()
   const soundEnabled = useAppSelector((state) => state.settings.soundEnabled)
+  const [isMounted, setIsMounted] = useState(false)
+  // Ждём монтирования на клиенте
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // Пока не смонтировалось — рендерим "заглушку"
+  if (!isMounted) {
+    return (
+      <button title="Загрузка..." aria-label="Загрузка">
+        {/* иконка */}
+      </button>
+    )
+  }
 
   return (
     <div className={style.soundToggleWrapper}>
