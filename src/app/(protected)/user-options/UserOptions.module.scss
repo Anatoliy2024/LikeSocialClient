@@ -1,0 +1,10 @@
+.userOption {
+  &__delAllTokens {
+    &:hover {
+      background: rgba(0, 0, 0, 0.693);
+    }
+    &:active {
+      background: rgba(0, 0, 0, 0.382);
+    }
+  }
+}

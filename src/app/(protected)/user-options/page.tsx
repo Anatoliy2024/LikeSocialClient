@@ -2,11 +2,12 @@
 import NotificationToggleButton from "@/components/NotificationToggleButton/NotificationToggleButton"
 import { SoundToggle } from "@/components/SoundToggle/SoundToggle"
 import { useNotification } from "@/hooks/useNotification"
+import style from "./UserOptions.module.scss"
 
 export default function UserOption() {
   const { permission, error, token, clearTokens } = useNotification()
   return (
-    <div>
+    <div className={style.userOption}>
       <h1>Настройки</h1>
       <div>
         <SoundToggle />
@@ -48,8 +49,11 @@ export default function UserOption() {
           </div>
         )}
 
-        <button onClick={clearTokens}>
-          Удалить уведомления со всех устройств
+        <button
+          onClick={clearTokens}
+          className={style.userOption__delAllTokens}
+        >
+          удалить все уведомления
         </button>
       </section>
     </div>
