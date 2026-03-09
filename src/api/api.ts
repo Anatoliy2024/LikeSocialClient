@@ -168,11 +168,11 @@ export const userAPI = {
   },
   saveFcmToken(token: string, platform: string) {
     return instance
-      .post(`user/fcm-token:save`, { token, platform })
+      .post(`user/fcm-token/save`, { token, platform })
       .then((res) => res.data)
   },
   dellAllFcmTokens() {
-    return instance.post(`user/fcm-token:dell-all`).then((res) => res.data)
+    return instance.post(`user/fcm-token/dell-all`).then((res) => res.data)
   },
 }
 
