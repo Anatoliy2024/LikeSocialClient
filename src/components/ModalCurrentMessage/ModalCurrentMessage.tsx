@@ -2,14 +2,9 @@
 import { REACTIONS } from "@/constants/reactions"
 import style from "./ModalCurrentMessage.module.scss"
 import { useEffect, useState } from "react"
-import {
-  MemberType,
-  // messageViewersUserType,
-  ReactionType,
-} from "@/types/conversation.types"
+import { MemberType, ReactionType } from "@/types/conversation.types"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
-// import { formatMessageTime } from "@/utils/formatMessageTime"
-// import { formatData } from "@/utils/formatData"
+
 import { formatMessageDate } from "@/utils/formatReactionToMessage"
 import { getMessageViewersThunk } from "@/store/thunks/conversationsThunk"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
@@ -21,13 +16,13 @@ import { HeartReactionMessage } from "@/assets/icons/heartReactionMessage"
 import { DeleteMessageIcon } from "@/assets/icons/deleteMessageIcon"
 import { EditMessageIcon } from "@/assets/icons/EditMessageIcon"
 import { DataEditMessageIcon } from "@/assets/icons/DataEditMessageIcon"
-// import { MessageType } from '@/types/conversation.types'
 
 export const ModalCurrentMessage = ({
   messageId,
   reactions,
   senderId,
   editedAt,
+  isGroup,
   handleReaction,
   handleDeleteMessage,
   handleShowEditMessage,
@@ -37,6 +32,7 @@ export const ModalCurrentMessage = ({
   reactions: ReactionType[]
   senderId: string
   editedAt?: string
+  isGroup: boolean
   handleReaction: (messageId: string, reactionId: string) => void
   handleDeleteMessage: (messageId: string) => void
   handleShowEditMessage: (messageId: string, text?: string) => void
@@ -46,10 +42,10 @@ export const ModalCurrentMessage = ({
   const [showUserReaction, setShowUserReaction] = useState(false)
   const dispatch = useAppDispatch()
   const users = useAppSelector(
-    (state: RootState) => state.conversations.messageViewers.users
+    (state: RootState) => state.conversations.messageViewers.users,
   )
   const owner = useAppSelector(
-    (state: RootState) => state.conversations.currentConversation?.owner
+    (state: RootState) => state.conversations.currentConversation?.owner,
   )
   const userId = useAppSelector((state: RootState) => state.auth.userId)
 
@@ -70,11 +66,6 @@ export const ModalCurrentMessage = ({
       dispatch(clearMessageViewers())
     }
   }, [dispatch, messageId])
-  // console.log("users", users)
-
-  // const modifiedUser= {
-
-  // }
 
   const normalizedUsers = users.map((e) => ({
     _id: e._id,
@@ -90,11 +81,13 @@ export const ModalCurrentMessage = ({
     emoji: e.emoji,
   }))
 
+  const myMessageShowReaction = users.length > 0 && senderId === userId
+
   return (
     <div className={style.modalCurrentMessage}>
       {!showUserReaction && (
         <ul>
-          {(users.length > 0 || reactions.length > 0) && (
+          {(myMessageShowReaction || reactions.length > 0) && (
             <li className={style.modalCurrentMessage__clickableItem}>
               <ul className={style.modalCurrentMessage__userReaction}>
                 <div
@@ -133,7 +126,7 @@ export const ModalCurrentMessage = ({
               <span>изменено {formatDateEditMessage(editedAt)}</span>
             </li>
           )}
-          {(users.length > 0 || reactions.length > 0 || editedAt) && (
+          {(myMessageShowReaction || reactions.length > 0 || editedAt) && (
             <div className={style.modalCurrentMessage__dividedLine}></div>
           )}
 
@@ -174,7 +167,7 @@ export const ModalCurrentMessage = ({
               <span>изменить</span>
             </li>
           )}
-          {(userId === owner || userId === senderId) && (
+          {((isGroup && userId === owner) || userId === senderId) && (
             <li
               onClick={() => handleDeleteMessage(messageId)}
               className={style.modalCurrentMessage__clickableItem}
@@ -190,11 +183,10 @@ export const ModalCurrentMessage = ({
         <div className={style.usersListReaction}>
           <button onClick={toggleShowUserReaction}>Назад</button>
           <UserList events={normalizedReactions} />
-          <UserList events={normalizedUsers} />
+          {senderId === userId && <UserList events={normalizedUsers} />}
         </div>
       )}
     </div>
-    // </div>
   )
 }
 

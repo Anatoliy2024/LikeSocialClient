@@ -120,7 +120,7 @@ export const MessageBlock = () => {
   const id = params.id
 
   const recipientId = currentConversation?.members.find(
-    (member) => member.user._id !== userId
+    (member) => member.user._id !== userId,
   )?.user
 
   const isGroup = currentConversation?.type === "group"
@@ -287,7 +287,7 @@ export const MessageBlock = () => {
       if (!node) return
       node.addEventListener("scroll", handleScroll, { passive: true })
     },
-    [handleScroll]
+    [handleScroll],
   )
 
   // ─────────────────────────────────────────
@@ -336,7 +336,7 @@ export const MessageBlock = () => {
         conversationId: id,
         direction: "older",
         cursor: oldestMessageId,
-      })
+      }),
     )
   }, [hasMoreOlder, loading, oldestMessageId, id, dispatch])
 
@@ -354,7 +354,7 @@ export const MessageBlock = () => {
       {
         root: container,
         threshold: 0.1,
-      }
+      },
     )
 
     observer.observe(topSentinelRef.current)
@@ -381,7 +381,7 @@ export const MessageBlock = () => {
   const handleCurrentMessage = (
     messageId: string,
     isOwn: boolean,
-    e: React.MouseEvent
+    e: React.MouseEvent,
   ) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     setMessagePosition({
@@ -418,7 +418,7 @@ export const MessageBlock = () => {
     if (!fixedId) return null
 
     const result = messages.find(
-      (m) => m.senderId._id !== userId && m._id > fixedId
+      (m) => m.senderId._id !== userId && m._id > fixedId,
     )?._id
 
     return result ?? null
@@ -456,6 +456,7 @@ export const MessageBlock = () => {
         <MessageModal
           message={activeMessage}
           position={messagePosition}
+          isGroup={isGroup}
           onClose={handleCloseCurrentMessage}
           handleReaction={handleReaction}
           handleDeleteMessage={handleDeleteMessage}
@@ -659,7 +660,7 @@ export const MessageBlock = () => {
                       handleCurrentMessage(
                         message._id,
                         message.senderId._id === userId,
-                        e
+                        e,
                       )
                     }
                   >

@@ -7,6 +7,7 @@ import style from "./MessageModal.module.scss"
 interface Props {
   message: MessageType
   position: { top: number; left: number; right: number; isOwn: boolean }
+  isGroup: boolean
   onClose: () => void
   handleReaction: (messageId: string, reactionId: string) => void
   handleDeleteMessage: (messageId: string) => void
@@ -49,6 +50,7 @@ const getModalPosition = (position: {
 export const MessageModal = ({
   message,
   position,
+  isGroup,
   onClose,
   handleReaction,
   handleDeleteMessage,
@@ -66,12 +68,13 @@ export const MessageModal = ({
           senderId={message.senderId._id}
           text={message?.text}
           editedAt={message?.editedAt}
+          isGroup={isGroup}
           handleReaction={handleReaction}
           handleDeleteMessage={handleDeleteMessage}
           handleShowEditMessage={handleShowEditMessage}
         />
       </div>
     </>,
-    document.body
+    document.body,
   )
 }
