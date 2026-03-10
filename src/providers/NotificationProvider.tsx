@@ -3,6 +3,7 @@
 import { usePushNotifications } from "@/hooks/usePushNotifications"
 import ReduxProvider from "./ReduxProvider"
 import { useEffect } from "react"
+// import { PwaInstallPrompt } from "@/components/PwaInstallPrompt/PwaInstallPrompt"
 
 export default function NotificationProvider({
   children,
@@ -35,5 +36,13 @@ export default function NotificationProvider({
     return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange)
   }, [refreshPermission])
-  return <ReduxProvider>{children}</ReduxProvider>
+  // 🎯 Скрываем баннер, если пользователь уже включил пуши
+  // (Значит, он либо уже установил PWA, либо использует десктоп)
+  // const shouldShowPrompt = !isSubscribed && permission !== "denied"
+  return (
+    <ReduxProvider>
+      {/* {shouldShowPrompt && <PwaInstallPrompt />} */}
+      {children}
+    </ReduxProvider>
+  )
 }

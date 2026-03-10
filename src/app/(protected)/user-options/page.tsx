@@ -4,6 +4,7 @@ import { SoundToggle } from "@/components/SoundToggle/SoundToggle"
 // import { useNotification } from "@/hooks/useNotification"
 import style from "./UserOptions.module.scss"
 import { PushNotificationToggle } from "@/components/PushNotificationToggle/PushNotificationToggle"
+// import { PwaInstallPrompt } from "@/components/PwaInstallPrompt/PwaInstallPrompt"
 
 export default function UserOption() {
   // const { permission, error, token, clearTokens } = useNotification()
@@ -17,6 +18,9 @@ export default function UserOption() {
         <h2>Уведомления</h2>
         <PushNotificationToggle />
       </div>
+      {/* <div>
+        <PwaInstallPrompt />
+      </div> */}
       {/* <section className="space-y-4">
         <h2 className="text-xl font-semibold">🔔 Push-уведомления</h2>
 
