@@ -13,23 +13,21 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       {
         src: "/logo.png",
-        sizes: "100x100", // ✅ Указываем реальный размер вашей иконки
-        type: "image/png",
-      },
-    ],
-    // 📸 Скриншоты для "красивого" окна установки (опционально, но убирает варнинги)
-    screenshots: [
-      {
-        src: "/logo.png", // Временно используем логотип как заглушку
         sizes: "100x100",
         type: "image/png",
-        form_factor: "wide", // Для десктопа
+        purpose: "any",
       },
       {
-        src: "/logo.png",
-        sizes: "100x100",
+        src: "/logo-192x192.png",
+        sizes: "192x192",
         type: "image/png",
-        // Без form_factor — для мобильных
+        purpose: "any",
+      },
+      {
+        src: "/logo-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
       },
     ],
   }
