@@ -1,0 +1,24 @@
+.pushNotification {
+  //   display: flex;
+  //   flex-direction: column;
+  //   gap: 10px;
+  &__activeNotification {
+    color: green;
+  }
+  &__closeNotification {
+  }
+  &__unsupportedNotification {
+  }
+  &__buttonActiveNotification {
+    border-radius: 12px;
+    padding: 5px 10px;
+    background: rgb(78, 40, 153);
+    cursor: pointer;
+    &:hover {
+      background: rgba(78, 40, 153, 0.688);
+    }
+    &:hover {
+      background: rgba(78, 40, 153, 0.388);
+    }
+  }
+}

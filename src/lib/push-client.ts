@@ -177,20 +177,20 @@ function urlBase64ToBufferSource(base64String: string): BufferSource {
   return outputArray as BufferSource
 }
 
-// 4. Функция отправки подписки на ваш сервер (опционально, но удобно)
-export async function sendSubscriptionToServer(
-  subscription: PushSubscriptionJSON,
-  apiUrl: string,
-): Promise<Response> {
-  return fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ subscription }),
-    credentials: "include", // Если используете куки для авторизации
-  })
-}
+// // 4. Функция отправки подписки на ваш сервер (опционально, но удобно)
+// export async function sendSubscriptionToServer(
+//   subscription: PushSubscriptionJSON,
+//   apiUrl: string,
+// ): Promise<Response> {
+//   return fetch(apiUrl, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({ subscription }),
+//     credentials: "include", // Если используете куки для авторизации
+//   })
+// }
 
 // 5. Функция для отписки (отмены подписки)
 export async function unsubscribeFromPush(): Promise<boolean> {

@@ -19,6 +19,8 @@ import conversationsReducer from "./slices/conversationsSlice"
 import groupCallReducer from "./slices/groupCallSlice"
 import adminReducer from "./slices/adminSlice"
 import settingsReducer from "./slices/settingsSlice"
+import pushNotificationsReducer from "./slices/pushNotificationsSlice"
+// import pushDevicesReducer from "./slices/pushDevicesSlice"
 // import messagesReducer from "./slices/messagesSlice"
 
 export const store = configureStore({
@@ -40,6 +42,8 @@ export const store = configureStore({
     conversations: conversationsReducer,
     admin: adminReducer,
     settings: settingsReducer,
+    pushNotifications: pushNotificationsReducer,
+    // pushDevices: pushDevicesReducer,
     // messages: messagesReducer,
     // добавь другие редьюсеры здесь
   },

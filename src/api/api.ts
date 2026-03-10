@@ -182,9 +182,17 @@ export const userAPI = {
   },
 
   // Удаление подписки (отписка)
-  removePushSubscription() {
+  // removePushSubscription() {
+  //   return instance
+  //     .post(`user/push-subscription/remove`)
+  //     .then((res) => res.data)
+  // },
+  getAllPushSubscription() {
+    return instance.get("user/push-subscriptions").then((res) => res.data)
+  },
+  deletePushDevice(deviceId: string) {
     return instance
-      .post(`user/push-subscription/remove`)
+      .delete(`user/push-subscription/${deviceId}`)
       .then((res) => res.data)
   },
 }

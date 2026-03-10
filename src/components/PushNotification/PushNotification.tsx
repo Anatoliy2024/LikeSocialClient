@@ -1,32 +1,51 @@
 // components/PushNotificationStatus.tsx
 import { usePushNotifications } from "@/hooks/usePushNotifications"
-
-export function PushNotificationToggle() {
-  const { isSubscribed, permission, subscribe } = usePushNotifications()
+import { DevicesList } from "../DevicesList/DevicesList"
+import style from "./PushNotification.module.scss"
+import { useAppSelector } from "@/store/hooks"
+import { RootState } from "@/store/store"
+export function PushNotification() {
+  const { subscribe } = usePushNotifications()
+  const permission = useAppSelector(
+    (root: RootState) => root.pushNotifications.permission,
+  )
+  const isSubscribed = useAppSelector(
+    (root: RootState) => root.pushNotifications.isSubscribed,
+  )
 
   // Проверяем, есть ли Google Services (грубая проверка для Android)
   const isAndroidWithoutGMS =
     /Android/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent) // Упрощённо
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={style.pushNotification}>
+      <h2>Уведомления: </h2>
       {isSubscribed ? (
-        <span className="text-green-600 text-sm">🔔 Уведомления включены</span>
-      ) : permission === "unsupported" || isAndroidWithoutGMS ? (
-        <span
-          className="text-gray-500 text-sm"
-          title="На этом устройстве пуши недоступны"
-        >
-          🔔 Уведомления (недоступно)
-        </span>
+        <div className={style.pushNotification__activeNotification}>
+          🔔 Уведомления включены
+        </div>
       ) : (
-        <button
-          onClick={subscribe}
-          className="text-blue-600 text-sm hover:underline"
-        >
-          🔕 Включить уведомления
-        </button>
+        <div className={style.pushNotification__closeNotification}>
+          🔔 Уведомления не включены
+        </div>
       )}
+      {permission === "unsupported" ||
+        (isAndroidWithoutGMS && (
+          <span
+            className={style.pushNotification__unsupportedNotification}
+            title="На этом устройстве пуши недоступны"
+          >
+            🔔 Уведомления (недоступно)
+          </span>
+        ))}
+
+      <button
+        onClick={subscribe}
+        className={style.pushNotification__buttonActiveNotification}
+      >
+        Включить уведомления
+      </button>
+      <DevicesList />
     </div>
   )
 }
