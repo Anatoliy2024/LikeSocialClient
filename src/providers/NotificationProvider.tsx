@@ -1,9 +1,6 @@
 "use client"
 
-import {
-  fetchPushDevicesThunk,
-  initPushNotificationsThunk,
-} from "@/store/thunks/pushNotificationsThunk"
+import { initPushNotificationsThunk } from "@/store/thunks/pushNotificationsThunk"
 // import { usePushNotifications } from "@/hooks/usePushNotifications"
 // import ReduxProvider from "./ReduxProvider"
 import { useEffect } from "react"
@@ -48,9 +45,11 @@ export default function NotificationProvider({
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    // 👇 Используем диспатч для запуска санок
+    // Только лёгкая инициализация:
+    // - читаем permission из браузера
+    // - проверяем есть ли подписка
+    // - синхронизируем endpoint с сервером если нужно
     dispatch(initPushNotificationsThunk())
-    dispatch(fetchPushDevicesThunk())
   }, [dispatch])
 
   return (

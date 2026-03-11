@@ -1,0 +1,108 @@
+// components/DevicesList/DevicesList.module.scss
+
+.devicesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0;
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  &__empty {
+    color: #dfdfdf;
+    font-size: 14px;
+    padding: 12px 0;
+  }
+
+  &__loading {
+    color: #d8d8d8;
+    font-size: 14px;
+    padding: 12px 0;
+  }
+
+  &__error {
+    color: #e53e3e;
+    font-size: 14px;
+    padding: 8px 12px;
+    background-color: #fff5f5;
+    border-radius: 8px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f7fafc;
+    }
+
+    // Текущее устройство выделяем
+    &_current {
+      border-color: #4299e1;
+      background-color: #ebf8ff;
+
+      &:hover {
+        background-color: #e3f2fd;
+      }
+    }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__name {
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__currentBadge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2b6cb0;
+    background-color: #bee3f8;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__date {
+    font-size: 13px;
+    color: #312f2f;
+  }
+
+  &__deleteButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    line-height: 1;
+
+    &:hover {
+      background-color: #fff5f5;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}

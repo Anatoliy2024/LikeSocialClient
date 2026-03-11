@@ -1,7 +1,12 @@
 import { authAPI } from "@/api/api"
+import {
+  getCurrentBrowserSubscription,
+  unsubscribeFromPush,
+} from "@/lib/push-client"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { jwtDecode } from "jwt-decode"
+import { clearPushState } from "../slices/pushNotificationsSlice"
 
 type RegisterParams = {
   username: string
@@ -34,7 +39,7 @@ export const registerThunk = createAsyncThunk(
   "auth/register",
   async (
     { username, email, password, inviteKey }: RegisterParams,
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const data = await authAPI.register(username, email, password, inviteKey)
@@ -52,7 +57,7 @@ export const registerThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Произошла ошибка при регистрации")
     }
-  }
+  },
 )
 export const authThunk = createAsyncThunk(
   "auth/auth",
@@ -71,7 +76,7 @@ export const authThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Произошла ошибка при авторизации")
     }
-  }
+  },
 )
 export const verifyThunk = createAsyncThunk(
   "auth/verify",
@@ -89,7 +94,7 @@ export const verifyThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Произошла ошибка при верификации")
     }
-  }
+  },
 )
 
 export const authCheckThunk = createAsyncThunk(
@@ -109,13 +114,22 @@ export const authCheckThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Произошла ошибка при authCheckThunk")
     }
-  }
+  },
 )
 export const logoutThunk = createAsyncThunk(
   "auth/logout",
   async (_, thunkAPI) => {
     try {
-      const data = await authAPI.postLogout()
+      // 1. Отписываем в браузере и удаляем с сервера
+      const currentSub = await getCurrentBrowserSubscription()
+      if (currentSub) {
+        await unsubscribeFromPush()
+      }
+
+      // 2. Чистим стейт пушей
+      thunkAPI.dispatch(clearPushState())
+
+      const data = await authAPI.postLogout(currentSub?.endpoint)
       // console.log(data)
 
       return data
@@ -128,5 +142,5 @@ export const logoutThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Произошла ошибка при logoutThunk")
     }
-  }
+  },
 )

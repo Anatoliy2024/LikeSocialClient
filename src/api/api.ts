@@ -50,8 +50,10 @@ export const authAPI = {
     return instance.get("auth/me").then((response) => response.data)
   },
 
-  postLogout() {
-    return instance.post("auth/logout").then((response) => response.data)
+  postLogout(endpoint?: string) {
+    return instance
+      .post("auth/logout", { endpoint })
+      .then((response) => response.data)
   },
   forgotPassword(email: string) {
     return instance
@@ -195,6 +197,13 @@ export const userAPI = {
       .delete(`user/push-subscription/${deviceId}`)
       .then((res) => res.data)
   },
+  // deletePushDeviceByEndpoint(endpoint: string) {
+  //   return instance
+  //     .delete(`user/push-subscription/endpoint`, {
+  //       data: { endpoint }, // axios delete с body передаётся через data
+  //     })
+  //     .then((res) => res.data)
+  // },
 }
 
 export const postAPI = {
