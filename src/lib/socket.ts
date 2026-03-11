@@ -24,40 +24,9 @@ export const getSocket = (newToken?: string): Socket => {
   return socket
 }
 
-// export const getSocket = (token: string) => {
-//   if (!socket) {
-//     socket = io(baseApiUrl, {
-//       withCredentials: true,
-//       reconnection: true,
-//       reconnectionAttempts: 50,
-//       reconnectionDelay: 5000,
-//       reconnectionDelayMax: 10000,
-//       timeout: 10000,
-//       auth: {
-//         token, // прокидываем актуальный токен
-//       },
-//     })
-//   }
-//   return socket
-// }
-
-// export const getSocket = () => {
-//   if (!socket) {
-//     //
-//     socket = io(baseApiUrl, {
-//       withCredentials: true,
-//       // autoConnect: false,
-//       // transports: ["websocket", "polling"],
-
-//       reconnection: true,
-//       reconnectionAttempts: 50,
-//       reconnectionDelay: 5000,
-//       reconnectionDelayMax: 10000,
-//       timeout: 10000,
-//       auth: {
-//         token: localStorage.getItem("accessToken"), // или откуда ты хранишь JWT
-//       },
-//     })
-//   }
-//   return socket
-// }
+export const destroySocket = (): void => {
+  if (socket) {
+    socket.disconnect()
+    socket = null
+  }
+}

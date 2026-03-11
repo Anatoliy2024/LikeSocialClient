@@ -11,6 +11,7 @@ import {
   fetchNotificationsThunk,
   markAllNotificationsReadThunk,
 } from "@/store/thunks/notificationsThunk"
+import { destroySocket } from "@/lib/socket"
 // import throttle from "lodash.throttle"
 // import { useHideOnScroll } from "@/hooks/useHideOnScroll"
 const HeaderContainer = ({
@@ -34,13 +35,14 @@ const HeaderContainer = ({
   // const avatar = useAppSelector((state: RootState) => state.profile.avatar)
   const [showNotifications, setShowNotifications] = useState(false)
   const notifications = useAppSelector(
-    (state: RootState) => state.notifications
+    (state: RootState) => state.notifications,
   )
   useEffect(() => {
     if (isAuth) dispatch(fetchNotificationsThunk())
   }, [dispatch, isAuth])
 
   const logoutButton = () => {
+    destroySocket()
     dispatch(logoutThunk())
     router.push("/")
     localStorage.removeItem("accessToken")
