@@ -1,5 +1,8 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
+import {
+  // useEffect, useRef,
+  useState,
+} from "react"
 import { useAppSelector } from "@/store/hooks"
 // import { useGroupCallContext } from "@/app/GroupCallProvider"
 import { RootState } from "@/store/store"
@@ -13,7 +16,7 @@ export const GroupCallPanel = () => {
   const status = useAppSelector((s: RootState) => s.groupCall.status)
 
   const callParticipantsCache = useAppSelector(
-    (s: RootState) => s.users.callParticipantsCache
+    (s: RootState) => s.users.callParticipantsCache,
   )
 
   const {
@@ -25,7 +28,7 @@ export const GroupCallPanel = () => {
     leaveCall,
     handleToggleAudio,
     // handleToggleVideo,
-    remoteStreams,
+    // remoteStreams,
     // localStream,
   } = useGroupCallContext()
 
@@ -77,12 +80,11 @@ export const GroupCallPanel = () => {
         </span>
       </div>
 
-      <div className={styles.streams}>
-        {/* Локальный аудио не нужен, только remote */}
+      {/* <div className={styles.streams}>
         {Object.entries(remoteStreams).map(([socketId, stream]) => (
           <AudioStream key={socketId} stream={stream} />
         ))}
-      </div>
+      </div> */}
 
       <div className={styles.controls}>
         <button
@@ -113,18 +115,18 @@ export const GroupCallPanel = () => {
   )
 }
 
-// Компонент для воспроизведения аудио стрима
-const AudioStream = ({ stream }: { stream: MediaStream }) => {
-  const audioRef = useRef<HTMLAudioElement>(null)
+// // Компонент для воспроизведения аудио стрима
+// const AudioStream = ({ stream }: { stream: MediaStream }) => {
+//   const audioRef = useRef<HTMLAudioElement>(null)
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.srcObject = stream
-    }
-  }, [stream])
+//   useEffect(() => {
+//     if (audioRef.current) {
+//       audioRef.current.srcObject = stream
+//     }
+//   }, [stream])
 
-  return <audio ref={audioRef} autoPlay playsInline />
-}
+//   return <audio ref={audioRef} autoPlay playsInline />
+// }
 
 // SVG иконки
 const MicIcon = () => (
