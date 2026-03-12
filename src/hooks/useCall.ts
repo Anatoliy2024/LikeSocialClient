@@ -27,6 +27,12 @@ import {
   type IceCandidateData,
   type SdpData,
 } from "@/lib/webrtc/PeerConnectionManager"
+// 🔹 Добавь импорты
+import {
+  getVideoDevices,
+  getOppositeCamera,
+  VideoDevice,
+} from "@/utils/getVideoDevices"
 
 type Maybe<T> = T | null
 
@@ -46,6 +52,14 @@ export const useCall = (userId: string | null) => {
   const [localStreamState, setLocalStreamState] =
     useState<Maybe<MediaStream>>(null)
   const [remoteStream, setRemoteStream] = useState<Maybe<MediaStream>>(null)
+
+  // 🔹 Добавь состояние для текущей камеры
+  const [currentVideoDeviceId, setCurrentVideoDeviceId] = useState<
+    string | null
+  >(null)
+  const [videoDevices, setVideoDevices] = useState<VideoDevice[]>([])
+  const videoDeviceIdRef = useRef<string | null>(null)
+  const hasRequestedCameraRef = useRef(false)
 
   const managerRef = useRef<Maybe<PeerConnectionManager>>(null)
   const localStreamRef = useRef<Maybe<MediaStream>>(null)
@@ -381,7 +395,11 @@ export const useCall = (userId: string | null) => {
       // Добавляем новый видео-трек
       try {
         const videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 640 }, height: { ideal: 360 } },
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 360 },
+            facingMode: "user",
+          },
         })
         const videoTrack = videoStream.getVideoTracks()[0]
         localStreamRef.current.addTrack(videoTrack)
@@ -399,6 +417,10 @@ export const useCall = (userId: string | null) => {
         // }
 
         setLocalStreamState(new MediaStream(localStreamRef.current.getTracks()))
+
+        // 🔹 Ключевое: после первого успешного запроса камеры — загружаем список устройств
+        hasRequestedCameraRef.current = true
+        await loadVideoDevices() // ← Теперь enumerateDevices вернёт нормальные label!
       } catch (err) {
         console.error("❌ Не удалось получить камеру", err)
         return
@@ -407,6 +429,74 @@ export const useCall = (userId: string | null) => {
 
     dispatch(toggleVideo())
   }, [dispatch])
+
+  // 🔹 Функция получения списка камер (вызывать ТОЛЬКО после разрешения камеры)
+  const loadVideoDevices = useCallback(async () => {
+    // 🔹 Важно: enumerateDevices вернёт пустые label, если нет разрешения на камеру
+    const devices = await getVideoDevices()
+    setVideoDevices(devices)
+
+    if (devices.length > 0 && !videoDeviceIdRef.current) {
+      videoDeviceIdRef.current = devices[0].deviceId
+      setCurrentVideoDeviceId(devices[0].deviceId)
+    }
+  }, [])
+
+  // 🔹 Функция переключения камеры (вызывать ТОЛЬКО после включения видео)
+  const handleSwitchCamera = useCallback(async () => {
+    if (videoDevices.length < 2) {
+      console.warn("⚠️ Только одна камера доступна")
+      return
+    }
+
+    const nextDeviceId = getOppositeCamera(
+      videoDeviceIdRef.current || "",
+      videoDevices,
+    )
+    if (!nextDeviceId) return
+
+    videoDeviceIdRef.current = nextDeviceId
+    setCurrentVideoDeviceId(nextDeviceId)
+
+    // 🔹 Пересоздаём видеострим с новой камерой
+    if (localStreamRef.current) {
+      // 1. Удаляем старый видео-трек
+      const oldVideoTracks = localStreamRef.current.getVideoTracks()
+      oldVideoTracks.forEach((track) => {
+        track.stop()
+        localStreamRef.current?.removeTrack(track)
+      })
+
+      // 2. Получаем новый видеострим с выбранной камерой
+      // 🔹 Важно: permission уже есть, поэтому запрос не покажется снова!
+      const newVideoStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          deviceId: { exact: nextDeviceId },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      })
+
+      const newVideoTrack = newVideoStream.getVideoTracks()[0]
+      localStreamRef.current.addTrack(newVideoTrack)
+
+      // 3. Добавляем трек в PeerConnection
+      if (managerRef.current) {
+        managerRef.current.addVideoTrack(newVideoTrack, localStreamRef.current)
+        // 4. Запускаем ренеготацию
+        await managerRef.current.renegotiateForVideo()
+      }
+
+      setLocalStreamState(new MediaStream(localStreamRef.current.getTracks()))
+    }
+  }, [videoDevices])
+
+  // 🔹 Вызови loadVideoDevices при инициализации звонка
+  // useEffect(() => {
+  //   if (status === "inCall" || status === "calling") {
+  //     loadVideoDevices()
+  //   }
+  // }, [status, loadVideoDevices])
 
   // ---- Публичный API ----
   return useMemo(
@@ -418,6 +508,9 @@ export const useCall = (userId: string | null) => {
       endCall,
       handleToggleAudio,
       handleToggleVideo,
+      handleSwitchCamera, // ← Новая функция
+      videoDevices, // ← Список камер
+      currentVideoDeviceId, // ← Текущая камера
       loadingConnect,
     }),
     [
@@ -428,6 +521,9 @@ export const useCall = (userId: string | null) => {
       endCall,
       handleToggleAudio,
       handleToggleVideo,
+      handleSwitchCamera, // ← Новая функция
+      videoDevices, // ← Список камер
+      currentVideoDeviceId, // ← Текущая камера
       loadingConnect,
     ],
   )

@@ -57,6 +57,12 @@ const IconEndCall = () => (
     <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" />
   </svg>
 )
+// 🔹 Добавь иконку переключения камеры
+const IconSwitchCamera = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 11.5V13H9v2.5L5.5 12 9 8.5V11h6V8.5l3.5 3.5-3.5 3.5z" />
+  </svg>
+)
 
 // ---- Аватар ----
 interface AvatarRingProps {
@@ -168,6 +174,8 @@ export const CallModal = () => {
     loadingConnect,
     handleToggleAudio,
     handleToggleVideo,
+    handleSwitchCamera, // ← Новая функция
+    videoDevices, // ← Список камер
   } = useCallContext()
 
   const {
@@ -320,7 +328,15 @@ export const CallModal = () => {
               >
                 <IconEndCall />
               </button>
-
+              {isVideoEnabled && videoDevices.length > 1 && (
+                <button
+                  className={styles.ctrlBtn}
+                  onClick={handleSwitchCamera}
+                  title="Переключить камеру"
+                >
+                  <IconSwitchCamera />
+                </button>
+              )}
               <button
                 className={`${styles.ctrlBtn} ${!isVideoEnabled ? styles.ctrlBtnOff : ""}`}
                 onClick={handleToggleVideo}
