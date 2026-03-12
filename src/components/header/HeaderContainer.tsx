@@ -43,13 +43,18 @@ const HeaderContainer = ({
   }, [dispatch, isAuth])
 
   const logoutButton = async () => {
-    console.log("logoutButton start")
-    await dispatch(logoutThunk())
-    router.push("/")
-    localStorage.removeItem("accessToken")
+    try {
+      console.log("logoutButton start")
+      await dispatch(logoutThunk())
+      console.log("after dispatch(logoutThunk())")
+      router.push("/")
+      localStorage.removeItem("accessToken")
 
-    dispatch(clearAuthSlice())
-    console.log("logoutButton finish")
+      dispatch(clearAuthSlice())
+      console.log("logoutButton finish")
+    } catch (error) {
+      console.log("error", error)
+    }
   }
   const toggleShowNotification = () => {
     setShowNotifications((prev) => !prev)
