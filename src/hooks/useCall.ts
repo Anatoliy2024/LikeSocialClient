@@ -129,6 +129,12 @@ export const useCall = (userId: string | null) => {
     setLocalStreamState(null)
     setRemoteStream(null)
     setLoadingConnect(false)
+
+    // 🔹 Сбросить состояния камер
+    setVideoDevices([])
+    setCurrentVideoDeviceId(null)
+    videoDeviceIdRef.current = null
+    hasRequestedCameraRef.current = false
   }, [])
 
   // ---- Переподключение ----
@@ -394,13 +400,28 @@ export const useCall = (userId: string | null) => {
     } else {
       // Добавляем новый видео-трек
       try {
-        const videoStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 640 },
-            height: { ideal: 360 },
-            facingMode: "user",
-          },
-        })
+        const videoStream = await navigator.mediaDevices
+          .getUserMedia({
+            video: {
+              facingMode: { exact: "user" },
+              width: { ideal: 640 },
+              height: { ideal: 360 },
+            },
+          })
+          .catch(async (err) => {
+            // 🔹 Фоллбэк: если exact не сработал — пробуем обычный режим
+            console.warn(
+              "⚠️ facingMode: exact не сработал, пробуем обычный режим",
+              err,
+            )
+            return await navigator.mediaDevices.getUserMedia({
+              video: {
+                facingMode: "user",
+                width: { ideal: 640 },
+                height: { ideal: 360 },
+              },
+            })
+          })
         const videoTrack = videoStream.getVideoTracks()[0]
         localStreamRef.current.addTrack(videoTrack)
 
@@ -491,12 +512,11 @@ export const useCall = (userId: string | null) => {
     }
   }, [videoDevices])
 
-  // 🔹 Вызови loadVideoDevices при инициализации звонка
-  // useEffect(() => {
-  //   if (status === "inCall" || status === "calling") {
-  //     loadVideoDevices()
-  //   }
-  // }, [status, loadVideoDevices])
+  useEffect(() => {
+    if (hasRequestedCameraRef.current) {
+      loadVideoDevices()
+    }
+  }, [hasRequestedCameraRef.current, loadVideoDevices])
 
   // ---- Публичный API ----
   return useMemo(
