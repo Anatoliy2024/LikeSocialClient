@@ -124,17 +124,26 @@ export const logoutThunk = createAsyncThunk(
       // 1. Отписываем в браузере и удаляем с сервера
       const currentSub = await getCurrentBrowserSubscription()
       console.log("after currentSub")
+
+      // 🔹 Отписка от пушей — НЕ блокирует основной логаут
+      const data = await authAPI.postLogout(currentSub?.endpoint)
+      console.log("after data")
+
       if (currentSub) {
-        await unsubscribeFromPush()
+        try {
+          await unsubscribeFromPush()
+          console.log("✅ Unsubscribed from push")
+        } catch (pushErr) {
+          // 🔹 Логируем, но не прерываем процесс
+          console.warn("⚠️ Не удалось отписаться от пушей:", pushErr)
+          // Опционально: отправить аналитику
+        }
       }
       console.log("after unsubscribeFromPush")
 
       // 2. Чистим стейт пушей
       thunkAPI.dispatch(clearPushState())
       console.log("after thunkAPI.dispatch(clearPushState())")
-
-      const data = await authAPI.postLogout(currentSub?.endpoint)
-      console.log("after data")
 
       // console.log(data)
 
