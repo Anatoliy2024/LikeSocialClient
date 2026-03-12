@@ -32,6 +32,7 @@ import {
   getVideoDevices,
   getOppositeCamera,
   VideoDevice,
+  isFrontCamera,
 } from "@/utils/getVideoDevices"
 
 type Maybe<T> = T | null
@@ -463,10 +464,13 @@ export const useCall = (userId: string | null) => {
     }
   }, [])
 
-  // 🔹 Функция переключения камеры (вызывать ТОЛЬКО после включения видео)
   const handleSwitchCamera = useCallback(async () => {
-    if (videoDevices.length < 2) {
-      console.warn("⚠️ Только одна камера доступна")
+    if (
+      videoDevices.length < 2 ||
+      !localStreamRef.current ||
+      !managerRef.current
+    ) {
+      console.warn("⚠️ Cannot switch camera: preconditions not met")
       return
     }
 
@@ -479,17 +483,34 @@ export const useCall = (userId: string | null) => {
     videoDeviceIdRef.current = nextDeviceId
     setCurrentVideoDeviceId(nextDeviceId)
 
-    // 🔹 Пересоздаём видеострим с новой камерой
-    if (localStreamRef.current) {
-      // 1. Удаляем старый видео-трек
+    // 🔹 Теперь работает правильно:
+    const isFront = isFrontCamera(nextDeviceId, videoDevices)
+    console.log(
+      `🔄 Switching to ${isFront ? "front" : "back"} camera: ${nextDeviceId.slice(0, 8)}...`,
+    )
+
+    try {
+      const pc = managerRef.current.getPeerConnection()
+
+      // 1. Удаляем старые видео-сендеры из PeerConnection
+      const videoSenders = pc
+        .getSenders()
+        .filter((s) => s.track?.kind === "video")
+      for (const sender of videoSenders) {
+        pc.removeTrack(sender)
+      }
+
+      // 2. Останавливаем и удаляем треки из локального стрима
       const oldVideoTracks = localStreamRef.current.getVideoTracks()
       oldVideoTracks.forEach((track) => {
-        track.stop()
         localStreamRef.current?.removeTrack(track)
+        track.stop()
       })
 
-      // 2. Получаем новый видеострим с выбранной камерой
-      // 🔹 Важно: permission уже есть, поэтому запрос не покажется снова!
+      // 3. Небольшая задержка для стабилизации
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      // 4. Получаем новый видеострим
       const newVideoStream = await navigator.mediaDevices.getUserMedia({
         video: {
           deviceId: { exact: nextDeviceId },
@@ -499,18 +520,109 @@ export const useCall = (userId: string | null) => {
       })
 
       const newVideoTrack = newVideoStream.getVideoTracks()[0]
+
+      // 5. Добавляем трек в локальный стрим
       localStreamRef.current.addTrack(newVideoTrack)
-
-      // 3. Добавляем трек в PeerConnection
-      if (managerRef.current) {
-        managerRef.current.addVideoTrack(newVideoTrack, localStreamRef.current)
-        // 4. Запускаем ренеготацию
-        await managerRef.current.renegotiateForVideo()
-      }
-
       setLocalStreamState(new MediaStream(localStreamRef.current.getTracks()))
+
+      // 6. Добавляем трек в PeerConnection
+      managerRef.current.addVideoTrack(newVideoTrack, localStreamRef.current)
+
+      // 7. Ренеготация
+      await managerRef.current.renegotiateForVideo()
+    } catch (err) {
+      console.error("❌ Camera switch failed:", err)
+
+      // Фоллбэк через facingMode
+      try {
+        const newFacingMode = isFront ? "user" : "environment"
+
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: newFacingMode,
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+        })
+
+        const oldVideoTracks = localStreamRef.current?.getVideoTracks() || []
+        oldVideoTracks.forEach((track) => {
+          localStreamRef.current?.removeTrack(track)
+          track.stop()
+        })
+
+        const newVideoTrack = fallbackStream.getVideoTracks()[0]
+        localStreamRef.current?.addTrack(newVideoTrack)
+
+        if (managerRef.current) {
+          const pc = managerRef.current.getPeerConnection()
+          pc.getSenders()
+            .filter((s) => s.track?.kind === "video")
+            .forEach((s) => pc.removeTrack(s))
+          managerRef.current.addVideoTrack(
+            newVideoTrack,
+            localStreamRef.current!,
+          )
+          await managerRef.current.renegotiateForVideo()
+        }
+
+        setLocalStreamState(
+          new MediaStream(localStreamRef.current!.getTracks()),
+        )
+      } catch (fallbackErr) {
+        console.error("❌ Fallback camera switch also failed:", fallbackErr)
+      }
     }
   }, [videoDevices])
+
+  // // 🔹 Функция переключения камеры (вызывать ТОЛЬКО после включения видео)
+  // const handleSwitchCamera = useCallback(async () => {
+  //   if (videoDevices.length < 2) {
+  //     console.warn("⚠️ Только одна камера доступна")
+  //     return
+  //   }
+
+  //   const nextDeviceId = getOppositeCamera(
+  //     videoDeviceIdRef.current || "",
+  //     videoDevices,
+  //   )
+  //   if (!nextDeviceId) return
+
+  //   videoDeviceIdRef.current = nextDeviceId
+  //   setCurrentVideoDeviceId(nextDeviceId)
+
+  //   // 🔹 Пересоздаём видеострим с новой камерой
+  //   if (localStreamRef.current) {
+  //     // 1. Удаляем старый видео-трек
+  //     const oldVideoTracks = localStreamRef.current.getVideoTracks()
+  //     oldVideoTracks.forEach((track) => {
+  //       track.stop()
+  //       localStreamRef.current?.removeTrack(track)
+  //     })
+
+  //     // 2. Получаем новый видеострим с выбранной камерой
+  //     // 🔹 Важно: permission уже есть, поэтому запрос не покажется снова!
+  //     const newVideoStream = await navigator.mediaDevices.getUserMedia({
+  //       video: {
+  //         deviceId: { exact: nextDeviceId },
+  //         width: { ideal: 1280 },
+  //         height: { ideal: 720 },
+  //       },
+  //     })
+
+  //     const newVideoTrack = newVideoStream.getVideoTracks()[0]
+  //     localStreamRef.current.addTrack(newVideoTrack)
+
+  //     // 3. Добавляем трек в PeerConnection
+  //     if (managerRef.current) {
+  //       managerRef.current.addVideoTrack(newVideoTrack, localStreamRef.current)
+  //       // 4. Запускаем ренеготацию
+  //       await managerRef.current.renegotiateForVideo()
+  //     }
+
+  //     setLocalStreamState(new MediaStream(localStreamRef.current.getTracks()))
+  //   }
+  // }, [videoDevices])
 
   useEffect(() => {
     if (hasRequestedCameraRef.current) {

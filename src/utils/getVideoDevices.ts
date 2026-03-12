@@ -134,10 +134,48 @@ export function getOppositeCamera(
   return devices[nextIndex].deviceId
 }
 
-// 🔹 Опционально: определить, фронтальная ли камера по названию
-export function isFrontCamera(device: VideoDevice): boolean {
+// // 🔹 Опционально: определить, фронтальная ли камера по названию
+// export function isFrontCamera(device: VideoDevice): boolean {
+//   const label = device.label.toLowerCase()
+//   return (
+//     label.includes("front") || label.includes("user") || label.includes("face")
+//   )
+// }
+export function isFrontCamera(
+  deviceId: string,
+  devices: VideoDevice[],
+): boolean {
+  const device = devices.find((d) => d.deviceId === deviceId)
+  if (!device) return false
+
   const label = device.label.toLowerCase()
   return (
-    label.includes("front") || label.includes("user") || label.includes("face")
+    label.includes("front") ||
+    label.includes("user") ||
+    label.includes("face") ||
+    label.includes("selfie")
   )
 }
+
+// /**
+//  * 🔹 Определяет, является ли камера задней
+//  */
+// export function isBackCamera(
+//   deviceId: string,
+//   devices: VideoDevice[],
+// ): boolean {
+//   const device = devices.find((d) => d.deviceId === deviceId)
+//   if (!device) return false
+
+//   const label = device.label.toLowerCase()
+
+//   // 🔹 Ключевые слова для задней камеры
+//   return (
+//     label.includes("back") ||
+//     label.includes("rear") ||
+//     label.includes("environment") ||
+//     label.includes("wide") ||
+//     label.includes("main") ||
+//     label.includes("primary")
+//   )
+// }

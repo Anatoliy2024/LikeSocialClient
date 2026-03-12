@@ -39,6 +39,7 @@ export class PeerConnectionManager {
   private readonly initiator: boolean // 🔹 FIX: сохраняем как свойство класса
   private isClosed = false
   private isNegotiating = false // 🔹 Защита от параллельных renegotiate
+  private pendingRenegotiation = false
   private iceCandidateBuffer: RTCIceCandidateInit[] = []
   private isBufferApplied = false // ← Новый флаг
 
@@ -168,32 +169,99 @@ export class PeerConnectionManager {
     }
   }
 
+  // /**
+  //  * 🔹 НОВЫЙ МЕТОД: Запуск ренеготации для добавления видео
+  //  * Вызывай этот метод из useCall/useGroupCall при toggleVideo
+  //  */
+  // async renegotiateForVideo() {
+  //   if (this.isClosed || this.isNegotiating) return
+  //   if (this.pc.signalingState !== "stable") return
+
+  //   this.isNegotiating = true
+  //   try {
+  //     const offer = await this.pc.createOffer({
+  //       offerToReceiveAudio: true,
+  //       offerToReceiveVideo: true, // ← Важно для видео
+  //     })
+  //     if (this.pc.signalingState !== "stable") return
+
+  //     await this.pc.setLocalDescription(offer)
+  //     this.events.onSignal({
+  //       type: "offer",
+  //       payload: this.pc.localDescription!,
+  //     })
+  //     console.log("🎥 Renegotiation offer sent for video")
+  //   } catch (err) {
+  //     console.error("❌ Renegotiation failed:", err)
+  //   } finally {
+  //     this.isNegotiating = false
+  //   }
+  // }
   /**
-   * 🔹 НОВЫЙ МЕТОД: Запуск ренеготации для добавления видео
-   * Вызывай этот метод из useCall/useGroupCall при toggleVideo
+   * 🔹 Ренеготация для добавления/удаления видео
+   * С защитой от гонок и очередью
    */
   async renegotiateForVideo() {
-    if (this.isClosed || this.isNegotiating) return
-    if (this.pc.signalingState !== "stable") return
+    // 🔹 Защита от повторных вызовов
+    if (this.isClosed || this.isNegotiating) {
+      console.log("⏳ Renegotiation already in progress, queued")
+      this.pendingRenegotiation = true
+      return
+    }
+
+    // 🔹 Ждём стабильного состояния
+    if (this.pc.signalingState !== "stable") {
+      console.log(
+        `⏳ Waiting for stable signaling state: ${this.pc.signalingState}`,
+      )
+      this.pendingRenegotiation = true
+      return
+    }
 
     this.isNegotiating = true
+    this.pendingRenegotiation = false
+
     try {
       const offer = await this.pc.createOffer({
         offerToReceiveAudio: true,
-        offerToReceiveVideo: true, // ← Важно для видео
+        offerToReceiveVideo: true,
       })
-      if (this.pc.signalingState !== "stable") return
+
+      // 🔹 Двойная проверка после await
+      if (this.isClosed || this.pc.signalingState !== "stable") {
+        console.warn(
+          "⚠️ Signaling state changed during renegotiation, aborting",
+        )
+        return
+      }
 
       await this.pc.setLocalDescription(offer)
+
       this.events.onSignal({
         type: "offer",
         payload: this.pc.localDescription!,
       })
-      console.log("🎥 Renegotiation offer sent for video")
+
+      console.log("🎥 Renegotiation offer sent")
     } catch (err) {
       console.error("❌ Renegotiation failed:", err)
+      this.events.onError(
+        err instanceof Error ? err : new Error("Renegotiation failed"),
+      )
     } finally {
       this.isNegotiating = false
+
+      // 🔹 Если пока ждали, пришла ещё одна ренеготация — выполняем её
+      if (
+        this.pendingRenegotiation &&
+        !this.isClosed &&
+        this.pc.signalingState === "stable"
+      ) {
+        console.log("🔄 Processing queued renegotiation")
+        this.pendingRenegotiation = false
+        // Рекурсивный вызов, но с защитой от бесконечного цикла
+        setTimeout(() => this.renegotiateForVideo(), 100)
+      }
     }
   }
 
@@ -336,6 +404,9 @@ export class PeerConnectionManager {
    */
   getConnectionState(): RTCPeerConnectionState {
     return this.pc.connectionState
+  }
+  getPeerConnection(): RTCPeerConnection {
+    return this.pc
   }
 
   addVideoTrack(track: MediaStreamTrack, stream: MediaStream) {
