@@ -8,8 +8,9 @@ import { Sticker } from "@/assets/icons/sticker"
 import style from "./MessageBlockInput.module.scss"
 import { useEffect, useRef, useState } from "react"
 import { fileAPI } from "@/api/api"
-import { getSocket } from "@/lib/socket"
+// import { getSocket } from "@/lib/socket"
 import { compressImage } from "@/utils/compressImage"
+import { useSocket } from "@/providers/SocketProvider"
 
 type IsEditMessageType = {
   messageId: string
@@ -36,7 +37,8 @@ export const MessageBlockInput = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const socket = getSocket()
+  // const socket = getSocket()
+  const socket = useSocket()
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -51,7 +53,8 @@ export const MessageBlockInput = ({
 
   const handleSendMessage = async () => {
     // console.log("handleSendMessage")
-    if (!textMessage.trim() && !selectedImage) return
+
+    if ((!textMessage.trim() && !selectedImage) || !socket) return
     try {
       if (selectedImage) {
         setIsUploading(true)
@@ -83,6 +86,7 @@ export const MessageBlockInput = ({
   }
 
   const handleEditMessage = () => {
+    if (!socket) return
     socket.emit("messages:edit", {
       messageId: isEditMessage.messageId,
       text: textMessage,
@@ -110,6 +114,8 @@ export const MessageBlockInput = ({
   }
 
   const handleSendSticker = (stickerId: string) => {
+    if (!socket) return
+
     socket.emit("message:send", {
       conversationId: id,
       type: "sticker",

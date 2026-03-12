@@ -2,12 +2,14 @@
 
 import { useEffect } from "react"
 import { useAppSelector } from "@/store/hooks"
-import { getSocket } from "@/lib/socket"
+// import { getSocket } from "@/lib/socket"
 import { useSound } from "@/hooks/useSound"
 import { MessageType } from "@/types/conversation.types"
+import { useSocket } from "@/providers/SocketProvider"
 
 export const SoundNotificationListener = () => {
-  const socket = getSocket()
+  // const socket = getSocket()
+  const socket = useSocket()
 
   // 🔥 Получаем настройку звука из Redux
   const soundEnabled = useAppSelector((state) => state.settings.soundEnabled)

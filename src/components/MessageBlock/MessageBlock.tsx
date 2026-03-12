@@ -16,7 +16,7 @@ import {
   useState,
 } from "react"
 import style from "./MessageBlock.module.scss"
-import { getSocket } from "@/lib/socket"
+// import { getSocket } from "@/lib/socket"
 import {
   addMessageFromSocket,
   clearMessages,
@@ -47,6 +47,7 @@ import { MessageModal } from "../MessageModal/MessageModal"
 
 import { getStickerImage } from "@/utils/getStickerImage"
 import { MessageBlockInput } from "../MessageBlockInput/MessageBlockInput"
+import { useSocket } from "@/providers/SocketProvider"
 // import { SoundToggle } from "../SoundToggle/SoundToggle"
 
 export const MessageBlock = () => {
@@ -99,7 +100,9 @@ export const MessageBlock = () => {
 
   const initialLastReadIdRef = useRef<string | null | undefined>(undefined)
 
-  const socket = getSocket()
+  // const socket = getSocket()
+  const socket = useSocket()
+
   const dispatch = useAppDispatch()
 
   const {
@@ -230,7 +233,7 @@ export const MessageBlock = () => {
   }, [id, dispatch, socket])
 
   useEffect(() => {
-    if (!hasLoaded) return
+    if (!hasLoaded || !socket) return
     if (initialLastReadIdRef.current !== undefined) return
 
     initialLastReadIdRef.current = lastReadMessageId ?? null
@@ -244,7 +247,7 @@ export const MessageBlock = () => {
         lastReadMessageId: lastMessageId,
       })
     }
-  }, [hasLoaded])
+  }, [hasLoaded, socket])
 
   // Убираешь старый useEffect с restoreScrollRef и заменяешь на:
   useLayoutEffect(() => {
@@ -399,6 +402,7 @@ export const MessageBlock = () => {
   }
 
   const handleReaction = (messageId: string, reactionId: string) => {
+    if (!socket) return
     socket.emit("message:reaction", { messageId, reactionId })
     if (currentMessage === messageId) setCurrentMessage(null)
   }
@@ -425,6 +429,8 @@ export const MessageBlock = () => {
   }, [messages, userId, isInitialized])
 
   const handleDeleteMessage = (messageId: string) => {
+    if (!socket) return
+
     socket.emit("messages:delete", {
       messageId,
     })

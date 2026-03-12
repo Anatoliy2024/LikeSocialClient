@@ -1,7 +1,7 @@
 // src/hooks/useGroupCall.ts
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
-import { getSocket } from "@/lib/socket"
+// import { getSocket } from "@/lib/socket"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   joinGroupCall,
@@ -27,6 +27,7 @@ import {
   type SdpData,
 } from "@/lib/webrtc/PeerConnectionManager"
 import { fetchUsersBulkThunk } from "@/store/thunks/usersThunk"
+import { useSocket } from "@/providers/SocketProvider"
 
 interface PeerEntry {
   manager: PeerConnectionManager
@@ -46,7 +47,8 @@ export const useGroupCall = (userId: string | null) => {
   >({})
   const peersRef = useRef<Record<string, PeerEntry>>({})
   const localStreamRef = useRef<MediaStream | null>(null)
-  const socketRef = useRef<ReturnType<typeof getSocket> | null>(null)
+  const socket = useSocket()
+  // const socketRef = useRef<ReturnType<typeof getSocket> | null>(null)
   const audioEnabledRef = useRef<boolean>(true) // 🔹 Реф для актуального состояния без зависимостей
 
   // ---- Локальный стрим ----
@@ -91,7 +93,7 @@ export const useGroupCall = (userId: string | null) => {
         localStream: stream,
         events: {
           onSignal: ({ type, payload }) => {
-            const socket = socketRef.current
+            // const socket = socketRef.current
             if (!socket) return
 
             if (type === "ice-candidate") {
@@ -142,7 +144,7 @@ export const useGroupCall = (userId: string | null) => {
 
       return manager
     },
-    [dispatch],
+    [dispatch, socket],
   )
 
   // ---- Удалить Peer ----
@@ -166,16 +168,16 @@ export const useGroupCall = (userId: string | null) => {
 
   // ---- Socket события ----
   useEffect(() => {
-    if (!userId) return
-    const token = localStorage.getItem("accessToken")
-    if (!token) return
+    if (!userId || !socket) return
+    // const token = localStorage.getItem("accessToken")
+    // if (!token) return
 
-    if (!socketRef.current) {
-      socketRef.current = getSocket(token)
-    }
+    // if (!socketRef.current) {
+    //   socketRef.current = getSocket(token)
+    // }
 
-    const socket = socketRef.current
-    if (!socket.connected) socket.connect()
+    // const socket = socketRef.current
+    // if (socket&&!socket.connected) socket.connect()
 
     // 📥 Кто уже в комнате
     socket.on(
@@ -311,24 +313,26 @@ export const useGroupCall = (userId: string | null) => {
       socket.off("group-call:ended")
       socket.off("group-call:participants-count")
     }
-  }, [userId, createPeer, destroyPeer, dispatch])
+  }, [userId, createPeer, destroyPeer, dispatch, socket])
 
   // ---- Присоединиться ----
   const joinCall = useCallback(
     async (gId: string) => {
-      if (!socketRef.current) return
+      if (!socket) return
       await getOrCreateLocalStream()
       dispatch(joinGroupCall({ groupId: gId }))
-      socketRef.current.emit("group-call:join", { groupId: gId })
+      socket.emit("group-call:join", { groupId: gId })
     },
-    [dispatch],
+    [dispatch, socket],
   )
 
   // ---- Покинуть ----
   const leaveCall = useCallback(() => {
-    if (!socketRef.current) return
+    if (!socket) return
+
+    // if (!socketRef.current) return
     if (groupId) {
-      socketRef.current.emit("group-call:leave", { groupId })
+      socket.emit("group-call:leave", { groupId })
     }
 
     // Закрываем все соединения
@@ -341,7 +345,7 @@ export const useGroupCall = (userId: string | null) => {
     stopAllGroupStreams()
     closeAudioContext()
     dispatch(leaveGroupCall())
-  }, [groupId, destroyPeer, dispatch])
+  }, [groupId, destroyPeer, dispatch, socket])
 
   // ---- Мут аудио ----
   const handleToggleAudio = useCallback(() => {

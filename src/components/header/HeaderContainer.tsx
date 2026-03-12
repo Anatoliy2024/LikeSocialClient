@@ -11,7 +11,8 @@ import {
   fetchNotificationsThunk,
   markAllNotificationsReadThunk,
 } from "@/store/thunks/notificationsThunk"
-import { destroySocket } from "@/lib/socket"
+import { clearAuthSlice } from "@/store/slices/authSlice"
+// import { destroySocket } from "@/lib/socket"
 // import throttle from "lodash.throttle"
 // import { useHideOnScroll } from "@/hooks/useHideOnScroll"
 const HeaderContainer = ({
@@ -41,9 +42,9 @@ const HeaderContainer = ({
     if (isAuth) dispatch(fetchNotificationsThunk())
   }, [dispatch, isAuth])
 
-  const logoutButton = () => {
-    destroySocket()
-    dispatch(logoutThunk())
+  const logoutButton = async () => {
+    await dispatch(logoutThunk())
+    dispatch(clearAuthSlice())
     router.push("/")
     localStorage.removeItem("accessToken")
   }

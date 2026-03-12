@@ -7,15 +7,15 @@ import HeaderContainer from "@/components/header/HeaderContainer"
 import AuthProvider from "./AuthProvider"
 import { ServerType } from "@/store/slices/serverSlice"
 import { useTikServer } from "@/utils/useTikServer"
-import { getSocket } from "@/lib/socket"
+// import { destroySocket, getSocket } from "@/lib/socket"
 
 import style from "@/components/navbar/navbar.module.scss"
 import { RootState } from "@/store/store"
-import {
-  setOnlineStatusList,
-  updateUserStatus,
-} from "@/store/slices/onlineStatusSlice"
-import { addNotification } from "@/store/slices/notificationsSlice"
+// import {
+//   setOnlineStatusList,
+//   updateUserStatus,
+// } from "@/store/slices/onlineStatusSlice"
+// import { addNotification } from "@/store/slices/notificationsSlice"
 import { Loading } from "@/assets/loading/loading"
 // import {
 //   acceptCall,
@@ -44,7 +44,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
   const dispatch = useAppDispatch()
   const server = useAppSelector((state) => state.server) as ServerType
-  const userId = useAppSelector((state: RootState) => state.auth.userId) // пример, где хранится user
+  // const userId = useAppSelector((state: RootState) => state.auth.userId) // пример, где хранится user
   const role = useAppSelector((state: RootState) => state.auth.role) // пример, где хранится user
 
   const status = useAppSelector((state: RootState) => state.call.status)
@@ -92,45 +92,48 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
   useTikServer(server?.statusServer)
 
-  useEffect(() => {
-    if (!userId) return
-    const token = localStorage.getItem("accessToken")
-    if (!token) return
-    const socket = getSocket(token)
-    // if (!socket) return
-    // setSocket(socket)
-    socket.connect()
+  // useEffect(() => {
+  //   if (!userId) {
+  //     destroySocket()
+  //     return
+  //   }
+  //   const token = localStorage.getItem("accessToken")
+  //   if (!token) return
+  //   const socket = getSocket(token)
+  //   // if (!socket) return
+  //   // setSocket(socket)
+  //   socket.connect()
 
-    socket.emit("user-connected", userId)
-    socket.emit("get-online-users")
+  //   socket.emit("user-connected", userId)
+  //   socket.emit("get-online-users")
 
-    socket.on("user-status-changed", ({ userId, status }) => {
-      dispatch(updateUserStatus({ userId, status }))
+  //   socket.on("user-status-changed", ({ userId, status }) => {
+  //     dispatch(updateUserStatus({ userId, status }))
 
-      // обновляем локально статус этого пользователя
-    })
+  //     // обновляем локально статус этого пользователя
+  //   })
 
-    socket.on("online-users", (users) => {
-      dispatch(setOnlineStatusList(users))
-      console.log("Сейчас онлайн:", users)
-      // Тут можешь диспатчить в стор, если хочешь хранить онлайн список
-    })
+  //   socket.on("online-users", (users) => {
+  //     dispatch(setOnlineStatusList(users))
+  //     console.log("Сейчас онлайн:", users)
+  //     // Тут можешь диспатчить в стор, если хочешь хранить онлайн список
+  //   })
 
-    socket.on("new-notification", (notification) => {
-      // например, добавить в Redux:
-      dispatch(addNotification(notification))
-      // или показать toast:
-      // toast(notification.message)
-    })
+  //   socket.on("new-notification", (notification) => {
+  //     // например, добавить в Redux:
+  //     dispatch(addNotification(notification))
+  //     // или показать toast:
+  //     // toast(notification.message)
+  //   })
 
-    return () => {
-      socket.off("user-status-changed")
-      socket.off("online-users")
-      socket.off("new-notification")
+  //   return () => {
+  //     socket.off("user-status-changed")
+  //     socket.off("online-users")
+  //     socket.off("new-notification")
 
-      // socket.disconnect()
-    }
-  }, [userId, dispatch])
+  //     // socket.disconnect()
+  //   }
+  // }, [userId, dispatch])
 
   if (server?.loading) {
     return (

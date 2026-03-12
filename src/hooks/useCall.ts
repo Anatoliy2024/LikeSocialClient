@@ -1,7 +1,7 @@
 // src/hooks/useCall.ts
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
-import { getSocket } from "@/lib/socket"
+// import { getSocket } from "@/lib/socket"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   setIncomingCall,
@@ -15,7 +15,7 @@ import {
   setCallStatus,
 } from "@/store/slices/callSlice"
 import type { RootState } from "@/store/store"
-import type { Socket } from "socket.io-client"
+// import type { Socket } from "socket.io-client"
 import {
   getAudioContext,
   playRemoteStream,
@@ -34,6 +34,7 @@ import {
   VideoDevice,
   isFrontCamera,
 } from "@/utils/getVideoDevices"
+import { useSocket } from "@/providers/SocketProvider"
 
 type Maybe<T> = T | null
 
@@ -64,12 +65,14 @@ export const useCall = (userId: string | null) => {
 
   const managerRef = useRef<Maybe<PeerConnectionManager>>(null)
   const localStreamRef = useRef<Maybe<MediaStream>>(null)
-  const socketRef = useRef<Maybe<Socket>>(null)
+  // const socketRef = useRef<Maybe<Socket>>(null)
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const handleReconnectRef = useRef<
     ((initiator: boolean, targetSocketId?: string) => void) | null
   >(null)
+  const socket = useSocket()
+  // console.log("socket", !!socket)
 
   // ✅ Фикс #3: флаг намеренного завершения звонка
   const intentionalEndRef = useRef(false)
@@ -197,9 +200,9 @@ export const useCall = (userId: string | null) => {
           // 📡 Отправка сигналов через сокет
           onSignal: ({ type, payload }) => {
             const to = targetSocketId ?? callerId ?? targetId
-            if (!to || !socketRef.current) return
+            if (!to || !socket) return
 
-            socketRef.current.emit("call:signal", {
+            socket.emit("call:signal", {
               to,
               signal: { type, payload },
             })
@@ -262,31 +265,32 @@ export const useCall = (userId: string | null) => {
 
       return manager
     },
-    [callerId, targetId, dispatch],
+    [callerId, targetId, dispatch, socket],
   )
 
   // ---- beforeunload ----
   useEffect(() => {
     const handleUnload = () => {
       const to = callerId ?? targetId
-      if (to) socketRef.current?.emit("call:end", { to })
+      if (to) socket?.emit("call:end", { to })
     }
     window.addEventListener("beforeunload", handleUnload)
     return () => window.removeEventListener("beforeunload", handleUnload)
-  }, [callerId, targetId])
+  }, [callerId, targetId, socket])
 
   // ---- Socket события ----
   useEffect(() => {
-    if (!userId) return
-    const token = localStorage.getItem("accessToken")
-    if (!token) return
+    if (!userId || !socket) return
+    // const token = localStorage.getItem("accessToken")
+    // if (!token) return
 
-    const s = getSocket(token)
-    s.connect()
-    socketRef.current = s
+    // const s = getSocket(token)
+    // const s = getSocket(token)
+    // s.connect()
+    // socketRef.current = s
 
     // 📞 Входящий звонок
-    s.on("call:incoming", ({ from, avatar, username }) =>
+    socket.on("call:incoming", ({ from, avatar, username }) =>
       dispatch(setIncomingCall({ callerId: from, avatar, username })),
     )
 
@@ -328,15 +332,15 @@ export const useCall = (userId: string | null) => {
       endCall()
     }
 
-    s.on("call:accept", onCallAccept)
-    s.on("call:signal", onSignal)
-    s.on("call:end", onCallEnd)
+    socket.on("call:accept", onCallAccept)
+    socket.on("call:signal", onSignal)
+    socket.on("call:end", onCallEnd)
 
     return () => {
-      s.off("call:incoming")
-      s.off("call:accept", onCallAccept)
-      s.off("call:signal", onSignal)
-      s.off("call:end", onCallEnd)
+      socket.off("call:incoming")
+      socket.off("call:accept", onCallAccept)
+      socket.off("call:signal", onSignal)
+      socket.off("call:end", onCallEnd)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, createPeerConnection, dispatch])
@@ -346,36 +350,46 @@ export const useCall = (userId: string | null) => {
   // PC создаётся в onCallAccept — когда собеседник реально принял
   const callStart = useCallback(
     async (toId: string, avatar: string, username: string) => {
+      console.log("callStart до проверки socket")
+
+      if (!socket) return
+      console.log("callStart")
+
       dispatch(startCall({ peerId: toId, avatar, username }))
 
       // Получаем микрофон заранее чтобы не было задержки после accept
       await getOrCreateLocalStream()
 
-      socketRef.current?.emit("call:start", {
+      socket.emit("call:start", {
         toUserId: toId,
         fromUserId: userId,
         avatar,
         username,
       })
     },
-    [userId, dispatch],
+    [userId, dispatch, socket],
   )
 
   // ---- Принять звонок ----
   const callAccept = useCallback(() => {
+    if (!socket) return
+    console.log("callAccept")
+
     setLoadingConnect(true)
-    socketRef.current?.emit("call:accept", { to: callerId })
-  }, [callerId])
+    socket.emit("call:accept", { to: callerId })
+  }, [callerId, socket])
 
   // ---- Завершить звонок ----
   const endCall = useCallback(() => {
+    if (!socket) return
+
     const to = callerId ?? targetId
-    if (to) socketRef.current?.emit("call:end", { to })
+    if (to) socket.emit("call:end", { to })
 
     dispatch(setCallStatus("ended"))
     hardCleanup()
     dispatch(clearIncomingCall())
-  }, [callerId, targetId, hardCleanup, dispatch])
+  }, [callerId, targetId, hardCleanup, dispatch, socket])
 
   // ---- Мут микрофона ----
   const handleToggleAudio = useCallback(() => {

@@ -2,8 +2,9 @@
 import { useState } from "react"
 import style from "./CreateUserMessageModal.module.scss"
 import ButtonMenu from "../ui/button/Button"
-import { getSocket } from "@/lib/socket"
+// import { getSocket } from "@/lib/socket"
 import { useRouter } from "next/navigation"
+import { useSocket } from "@/providers/SocketProvider"
 // import CloseButton from "../ui/closeButton/CloseButton"
 export const CreateUserMessageModal = ({
   onClose,
@@ -16,8 +17,10 @@ export const CreateUserMessageModal = ({
 }) => {
   const [messageText, setMessageText] = useState("")
   const router = useRouter()
-  const socket = getSocket()
+  // const socket = getSocket()
+  const socket = useSocket()
   const handleSendMessage = async () => {
+    if (!socket) return
     try {
       socket.emit(
         "message:send",
@@ -40,7 +43,7 @@ export const CreateUserMessageModal = ({
           } else if (error) {
             console.log("error:", error)
           }
-        }
+        },
       )
 
       onClose()
