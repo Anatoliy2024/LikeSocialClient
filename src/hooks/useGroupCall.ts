@@ -150,7 +150,7 @@ export const useGroupCall = (userId: string | null) => {
     (socketId: string) => {
       const entry = peersRef.current[socketId]
       if (entry) {
-        entry.manager.close()
+        entry.manager.close(true)
         delete peersRef.current[socketId]
       }
       stopGroupRemoteStream(socketId)

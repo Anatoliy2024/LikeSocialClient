@@ -1,6 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-export type CallStatus = "calling" | "incoming" | "inCall" | "reconnecting" | ""
+export type CallStatus =
+  | "idle"
+  | "calling"
+  | "incoming"
+  | "inCall"
+  | "reconnecting"
+  | "failed"
+  | "ended"
 
 interface CallState {
   status: CallStatus
@@ -17,7 +24,7 @@ interface CallState {
 }
 
 const initialState: CallState = {
-  status: "",
+  status: "idle",
   callerId: null,
   avatarCaller: null,
   usernameCaller: null,
@@ -40,7 +47,7 @@ const callSlice = createSlice({
         peerId: string
         avatar?: string
         username?: string
-      }>
+      }>,
     ) => {
       state.status = "calling"
       state.targetId = action.payload.peerId
@@ -53,12 +60,15 @@ const callSlice = createSlice({
         callerId: string
         avatar: string
         username: string
-      }>
+      }>,
     ) => {
       state.status = "incoming"
       state.callerId = action.payload.callerId
       state.avatarCaller = action.payload.avatar
       state.usernameCaller = action.payload.username
+    },
+    setCallStatus: (state, action: PayloadAction<CallState["status"]>) => {
+      state.status = action.payload
     },
     acceptCall: (state) => {
       state.status = "inCall"
@@ -66,7 +76,7 @@ const callSlice = createSlice({
       state.reconnectAttempt = 0
     },
     clearIncomingCall: (state) => {
-      state.status = ""
+      state.status = "idle"
       state.targetId = null
       state.targetAvatar = null
       state.targetUsername = null
@@ -98,6 +108,7 @@ export const {
   setIncomingCall,
   clearIncomingCall,
   startCall,
+  setCallStatus,
   acceptCall,
   toggleAudio,
   toggleVideo,

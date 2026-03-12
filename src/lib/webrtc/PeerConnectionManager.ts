@@ -9,6 +9,7 @@ export interface PeerConnectionEvents {
     payload: SdpData | IceCandidateData
   }) => void
   onStream: (stream: MediaStream) => void
+  onConnected?: () => void
   onError: (error: Error) => void
   onClose: () => void
 }
@@ -38,6 +39,8 @@ export class PeerConnectionManager {
   private readonly initiator: boolean // 🔹 FIX: сохраняем как свойство класса
   private isClosed = false
   private isNegotiating = false // 🔹 Защита от параллельных renegotiate
+  private iceCandidateBuffer: RTCIceCandidateInit[] = []
+  private isBufferApplied = false // ← Новый флаг
 
   constructor(config: PeerConnectionConfig) {
     this.remoteSocketId = config.remoteSocketId
@@ -57,9 +60,28 @@ export class PeerConnectionManager {
     this.remoteStream = new MediaStream() // 🔹 React Native: из 'react-native-webrtc'
     this.setupEventListeners()
   }
+  // 🔹 2. Метод для применения буфера (переиспользуемый)
+  private async applyIceCandidateBuffer() {
+    if (this.isBufferApplied || this.iceCandidateBuffer.length === 0) return
+
+    console.log(
+      `📦 Applying ${this.iceCandidateBuffer.length} buffered ICE candidates`,
+    )
+
+    for (const candidate of this.iceCandidateBuffer) {
+      try {
+        await this.pc.addIceCandidate(candidate)
+      } catch (err) {
+        console.warn("⚠️ Failed to add buffered candidate:", err)
+      }
+    }
+
+    this.iceCandidateBuffer = []
+    this.isBufferApplied = true
+  }
 
   private setupEventListeners() {
-    // 🎵 Добавляем аудио-треки
+    // 🎵 Добавляем аудио-треки (всегда при создании)
     this.localStream.getAudioTracks().forEach((track) => {
       this.pc.addTrack(track, this.localStream)
     })
@@ -85,6 +107,15 @@ export class PeerConnectionManager {
     // ❌ Ошибки соединения
     this.pc.onconnectionstatechange = () => {
       if (this.isClosed) return
+      console.log(
+        `🔌 connectionState [${this.remoteSocketId}]:`,
+        this.pc.connectionState,
+      )
+
+      if (this.pc.connectionState === "connected") {
+        console.log("✅ Connection established")
+        this.events.onConnected?.()
+      }
       if (this.pc.connectionState === "failed") {
         this.events.onError(new Error("Connection failed"))
       }
@@ -101,27 +132,28 @@ export class PeerConnectionManager {
       }
     }
 
-    // 🔁 Negotiation needed (только для инициатора)
+    // 🔁 Negotiation needed (только для инициатора, ТОЛЬКО для начального соединения)
     if (this.initiator) {
-      // 🔹 FIX: используем это.initiator, а не config
       this.pc.onnegotiationneeded = async () => {
-        await this.createAndSendOffer()
+        // 🔹 Пропускаем, если уже есть удалённое описание (ренеготация)
+        if (!this.pc.remoteDescription) {
+          await this.createAndSendOffer()
+        }
       }
     }
   }
-
   /**
-   * Создаёт и отправляет offer (выносится в отдельный метод для повторного использования)
+   * Создаёт и отправляет offer
    */
   private async createAndSendOffer() {
     if (this.isClosed || this.isNegotiating) return
-    this.isNegotiating = true
+    if (this.pc.signalingState !== "stable") return
 
+    this.isNegotiating = true
     try {
-      const offer = await this.pc.createOffer({
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: false,
-      })
+      const offer = await this.pc.createOffer()
+      if (this.pc.signalingState !== "stable") return
+
       await this.pc.setLocalDescription(offer)
       this.events.onSignal({
         type: "offer",
@@ -129,7 +161,7 @@ export class PeerConnectionManager {
       })
     } catch (err) {
       this.events.onError(
-        err instanceof Error ? err : new Error("Create offer failed")
+        err instanceof Error ? err : new Error("Create offer failed"),
       )
     } finally {
       this.isNegotiating = false
@@ -137,7 +169,36 @@ export class PeerConnectionManager {
   }
 
   /**
-   * Обработка входящего сигнала от сокета
+   * 🔹 НОВЫЙ МЕТОД: Запуск ренеготации для добавления видео
+   * Вызывай этот метод из useCall/useGroupCall при toggleVideo
+   */
+  async renegotiateForVideo() {
+    if (this.isClosed || this.isNegotiating) return
+    if (this.pc.signalingState !== "stable") return
+
+    this.isNegotiating = true
+    try {
+      const offer = await this.pc.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: true, // ← Важно для видео
+      })
+      if (this.pc.signalingState !== "stable") return
+
+      await this.pc.setLocalDescription(offer)
+      this.events.onSignal({
+        type: "offer",
+        payload: this.pc.localDescription!,
+      })
+      console.log("🎥 Renegotiation offer sent for video")
+    } catch (err) {
+      console.error("❌ Renegotiation failed:", err)
+    } finally {
+      this.isNegotiating = false
+    }
+  }
+
+  /**
+   * Обработка входящего сигнала
    */
   async handleSignal(data: {
     type: "offer" | "answer" | "ice-candidate"
@@ -148,15 +209,30 @@ export class PeerConnectionManager {
     try {
       switch (data.type) {
         case "offer": {
+          // Glare handling: если у нас уже есть локальный offer — откатываемся
+          if (this.pc.signalingState === "have-local-offer") {
+            await this.pc.setLocalDescription({ type: "rollback" })
+          }
+
           await this.pc.setRemoteDescription(
-            data.payload as RTCSessionDescriptionInit
+            data.payload as RTCSessionDescriptionInit,
           )
-          // Создаём answer только если мы НЕ инициатор
-          if (!this.initiator) {
-            const answer = await this.pc.createAnswer({
-              offerToReceiveAudio: true,
-              offerToReceiveVideo: false,
-            })
+          await this.applyIceCandidateBuffer()
+          // // Применяем буферизованные ICE кандидаты
+          // if (this.iceCandidateBuffer.length > 0) {
+          //   console.log(
+          //     `📦 Applying ${this.iceCandidateBuffer.length} buffered ICE candidates`,
+          //   )
+          //   for (const candidate of this.iceCandidateBuffer) {
+          //     await this.pc.addIceCandidate(candidate)
+          //   }
+          //   this.iceCandidateBuffer = []
+          // }
+
+          // 🔹 Создаём answer ТОЛЬКО если мы НЕ инициатор (для начального соединения)
+          // Но для ренеготации — создаём всегда, если получили offer
+          if (!this.initiator || this.pc.remoteDescription) {
+            const answer = await this.pc.createAnswer()
             await this.pc.setLocalDescription(answer)
             this.events.onSignal({
               type: "answer",
@@ -165,18 +241,41 @@ export class PeerConnectionManager {
           }
           break
         }
+
         case "answer": {
-          // Answer применяем только если мы инициатор
-          if (this.initiator && this.pc.signalingState !== "stable") {
-            await this.pc.setRemoteDescription(
-              data.payload as RTCSessionDescriptionInit
-            )
+          // 🔹 Answer применяем, если мы инициатор ИЛИ если это ренеготация
+          if (this.initiator || this.pc.signalingState === "have-local-offer") {
+            if (this.pc.signalingState === "have-local-offer") {
+              await this.pc.setRemoteDescription(
+                data.payload as RTCSessionDescriptionInit,
+              )
+              await this.applyIceCandidateBuffer()
+              // if (this.iceCandidateBuffer.length > 0) {
+              //   for (const candidate of this.iceCandidateBuffer) {
+              //     await this.pc.addIceCandidate(candidate)
+              //   }
+              //   this.iceCandidateBuffer = []
+              // }
+            }
           }
           break
         }
+
         case "ice-candidate": {
-          if (data.payload && this.pc.remoteDescription) {
-            await this.pc.addIceCandidate(data.payload as RTCIceCandidateInit)
+          if (!data.payload) break
+
+          const candidate = data.payload as RTCIceCandidateInit
+
+          if (this.pc.remoteDescription) {
+            // await this.pc.addIceCandidate(data.payload as RTCIceCandidateInit)
+            await this.pc
+              .addIceCandidate(candidate)
+              .catch((err) =>
+                console.warn("⚠️ Failed to add ICE candidate:", err),
+              )
+          } else {
+            console.log("📦 Buffering ICE candidate")
+            this.iceCandidateBuffer.push(candidate)
           }
           break
         }
@@ -184,7 +283,7 @@ export class PeerConnectionManager {
     } catch (err) {
       console.error(`[PeerConnectionManager] Signal error (${data.type}):`, err)
       this.events.onError(
-        err instanceof Error ? err : new Error("Signal handling failed")
+        err instanceof Error ? err : new Error("Signal handling failed"),
       )
     }
   }
@@ -199,22 +298,29 @@ export class PeerConnectionManager {
     })
   }
 
-  close() {
+  close(silent = false) {
     if (this.isClosed) return
     this.isClosed = true
 
     this.pc.ontrack = null
     this.pc.onicecandidate = null
     this.pc.onconnectionstatechange = null
+    this.pc.oniceconnectionstatechange = null
     this.pc.onnegotiationneeded = null
+    this.iceCandidateBuffer = []
+    this.isBufferApplied = false
 
-    // Останавливаем только отправленные треки, не трогаем локальный стрим (он управляется хуком)
-    this.pc.getSenders().forEach((sender) => {
-      sender.track?.stop()
-    })
+    // // Останавливаем только отправленные треки, не трогаем локальный стрим (он управляется хуком)
+    // this.pc.getSenders().forEach((sender) => {
+    //   sender.track?.stop()
+    // })
 
     this.pc.close()
-    this.events.onClose()
+    // Не триггерим onClose если закрываем намеренно (silent = true)
+    if (!silent) {
+      this.events.onClose()
+    }
+    // this.events.onClose()
   }
 
   getRemoteSocketId(): string {
@@ -230,6 +336,16 @@ export class PeerConnectionManager {
    */
   getConnectionState(): RTCPeerConnectionState {
     return this.pc.connectionState
+  }
+
+  addVideoTrack(track: MediaStreamTrack, stream: MediaStream) {
+    this.pc.addTrack(track, stream)
+  }
+  getIsClosed(): boolean {
+    return (
+      this.pc.connectionState === "closed" ||
+      this.pc.connectionState === "failed"
+    )
   }
 }
 
