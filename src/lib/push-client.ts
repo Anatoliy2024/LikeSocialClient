@@ -99,8 +99,23 @@ export async function getCurrentBrowserSubscription(): Promise<PushSubscriptionJ
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) return null
 
   try {
-    const registration = await navigator.serviceWorker.ready
-    const subscription = await registration.pushManager.getSubscription()
+    // const registration = await navigator.serviceWorker.ready
+    const registration = await withTimeout(
+      navigator.serviceWorker.ready,
+      3000,
+      null,
+    )
+    if (!registration) {
+      console.warn("⚠️ Service Worker не готов, пропускаем отписку")
+      return null
+    }
+    let subscription = null
+    try {
+      subscription = await registration.pushManager?.getSubscription()
+    } catch (pushErr) {
+      console.warn("⚠️ PushManager недоступен:", pushErr)
+    }
+    // const subscription = await registration.pushManager.getSubscription()
     return subscription ? (subscription.toJSON() as PushSubscriptionJSON) : null
   } catch {
     return null
