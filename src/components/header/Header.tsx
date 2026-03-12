@@ -23,6 +23,7 @@ type HeaderData = {
   notifications: initialStateNotificationsType
   deleteAllNotifications: () => void
   markAllNotificationsRead: () => void
+
   // showHeader: boolean
   // handleShowNotification:() => void
   // handleCloseNotification:() => void

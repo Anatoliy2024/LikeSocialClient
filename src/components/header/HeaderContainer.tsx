@@ -27,6 +27,7 @@ const HeaderContainer = ({
   // const [showHeader, setShowHeader] = useState(true)
   // // const [lastScrollY, setLastScrollY] = useState(0)
   // const lastScrollYRef = useRef(0)
+
   const dispatch = useAppDispatch()
   const router = useRouter()
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
@@ -43,18 +44,25 @@ const HeaderContainer = ({
   }, [dispatch, isAuth])
 
   const logoutButton = async () => {
-    try {
-      console.log("logoutButton start")
-      await dispatch(logoutThunk())
-      console.log("after dispatch(logoutThunk())")
+    // try {
+    // console.log("logoutButton start")
+    dispatch(logoutThunk()).catch((err) =>
+      console.warn("⚠️ Logout thunk error (non-blocking):", err),
+    )
+    // await dispatch(logoutThunk())
+    // console.log("after dispatch(logoutThunk())")
+
+    setTimeout(() => {
       router.push("/")
       localStorage.removeItem("accessToken")
 
       dispatch(clearAuthSlice())
-      console.log("logoutButton finish")
-    } catch (error) {
-      console.log("error", error)
-    }
+      console.log("🔘 Logout complete (local cleanup done)")
+    }, 100)
+    // console.log("logoutButton finish")
+    // } catch (error) {
+    //   console.log("error", error)
+    // }
   }
   const toggleShowNotification = () => {
     setShowNotifications((prev) => !prev)
@@ -82,6 +90,7 @@ const HeaderContainer = ({
       notifications={notifications}
       deleteAllNotifications={deleteAllNotifications}
       markAllNotificationsRead={markAllNotificationsRead}
+
       // showHeader={showHeader}
       // handleShowNotification={handleShowNotification}
       // handleCloseNotification={handleCloseNotification}
