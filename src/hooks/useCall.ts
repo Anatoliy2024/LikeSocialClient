@@ -200,6 +200,8 @@ export const useCall = (userId: string | null) => {
           // 📡 Отправка сигналов через сокет
           onSignal: ({ type, payload }) => {
             const to = targetSocketId ?? callerId ?? targetId
+            console.log("onSignal to", to)
+            console.log("onSignal socket", socket)
             if (!to || !socket) return
 
             socket.emit("call:signal", {
@@ -272,7 +274,7 @@ export const useCall = (userId: string | null) => {
   useEffect(() => {
     const handleUnload = () => {
       const to = callerId ?? targetId
-      if (to) socket?.emit("call:end", { to })
+      if (to && socket) socket.emit("call:end", { to })
     }
     window.addEventListener("beforeunload", handleUnload)
     return () => window.removeEventListener("beforeunload", handleUnload)
