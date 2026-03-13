@@ -41,10 +41,20 @@ type Maybe<T> = T | null
 const MAX_RECONNECT_ATTEMPTS = 2
 const RECONNECT_DELAY_MS = 2000
 
-const ICE_SERVERS = [
-  { urls: "stun:stun.l.google.com:19302" },
-  { urls: "stun:stun1.l.google.com:19302" },
-]
+// const ICE_SERVERS = [
+//   { urls: "stun:stun.l.google.com:19302" },
+//   { urls: "stun:stun1.l.google.com:19302" },
+//   { urls: "stun:stun2.l.google.com:19302" },
+//   { urls: "stun:stun3.l.google.com:19302" },
+//   { urls: "stun:stun4.l.google.com:19302" },
+
+//   // Cloudflare — бесплатный, без лимитов
+//   { urls: "stun:stun.cloudflare.com:3478" },
+
+//   // Резервные от других провайдеров
+//   { urls: "stun:stun.stunprotocol.org:3478" },
+//   { urls: "stun:stun.voip.blackberry.com:3478" },
+// ]
 
 export const useCall = (userId: string | null) => {
   const [loadingConnect, setLoadingConnect] = useState(false)
@@ -71,6 +81,13 @@ export const useCall = (userId: string | null) => {
   const handleReconnectRef = useRef<
     ((initiator: boolean, targetSocketId?: string) => void) | null
   >(null)
+  const isCreatingManagerRef = useRef(false)
+  const pendingSignalsRef = useRef<
+    Array<{
+      from: string
+      signal: { type: string; payload: SdpData | IceCandidateData }
+    }>
+  >([])
   const socket = useSocket()
   // console.log("socket", !!socket)
 
@@ -137,6 +154,8 @@ export const useCall = (userId: string | null) => {
 
     stopRemoteStream()
     closeAudioContext()
+    isCreatingManagerRef.current = false
+    pendingSignalsRef.current = []
 
     reconnectAttemptsRef.current = 0
     intentionalEndRef.current = false // сбрасываем для следующего звонка
@@ -205,7 +224,7 @@ export const useCall = (userId: string | null) => {
         remoteUserId: targetId || callerId || "",
         remoteSocketId: targetSocketId || "",
         localStream: stream,
-        iceServers: ICE_SERVERS,
+        // iceServers: ICE_SERVERS,
         events: {
           // 📡 Отправка сигналов через сокет
           onSignal: ({ type, payload }) => {
@@ -331,7 +350,7 @@ export const useCall = (userId: string | null) => {
       )
     }
 
-    // 📡 Обработка сигналов (offer/answer/ice)
+    // Заменяй полностью onSignal внутри useEffect
     const onSignal = async ({
       from,
       signal,
@@ -343,32 +362,77 @@ export const useCall = (userId: string | null) => {
         from,
         type: signal.type,
         hasManager: !!managerRef.current,
+        isCreating: isCreatingManagerRef.current,
         signalingState:
           managerRef.current?.getPeerConnection?.()?.signalingState,
       })
-      if (!managerRef.current) {
-        console.log(
-          "🔧 [DEBUG] No manager, creating new one for signal:",
-          signal.type,
-        )
-        if (signal.type === "offer") {
-          const stream = await getOrCreateLocalStream()
-          const manager = createPeerConnection(false, stream, from)
-          managerRef.current = manager
-          console.log("⏳ [DEBUG] Handling offer...")
-          await manager.handleSignal({
-            type: "offer",
-            payload: signal.payload,
-          })
-          console.log("✅ [DEBUG] Offer handled")
-        }
-      } else {
+
+      // Если manager уже есть — просто передаём сигнал
+      if (managerRef.current) {
         console.log("⏳ [DEBUG] Handling signal with existing manager...")
         await managerRef.current.handleSignal({
           type: signal.type as "offer" | "answer" | "ice-candidate",
           payload: signal.payload,
         })
         console.log("✅ [DEBUG] Signal handled")
+        return
+      }
+
+      // Manager ещё создаётся (offer в процессе) — буферизуем всё кроме offer
+      if (isCreatingManagerRef.current) {
+        if (signal.type !== "offer") {
+          console.log(
+            "📦 [DEBUG] Buffering signal while manager is creating:",
+            signal.type,
+          )
+          pendingSignalsRef.current.push({ from, signal })
+        }
+        return
+      }
+
+      // Manager нет и не создаётся
+      if (signal.type === "offer") {
+        console.log("🔧 [DEBUG] No manager, creating new one for offer")
+        isCreatingManagerRef.current = true
+
+        try {
+          const stream = await getOrCreateLocalStream()
+          const manager = createPeerConnection(false, stream, from)
+          managerRef.current = manager
+
+          console.log("⏳ [DEBUG] Handling offer...")
+          await manager.handleSignal({
+            type: "offer",
+            payload: signal.payload,
+          })
+          console.log("✅ [DEBUG] Offer handled")
+
+          // Применяем все накопившиеся сигналы по порядку
+          if (pendingSignalsRef.current.length > 0) {
+            console.log(
+              `📦 [DEBUG] Applying ${pendingSignalsRef.current.length} buffered signals`,
+            )
+            for (const pending of pendingSignalsRef.current) {
+              await manager.handleSignal({
+                type: pending.signal.type as
+                  | "offer"
+                  | "answer"
+                  | "ice-candidate",
+                payload: pending.signal.payload,
+              })
+            }
+            pendingSignalsRef.current = []
+          }
+        } finally {
+          isCreatingManagerRef.current = false
+        }
+      } else {
+        // ice-candidate пришёл раньше offer и manager ещё не создан — буферизуем
+        console.log(
+          "📦 [DEBUG] Buffering early signal (no manager yet):",
+          signal.type,
+        )
+        pendingSignalsRef.current.push({ from, signal })
       }
     }
 
