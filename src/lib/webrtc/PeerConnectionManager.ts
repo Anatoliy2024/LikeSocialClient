@@ -55,6 +55,7 @@ export class PeerConnectionManager {
       iceServers: config.iceServers || [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" }, // Опционально
       ],
     })
 
@@ -107,6 +108,18 @@ export class PeerConnectionManager {
 
     // ❌ Ошибки соединения
     this.pc.onconnectionstatechange = () => {
+      console.log(
+        `🔌 [PC] connectionState [${this.remoteSocketId}]:`,
+        this.pc.connectionState,
+      )
+      console.log(
+        `❄️ [PC] iceConnectionState [${this.remoteSocketId}]:`,
+        this.pc.iceConnectionState,
+      )
+      console.log(
+        `📡 [PC] signalingState [${this.remoteSocketId}]:`,
+        this.pc.signalingState,
+      )
       if (this.isClosed) return
       console.log(
         `🔌 connectionState [${this.remoteSocketId}]:`,
@@ -118,6 +131,7 @@ export class PeerConnectionManager {
         this.events.onConnected?.()
       }
       if (this.pc.connectionState === "failed") {
+        console.error("❌ [PC] Connection failed")
         this.events.onError(new Error("Connection failed"))
       }
     }
@@ -333,7 +347,9 @@ export class PeerConnectionManager {
           if (!data.payload) break
 
           const candidate = data.payload as RTCIceCandidateInit
-
+          // console.log(
+          //   `❄️ [ICE] Candidate: type=${candidate.type}, candidate=${candidate.candidate?.slice(0, 50)}...`,
+          // )
           if (this.pc.remoteDescription) {
             // await this.pc.addIceCandidate(data.payload as RTCIceCandidateInit)
             await this.pc

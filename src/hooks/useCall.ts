@@ -77,8 +77,18 @@ export const useCall = (userId: string | null) => {
   // ✅ Фикс #3: флаг намеренного завершения звонка
   const intentionalEndRef = useRef(false)
 
+  // 🔹 В начало хука useCall — отслеживаем состояние сокета
+  useEffect(() => {
+    console.log("🔌 [DEBUG] Socket state:", {
+      hasSocket: !!socket,
+      connected: socket?.connected,
+      id: socket?.id?.slice(0, 8) + "...",
+      userId,
+    })
+  }, [socket, userId])
+
   // ---- Получение микрофона ----
-  const getOrCreateLocalStream = async () => {
+  const getOrCreateLocalStream = useCallback(async () => {
     if (localStreamRef.current) {
       localStreamRef.current.getAudioTracks().forEach((t) => (t.enabled = true))
       return localStreamRef.current
@@ -102,7 +112,7 @@ export const useCall = (userId: string | null) => {
     localStreamRef.current = stream
     setLocalStreamState(stream)
     return stream
-  }
+  }, [])
 
   // ---- Очистка ----
   const hardCleanup = useCallback(() => {
@@ -292,15 +302,33 @@ export const useCall = (userId: string | null) => {
     // socketRef.current = s
 
     // 📞 Входящий звонок
-    socket.on("call:incoming", ({ from, avatar, username }) =>
-      dispatch(setIncomingCall({ callerId: from, avatar, username })),
-    )
+    // socket.on("call:incoming", ({ from, avatar, username }) =>
+    //   dispatch(setIncomingCall({ callerId: from, avatar, username })),
+    // )
+
+    const onIncoming = ({
+      from,
+      avatar,
+      username,
+    }: {
+      from: string
+      avatar: string
+      username: string
+    }) => {
+      console.log("📥 [DEBUG] Received call:incoming:", { from })
+      dispatch(setIncomingCall({ callerId: from, avatar, username }))
+    }
 
     // ✅ Фикс callStart: PC создаём здесь — только после того как собеседник принял
     const onCallAccept = async ({ from }: { from: string }) => {
+      console.log("📥 [DEBUG] Received call:accept from:", from)
       const stream = await getOrCreateLocalStream()
+      console.log("🔧 [DEBUG] Creating PeerConnection (initiator: true)")
       const manager = createPeerConnection(true, stream, from)
       managerRef.current = manager
+      console.log(
+        "✅ [DEBUG] PeerConnection created, waiting for negotiation...",
+      )
     }
 
     // 📡 Обработка сигналов (offer/answer/ice)
@@ -311,57 +339,77 @@ export const useCall = (userId: string | null) => {
       from: string
       signal: { type: string; payload: SdpData | IceCandidateData }
     }) => {
+      console.log("📡 [DEBUG] Received signal:", {
+        from,
+        type: signal.type,
+        hasManager: !!managerRef.current,
+        signalingState:
+          managerRef.current?.getPeerConnection?.()?.signalingState,
+      })
       if (!managerRef.current) {
+        console.log(
+          "🔧 [DEBUG] No manager, creating new one for signal:",
+          signal.type,
+        )
         if (signal.type === "offer") {
           const stream = await getOrCreateLocalStream()
           const manager = createPeerConnection(false, stream, from)
           managerRef.current = manager
+          console.log("⏳ [DEBUG] Handling offer...")
           await manager.handleSignal({
             type: "offer",
             payload: signal.payload,
           })
+          console.log("✅ [DEBUG] Offer handled")
         }
       } else {
+        console.log("⏳ [DEBUG] Handling signal with existing manager...")
         await managerRef.current.handleSignal({
           type: signal.type as "offer" | "answer" | "ice-candidate",
           payload: signal.payload,
         })
+        console.log("✅ [DEBUG] Signal handled")
       }
     }
 
     // 🚪 Завершение звонка от собеседника
     const onCallEnd = () => {
+      console.log("📥 [DEBUG] Received call:end")
       endCall()
     }
-
+    socket.on("call:incoming", onIncoming)
     socket.on("call:accept", onCallAccept)
     socket.on("call:signal", onSignal)
     socket.on("call:end", onCallEnd)
 
     return () => {
-      socket.off("call:incoming")
+      console.log("🧹 [DEBUG] Cleaning up socket listeners")
+      socket.off("call:incoming", onIncoming)
       socket.off("call:accept", onCallAccept)
       socket.off("call:signal", onSignal)
       socket.off("call:end", onCallEnd)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, createPeerConnection, dispatch])
+  }, [userId, dispatch, socket, getOrCreateLocalStream])
 
   // ---- Начать звонок ----
   // ✅ Фикс callStart: только emit, без создания PC
   // PC создаётся в onCallAccept — когда собеседник реально принял
   const callStart = useCallback(
     async (toId: string, avatar: string, username: string) => {
-      console.log("callStart до проверки socket")
+      console.log("📞 [DEBUG] callStart called:", { toId, userId })
 
-      if (!socket) return
+      if (!socket) {
+        console.error("❌ [DEBUG] socket is null in callStart")
+        return
+      }
       console.log("callStart")
 
       dispatch(startCall({ peerId: toId, avatar, username }))
 
       // Получаем микрофон заранее чтобы не было задержки после accept
       await getOrCreateLocalStream()
-
+      console.log("📤 [DEBUG] Emitting call:start:", { toUserId: toId })
       socket.emit("call:start", {
         toUserId: toId,
         fromUserId: userId,
@@ -374,10 +422,13 @@ export const useCall = (userId: string | null) => {
 
   // ---- Принять звонок ----
   const callAccept = useCallback(() => {
-    if (!socket) return
-    console.log("callAccept")
+    if (!socket) {
+      console.error("❌ [DEBUG] socket is null in callAccept")
+      return
+    }
 
     setLoadingConnect(true)
+    console.log("📤 [DEBUG] Emitting call:accept:", { to: callerId })
     socket.emit("call:accept", { to: callerId })
   }, [callerId, socket])
 
