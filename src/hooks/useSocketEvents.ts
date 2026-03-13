@@ -7,7 +7,12 @@ import {
   setOnlineStatusList,
   updateUserStatus,
 } from "@/store/slices/onlineStatusSlice"
-import { addNotification } from "@/store/slices/notificationsSlice"
+import {
+  addNotification,
+  dellNotification,
+  updateNotification,
+} from "@/store/slices/notificationsSlice"
+import { notificationsType } from "@/store/thunks/notificationsThunk"
 
 export const useSocketEvents = (userId: string | null) => {
   const dispatch = useAppDispatch()
@@ -27,6 +32,23 @@ export const useSocketEvents = (userId: string | null) => {
       socket.connect()
     }
 
+    const newNotification = (notification: {
+      type?: "create" | "delete" | "update"
+      notification: notificationsType
+    }) => {
+      if (!notification?.type) {
+        // console.log("notification.type нету")
+        dispatch(addNotification(notification))
+      } else if (notification.type === "delete") {
+        // console.log("notification.type == delete", notification)
+        dispatch(dellNotification(notification))
+      } else if (notification.type === "update") {
+        // console.log("notification.type == update", notification)
+
+        dispatch(updateNotification(notification))
+      }
+    }
+
     socket.emit("user-connected", userId)
     socket.emit("get-online-users")
 
@@ -41,14 +63,12 @@ export const useSocketEvents = (userId: string | null) => {
     })
 
     socket.off("new-notification")
-    socket.on("new-notification", (notification) => {
-      dispatch(addNotification(notification))
-    })
+    socket.on("new-notification", newNotification)
 
     return () => {
       socket.off("user-status-changed")
       socket.off("online-users")
-      socket.off("new-notification")
+      socket.off("new-notification", newNotification)
     }
   }, [userId, dispatch])
 }

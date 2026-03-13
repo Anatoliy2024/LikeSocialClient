@@ -6,12 +6,21 @@ type senderType = {
   avatar: string
   username: string
 }
+type conversationIdType = {
+  _id: string
+  avatar: string
+  title: string
+  type: string
+}
 export type notificationsType = {
   createdAt: string
   isRead: boolean
-  message: string
+  message?: string
   recipientId: string
   roomId: string | null
+  conversationId?: conversationIdType
+  count: number
+  updatedAt: string
   senderId: senderType
   type: string
   __v: string
@@ -56,7 +65,7 @@ export const markAllNotificationsReadThunk = createAsyncThunk<
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
     return thunkAPI.rejectWithValue(
-      "Ошибка отметки уведомлений как прочитанных"
+      "Ошибка отметки уведомлений как прочитанных",
     )
   }
 })

@@ -36,9 +36,7 @@ const HeaderContainer = ({
   const avatar = useAppSelector((state: RootState) => state.auth.avatar)
   // const avatar = useAppSelector((state: RootState) => state.profile.avatar)
   const [showNotifications, setShowNotifications] = useState(false)
-  const notifications = useAppSelector(
-    (state: RootState) => state.notifications,
-  )
+
   useEffect(() => {
     if (isAuth) dispatch(fetchNotificationsThunk())
   }, [dispatch, isAuth])
@@ -75,7 +73,7 @@ const HeaderContainer = ({
   }
 
   // const showHeader = useHideOnScroll()
-
+  console.log("Header rerender")
   return (
     <Header
       isAuth={isAuth}
@@ -87,7 +85,7 @@ const HeaderContainer = ({
       menuOpen={menuOpen}
       showNotifications={showNotifications}
       toggleShowNotification={toggleShowNotification}
-      notifications={notifications}
+      // notifications={notifications}
       deleteAllNotifications={deleteAllNotifications}
       markAllNotificationsRead={markAllNotificationsRead}
 

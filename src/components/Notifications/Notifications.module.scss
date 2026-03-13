@@ -1,4 +1,4 @@
-.wrapper {
+.notifications {
   position: fixed;
   top: 0;
   left: 0;
@@ -8,7 +8,7 @@
   justify-content: center;
   align-items: center;
   //   background-color: rgba(255, 255, 255, 0.577);
-  .container {
+  &__container {
     position: relative;
     min-width: 70vw;
     min-height: 70vh;
@@ -21,45 +21,69 @@
     justify-content: center;
     align-items: center;
     border-radius: 20px;
-    .buttonCloseBlock {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-    }
-    .lists {
-      max-height: 60vh;
-      overflow-y: auto;
-      //   width: auto;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      .list {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        .imgBlockList {
-          max-width: 40px;
-          max-height: 40px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          overflow: hidden;
-          border-radius: 50%;
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
-        }
-        .message {
-        }
-      }
-    }
+
     .buttonBlock {
       display: flex;
       justify-content: center;
       gap: 20px;
     }
+  }
+  &__buttonCloseBlock {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+
+  &__lists {
+    max-height: 60vh;
+    overflow-y: auto;
+    //   width: auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  &__list {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  &__senderInfo {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    span:nth-child(1) {
+      color: rgb(177, 85, 193);
+    }
+    span:nth-child(2) {
+      display: flex;
+      width: 30px;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      // color: rgb(222, 107, 242);
+      border-radius: 50%;
+      border: 1px solid rgb(222, 107, 242);
+    }
+    span:nth-child(3) {
+      // color: rgb(177, 85, 193);
+    }
+  }
+
+  &__imgBlockList {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    img {
+      width: 100%;
+      height: 100%;
+      // object-fit: cover;
+    }
+  }
+  &__message {
   }
 }

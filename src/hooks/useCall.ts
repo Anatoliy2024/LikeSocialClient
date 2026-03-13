@@ -94,15 +94,15 @@ export const useCall = (userId: string | null) => {
   // ✅ Фикс #3: флаг намеренного завершения звонка
   const intentionalEndRef = useRef(false)
 
-  // 🔹 В начало хука useCall — отслеживаем состояние сокета
-  useEffect(() => {
-    console.log("🔌 [DEBUG] Socket state:", {
-      hasSocket: !!socket,
-      connected: socket?.connected,
-      id: socket?.id?.slice(0, 8) + "...",
-      userId,
-    })
-  }, [socket, userId])
+  // // 🔹 В начало хука useCall — отслеживаем состояние сокета
+  // useEffect(() => {
+  //   console.log("🔌 [DEBUG] Socket state:", {
+  //     hasSocket: !!socket,
+  //     connected: socket?.connected,
+  //     id: socket?.id?.slice(0, 8) + "...",
+  //     userId,
+  //   })
+  // }, [socket, userId])
 
   // ---- Получение микрофона ----
   const getOrCreateLocalStream = useCallback(async () => {
@@ -229,8 +229,8 @@ export const useCall = (userId: string | null) => {
           // 📡 Отправка сигналов через сокет
           onSignal: ({ type, payload }) => {
             const to = targetSocketId ?? callerId ?? targetId
-            console.log("onSignal to", to)
-            console.log("onSignal socket", socket)
+            // console.log("onSignal to", to)
+            // console.log("onSignal socket", socket)
             if (!to || !socket) return
 
             socket.emit("call:signal", {
@@ -241,10 +241,10 @@ export const useCall = (userId: string | null) => {
 
           // 🎵 Приём удалённого стрима — аудио через Web Audio, видео через state
           onStream: (incomingStream) => {
-            console.log(
-              "📥 Remote stream received:",
-              incomingStream.getTracks(),
-            )
+            // console.log(
+            //   "📥 Remote stream received:",
+            //   incomingStream.getTracks(),
+            // )
 
             // Аудио треки → Web Audio цепочка (фильтры + gain)
             const audioTracks = incomingStream.getAudioTracks()
@@ -265,7 +265,7 @@ export const useCall = (userId: string | null) => {
 
           // 🟢 Соединение установлено
           onConnected: () => {
-            console.log("✅ Connection established")
+            // console.log("✅ Connection established")
             dispatch(acceptCall())
             setLoadingConnect(false)
             if (reconnectAttemptsRef.current > 0) {
@@ -285,7 +285,7 @@ export const useCall = (userId: string | null) => {
 
           // 🚪 Закрытие
           onClose: () => {
-            console.log("🔌 PeerConnection closed")
+            // console.log("🔌 PeerConnection closed")
             // ✅ Фикс #3: реконнектим только если это НЕ намеренное завершение
             if (!intentionalEndRef.current) {
               handleReconnectRef.current?.(initiator, targetSocketId)
@@ -334,20 +334,20 @@ export const useCall = (userId: string | null) => {
       avatar: string
       username: string
     }) => {
-      console.log("📥 [DEBUG] Received call:incoming:", { from })
+      // console.log("📥 [DEBUG] Received call:incoming:", { from })
       dispatch(setIncomingCall({ callerId: from, avatar, username }))
     }
 
     // ✅ Фикс callStart: PC создаём здесь — только после того как собеседник принял
     const onCallAccept = async ({ from }: { from: string }) => {
-      console.log("📥 [DEBUG] Received call:accept from:", from)
+      // console.log("📥 [DEBUG] Received call:accept from:", from)
       const stream = await getOrCreateLocalStream()
-      console.log("🔧 [DEBUG] Creating PeerConnection (initiator: true)")
+      // console.log("🔧 [DEBUG] Creating PeerConnection (initiator: true)")
       const manager = createPeerConnection(true, stream, from)
       managerRef.current = manager
-      console.log(
-        "✅ [DEBUG] PeerConnection created, waiting for negotiation...",
-      )
+      // console.log(
+      //   "✅ [DEBUG] PeerConnection created, waiting for negotiation...",
+      // )
     }
 
     // Заменяй полностью onSignal внутри useEffect
@@ -358,33 +358,33 @@ export const useCall = (userId: string | null) => {
       from: string
       signal: { type: string; payload: SdpData | IceCandidateData }
     }) => {
-      console.log("📡 [DEBUG] Received signal:", {
-        from,
-        type: signal.type,
-        hasManager: !!managerRef.current,
-        isCreating: isCreatingManagerRef.current,
-        signalingState:
-          managerRef.current?.getPeerConnection?.()?.signalingState,
-      })
+      // console.log("📡 [DEBUG] Received signal:", {
+      //   from,
+      //   type: signal.type,
+      //   hasManager: !!managerRef.current,
+      //   isCreating: isCreatingManagerRef.current,
+      //   signalingState:
+      //     managerRef.current?.getPeerConnection?.()?.signalingState,
+      // })
 
       // Если manager уже есть — просто передаём сигнал
       if (managerRef.current) {
-        console.log("⏳ [DEBUG] Handling signal with existing manager...")
+        // console.log("⏳ [DEBUG] Handling signal with existing manager...")
         await managerRef.current.handleSignal({
           type: signal.type as "offer" | "answer" | "ice-candidate",
           payload: signal.payload,
         })
-        console.log("✅ [DEBUG] Signal handled")
+        // console.log("✅ [DEBUG] Signal handled")
         return
       }
 
       // Manager ещё создаётся (offer в процессе) — буферизуем всё кроме offer
       if (isCreatingManagerRef.current) {
         if (signal.type !== "offer") {
-          console.log(
-            "📦 [DEBUG] Buffering signal while manager is creating:",
-            signal.type,
-          )
+          // console.log(
+          //   "📦 [DEBUG] Buffering signal while manager is creating:",
+          //   signal.type,
+          // )
           pendingSignalsRef.current.push({ from, signal })
         }
         return
@@ -392,7 +392,7 @@ export const useCall = (userId: string | null) => {
 
       // Manager нет и не создаётся
       if (signal.type === "offer") {
-        console.log("🔧 [DEBUG] No manager, creating new one for offer")
+        // console.log("🔧 [DEBUG] No manager, creating new one for offer")
         isCreatingManagerRef.current = true
 
         try {
@@ -400,18 +400,18 @@ export const useCall = (userId: string | null) => {
           const manager = createPeerConnection(false, stream, from)
           managerRef.current = manager
 
-          console.log("⏳ [DEBUG] Handling offer...")
+          // console.log("⏳ [DEBUG] Handling offer...")
           await manager.handleSignal({
             type: "offer",
             payload: signal.payload,
           })
-          console.log("✅ [DEBUG] Offer handled")
+          // console.log("✅ [DEBUG] Offer handled")
 
           // Применяем все накопившиеся сигналы по порядку
           if (pendingSignalsRef.current.length > 0) {
-            console.log(
-              `📦 [DEBUG] Applying ${pendingSignalsRef.current.length} buffered signals`,
-            )
+            // console.log(
+            //   `📦 [DEBUG] Applying ${pendingSignalsRef.current.length} buffered signals`,
+            // )
             for (const pending of pendingSignalsRef.current) {
               await manager.handleSignal({
                 type: pending.signal.type as
@@ -428,17 +428,17 @@ export const useCall = (userId: string | null) => {
         }
       } else {
         // ice-candidate пришёл раньше offer и manager ещё не создан — буферизуем
-        console.log(
-          "📦 [DEBUG] Buffering early signal (no manager yet):",
-          signal.type,
-        )
+        // console.log(
+        //   "📦 [DEBUG] Buffering early signal (no manager yet):",
+        //   signal.type,
+        // )
         pendingSignalsRef.current.push({ from, signal })
       }
     }
 
     // 🚪 Завершение звонка от собеседника
     const onCallEnd = () => {
-      console.log("📥 [DEBUG] Received call:end")
+      // console.log("📥 [DEBUG] Received call:end")
       endCall()
     }
     socket.on("call:incoming", onIncoming)
@@ -447,7 +447,7 @@ export const useCall = (userId: string | null) => {
     socket.on("call:end", onCallEnd)
 
     return () => {
-      console.log("🧹 [DEBUG] Cleaning up socket listeners")
+      // console.log("🧹 [DEBUG] Cleaning up socket listeners")
       socket.off("call:incoming", onIncoming)
       socket.off("call:accept", onCallAccept)
       socket.off("call:signal", onSignal)
@@ -461,19 +461,19 @@ export const useCall = (userId: string | null) => {
   // PC создаётся в onCallAccept — когда собеседник реально принял
   const callStart = useCallback(
     async (toId: string, avatar: string, username: string) => {
-      console.log("📞 [DEBUG] callStart called:", { toId, userId })
+      // console.log("📞 [DEBUG] callStart called:", { toId, userId })
 
       if (!socket) {
         console.error("❌ [DEBUG] socket is null in callStart")
         return
       }
-      console.log("callStart")
+      // console.log("callStart")
 
       dispatch(startCall({ peerId: toId, avatar, username }))
 
       // Получаем микрофон заранее чтобы не было задержки после accept
       await getOrCreateLocalStream()
-      console.log("📤 [DEBUG] Emitting call:start:", { toUserId: toId })
+      // console.log("📤 [DEBUG] Emitting call:start:", { toUserId: toId })
       socket.emit("call:start", {
         toUserId: toId,
         fromUserId: userId,
@@ -492,7 +492,7 @@ export const useCall = (userId: string | null) => {
     }
 
     setLoadingConnect(true)
-    console.log("📤 [DEBUG] Emitting call:accept:", { to: callerId })
+    // console.log("📤 [DEBUG] Emitting call:accept:", { to: callerId })
     socket.emit("call:accept", { to: callerId })
   }, [callerId, socket])
 
@@ -616,9 +616,9 @@ export const useCall = (userId: string | null) => {
 
     // 🔹 Теперь работает правильно:
     const isFront = isFrontCamera(nextDeviceId, videoDevices)
-    console.log(
-      `🔄 Switching to ${isFront ? "front" : "back"} camera: ${nextDeviceId.slice(0, 8)}...`,
-    )
+    // console.log(
+    //   `🔄 Switching to ${isFront ? "front" : "back"} camera: ${nextDeviceId.slice(0, 8)}...`,
+    // )
 
     try {
       const pc = managerRef.current.getPeerConnection()
@@ -791,397 +791,3 @@ export const useCall = (userId: string | null) => {
     ],
   )
 }
-
-// import { useEffect, useRef, useState, useCallback, useMemo } from "react"
-// import { getSocket } from "@/lib/socket"
-// import { useAppDispatch, useAppSelector } from "@/store/hooks"
-// import {
-//   setIncomingCall,
-//   clearIncomingCall,
-//   acceptCall,
-//   startCall,
-//   toggleAudio,
-//   toggleVideo,
-//   setReconnecting,
-//   setReconnected,
-// } from "@/store/slices/callSlice"
-// import Peer from "simple-peer"
-// import type { RootState } from "@/store/store"
-// import type { Socket } from "socket.io-client"
-// import type { SignalData } from "simple-peer"
-// import { getAudioContext } from "@/utils/audioPlayback"
-
-// type Maybe<T> = T | null
-// type HandleReconnectFn = (initiator: boolean, targetSocketId?: string) => void
-
-// const MAX_RECONNECT_ATTEMPTS = 2
-// const RECONNECT_DELAY_MS = 2000
-
-// const ICE_SERVERS = [
-//   { urls: "stun:stun.l.google.com:19302" },
-//   { urls: "stun:stun1.l.google.com:19302" },
-// ]
-
-// export const useCall = (userId: string | null) => {
-//   const [loadingConnect, setLoadingConnect] = useState(false)
-//   const dispatch = useAppDispatch()
-//   const { callerId, targetId } = useAppSelector((s: RootState) => s.call)
-
-//   const [localStreamState, setLocalStreamState] =
-//     useState<Maybe<MediaStream>>(null)
-//   const [remoteStream, setRemoteStream] = useState<Maybe<MediaStream>>(null)
-
-//   const peerRef = useRef<Maybe<Peer.Instance>>(null)
-//   const localStreamRef = useRef<Maybe<MediaStream>>(null)
-//   const socketRef = useRef<Maybe<Socket>>(null)
-//   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-//   const reconnectAttemptsRef = useRef(0)
-//   const handleReconnectRef = useRef<HandleReconnectFn | null>(null)
-
-//   // ---- Получение микрофона ----
-//   const getOrCreateLocalStream = async () => {
-//     if (localStreamRef.current) {
-//       localStreamRef.current.getAudioTracks().forEach((t) => (t.enabled = true))
-//       return localStreamRef.current
-//     }
-//     const stream = await navigator.mediaDevices.getUserMedia({
-//       audio: {
-//         echoCancellation: true,
-//         noiseSuppression: true,
-//         autoGainControl: false,
-//         sampleRate: 48000,
-//         channelCount: 1,
-//       },
-//       video: false,
-//     })
-
-//     // Важно: "разбудить" AudioContext тем же жестом пользователя
-//     // когда он нажал "принять" / "позвонить"
-//     getAudioContext().resume()
-
-//     // stream.getAudioTracks().forEach((t) => (t.enabled = true))
-//     localStreamRef.current = stream
-//     setLocalStreamState(stream)
-//     return stream
-//   }
-
-//   // ---- Очистка ----
-//   const hardCleanup = useCallback(() => {
-//     if (reconnectTimerRef.current) {
-//       clearTimeout(reconnectTimerRef.current)
-//       reconnectTimerRef.current = null
-//     }
-
-//     if (peerRef.current) {
-//       peerRef.current.removeAllListeners()
-//       peerRef.current.destroy()
-//       peerRef.current = null
-//     }
-
-//     if (localStreamRef.current) {
-//       localStreamRef.current.getTracks().forEach((t) => t.stop())
-//       localStreamRef.current = null
-//     }
-
-//     reconnectAttemptsRef.current = 0
-//     setLocalStreamState(null)
-//     setRemoteStream(null)
-//     setLoadingConnect(false)
-//   }, [])
-
-//   // ---- Переподключение ----
-//   const handleReconnect = useCallback(
-//     (initiator: boolean, targetSocketId?: string) => {
-//       if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
-//         endCall()
-//         return
-//       }
-
-//       reconnectAttemptsRef.current += 1
-//       dispatch(setReconnecting())
-
-//       reconnectTimerRef.current = setTimeout(async () => {
-//         if (peerRef.current) {
-//           peerRef.current.removeAllListeners()
-//           peerRef.current.destroy()
-//           peerRef.current = null
-//         }
-
-//         const stream = await getOrCreateLocalStream()
-//         const peer = createPeer(initiator, stream, targetSocketId)
-
-//         peer.on("signal", (signal) => {
-//           const to = targetSocketId ?? callerId ?? targetId
-//           if (to) socketRef.current?.emit("call:signal", { to, signal })
-//         })
-
-//         peer.on("connect", () => {
-//           dispatch(setReconnected())
-//           reconnectAttemptsRef.current = 0
-//         })
-//       }, RECONNECT_DELAY_MS)
-//     },
-//     [callerId, targetId, dispatch] // eslint-disable-line
-//   )
-
-//   // 2. Обновляй реф при изменении функции
-//   useEffect(() => {
-//     handleReconnectRef.current = handleReconnect
-//   }, [handleReconnect])
-
-//   // ---- Создание Peer ----
-//   const createPeer = useCallback(
-//     (initiator: boolean, stream: MediaStream, targetSocketId?: string) => {
-//       if (peerRef.current) return peerRef.current
-
-//       const p = new Peer({
-//         initiator,
-//         trickle: true,
-//         // trickle: false,
-//         stream,
-//         config: { iceServers: ICE_SERVERS },
-//       })
-
-//       p.on("stream", (remote) => {
-//         console.log("📹 remote stream tracks:", remote.getTracks())
-//         setRemoteStream(remote)
-//       })
-//       p.on("track", (track, stream) => {
-//         console.log("📹 new track:", track.kind)
-//         setRemoteStream(stream)
-//       })
-
-//       p.on("error", (err) => {
-//         console.error("Peer error", err)
-//         handleReconnectRef.current?.(initiator, targetSocketId)
-//         // handleReconnect(initiator, targetSocketId)
-//       })
-
-//       p.on("close", () => {
-//         // 👇 Вызываем через .current — всегда актуальная версия
-//         handleReconnectRef.current?.(initiator, targetSocketId)
-//         // handleReconnect(initiator, targetSocketId)
-//       })
-
-//       peerRef.current = p
-//       return p
-//     },
-//     []
-//   )
-
-//   // ---- beforeunload ----
-//   useEffect(() => {
-//     const handleUnload = () => {
-//       const to = callerId ?? targetId
-//       if (to) socketRef.current?.emit("call:end", { to })
-//     }
-//     window.addEventListener("beforeunload", handleUnload)
-//     return () => window.removeEventListener("beforeunload", handleUnload)
-//   }, [callerId, targetId])
-
-//   // ---- Socket события ----
-//   useEffect(() => {
-//     if (!userId) return
-//     const token = localStorage.getItem("accessToken")
-//     if (!token) return
-
-//     const s = getSocket(token)
-//     s.connect()
-//     socketRef.current = s
-
-//     s.on("call:incoming", ({ from, avatar, username }) =>
-//       dispatch(setIncomingCall({ callerId: from, avatar, username }))
-//     )
-
-//     const onCallAccept = async ({ from }: { from: string }) => {
-//       const stream = await getOrCreateLocalStream()
-//       const peer = createPeer(true, stream, from)
-
-//       peer.on("signal", (signal) => {
-//         s.emit("call:signal", { to: from, signal })
-//       })
-
-//       peer.on("connect", () => {
-//         dispatch(acceptCall())
-//         setLoadingConnect(false)
-//       })
-//     }
-
-//     s.on("call:accept", onCallAccept)
-
-//     // const onSignal = async ({
-//     //   from,
-//     //   signal,
-//     // }: {
-//     //   from: string
-//     //   signal: SignalData
-//     // }) => {
-//     //   if (signal.type === "offer") {
-//     //     if (!peerRef.current) {
-//     //       const stream = await getOrCreateLocalStream()
-//     //       const peer = createPeer(false, stream, from)
-
-//     //       peer.on("signal", (sig) => {
-//     //         s.emit("call:signal", { to: from, signal: sig })
-//     //       })
-
-//     //       peer.on("connect", () => dispatch(acceptCall()))
-//     //       peer.signal(signal)
-//     //     }
-//     //   } else if (signal.type === "answer") {
-//     //     if (peerRef.current) {
-//     //       peerRef.current.signal(signal)
-//     //     }
-//     //   }
-//     // }
-//     const onSignal = async ({
-//       from,
-//       signal,
-//     }: {
-//       from: string
-//       signal: SignalData
-//     }) => {
-//       if (signal.type === "offer") {
-//         if (!peerRef.current) {
-//           const stream = await getOrCreateLocalStream()
-//           const peer = createPeer(false, stream, from)
-
-//           peer.on("signal", (sig) => {
-//             s.emit("call:signal", { to: from, signal: sig })
-//           })
-
-//           peer.on("connect", () => dispatch(acceptCall()))
-//           peer.signal(signal)
-//         } else {
-//           // Peer уже есть — просто сигналим (renegotiation для видео)
-//           peerRef.current.signal(signal)
-//         }
-//       } else if (signal.type === "answer") {
-//         if (peerRef.current) {
-//           peerRef.current.signal(signal)
-//         }
-//       } else {
-//         // ICE кандидат — передаём существующему peer
-//         if (peerRef.current) {
-//           peerRef.current.signal(signal)
-//         }
-//       }
-//     }
-
-//     s.on("call:signal", onSignal)
-//     s.on("call:end", endCall)
-
-//     return () => {
-//       s.off("call:incoming")
-//       s.off("call:accept", onCallAccept)
-//       s.off("call:signal", onSignal)
-//       s.off("call:end")
-//     }
-//   }, [userId]) // eslint-disable-line
-
-//   // ---- Начать звонок ----
-//   const callStart = useCallback(
-//     async (toId: string, avatar: string, username: string) => {
-//       dispatch(startCall({ peerId: toId, avatar, username }))
-//       socketRef.current?.emit("call:start", {
-//         toUserId: toId,
-//         fromUserId: userId,
-//         avatar,
-//         username,
-//       })
-//     },
-//     [userId, dispatch]
-//   )
-
-//   // ---- Принять звонок ----
-//   const callAccept = useCallback(() => {
-//     setLoadingConnect(true)
-//     socketRef.current?.emit("call:accept", { to: callerId })
-//   }, [callerId])
-
-//   // ---- Завершить звонок ----
-//   const endCall = useCallback(() => {
-//     const to = callerId ?? targetId
-//     if (to) socketRef.current?.emit("call:end", { to })
-//     hardCleanup()
-//     dispatch(clearIncomingCall())
-//   }, [callerId, targetId, hardCleanup, dispatch])
-
-//   // ---- Мут микрофона ----
-//   const handleToggleAudio = useCallback(() => {
-//     if (localStreamRef.current) {
-//       localStreamRef.current.getAudioTracks().forEach((t) => {
-//         t.enabled = !t.enabled
-//       })
-//     }
-//     dispatch(toggleAudio())
-//   }, [dispatch])
-
-//   // ---- Видео ----
-//   const handleToggleVideo = useCallback(async () => {
-//     if (!localStreamRef.current) return
-
-//     const videoTracks = localStreamRef.current.getVideoTracks()
-
-//     if (videoTracks.length > 0) {
-//       videoTracks.forEach((t) => {
-//         t.enabled = !t.enabled
-//       })
-//     } else {
-//       try {
-//         const videoStream = await navigator.mediaDevices.getUserMedia({
-//           video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-//         })
-//         const videoTrack = videoStream.getVideoTracks()[0]
-//         localStreamRef.current.addTrack(videoTrack)
-
-//         if (peerRef.current) {
-//           peerRef.current.addTrack(videoTrack, localStreamRef.current)
-//         }
-
-//         setLocalStreamState(new MediaStream(localStreamRef.current.getTracks()))
-//       } catch (err) {
-//         console.error("Не удалось получить камеру", err)
-//         return
-//       }
-//     }
-
-//     dispatch(toggleVideo())
-//   }, [dispatch])
-
-//   // 2. В самом конце хука замени return на:
-//   return useMemo(
-//     () => ({
-//       localStream: localStreamState,
-//       remoteStream,
-//       callStart,
-//       callAccept,
-//       endCall,
-//       handleToggleAudio,
-//       handleToggleVideo,
-//       loadingConnect,
-//     }),
-//     [
-//       // 👇 Зависимости:
-//       localStreamState, // если стрим обновился — вернем новый объект (это правильно!)
-//       remoteStream, // если удаленный стрим изменился — вернем новый объект (правильно!)
-//       callStart, // уже в useCallback ✅
-//       callAccept, // уже в useCallback ✅
-//       endCall, // уже в useCallback ✅
-//       handleToggleAudio, // уже в useCallback ✅
-//       handleToggleVideo, // уже в useCallback ✅
-//       loadingConnect, // примитив, стабильный пока не изменится ✅
-//     ]
-//   )
-
-//   // return {
-//   //   localStream: localStreamState,
-//   //   remoteStream,
-//   //   callStart,
-//   //   callAccept,
-//   //   endCall,
-//   //   handleToggleAudio,
-//   //   handleToggleVideo,
-//   //   loadingConnect,
-//   // }
-// }

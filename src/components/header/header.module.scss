@@ -1,4 +1,4 @@
-.wrapper {
+.header {
   height: 45px;
   // height: min(60px, 30vh);
   background-color: #b687fe;
@@ -30,81 +30,91 @@
   @media (max-width: 400px) {
     padding: 0 5px;
   }
-  .logoWrapper {
-    display: flex;
-    align-items: center;
-    gap: 20px;
 
+  &__logoWrapperImage {
     img {
       width: 30px;
       height: 30px;
     }
+  }
+  &__logoWrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 
-    .hamburger {
-      width: 30px;
-      height: 20px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-      z-index: 1100;
-      background: none;
-      border: none;
-      span {
-        height: 3px;
-        background-color: black;
-        border-radius: 2px;
-        transition: all 0.3s ease;
-      }
+    // img {
+    //   width: 30px;
+    //   height: 30px;
+    // }
+  }
+
+  &__hamburger {
+    width: 30px;
+    height: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    z-index: 1100;
+    background: none;
+    border: none;
+    span {
+      height: 3px;
+      background-color: black;
+      border-radius: 2px;
+      transition: all 0.3s ease;
     }
-    .hamburgerOpen span:nth-child(1) {
-      transform: rotate(45deg) translate(6px, 6px);
-    }
-    .hamburgerOpen span:nth-child(2) {
-      opacity: 0;
-    }
-    .hamburgerOpen span:nth-child(3) {
-      transform: rotate(-45deg) translate(6px, -6px);
-    }
-    .containerNotification {
-      position: relative;
-      .toggleButton {
-        color: #28287266;
-        width: 35px;
-        height: 35px;
-        // background-color: #ccc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 20px;
-        cursor: pointer;
-        &:hover {
-          background: #8f93da;
-          color: #ffffff;
-        }
-        .fireBlock {
-          position: relative;
-          .fireCountBlock {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            background: #4b4ab1;
-            color: white;
-            border-radius: 50%;
-            font-size: 14px;
-            width: 17px;
-            height: 17px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
-        }
-      }
+  }
+  &__hamburgerOpen span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+  }
+  &__hamburgerOpen span:nth-child(2) {
+    opacity: 0;
+  }
+  &__hamburgerOpen span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+  }
+
+  &__containerNotification {
+    position: relative;
+  }
+  &__toggleButton {
+    color: #28287266;
+    width: 35px;
+    height: 35px;
+    // background-color: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    cursor: pointer;
+    &:hover {
+      background: #8f93da;
+      color: #ffffff;
     }
   }
 
-  .blockAuth {
+  &__fireBlock {
+    position: relative;
+  }
+
+  &__fireCountBlock {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: #4b4ab1;
+    color: white;
+    border-radius: 50%;
+    font-size: 14px;
+    width: 17px;
+    height: 17px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__blockAuth {
     display: flex;
     gap: 10px;
     div {
@@ -118,62 +128,73 @@
     }
   }
 
-  .profileWrapper {
+  &__profileWrapper {
     position: relative;
-    .profile {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      .userNameBlock {
-        @media (max-width: 500px) {
-          display: none;
-        }
-      }
-      .avatarBlock {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        overflow: hidden;
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-    }
+  }
 
-    .menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background-color: white;
-      border: 1px solid #ccc;
-      padding: 8px;
-      display: none;
-      flex-direction: column;
-      gap: 4px;
-      z-index: 10;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      button {
-        cursor: pointer;
-        padding: 5px;
-        border-radius: 5px;
-        &:hover {
-          background-color: #8536fc;
-        }
-        &:active {
-          background-color: #8536fc86;
-        }
+  &__menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 10;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    button {
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 5px;
+      &:hover {
+        background-color: #8536fc;
+      }
+      &:active {
+        background-color: #8536fc86;
       }
     }
   }
 
+  &__profile {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__userNameBlock {
+    @media (max-width: 500px) {
+      display: none;
+    }
+  }
+  &__avatarBlock {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
   /* Показываем меню при наведении */
-  .profileWrapper:hover .menu {
+  &__profileWrapper:hover &__menu {
     display: flex;
   }
 }
 // .hidden {
 //   transform: translateY(-100%);
+// }
+
+// .header {
+//   &__logoWrapperImage {
+//     img {
+//       width: 30px;
+//       height: 30px;
+//     }
+//   }
 // }

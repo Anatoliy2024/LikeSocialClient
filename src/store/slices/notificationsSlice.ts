@@ -32,6 +32,20 @@ const notificationsSlice = createSlice({
         state.unreadCount += 1
       }
     },
+    dellNotification(state, action) {
+      state.items = state.items.filter(
+        (item) => item._id !== action.payload._id,
+      )
+      state.unreadCount -= 1
+    },
+    updateNotification(state, action) {
+      state.items = state.items.map((item) => {
+        if (item._id === action.payload.updated._id) {
+          return action.payload.updated
+        }
+        return item
+      })
+    },
     // removeNotification(state, action) {
     //   state.items = state.items.filter((n) => n._id !== action.payload)
     //   state.unreadCount = state.items.filter((n) => !n.isRead).length
@@ -109,5 +123,6 @@ const notificationsSlice = createSlice({
   },
 })
 
-export const { addNotification } = notificationsSlice.actions
+export const { addNotification, dellNotification, updateNotification } =
+  notificationsSlice.actions
 export default notificationsSlice.reducer

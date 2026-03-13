@@ -73,6 +73,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
 
   //Таймер включения сервера
   useEffect(() => {
+    if (!server?.loading) return
     if (timerCount === 0) {
       countRef.current++
       if (countRef.current === 2) return
@@ -84,56 +85,13 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
     }, 1000)
 
     return () => clearInterval(intervalId)
-  }, [timerCount, countRef])
+  }, [timerCount, countRef, server?.loading])
 
   useEffect(() => {
     dispatch(getStatusServerThunk())
   }, [dispatch])
 
   useTikServer(server?.statusServer)
-
-  // useEffect(() => {
-  //   if (!userId) {
-  //     destroySocket()
-  //     return
-  //   }
-  //   const token = localStorage.getItem("accessToken")
-  //   if (!token) return
-  //   const socket = getSocket(token)
-  //   // if (!socket) return
-  //   // setSocket(socket)
-  //   socket.connect()
-
-  //   socket.emit("user-connected", userId)
-  //   socket.emit("get-online-users")
-
-  //   socket.on("user-status-changed", ({ userId, status }) => {
-  //     dispatch(updateUserStatus({ userId, status }))
-
-  //     // обновляем локально статус этого пользователя
-  //   })
-
-  //   socket.on("online-users", (users) => {
-  //     dispatch(setOnlineStatusList(users))
-  //     console.log("Сейчас онлайн:", users)
-  //     // Тут можешь диспатчить в стор, если хочешь хранить онлайн список
-  //   })
-
-  //   socket.on("new-notification", (notification) => {
-  //     // например, добавить в Redux:
-  //     dispatch(addNotification(notification))
-  //     // или показать toast:
-  //     // toast(notification.message)
-  //   })
-
-  //   return () => {
-  //     socket.off("user-status-changed")
-  //     socket.off("online-users")
-  //     socket.off("new-notification")
-
-  //     // socket.disconnect()
-  //   }
-  // }, [userId, dispatch])
 
   if (server?.loading) {
     return (
@@ -165,7 +123,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   if (server?.error) {
     return <div>Сервер не отвечает...</div>
   }
-
+  console.log("rerender InnerApp")
   return (
     <AuthProvider>
       <GroupCallProvider>
