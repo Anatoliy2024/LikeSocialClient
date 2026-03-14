@@ -1,5 +1,6 @@
 "use client"
 import {
+  useEffect,
   // useEffect, useRef,
   useState,
 } from "react"
@@ -23,6 +24,14 @@ export const GroupCallPanel = () => {
   const callParticipantsCache = useAppSelector(
     (s: RootState) => s.users.callParticipantsCache,
   )
+
+  useEffect(() => {
+    if (status === "inCall") {
+      setShowMembers(false)
+      setIsMuted({})
+      setVolumes({})
+    }
+  }, [status])
 
   const {
     isAudioEnabled,
