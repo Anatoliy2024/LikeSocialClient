@@ -48,7 +48,7 @@ const notificationsSlice = createSlice({
     },
     updateNotificationIsRead(state, action) {
       state.items = state.items.map((item) => {
-        if (item.conversationId === action.payload.conversationId) {
+        if (item.conversationId?._id === action.payload.conversationId) {
           return { ...item, isRead: true }
         }
         return item
