@@ -44,6 +44,8 @@ export function playGroupRemoteStream(socketId: string, stream: MediaStream) {
 
   try {
     const ctx = getAudioContext()
+    console.log("Звук с обработчиком")
+
     console.log(`🔊 AudioContext state: ${ctx.state}`)
 
     // 🔹 Проверка 3: пробуем resume (может требовать жеста пользователя)
@@ -125,7 +127,7 @@ export function playGroupRemoteStream(socketId: string, stream: MediaStream) {
     // Это помогает некоторым браузерам "разбудить" аудио-систему
     const audio = new Audio()
     audio.srcObject = stream
-    // audio.volume = 0 // ← Мутим, чтобы не дублировать звук
+    audio.volume = 0 // ← Мутим, чтобы не дублировать звук
     audio.muted = true // ← семантически "заглушён", не "тихий"
     audio.play().catch(() => {})
     remoteAudioEls.set(socketId, audio)
@@ -281,6 +283,7 @@ export function playRemoteStream(stream: MediaStream | null) {
     // 🔹 Разблокировка аудио для Safari iOS
     const audio = new Audio()
     audio.srcObject = stream
+    audio.volume = 0
     audio.muted = true // ← muted вместо volume=0, надёжнее
     audio.play().catch(() => {})
     singleAudioEl = audio

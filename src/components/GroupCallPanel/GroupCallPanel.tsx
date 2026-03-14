@@ -108,8 +108,8 @@ export const GroupCallPanel = () => {
                       <input
                         type="range"
                         min={0}
-                        max={2}
-                        step={0.01}
+                        max={1}
+                        step={0.05}
                         value={
                           isMuted[socketId] ? 0 : (volumes[socketId] ?? 0.75)
                         }
