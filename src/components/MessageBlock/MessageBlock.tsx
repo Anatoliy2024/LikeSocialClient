@@ -48,6 +48,7 @@ import { MessageModal } from "../MessageModal/MessageModal"
 import { getStickerImage } from "@/utils/getStickerImage"
 import { MessageBlockInput } from "../MessageBlockInput/MessageBlockInput"
 import { useSocket } from "@/providers/SocketProvider"
+import { updateNotificationIsRead } from "@/store/slices/notificationsSlice"
 // import { SoundToggle } from "../SoundToggle/SoundToggle"
 
 export const MessageBlock = () => {
@@ -246,6 +247,7 @@ export const MessageBlock = () => {
         conversationId: id,
         lastReadMessageId: lastMessageId,
       })
+      dispatch(updateNotificationIsRead(id))
     }
   }, [hasLoaded, socket])
 

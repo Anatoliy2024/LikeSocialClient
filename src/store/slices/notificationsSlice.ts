@@ -46,6 +46,15 @@ const notificationsSlice = createSlice({
         return item
       })
     },
+    updateNotificationIsRead(state, action) {
+      state.items = state.items.map((item) => {
+        if (item.conversationId === action.payload.conversationId) {
+          return { ...item, isRead: true }
+        }
+        return item
+      })
+    },
+
     // removeNotification(state, action) {
     //   state.items = state.items.filter((n) => n._id !== action.payload)
     //   state.unreadCount = state.items.filter((n) => !n.isRead).length
@@ -123,6 +132,10 @@ const notificationsSlice = createSlice({
   },
 })
 
-export const { addNotification, dellNotification, updateNotification } =
-  notificationsSlice.actions
+export const {
+  addNotification,
+  dellNotification,
+  updateNotification,
+  updateNotificationIsRead,
+} = notificationsSlice.actions
 export default notificationsSlice.reducer
