@@ -47,7 +47,7 @@ export const GroupCallPanel = () => {
     setIsMuted((prev) => {
       // const next = !prev[socketId]
       // next ? mutePeer(socketId) : unmutePeer(socketId)
-      return { ...prev, [socketId]: !prev.socketId }
+      return { ...prev, [socketId]: !prev[socketId] }
     })
   }
 
@@ -68,10 +68,11 @@ export const GroupCallPanel = () => {
                 if (!user) return
 
                 const socketId = participant.socketId
-                setIsMuted((prev) => ({
-                  ...prev,
-                  [socketId]: false,
-                }))
+                const muted = isMuted[socketId] ?? false // ← дефолт false без setIsMuted
+                // setIsMuted((prev) => ({
+                //   ...prev,
+                //   [socketId]: false,
+                // }))
                 return (
                   <li
                     key={participant.userId}
@@ -111,11 +112,11 @@ export const GroupCallPanel = () => {
                       />
                       <button
                         onClick={() => {
-                          mutePeerToggle(socketId, isMuted.socketId)
+                          mutePeerToggle(socketId, muted)
                           handleMute(socketId)
                         }}
                       >
-                        {isMuted.socketId ? <SoundMutedIcon /> : <SoundIcon />}
+                        {muted ? <SoundMutedIcon /> : <SoundIcon />}
                       </button>
                     </div>
                   </li>
