@@ -159,12 +159,8 @@ export function setRemotePeerVolume(socketId: string, value: number) {
   console.log(`🔊 Громкость ${socketId} → ${value}`)
 }
 
-export function mutePeerToggle(socketId: string, isMuted: boolean) {
-  if (isMuted) {
-    setRemotePeerVolume(socketId, 0.75) // твоё дефолтное значение
-  } else {
-    setRemotePeerVolume(socketId, 0)
-  }
+export function mutePeer(socketId: string) {
+  setRemotePeerVolume(socketId, 0)
 }
 
 // ---- Очистка ----

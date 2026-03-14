@@ -10,13 +10,14 @@ import styles from "./GroupCallPanel.module.scss"
 import { useGroupCallContext } from "@/providers/GroupCallProvider"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import Link from "next/link"
-import { mutePeerToggle, setRemotePeerVolume } from "@/utils/audioPlayback"
+import { mutePeer, setRemotePeerVolume } from "@/utils/audioPlayback"
 import { SoundMutedIcon } from "@/assets/icons/SoundMutedIcon"
 import { SoundIcon } from "@/assets/icons/SoundIcon"
 
 export const GroupCallPanel = () => {
   const [showMembers, setShowMembers] = useState(false)
   const [isMuted, setIsMuted] = useState<Record<string, boolean>>({})
+  const [volumes, setVolumes] = useState<Record<string, number>>({})
   const status = useAppSelector((s: RootState) => s.groupCall.status)
 
   const callParticipantsCache = useAppSelector(
@@ -42,12 +43,18 @@ export const GroupCallPanel = () => {
     setShowMembers((prev) => !prev)
   }
 
-  // в компоненте участника
-  const handleMute = (socketId: string) => {
+  const handleMuteToggle = (socketId: string) => {
     setIsMuted((prev) => {
-      // const next = !prev[socketId]
-      // next ? mutePeer(socketId) : unmutePeer(socketId)
-      return { ...prev, [socketId]: !prev[socketId] }
+      const next = !prev[socketId]
+      if (next) {
+        // мьютим — просто убираем звук, volumes не трогаем
+        mutePeer(socketId)
+      } else {
+        // размьютим — восстанавливаем то что было на слайдере
+        const savedVolume = volumes[socketId] ?? 0.75
+        setRemotePeerVolume(socketId, savedVolume)
+      }
+      return { ...prev, [socketId]: next }
     })
   }
 
@@ -103,17 +110,18 @@ export const GroupCallPanel = () => {
                         min={0}
                         max={2}
                         step={0.01}
-                        onChange={(e) =>
-                          setRemotePeerVolume(
-                            socketId,
-                            parseFloat(e.target.value),
-                          )
+                        value={
+                          isMuted[socketId] ? 0 : (volumes[socketId] ?? 0.75)
                         }
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value)
+                          setVolumes((prev) => ({ ...prev, [socketId]: val }))
+                          setRemotePeerVolume(socketId, val)
+                        }}
                       />
                       <button
                         onClick={() => {
-                          mutePeerToggle(socketId, muted)
-                          handleMute(socketId)
+                          handleMuteToggle(socketId)
                         }}
                       >
                         {muted ? <SoundMutedIcon /> : <SoundIcon />}
