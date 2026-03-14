@@ -1,31 +1,20 @@
-// import { useEffect } from "react"
-// import {
-//   deleteAllNotificationsThunk,
-//   fetchNotificationsThunk,
-//   markAllNotificationsReadThunk,
-// } from "@/store/thunks/notificationsThunk"
-// import { useAppDispatch, useAppSelector } from "@/store/hooks"
-// import { RootState } from "@/store/store"
 import { useEffect } from "react"
 import ButtonMenu from "../ui/button/Button"
 import style from "./Notifications.module.scss"
-// import { initialStateNotificationsType } from "@/store/slices/notificationsSlice"
-// import Image from "next/image"
 import CloseButton from "../ui/closeButton/CloseButton"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
-
 import Link from "next/link"
 import { RootState } from "@/store/store"
 import { useAppSelector } from "@/store/hooks"
 
 export const Notifications = ({
   toggleShowNotification,
-  // notifications,
+
   deleteAllNotifications,
   markAllNotificationsRead,
 }: {
   toggleShowNotification: () => void
-  // notifications: initialStateNotificationsType
+
   deleteAllNotifications: () => void
   markAllNotificationsRead: () => void
 }) => {
@@ -37,7 +26,6 @@ export const Notifications = ({
     (state: RootState) => state.notifications.unreadCount,
   )
   const error = useAppSelector((state: RootState) => state.notifications.error)
-  // const { items, loading, unreadCount, error } = notifications
 
   useEffect(() => {
     // при монтировании — запрещаем прокрутку
@@ -48,7 +36,7 @@ export const Notifications = ({
       document.body.style.overflow = ""
     }
   }, [])
-  // console.log("items***", items)
+
   return (
     <div className={style.notifications} onClick={toggleShowNotification}>
       <div
@@ -62,12 +50,8 @@ export const Notifications = ({
         {unreadCount === 0 && <div>Новых уведомлений нет...</div>}
         {loading && <p>Загрузка...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <ul className={style.lists}>
+        <ul className={style.notifications__lists}>
           {items.map((n) => {
-            // const senderId =n.senderId._id
-            // const conversationId =n.conversationId?._id
-            // const isGroup = n.conversationId?.type === "group"
-            // console.log(" n.conversationId?.type === group", n.conversationId)
             return (
               <li
                 key={n._id}
@@ -119,9 +103,6 @@ export const Notifications = ({
                       />
                     </div>
                   </Link>
-                  // <ProfileLink userId={n.senderId._id} currentUserId={userId}>
-
-                  // </ProfileLink>
                 )}
                 {n.message && (
                   <div className={style.notifications__message}>

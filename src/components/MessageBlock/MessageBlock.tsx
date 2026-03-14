@@ -48,7 +48,10 @@ import { MessageModal } from "../MessageModal/MessageModal"
 import { getStickerImage } from "@/utils/getStickerImage"
 import { MessageBlockInput } from "../MessageBlockInput/MessageBlockInput"
 import { useSocket } from "@/providers/SocketProvider"
-import { updateNotificationIsRead } from "@/store/slices/notificationsSlice"
+import {
+  // updateNotificationIsRead,
+  updateNotificationIsReadMessage,
+} from "@/store/slices/notificationsSlice"
 // import { SoundToggle } from "../SoundToggle/SoundToggle"
 
 export const MessageBlock = () => {
@@ -242,14 +245,14 @@ export const MessageBlock = () => {
 
     // Сразу помечаем всё прочитанным если есть сообщения
     if (messages.length > 0) {
+      dispatch(updateNotificationIsReadMessage({ conversationId: id }))
       const lastMessageId = messages[messages.length - 1]._id
       socket.emit("messages:read", {
         conversationId: id,
         lastReadMessageId: lastMessageId,
       })
-      dispatch(updateNotificationIsRead(id))
     }
-  }, [hasLoaded, socket])
+  }, [hasLoaded, socket, id])
 
   // Убираешь старый useEffect с restoreScrollRef и заменяешь на:
   useLayoutEffect(() => {

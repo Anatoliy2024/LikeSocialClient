@@ -46,12 +46,24 @@ const notificationsSlice = createSlice({
         return item
       })
     },
-    updateNotificationIsRead(state, action) {
-      state.items = state.items.map((item) => {
-        if (item.conversationId?._id === action.payload.conversationId) {
-          return { ...item, isRead: true }
+    updateNotificationIsReadMessage(state, action) {
+      const { conversationId } = action.payload
+
+      state.items.forEach((item) => {
+        // 1. Проверяем, что это нужная беседа
+        // (Сравниваем напрямую, если conversationId - это ObjectId/строка)
+        if (item.conversationId === conversationId) {
+          // 2. Обновляем статус ТОЛЬКО если оно было непрочитанным
+          if (!item.isRead) {
+            item.isRead = true
+            item.updatedAt = new Date().toISOString() // Обновляем время, если нужно для сортировки
+
+            // 3. Уменьшаем счетчик только один раз для каждого нового прочтения
+            if (state.unreadCount > 0) {
+              state.unreadCount -= 1
+            }
+          }
         }
-        return item
       })
     },
 
@@ -136,6 +148,6 @@ export const {
   addNotification,
   dellNotification,
   updateNotification,
-  updateNotificationIsRead,
+  updateNotificationIsReadMessage,
 } = notificationsSlice.actions
 export default notificationsSlice.reducer
