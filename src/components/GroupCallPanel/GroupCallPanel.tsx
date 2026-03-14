@@ -10,9 +10,13 @@ import styles from "./GroupCallPanel.module.scss"
 import { useGroupCallContext } from "@/providers/GroupCallProvider"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import Link from "next/link"
+import { mutePeerToggle, setRemotePeerVolume } from "@/utils/audioPlayback"
+import { SoundMutedIcon } from "@/assets/icons/SoundMutedIcon"
+import { SoundIcon } from "@/assets/icons/SoundIcon"
 
 export const GroupCallPanel = () => {
   const [showMembers, setShowMembers] = useState(false)
+  const [isMuted, setIsMuted] = useState<Record<string, boolean>>({})
   const status = useAppSelector((s: RootState) => s.groupCall.status)
 
   const callParticipantsCache = useAppSelector(
@@ -38,13 +42,22 @@ export const GroupCallPanel = () => {
     setShowMembers((prev) => !prev)
   }
 
+  // в компоненте участника
+  const handleMute = (socketId: string) => {
+    setIsMuted((prev) => {
+      // const next = !prev[socketId]
+      // next ? mutePeer(socketId) : unmutePeer(socketId)
+      return { ...prev, [socketId]: !prev.socketId }
+    })
+  }
+
   return (
     <div className={styles.panel}>
-      <div className={styles.info} onClick={handleToggleMembers}>
-        <span className={styles.dot} />
-        <span className={styles.label}>Voice </span>
+      <div className={styles.panel__info} onClick={handleToggleMembers}>
+        <span className={styles.panel__dot} />
+        <span className={styles.panel__label}>Voice </span>
         <span
-          className={`${styles.count} ${showMembers ? styles.active : ""}`}
+          className={`${styles.panel__count} ${showMembers ? styles.active : ""}`}
           title="Участники голосового чата"
         >
           {participants.length + 1} member
@@ -53,14 +66,23 @@ export const GroupCallPanel = () => {
               {participants.map((participant) => {
                 const user = callParticipantsCache[participant.userId]
                 if (!user) return
+
+                const socketId = participant.socketId
+                setIsMuted((prev) => ({
+                  ...prev,
+                  [socketId]: false,
+                }))
                 return (
-                  <li key={participant.userId}>
+                  <li
+                    key={participant.userId}
+                    className={styles.panel__userItem}
+                  >
                     <Link
                       href={`/profile/${user._id}`}
-                      className={styles.userInfo}
+                      className={styles.panel__userInfo}
                     >
                       {user?.avatar && (
-                        <div className={styles.blockImg}>
+                        <div className={styles.panel__blockImg}>
                           <CloudinaryImage
                             src={user.avatar}
                             alt="avatar"
@@ -70,8 +92,32 @@ export const GroupCallPanel = () => {
                         </div>
                       )}
 
-                      <div className={styles.username}>{user.username}</div>
+                      <div className={styles.panel__username}>
+                        {user.username}
+                      </div>
                     </Link>
+                    <div className={styles.panel__voice}>
+                      <input
+                        type="range"
+                        min={0}
+                        max={2}
+                        step={0.01}
+                        onChange={(e) =>
+                          setRemotePeerVolume(
+                            socketId,
+                            parseFloat(e.target.value),
+                          )
+                        }
+                      />
+                      <button
+                        onClick={() => {
+                          mutePeerToggle(socketId, isMuted.socketId)
+                          handleMute(socketId)
+                        }}
+                      >
+                        {isMuted.socketId ? <SoundMutedIcon /> : <SoundIcon />}
+                      </button>
+                    </div>
                   </li>
                 )
               })}
@@ -86,9 +132,9 @@ export const GroupCallPanel = () => {
         ))}
       </div> */}
 
-      <div className={styles.controls}>
+      <div className={styles.panel__controls}>
         <button
-          className={`${styles.btn} ${!isAudioEnabled ? styles.btnOff : ""}`}
+          className={`${styles.panel__btn} ${!isAudioEnabled ? styles.panel__btnOff : ""}`}
           onClick={handleToggleAudio}
           title={isAudioEnabled ? "Выключить микрофон" : "Включить микрофон"}
         >
@@ -104,7 +150,7 @@ export const GroupCallPanel = () => {
         </button>  */}
 
         <button
-          className={`${styles.btn} ${styles.btnLeave}`}
+          className={`${styles.panel__btn} ${styles.panel__btnLeave}`}
           onClick={leaveCall}
           title="Покинуть беседу"
         >

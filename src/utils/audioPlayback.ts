@@ -142,6 +142,31 @@ export function playGroupRemoteStream(socketId: string, stream: MediaStream) {
   }
 }
 
+export function setRemotePeerVolume(socketId: string, value: number) {
+  const chain = remoteAudioChains.get(socketId)
+  if (!chain) {
+    console.warn(`⚠️ Цепочка для ${socketId} не найдена`)
+    return
+  }
+
+  const ctx = getAudioContext()
+  // плавно чтобы без щелчка
+  chain.gain.gain.linearRampToValueAtTime(
+    Math.max(0, Math.min(2, value)), // клампим 0..2
+    ctx.currentTime + 0.05,
+  )
+
+  console.log(`🔊 Громкость ${socketId} → ${value}`)
+}
+
+export function mutePeerToggle(socketId: string, isMuted: boolean) {
+  if (isMuted) {
+    setRemotePeerVolume(socketId, 0.75) // твоё дефолтное значение
+  } else {
+    setRemotePeerVolume(socketId, 0)
+  }
+}
+
 // ---- Очистка ----
 export function stopGroupRemoteStream(socketId: string) {
   // Очищаем Web Audio цепочку
