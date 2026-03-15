@@ -13,10 +13,16 @@ export type ReactionType = {
   emoji: EmojiId
   createdAt: string
 }
+export type ConversationIdType = {
+  _id: string
+  title: string
+  avatar: string
+  type: string
+}
 
 export interface MessageType {
   _id: string
-  conversationId: string
+  conversationId: ConversationIdType
   senderId: {
     _id: string
     username: string

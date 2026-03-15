@@ -39,7 +39,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   const [showButton, setShowButton] = useState(false)
   const [timerCount, setTimerCount] = useState(TIMER)
   // const [socket, setSocket] = useState<Socket | null>(null)
-  const navRef = useRef<HTMLDivElement | null>(null)
+  // const navRef = useRef<HTMLDivElement | null>(null)
   const countRef = useRef<number>(0)
 
   const dispatch = useAppDispatch()
@@ -139,7 +139,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
           )}
           <Navbar
             isOpen={menuOpen}
-            navRef={navRef}
+            // navRef={navRef}
             role={role}
             onClose={() => setMenuOpen(false)}
           />
