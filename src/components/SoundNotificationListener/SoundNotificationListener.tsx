@@ -12,6 +12,7 @@ import { useSocket } from "@/providers/SocketProvider"
 import style from "./SoundNotificationListener.module.scss"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { getMessagePreview } from "@/utils/getMessagePreview"
+import { usePathname } from "next/navigation"
 // import {
 //   addNotification,
 //   updateNotification,
@@ -22,6 +23,7 @@ type NotificationType = Pick<
 >
 
 export const SoundNotificationListener = () => {
+  const pathname = usePathname()
   // const socket = getSocket()
   const socket = useSocket()
   // const dispatch = useAppDispatch()
@@ -60,6 +62,9 @@ export const SoundNotificationListener = () => {
 
       playNotification()
 
+      const conversationId = messageData.conversationId?._id
+      if (pathname === `/conversation/${conversationId}`) return
+
       setNotifications((prev) => [
         ...prev,
         {
@@ -76,7 +81,7 @@ export const SoundNotificationListener = () => {
     return () => {
       socket.off("message:new", handleNewMessage)
     }
-  }, [socket, playNotification, soundEnabled, userId])
+  }, [socket, playNotification, soundEnabled, userId, pathname])
 
   useEffect(() => {
     if (notifications.length === 0) return
