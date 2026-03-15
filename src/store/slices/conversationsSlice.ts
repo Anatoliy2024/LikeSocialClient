@@ -63,7 +63,7 @@ const conversationSlice = createSlice({
       action: PayloadAction<{ message: MessageType; userId: string }>,
     ) {
       const conversation = state.conversations.find(
-        (c) => c._id === action.payload.message.conversationId,
+        (c) => c._id === action.payload.message.conversationId._id,
       )
       if (!conversation) return
       conversation.lastMessageId = action.payload.message
