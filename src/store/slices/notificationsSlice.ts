@@ -52,7 +52,7 @@ const notificationsSlice = createSlice({
       state.items.forEach((item) => {
         // 1. Проверяем, что это нужная беседа
         // (Сравниваем напрямую, если conversationId - это ObjectId/строка)
-        if (item.conversationId === conversationId) {
+        if (item.conversationId?._id === conversationId) {
           // 2. Обновляем статус ТОЛЬКО если оно было непрочитанным
           if (!item.isRead) {
             item.isRead = true

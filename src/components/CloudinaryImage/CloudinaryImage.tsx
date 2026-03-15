@@ -31,7 +31,6 @@ export const CloudinaryImage = ({
   priority = false,
   onClick,
 }: Props) => {
-  // console.log("CloudinaryImage***", src)
   const url = cloudinaryLoader({ src, width })
 
   return (
@@ -50,35 +49,3 @@ export const CloudinaryImage = ({
     />
   )
 }
-
-// const cloudinaryLoader = ({ src, width }: { src: string; width: number }) => {
-
-//   const [prefix, suffix] = src.split("/upload/")
-//   return `${prefix}/upload/w_${width},q_auto,f_auto,c_limit/${suffix}`
-// }
-
-// export const FixedSizeCloudinaryImage = ({
-//   src,
-//   alt,
-//   //   size,
-//   className,
-//   style,
-//   priority = false,
-//   width,
-//   height,
-// }: Props) => {
-//   return (
-//     <Image
-//       loader={cloudinaryLoader}
-//       src={src}
-//       alt={alt}
-//       width={width}
-//       height={height}
-//       sizes={`${width}px`} // 👈 строго задаём нужную ширину
-//       className={className}
-//       style={style}
-//       priority={priority}
-//       loading={priority ? undefined : "lazy"}
-//     />
-//   )
-// }

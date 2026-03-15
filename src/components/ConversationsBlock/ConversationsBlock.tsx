@@ -1,42 +1,41 @@
 import { useEffect, useState } from "react"
 import style from "./ConversationsBlock.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-
 import { RootState } from "@/store/store"
-
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
 import ButtonMenu from "@/components/ui/button/Button"
-// import { ModalAddGroup } from "@/components/ModalAddGroup/ModalCreateGroup"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Paginator } from "@/components/Paginator/Paginator"
 import { fetchConversationsThunk } from "@/store/thunks/conversationsThunk"
-import { clearMessages } from "@/store/slices/conversationsSlice"
+import {
+  addMessageInConversationPage,
+  clearMessages,
+} from "@/store/slices/conversationsSlice"
 import { ModalCreateGroup } from "../ModalAddGroup/ModalCreateGroup"
+import { useSocket } from "@/providers/SocketProvider"
+import { MessageType } from "@/types/conversation.types"
+import { getMessagePreview } from "@/utils/getMessagePreview"
 
 export function ConversationsBlock() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const urlPage = Number(searchParams?.get("page")) || 1
-
+  const socket = useSocket()
   const [showAddGroup, setShowAddGroup] = useState(false)
   const dispatch = useAppDispatch()
   const conversations = useAppSelector(
-    (state: RootState) => state.conversations.conversations
+    (state: RootState) => state.conversations.conversations,
   )
 
-  // const currentConversation = useAppSelector(
-  //   (state: RootState) => state.conversations.currentConversation
-  // )
-
   const pagination = useAppSelector(
-    (state: RootState) => state.conversations.pagination
+    (state: RootState) => state.conversations.pagination,
   )
 
   const loading = useAppSelector(
-    (state: RootState) => state.conversations.loading
+    (state: RootState) => state.conversations.loading,
   )
   const userId = useAppSelector((state: RootState) => state.auth.userId)
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
@@ -61,6 +60,22 @@ export function ConversationsBlock() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
+  useEffect(() => {
+    if (!socket || !userId) return
+
+    const handleNewMessage = (data: { message: MessageType }) => {
+      const messageData = data.message
+      dispatch(addMessageInConversationPage({ message: messageData, userId }))
+    }
+
+    socket.on("message:new", handleNewMessage)
+
+    return () => {
+      socket.off("message:new", handleNewMessage)
+    }
+  }, [socket, userId, dispatch])
+
+  console.log("render ConversationsBlock")
   return (
     <>
       {loading && <SpinnerWindow />}
@@ -89,16 +104,11 @@ export function ConversationsBlock() {
           <ul className={style.conversation__lists}>
             {conversations.map((conversation) => {
               const isGroup = conversation.type === "group"
-              // console.log("conversation****", conversation)
-              // let dataConversation
-              // if (conversation.type === "private") {
-              // }
               const unreadCount = conversation.members.find(
-                (member) => member.user._id === userId
+                (member) => member.user._id === userId,
               )?.unreadCount
-              console.log("conversation.members.", conversation.members)
               const member = conversation.members.filter(
-                (member) => member.user._id !== userId
+                (member) => member.user._id !== userId,
               )[0].user
 
               return (
@@ -142,7 +152,15 @@ export function ConversationsBlock() {
                             <div>
                               {conversation.lastMessageId.senderId.username}:
                             </div>
-                            <div>{conversation.lastMessageId.text}</div>
+                            {/* {type==="text" &&}
+                            {type!==="text" &&getMessagePreview(type)} */}
+                            <div>
+                              {conversation.lastMessageId.type === "text"
+                                ? conversation.lastMessageId.text
+                                : getMessagePreview(
+                                    conversation.lastMessageId.type,
+                                  )}
+                            </div>
                           </div>
                         </div>
                       )}
@@ -151,7 +169,7 @@ export function ConversationsBlock() {
                       <div className={style.conversation__secondCol}>
                         <div className={style.conversation__timeBlock}>
                           {formatMessageTime(
-                            conversation.lastMessageId.createdAt
+                            conversation.lastMessageId.createdAt,
                           )}
                         </div>
                         {!!unreadCount && unreadCount > 0 && (
@@ -161,47 +179,13 @@ export function ConversationsBlock() {
                         )}
                       </div>
                     )}
-
-                    {/* {!isGroup && (
-                      <div className={style.conversation__userName}>
-                        {member.username}
-                      </div>
-                    )}
-                    {isGroup && (
-                      <div className={style.conversation__userName}>
-                        {conversation.title}
-                      </div>
-                    )}
-
-                    {conversation?.lastMessageId && (
-                      <div className={style.conversation__lastMessage}>
-                        <div className={style.conversation__lastMessageContent}>
-                          <div>
-                            {conversation.lastMessageId.senderId.username}:
-                          </div>
-                          <div>{conversation.lastMessageId.text}</div>
-                        </div>
-
-                        <div className={style.conversation__timeWrapper}>
-                          <div className={style.conversation__timeBlock}>
-                            {formatMessageTime(
-                              conversation.lastMessageId.createdAt
-                            )}
-                          </div>
-
-                          <div className={style.conversation__newMessage}>
-                            {unreadCount}
-                          </div>
-                        </div>
-                      </div>
-                    )} */}
                   </div>
                 </li>
               )
             })}
           </ul>
         ) : (
-          <div>Диалогов пока нет</div>
+          <div>Чатов пока нет</div>
         )}
       </div>
     </>

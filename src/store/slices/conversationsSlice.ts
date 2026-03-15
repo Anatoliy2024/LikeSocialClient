@@ -58,6 +58,28 @@ const conversationSlice = createSlice({
       // state.pendingNewMessages += 1
       // state.newestMessageId = action.payload._id
     },
+    addMessageInConversationPage(
+      state,
+      action: PayloadAction<{ message: MessageType; userId: string }>,
+    ) {
+      const conversation = state.conversations.find(
+        (c) => c._id === action.payload.message.conversationId,
+      )
+      if (!conversation) return
+      conversation.lastMessageId = action.payload.message
+      conversation.updatedAt = action.payload.message.createdAt
+      conversation.members = conversation.members.map((member) => {
+        if (member.user._id === action.payload.userId) {
+          return { ...member, unreadCount: member.unreadCount + 1 }
+        }
+        return member
+      })
+
+      state.conversations.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      )
+    },
 
     // clearPendingNewMessages(state) {
     //   state.pendingNewMessages = 0
@@ -65,14 +87,14 @@ const conversationSlice = createSlice({
 
     reactionUpdateFromSocket(state, action) {
       const message = state.messages.find(
-        (m) => m._id === action.payload.messageId
+        (m) => m._id === action.payload.messageId,
       )
       if (message) message.reactions = action.payload.reactions
     },
 
     readUpdateFromSocket(
       state,
-      action: PayloadAction<{ userId: string; lastReadMessageId: string }>
+      action: PayloadAction<{ userId: string; lastReadMessageId: string }>,
     ) {
       state.messages.forEach((msg) => {
         if (
@@ -85,10 +107,10 @@ const conversationSlice = createSlice({
     },
     messageDeleteFromSocket(
       state,
-      action: PayloadAction<{ messageId: string }>
+      action: PayloadAction<{ messageId: string }>,
     ) {
       state.messages = state.messages.filter(
-        (message) => message._id !== action.payload.messageId
+        (message) => message._id !== action.payload.messageId,
       )
     },
     messageEditedFromSocket(
@@ -98,7 +120,7 @@ const conversationSlice = createSlice({
         text: string
         isEdited: boolean
         editedAt: string
-      }>
+      }>,
     ) {
       state.messages = state.messages.map((message) => {
         if (message._id === action.payload.messageId) {
@@ -316,7 +338,7 @@ const conversationSlice = createSlice({
         if (action.payload.success && state.currentConversation) {
           state.currentConversation.members =
             state.currentConversation.members.filter(
-              (member) => member.user._id !== action.payload.memberId
+              (member) => member.user._id !== action.payload.memberId,
             )
         }
         state.loading = false
@@ -370,6 +392,7 @@ const conversationSlice = createSlice({
 
 export const {
   addMessageFromSocket,
+  addMessageInConversationPage,
   reactionUpdateFromSocket,
   clearMessages,
   messageDeleteFromSocket,
