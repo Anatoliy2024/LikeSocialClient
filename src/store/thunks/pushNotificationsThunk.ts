@@ -2,7 +2,7 @@
 
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
-import { userAPI } from "@/api/api"
+// import { userAPI } from "@/api/api"
 import {
   registerServiceWorker,
   requestPushSubscription,
@@ -10,6 +10,7 @@ import {
   unsubscribeFromPush,
   type PushSubscriptionJSON,
 } from "@/lib/push-client"
+import { userAPI } from "@/api/userAPI"
 
 export type PushDevice = {
   _id: string

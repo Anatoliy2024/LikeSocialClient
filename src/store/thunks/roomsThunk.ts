@@ -1,8 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { FormValuesAddRooms } from "../../components/addRoomBlock/AddRoomBlock"
-import { fileAPI, roomAPI } from "@/api/api"
+// import { fileAPI, roomAPI } from "@/api/api"
 import { BaseMember } from "@/types/base"
+import { roomAPI } from "@/api/roomAPI"
+import { fileAPI } from "@/api/fileAPI"
 type AddFriends = {
   users: string[]
   roomId: string

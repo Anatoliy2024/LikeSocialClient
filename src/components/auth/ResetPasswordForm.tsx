@@ -1,5 +1,5 @@
 "use client"
-import { authAPI } from "@/api/api"
+// import { authAPI } from "@/api/api"
 
 import { useState } from "react"
 import axios from "axios"
@@ -8,6 +8,7 @@ import ButtonMenu from "@/components/ui/button/Button"
 import Link from "next/link"
 // import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
+import { authAPI } from "@/api/authAPI"
 export default function ResetPassword() {
   const searchParams = useSearchParams()
   const token = searchParams?.get("token") ?? ""

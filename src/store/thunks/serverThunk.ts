@@ -1,8 +1,9 @@
 // store/thunks/postThunks.ts
+import { serverAPI } from "@/api/serverApi"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 // import { userPostType } from "../slices/userPostsSlice"
-import { serverAPI } from "@/api/api"
+// import { serverAPI } from "@/api/api"
 
 export const getStatusServerThunk = createAsyncThunk(
   "server/statusServer",
@@ -20,5 +21,5 @@ export const getStatusServerThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Ошибка при запросе статуса сервера")
     }
-  }
+  },
 )

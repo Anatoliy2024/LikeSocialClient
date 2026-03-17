@@ -1,8 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 
-import { userMovieAPI, fileAPI } from "@/api/api"
+// import { userMovieAPI, fileAPI } from "@/api/api"
 import { imageIdType, UserMovieType } from "../slices/userMoviesSlice"
+import { userMovieAPI } from "@/api/userMovieAPI"
+import { fileAPI } from "@/api/fileAPI"
 export type createUserMovieType = {
   title: string
   content: string
@@ -59,7 +61,7 @@ export const createUserMovieThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue(
-      "Ошибка при создании поста в createUserMovieThunk"
+      "Ошибка при создании поста в createUserMovieThunk",
     )
   }
 })
@@ -85,7 +87,7 @@ export const updateUserMovieThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue(
-      "Ошибка при изменении поста в updateUserMovieThunk"
+      "Ошибка при изменении поста в updateUserMovieThunk",
     )
   }
 })
@@ -111,7 +113,7 @@ export const addUserMovieThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue(
-      "Ошибка при изменении поста в addUserMovieThunk"
+      "Ошибка при изменении поста в addUserMovieThunk",
     )
   }
 })
@@ -127,7 +129,7 @@ export const deleteUserMovieThunk = createAsyncThunk<
     const response = await userMovieAPI.deleteUserMovie(
       userMovieId,
       status,
-      page
+      page,
     )
     // В ответе ожидаем список всех своих фильмов
 
@@ -140,7 +142,7 @@ export const deleteUserMovieThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue(
-      "Ошибка при создании поста в deleteUserMovieThunk"
+      "Ошибка при создании поста в deleteUserMovieThunk",
     )
   }
 })
@@ -153,13 +155,13 @@ export const uploadUserMovieAvatarThunk = createAsyncThunk(
       userMovieId,
       status,
     }: { file: File; userMovieId: string; status: string },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const data = await fileAPI.uploadUserMovieAvatar(
         file,
         userMovieId,
-        status
+        status,
       )
       return data
     } catch (error: unknown) {
@@ -171,7 +173,7 @@ export const uploadUserMovieAvatarThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Ошибка при изменении аватарки userMovie")
     }
-  }
+  },
 )
 
 // uploadUserMovieAvatar
@@ -211,7 +213,7 @@ export const toggleUserMovieStatusThunk = createAsyncThunk<
       const updatedMovie = await userMovieAPI.updateUserMovieStatus(
         userMovieId,
         newStatus,
-        page
+        page,
       )
       return updatedMovie
     } catch (error: unknown) {
@@ -220,7 +222,7 @@ export const toggleUserMovieStatusThunk = createAsyncThunk<
       }
       return thunkAPI.rejectWithValue("Ошибка при изменении статуса фильма")
     }
-  }
+  },
 )
 
 export const fetchUserMoviesThunk = createAsyncThunk<

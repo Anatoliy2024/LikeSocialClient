@@ -1,4 +1,5 @@
-import { notificationsAPI } from "@/api/api"
+// import { notificationsAPI } from "@/api/api"
+import { notificationsAPI } from "@/api/notificationsAPI"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 type senderType = {

@@ -1,10 +1,11 @@
 "use client"
 import { useState } from "react"
 import axios from "axios"
-import { authAPI } from "@/api/api"
+// import { authAPI } from "@/api/api"
 import ButtonMenu from "@/components/ui/button/Button"
 import style from "./Forgot-password.module.scss"
 import Link from "next/link"
+import { authAPI } from "@/api/authAPI"
 export default function ForgotPassword() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")

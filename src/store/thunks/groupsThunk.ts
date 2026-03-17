@@ -1,8 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
-import { groupsAPI } from "@/api/api"
+// import { groupsAPI } from "@/api/api"
 import axios from "axios"
 import { GroupType, MessageGroupType } from "../slices/groupsSlice"
+import { groupsAPI } from "@/api/groupsAPI"
 
 type TypeCreateGroup = {
   name: string
@@ -42,21 +43,6 @@ export const getUserGroupsThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue("Не удалось загрузить группы")
   }
 })
-// export const getUserDialogsThunk = createAsyncThunk<
-//   DialogType[],
-//   void,
-//   { rejectValue: string }
-// >("dialogs/getAll", async (_, thunkAPI) => {
-//   try {
-//     const data = await dialogsAPI.getUserDialog()
-//     return data
-//   } catch (error) {
-//     if (axios.isAxiosError(error) && error.response?.data?.message) {
-//       return thunkAPI.rejectWithValue(error.response.data.message)
-//     }
-//     return thunkAPI.rejectWithValue("Не удалось загрузить диалоги")
-//   }
-// })
 
 // ✅ Получить сообщения по dialogId
 export const getUserMessagesThunk = createAsyncThunk<
@@ -81,49 +67,3 @@ export const getUserMessagesThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue("Не удалось загрузить сообщения")
   }
 })
-
-// // ✅ Отправить сообщение (с существующим или новым диалогом)
-// export const sendUserMessageThunk = createAsyncThunk<
-//   MessageType,
-//   { recipientUserId: string; text: string; dialogId?: string },
-//   { rejectValue: string }
-// >(
-//   "dialogs/sendMessage",
-//   async ({ recipientUserId, text, dialogId }, thunkAPI) => {
-//     try {
-//       const data = await dialogsAPI.sendUserMessage(
-//         recipientUserId,
-//         text,
-//         dialogId
-//       )
-//       return data
-//     } catch (error) {
-//       if (axios.isAxiosError(error) && error.response?.data?.message) {
-//         return thunkAPI.rejectWithValue(error.response.data.message)
-//       }
-//       return thunkAPI.rejectWithValue("Не удалось отправить сообщение")
-//     }
-//   }
-// )
-
-// // ✅ Отправить сообщение (с существующим или новым диалогом)
-// export const deleteUserMessageThunk = createAsyncThunk<
-//   MessageType,
-//   string,
-//   { rejectValue: string }
-// >(
-//   "dialogs/sendMessage",
-//   async (messageId, thunkAPI) => {
-//     try {
-//       const data = await dialogsAPI.deleteUserMessage(
-//         messageId
-//       )
-//       return data
-//     } catch (error) {
-//       if (axios.isAxiosError(error) && error.response?.data?.message) {
-//         return thunkAPI.rejectWithValue(error.response.data.message)
-//       }
-//       return thunkAPI.rejectWithValue("Не удалось отправить сообщение")
-//     }
-//   }
-// )

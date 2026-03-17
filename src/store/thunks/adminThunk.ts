@@ -1,5 +1,6 @@
 // thunks/adminThunk.ts
 // import { adminAPI } from "@/api/api"
+// import { adminAPI } from "@/api/adminAPI"
 import { adminAPI } from "@/api/adminAPI"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
@@ -20,5 +21,5 @@ export const createTestUserThunk = createAsyncThunk(
       }
       return thunkAPI.rejectWithValue("Ошибка при создании тестового аккаунта")
     }
-  }
+  },
 )

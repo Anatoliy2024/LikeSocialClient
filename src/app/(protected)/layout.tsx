@@ -2,7 +2,8 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { authAPI } from "@/api/api"
+import { authAPI } from "@/api/authAPI"
+// import { authAPI } from "@/api/api"
 
 export default function ProtectedLayout({
   children,

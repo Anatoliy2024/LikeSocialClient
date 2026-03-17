@@ -1,6 +1,7 @@
+import { serverAPI } from "@/api/serverApi"
 import { useEffect } from "react"
 
-import { serverAPI } from "@/api/api"
+// import { serverAPI } from "@/api/api"
 
 export const useTikServer = (server: boolean) => {
   useEffect(() => {

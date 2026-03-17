@@ -7,10 +7,11 @@ import { StickersBlock } from "../StickersBlock/StickersBlock"
 import { Sticker } from "@/assets/icons/sticker"
 import style from "./MessageBlockInput.module.scss"
 import { useEffect, useRef, useState } from "react"
-import { fileAPI } from "@/api/api"
+// import { fileAPI } from "@/api/api"
 // import { getSocket } from "@/lib/socket"
 import { compressImage } from "@/utils/compressImage"
 import { useSocket } from "@/providers/SocketProvider"
+import { fileAPI } from "@/api/fileAPI"
 
 type IsEditMessageType = {
   messageId: string

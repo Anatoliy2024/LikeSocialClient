@@ -1,7 +1,9 @@
-import { fileAPI, userAPI } from "@/api/api"
+// import { fileAPI, userAPI } from "@/api/api"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { UserType } from "./usersThunk"
+import { userAPI } from "@/api/userAPI"
+import { fileAPI } from "@/api/fileAPI"
 
 export type ProfileType = {
   name: string | null
@@ -97,7 +99,7 @@ export const changeAvatarUserThunk = createAsyncThunk<
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
     return thunkAPI.rejectWithValue(
-      "Ошибка при изменении аватарки пользователя"
+      "Ошибка при изменении аватарки пользователя",
     )
   }
 })
@@ -126,7 +128,7 @@ export const subscribeToUserThunk = createAsyncThunk(
       }
       return thunkAPI.rejectWithValue("Ошибка при подписке")
     }
-  }
+  },
 )
 export const unsubscribeFromUserThunk = createAsyncThunk(
   "user/unsubscribe",
@@ -150,5 +152,5 @@ export const unsubscribeFromUserThunk = createAsyncThunk(
       }
       return thunkAPI.rejectWithValue("Ошибка при отписке")
     }
-  }
+  },
 )

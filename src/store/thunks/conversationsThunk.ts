@@ -8,7 +8,8 @@ import {
   MessageType,
   messageViewersUserType,
 } from "@/types/conversation.types"
-import { fileAPI } from "@/api/api"
+import { fileAPI } from "@/api/fileAPI"
+// import { fileAPI } from "@/api/api"
 
 // ===== Создание группы =====
 export const createGroupConversationThunk = createAsyncThunk<
@@ -24,7 +25,7 @@ export const createGroupConversationThunk = createAsyncThunk<
         title,
         memberIds,
         avatar,
-        description
+        description,
       )
       return data
     } catch (error) {
@@ -33,7 +34,7 @@ export const createGroupConversationThunk = createAsyncThunk<
       }
       return thunkAPI.rejectWithValue("Не удалось создать группу")
     }
-  }
+  },
 )
 
 // ===== Получение всех конверсейшенов =====
@@ -95,14 +96,14 @@ export const fetchMessagesThunk = createAsyncThunk<
   "conversations/fetchMessages",
   async (
     { conversationId, direction = "initial", cursor, limit },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const data = await conversationAPI.getMessages(
         conversationId,
         direction,
         cursor,
-        limit
+        limit,
       )
       return { ...data, direction }
     } catch (error) {
@@ -111,7 +112,7 @@ export const fetchMessagesThunk = createAsyncThunk<
       }
       return thunkAPI.rejectWithValue("Не удалось загрузить сообщения")
     }
-  }
+  },
 )
 // // ===== Получение сообщений чата =====
 // export const fetchMessagesThunk = createAsyncThunk<
@@ -194,7 +195,7 @@ export const addMemberToGroupThunk = createAsyncThunk<
     try {
       const data = await conversationAPI.addMemberToGroup(
         conversationId,
-        members
+        members,
       )
 
       return data
@@ -204,7 +205,7 @@ export const addMemberToGroupThunk = createAsyncThunk<
       }
       return thunkAPI.rejectWithValue("Не удалось добавить участников")
     }
-  }
+  },
 )
 
 export const deleteMemberToGroupThunk = createAsyncThunk<
@@ -217,7 +218,7 @@ export const deleteMemberToGroupThunk = createAsyncThunk<
     try {
       const data = await conversationAPI.deleteMemberToGroup(
         conversationId,
-        memberId
+        memberId,
       )
 
       return data
@@ -227,7 +228,7 @@ export const deleteMemberToGroupThunk = createAsyncThunk<
       }
       return thunkAPI.rejectWithValue("Не удалось удалить участника")
     }
-  }
+  },
 )
 
 export const getMessageViewersThunk = createAsyncThunk<

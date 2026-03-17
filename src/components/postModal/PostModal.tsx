@@ -19,7 +19,7 @@ import { Comment } from "../comment/Comment"
 import { useForm } from "react-hook-form"
 import StarRating from "../starRating/StarRating"
 
-import { voiceAPI } from "@/api/api"
+// import { voiceAPI } from "@/api/api"
 import { userPostType } from "@/store/slices/userPostsSlice"
 // import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
@@ -30,6 +30,7 @@ import PostForm, { FormCreatePost } from "../postForm/PostForm"
 import { addUserMovieThunk } from "@/store/thunks/userMoviesThunk"
 import { RootState } from "@/store/store"
 import Spinner from "../ui/spinner/Spinner"
+import { voiceAPI } from "@/api/voiceAPI"
 // import { ProfileLink } from "../ProfileLink/ProfileLink"
 // import { RootState } from '@/store/store'
 
@@ -64,7 +65,7 @@ const PostModal = ({
   const [sendingVoice, setSendingVoice] = useState(false)
   const dispatch = useAppDispatch()
   const loadingUserMovies = useAppSelector(
-    (state: RootState) => state.userMovies.loading
+    (state: RootState) => state.userMovies.loading,
   )
 
   const [votes, setVotes] = useState<VotesType[]>([])
@@ -111,7 +112,7 @@ const PostModal = ({
     try {
       if (roomId) {
         await dispatch(
-          createRoomCommentThunk({ postId, roomId, comment })
+          createRoomCommentThunk({ postId, roomId, comment }),
         ).unwrap()
         //пост комнаты  postId comment roomId отчистить  comment
       } else {

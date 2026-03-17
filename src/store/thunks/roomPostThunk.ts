@@ -2,43 +2,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { roomPostType } from "../slices/roomPostsSlice"
-import { roomPostAPI } from "@/api/api"
+// import { roomPostAPI } from "@/api/api"
 import { RootState } from "../store"
-
-// export interface RatingsType {
-//   stars: number
-//   acting: number
-//   specialEffects: number
-//   story: number
-// }
-
-// export interface CommentType {
-//   _id: string
-//   userId: {
-//     _id: string
-//     username: string
-//     avatar: string
-//   }
-//   text: string
-//   createdAt: string
-// }
-
-// export interface RoomPostType {
-//   _id: string
-//   authorId: string
-//   authorName: string
-//   title: string
-//   avatar: string
-//   avatarPublicId: string
-//   content: string | null
-//   ratings: RatingsType
-//   genres: string[]
-//   comments: CommentType[]
-//   votesCount: number
-//   createdAt: string
-//   updatedAt: string
-//   roomId: string
-// }
+import { roomPostAPI } from "@/api/roomPostAPI"
 
 export const createRoomPostThunk = createAsyncThunk<
   {
@@ -156,42 +122,5 @@ export const createRoomCommentThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Ошибка при создании коммента")
     }
-  }
+  },
 )
-
-// export const uploadRoomPostAvatarThunk = createAsyncThunk(
-//   "roomPost/uploadPostAvatar",
-//   async ({ file, postId }: { file: File; postId: string }, thunkAPI) => {
-//     try {
-//       const data = await fileAPI.uploadRoomPostAvatar(file, postId)
-//       return data
-//     } catch (error: unknown) {
-//       // Проверка, является ли ошибка ошибкой Axios
-//       if (axios.isAxiosError(error) && error.response?.data?.message) {
-//         return thunkAPI.rejectWithValue(error.response.data.message)
-//       }
-
-//       // если это вообще не ошибка axios или нет message
-//       return thunkAPI.rejectWithValue(
-//         "Ошибка при изменении аватарки room поста"
-//       )
-//     }
-//   }
-// )
-// export const createRoomVoiceThunk = createAsyncThunk(
-//   "post/createRoomVoice",
-//   async (dataInfo, thunkAPI) => {
-//     try {
-//       const data = await voiceAPI.createVoice(dataInfo)
-//       return data
-//     } catch (error: unknown) {
-//       // Проверка, является ли ошибка ошибкой Axios
-//       if (axios.isAxiosError(error) && error.response?.data?.message) {
-//         return thunkAPI.rejectWithValue(error.response.data.message)
-//       }
-
-//       // если это вообще не ошибка axios или нет message
-//       return thunkAPI.rejectWithValue("Ошибка при создании коммента")
-//     }
-//   }
-// )

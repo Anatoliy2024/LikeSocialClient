@@ -2,7 +2,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { userPostType } from "../slices/userPostsSlice"
-import { postAPI } from "@/api/api"
+import { postAPI } from "@/api/postAPI"
+// import { postAPI } from "@/api/api"
 
 export const createUserPostThunk = createAsyncThunk<
   {
@@ -131,7 +132,7 @@ export const createUserCommentThunk = createAsyncThunk(
   "userPost/createComment",
   async (
     { postId, comment }: { postId: string; comment: string },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const data = await postAPI.createUserComment(postId, comment)
@@ -145,7 +146,7 @@ export const createUserCommentThunk = createAsyncThunk(
       // если это вообще не ошибка axios или нет message
       return thunkAPI.rejectWithValue("Ошибка при создании коммента")
     }
-  }
+  },
 )
 // export const uploadUserPostAvatarThunk = createAsyncThunk(
 //   "userPost/uploadPostAvatar",

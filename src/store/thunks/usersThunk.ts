@@ -2,8 +2,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 // import { userPostType } from "../slices/userPostsSlice"
-import { userAPI } from "@/api/api"
+// import { userAPI } from "@/api/api"
 import { RootState } from "../store"
+import { userAPI } from "@/api/userAPI"
 
 export type UserType = {
   username: string
@@ -79,7 +80,7 @@ export const requestFriendThunk = createAsyncThunk<
 
     // если это вообще не ошибка axios или нет message
     return thunkAPI.rejectWithValue(
-      "Ошибка при отправке запроса на добавление в друзья"
+      "Ошибка при отправке запроса на добавление в друзья",
     )
   }
 })
@@ -191,7 +192,7 @@ export const fetchUsersBulkThunk = createAsyncThunk<
 
     // 🔹 3. Фильтруем: оставляем только тех, кого НЕТ в кэше
     const missingIds = idsArray.filter(
-      (id) => id && !cache?.[id] // id должен быть и не должен быть в кэше
+      (id) => id && !cache?.[id], // id должен быть и не должен быть в кэше
     )
 
     // 🔹 4. Если все уже в кэше — не делаем запрос, возвращаем пустой результат

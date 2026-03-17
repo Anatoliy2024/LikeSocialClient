@@ -1,4 +1,4 @@
-import { authAPI } from "@/api/api"
+// import { authAPI } from "@/api/api"
 import {
   getCurrentBrowserSubscription,
   unsubscribeFromPush,
@@ -7,6 +7,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 import { jwtDecode } from "jwt-decode"
 import { clearPushState } from "../slices/pushNotificationsSlice"
+import { authAPI } from "@/api/authAPI"
 // import { destroySocket } from "@/lib/socket"
 
 type RegisterParams = {
