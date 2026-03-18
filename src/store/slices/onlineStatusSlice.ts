@@ -22,7 +22,7 @@ const onlineStatusSlice = createSlice({
     // Обновить одного пользователя
     updateUserStatus(
       state,
-      action: PayloadAction<{ userId: string; status: OnlineStatus }>
+      action: PayloadAction<{ userId: string; status: OnlineStatus }>,
     ) {
       state[action.payload.userId] = action.payload.status
     },

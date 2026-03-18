@@ -12,6 +12,9 @@ export const baseURL = baseApiUrl + "/api"
 const instance = axios.create({
   baseURL,
   withCredentials: true,
+  headers: {
+    "X-Platform": "web",
+  },
 })
 
 // 👉 Добавляем accessToken в заголовок перед каждым запросом
