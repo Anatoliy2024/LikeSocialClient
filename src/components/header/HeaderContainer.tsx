@@ -11,7 +11,7 @@ import {
   fetchNotificationsThunk,
   markAllNotificationsReadThunk,
 } from "@/store/thunks/notificationsThunk"
-import { clearAuthSlice } from "@/store/slices/authSlice"
+// import { clearAuthSlice } from "@/store/slices/authSlice"
 // import { destroySocket } from "@/lib/socket"
 // import throttle from "lodash.throttle"
 // import { useHideOnScroll } from "@/hooks/useHideOnScroll"
@@ -42,25 +42,13 @@ const HeaderContainer = ({
   }, [dispatch, isAuth])
 
   const logoutButton = async () => {
-    // try {
-    // console.log("logoutButton start")
-    dispatch(logoutThunk()).catch((err) =>
-      console.warn("⚠️ Logout thunk error (non-blocking):", err),
-    )
-    // await dispatch(logoutThunk())
-    // console.log("after dispatch(logoutThunk())")
+    try {
+      await dispatch(logoutThunk())
 
-    setTimeout(() => {
-      router.push("/")
-      localStorage.removeItem("accessToken")
-
-      dispatch(clearAuthSlice())
-      console.log("🔘 Logout complete (local cleanup done)")
-    }, 100)
-    // console.log("logoutButton finish")
-    // } catch (error) {
-    //   console.log("error", error)
-    // }
+      router.push("/") // потом редирект
+    } catch (err) {
+      console.warn("⚠️ Logout thunk error:", err)
+    }
   }
   const toggleShowNotification = () => {
     setShowNotifications((prev) => !prev)
