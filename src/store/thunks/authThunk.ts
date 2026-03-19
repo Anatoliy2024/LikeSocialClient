@@ -8,7 +8,7 @@ import axios from "axios"
 import { jwtDecode } from "jwt-decode"
 import { clearPushState } from "../slices/pushNotificationsSlice"
 import { authAPI } from "@/api/authAPI"
-import { clearAuthSlice } from "../slices/authSlice"
+// import { clearAuthSlice } from "../slices/authSlice"
 // import { destroySocket } from "@/lib/socket"
 
 type RegisterParams = {
@@ -136,7 +136,7 @@ export const logoutThunk = createAsyncThunk(
       // 2. Чистим стейт пушей
       thunkAPI.dispatch(clearPushState())
 
-      thunkAPI.dispatch(clearAuthSlice()) // сначала чистим стейт
+      // thunkAPI.dispatch(clearAuthSlice()) // сначала чистим стейт
 
       localStorage.removeItem("accessToken")
 
