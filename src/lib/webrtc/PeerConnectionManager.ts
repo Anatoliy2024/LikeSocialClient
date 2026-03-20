@@ -155,6 +155,15 @@ export class PeerConnectionManager {
     // 🔁 Negotiation needed (только для инициатора, ТОЛЬКО для начального соединения)
     if (this.initiator) {
       this.pc.onnegotiationneeded = async () => {
+        // ✅ Не делаем offer если соединение уже установлено
+        if (
+          this.pc.connectionState === "connected" ||
+          this.pc.signalingState !== "stable" ||
+          this.isNegotiating
+        ) {
+          return
+        }
+
         // 🔹 Пропускаем, если уже есть удалённое описание (ренеготация)
         if (!this.pc.remoteDescription) {
           await this.createAndSendOffer()
@@ -168,6 +177,9 @@ export class PeerConnectionManager {
   private async createAndSendOffer() {
     if (this.isClosed || this.isNegotiating) return
     if (this.pc.signalingState !== "stable") return
+
+    // ✅ Не отправляем offer если уже подключены
+    if (this.pc.connectionState === "connected") return
 
     this.isNegotiating = true
     try {
