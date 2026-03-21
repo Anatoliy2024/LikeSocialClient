@@ -127,7 +127,7 @@ export const logoutThunk = createAsyncThunk(
       const currentSub = await getCurrentBrowserSubscription()
 
       // 🔹 Отписка от пушей — НЕ блокирует основной логаут
-      const data = await authAPI.postLogout(currentSub?.endpoint)
+      const data = await authAPI.postLogout({ endpoint: currentSub?.endpoint })
 
       if (currentSub) {
         await unsubscribeFromPush()

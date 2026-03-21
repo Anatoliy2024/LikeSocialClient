@@ -47,11 +47,21 @@ export const authAPI = {
     return instance.get("auth/me").then((response) => response.data)
   },
 
-  postLogout(endpoint?: string) {
+  // postLogout(endpoint?: string) {
+  //   return instance
+  //     .post("auth/logout", { endpoint })
+  //     .then((response) => response.data)
+  // },
+  postLogout({ endpoint }: { endpoint?: string }) {
     return instance
       .post("auth/logout", { endpoint })
       .then((response) => response.data)
   },
+  // postLogout(data: { endpoint?: string; token: string | null }) {
+  //   return instance
+  //     .post("auth/logout", { endpoint: data.endpoint, token: data.token })
+  //     .then((response) => response.data)
+  // },
   forgotPassword(email: string) {
     return instance
       .post("auth/forgot-password", { email })
