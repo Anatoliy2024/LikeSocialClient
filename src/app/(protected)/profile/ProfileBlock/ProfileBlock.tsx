@@ -63,32 +63,34 @@ const ProfileBlock = ({
 
   const profileData = useAppSelector((state: RootState) => state.profile)
   const profileLastSeen = useAppSelector(
-    (state: RootState) => state.profile.lastSeen
+    (state: RootState) => state.profile.lastSeen,
   )
   const friendshipStatus = useAppSelector(
-    (state: RootState) => state.users.friendshipStatus
+    (state: RootState) => state.users.friendshipStatus,
   )
 
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const username = useAppSelector(
-    (state: RootState) => state.auth.username
+    (state: RootState) => state.auth.username,
   ) as string
   const avatar = useAppSelector(
-    (state: RootState) => state.auth.avatar
+    (state: RootState) => state.auth.avatar,
   ) as string
 
   const loading = useAppSelector(
-    (state: RootState) => state.profile.profileLoading
+    (state: RootState) => state.profile.profileLoading,
   )
 
   const userOnlineStatus = useAppSelector((state: RootState) =>
-    userId ? state.onlineStatus[userId] : undefined
+    userId ? state.onlineStatus[userId] : undefined,
   )
   const status = isMyProfilePage
     ? { isOnline: true, lastSeen: null }
     : userOnlineStatus
 
-  const lastSeen = status?.isOnline ? null : status?.lastSeen ?? profileLastSeen
+  const lastSeen = status?.isOnline
+    ? null
+    : (status?.lastSeen ?? profileLastSeen)
 
   console.log("lastSeen************", lastSeen)
   const {
@@ -395,7 +397,8 @@ const ProfileBlock = ({
                   {!isMyProfilePage && (
                     <div
                       className={style.button}
-                      onClick={status?.isOnline ? handleCall : undefined}
+                      onClick={handleCall}
+                      // onClick={status?.isOnline ? handleCall : undefined}
                       title={
                         status?.isOnline ? "Позвонить юзеру" : "Юзер офлайн"
                       }
