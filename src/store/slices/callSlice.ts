@@ -21,6 +21,7 @@ interface CallState {
   isVideoEnabled: boolean
   callStartedAt: number | null // timestamp для таймера
   reconnectAttempt: number // счётчик попыток переподключения
+  callId: string | null
 }
 
 const initialState: CallState = {
@@ -35,6 +36,7 @@ const initialState: CallState = {
   isVideoEnabled: false,
   callStartedAt: null,
   reconnectAttempt: 0,
+  callId: null,
 }
 
 const callSlice = createSlice({
@@ -60,12 +62,14 @@ const callSlice = createSlice({
         callerId: string
         avatar: string
         username: string
+        callId: string
       }>,
     ) => {
       state.status = "incoming"
       state.callerId = action.payload.callerId
       state.avatarCaller = action.payload.avatar
       state.usernameCaller = action.payload.username
+      state.callId = action.payload.callId
     },
     setCallStatus: (state, action: PayloadAction<CallState["status"]>) => {
       state.status = action.payload
@@ -87,6 +91,7 @@ const callSlice = createSlice({
       state.isVideoEnabled = false
       state.callStartedAt = null
       state.reconnectAttempt = 0
+      state.callId = null
     },
     toggleAudio: (state) => {
       state.isAudioEnabled = !state.isAudioEnabled
@@ -101,6 +106,9 @@ const callSlice = createSlice({
     setReconnected: (state) => {
       state.status = "inCall"
     },
+    setCallId: (state, action: PayloadAction<string>) => {
+      state.callId = action.payload
+    },
   },
 })
 
@@ -114,6 +122,7 @@ export const {
   toggleVideo,
   setReconnecting,
   setReconnected,
+  setCallId,
 } = callSlice.actions
 
 export default callSlice.reducer

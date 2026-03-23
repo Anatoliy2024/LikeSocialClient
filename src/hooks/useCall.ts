@@ -13,6 +13,7 @@ import {
   setReconnecting,
   setReconnected,
   setCallStatus,
+  setCallId,
 } from "@/store/slices/callSlice"
 import type { RootState } from "@/store/store"
 // import type { Socket } from "socket.io-client"
@@ -44,7 +45,9 @@ const RECONNECT_DELAY_MS = 2000
 export const useCall = (userId: string | null) => {
   const [loadingConnect, setLoadingConnect] = useState(false)
   const dispatch = useAppDispatch()
-  const { callerId, targetId } = useAppSelector((s: RootState) => s.call)
+  const callerId = useAppSelector((s: RootState) => s.call.callerId)
+  const targetId = useAppSelector((s: RootState) => s.call.targetId)
+  const callId = useAppSelector((s: RootState) => s.call.callId)
 
   const [localStreamState, setLocalStreamState] =
     useState<Maybe<MediaStream>>(null)
@@ -314,13 +317,15 @@ export const useCall = (userId: string | null) => {
       from,
       avatar,
       username,
+      callId,
     }: {
       from: string
       avatar: string
       username: string
+      callId: string
     }) => {
       // console.log("📥 [DEBUG] Received call:incoming:", { from })
-      dispatch(setIncomingCall({ callerId: from, avatar, username }))
+      dispatch(setIncomingCall({ callerId: from, avatar, username, callId }))
     }
 
     // ✅ Фикс callStart: PC создаём здесь — только после того как собеседник принял
@@ -426,12 +431,20 @@ export const useCall = (userId: string | null) => {
       // console.log("📥 [DEBUG] Received call:end")
       endCall()
     }
+
+    const onStarted = ({ callId }: { callId: string }) => {
+      dispatch(setCallId(callId))
+    }
+
+    socket.on("call:started", onStarted)
     socket.on("call:incoming", onIncoming)
     socket.on("call:accept", onCallAccept)
     socket.on("call:signal", onSignal)
     socket.on("call:end", onCallEnd)
 
     return () => {
+      socket.off("call:started", onStarted)
+
       // console.log("🧹 [DEBUG] Cleaning up socket listeners")
       socket.off("call:incoming", onIncoming)
       socket.off("call:accept", onCallAccept)
@@ -478,20 +491,21 @@ export const useCall = (userId: string | null) => {
 
     setLoadingConnect(true)
     // console.log("📤 [DEBUG] Emitting call:accept:", { to: callerId })
-    socket.emit("call:accept", { to: callerId })
-  }, [callerId, socket])
+    socket.emit("call:accept", { to: callerId, callId })
+  }, [callerId, socket, callId])
 
   // ---- Завершить звонок ----
   const endCall = useCallback(() => {
     if (!socket) return
 
     const to = callerId ?? targetId
-    if (to) socket.emit("call:end", { to })
+    console.log("endCall callId", callId)
+    if (to) socket.emit("call:end", { to, callId })
 
     dispatch(setCallStatus("ended"))
     hardCleanup()
     dispatch(clearIncomingCall())
-  }, [callerId, targetId, hardCleanup, dispatch, socket])
+  }, [callerId, targetId, hardCleanup, dispatch, socket, callId])
 
   // ---- Мут микрофона ----
   const handleToggleAudio = useCallback(() => {
