@@ -173,6 +173,11 @@ const PostsBlock = ({
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               className={style.postsBlock__searchName}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchNameChange(searchText)
+                }
+              }}
             />
             <button onClick={() => handleSearchNameChange(searchText)}>
               Поиск
