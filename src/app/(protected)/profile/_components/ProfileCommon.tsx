@@ -38,7 +38,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   useEffect(() => {
     if (!isAuth) return
     if (isAuth) {
-      dispatch(clearUserPosts())
+      // dispatch(clearUserPosts())
       if (isMyProfilePage) {
         dispatch(setUserPage(pageFromUrl))
         // dispatch(getMyProfileThunk())
@@ -61,10 +61,9 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   }, [isMyProfilePage, userId, isAuth, dispatch, pageFromUrl, searchNameUrl])
 
   useEffect(() => {
-    return () => {
-      dispatch(clearUserPosts())
-    }
-  }, [dispatch])
+    if (!isAuth) return
+    dispatch(clearUserPosts())
+  }, [dispatch, userId, isMyProfilePage, isAuth])
   // dispatch(setRoomPage(pageFromUrl))
   // dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
 

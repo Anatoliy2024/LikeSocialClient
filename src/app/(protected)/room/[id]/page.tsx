@@ -102,10 +102,9 @@ const Room = () => {
   }, [isAuth, dispatch, id, pageRoomFromUrl, searchNameUrl])
 
   useEffect(() => {
-    return () => {
-      dispatch(clearRoomPosts())
-    }
-  }, [dispatch])
+    if (!isAuth) return
+    dispatch(clearRoomPosts())
+  }, [dispatch, id, isAuth])
 
   useEffect(() => {
     if (isAuth && typeof id === "string") {
