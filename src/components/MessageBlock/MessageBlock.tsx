@@ -52,6 +52,7 @@ import {
   // updateNotificationIsRead,
   updateNotificationIsReadMessage,
 } from "@/store/slices/notificationsSlice"
+import { MessageText } from "../MessageText/MessageText"
 // import { SoundToggle } from "../SoundToggle/SoundToggle"
 
 export const MessageBlock = () => {
@@ -725,7 +726,9 @@ export const MessageBlock = () => {
 
                       {message.text && (
                         <div className={style.messageBlock__messageListText}>
-                          {message.text}
+                          <MessageText text={message.text} />
+
+                          {/* {message.text} */}
                         </div>
                       )}
 
