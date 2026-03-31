@@ -11,10 +11,15 @@ export const roomPostAPI = {
       .put("roomPosts/update", data)
       .then((response) => response.data)
   },
-  getRoomPosts(roomId: string, page: number, limit?: number) {
+  getRoomPosts(
+    roomId: string,
+    page: number,
+    searchName: string | null,
+    limit?: number,
+  ) {
     return instance
       .get(`roomPosts/${roomId}`, {
-        params: { page, limit },
+        params: { page, limit, searchName },
       })
       .then((response) => response.data)
   },
@@ -22,11 +27,12 @@ export const roomPostAPI = {
     postId: string,
     roomId: string | null,
     page: number,
+    searchName: string | null,
     limit?: number,
   ) {
     return instance
       .delete(`roomPosts/post/${postId}?roomId=${roomId}`, {
-        params: { page, limit },
+        params: { page, limit, searchName },
       })
       .then((response) => response.data)
   },

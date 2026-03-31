@@ -37,6 +37,7 @@ type PostType = {
   comments: userCommentType[]
   votesCount: number
   page: number
+  searchNameUrl: string | null
 }
 
 const Post = ({
@@ -56,6 +57,7 @@ const Post = ({
   comments,
   votesCount,
   page,
+  searchNameUrl,
 }: PostType) => {
   const dispatch = useAppDispatch()
   const [isConfirmOpen, setConfirmOpen] = useState(false)
@@ -63,9 +65,18 @@ const Post = ({
   const handleDelete = async (postId: string) => {
     try {
       if (isProfile) {
-        dispatch(delUserPostsThunk({ postId, page })).unwrap()
+        dispatch(
+          delUserPostsThunk({ postId, page, searchName: searchNameUrl }),
+        ).unwrap()
       } else {
-        dispatch(delRoomPostsThunk({ postId, roomId, page })).unwrap()
+        dispatch(
+          delRoomPostsThunk({
+            postId,
+            roomId,
+            page,
+            searchName: searchNameUrl,
+          }),
+        ).unwrap()
       }
     } catch (err) {
       console.error("Ошибка удаления поста:", err)

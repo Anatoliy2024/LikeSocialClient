@@ -11,24 +11,34 @@ export const postAPI = {
       .put("userPosts/update", data)
       .then((response) => response.data)
   },
-  getUserPost(page: number, limit?: number) {
+  getUserPost(page: number, searchName: string | null, limit?: number) {
     return instance
       .get("userPosts", {
-        params: { page, limit },
+        params: { page, limit, searchName },
       })
       .then((response) => response.data)
   },
-  getUserPostsByUserId(userId: string, page: number, limit?: number) {
+  getUserPostsByUserId(
+    userId: string,
+    page: number,
+    searchName: string | null,
+    limit?: number,
+  ) {
     return instance
       .get(`/userPosts/${userId}`, {
-        params: { page, limit },
+        params: { page, limit, searchName },
       })
       .then((res) => res.data)
   },
-  delUserPost(postId: string, page: number, limit?: number) {
+  delUserPost(
+    postId: string,
+    page: number,
+    searchName: string | null,
+    limit?: number,
+  ) {
     return instance
       .delete(`userPosts/${postId}`, {
-        params: { page, limit },
+        params: { page, limit, searchName },
       })
       .then((response) => response.data)
   },

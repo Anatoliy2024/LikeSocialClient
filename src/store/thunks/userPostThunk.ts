@@ -65,11 +65,11 @@ export const getUserPostsThunk = createAsyncThunk<
     total: number
     pages: number
   }, // тип данных, которые вернутся — массив пользователей
-  number, // параметр тип данных которые отправляю
+  { page: number; searchName: string | null }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("userPost/getPosts", async (page, thunkAPI) => {
+>("userPost/getPosts", async ({ page, searchName }, thunkAPI) => {
   try {
-    const data = await postAPI.getUserPost(page)
+    const data = await postAPI.getUserPost(page, searchName)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -90,11 +90,11 @@ export const getUserPostsByIdThunk = createAsyncThunk<
     total: number
     pages: number
   }, // тип данных, которые вернутся — массив пользователей
-  { userId: string; page: number }, // параметр тип данных которые отправляю
+  { userId: string; page: number; searchName: string | null }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("userPost/getPostsById", async ({ userId, page }, thunkAPI) => {
+>("userPost/getPostsById", async ({ userId, page, searchName }, thunkAPI) => {
   try {
-    const data = await postAPI.getUserPostsByUserId(userId, page)
+    const data = await postAPI.getUserPostsByUserId(userId, page, searchName)
     return data
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {
@@ -112,11 +112,11 @@ export const delUserPostsThunk = createAsyncThunk<
     total: number
     pages: number
   }, // тип данных, которые вернутся — массив пользователей
-  { postId: string; page: number }, // параметр тип данных которые отправляю
+  { postId: string; page: number; searchName: string | null }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("userPost/delPosts", async ({ postId, page }, thunkAPI) => {
+>("userPost/delPosts", async ({ postId, page, searchName }, thunkAPI) => {
   try {
-    const data = await postAPI.delUserPost(postId, page)
+    const data = await postAPI.delUserPost(postId, page, searchName)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios

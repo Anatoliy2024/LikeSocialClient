@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { compressImage } from "@/utils/compressImage"
 import { imageIdType } from "@/store/slices/userPostsSlice"
+import { useRouter } from "next/navigation"
 
 export type FormCreatePost = {
   title: string
@@ -59,6 +60,7 @@ const PostForm = ({
     defaultValues: initialData || {},
   })
   const dispatch = useAppDispatch()
+  const router = useRouter()
   // const { id } = useParams()
   const loading = useAppSelector((state: RootState) => state.userPost.loading)
 
@@ -84,7 +86,7 @@ const PostForm = ({
       formData.append("ratings[acting]", dataForm.acting?.toString())
       formData.append(
         "ratings[specialEffects]",
-        dataForm.specialEffects?.toString()
+        dataForm.specialEffects?.toString(),
       )
       formData.append("ratings[story]", dataForm.story?.toString())
 
@@ -110,8 +112,8 @@ const PostForm = ({
             `***********************************************До: ${(
               file.size / 1024
             ).toFixed(2)} KB | После: ${(compressedFile.size / 1024).toFixed(
-              2
-            )} KB`
+              2,
+            )} KB`,
           )
           // await onUpload(compressedFile, { roomId })
           // // await onUpload(file, context)
@@ -127,6 +129,7 @@ const PostForm = ({
       if (isProfile) {
         if (!editMode) {
           dispatch(createUserPostThunk(formData))
+          router.push(`/profile`, { scroll: false })
         } else {
           if (initialData?._id) {
             console.log("Редактирование поста в профиле", formData)
@@ -138,6 +141,7 @@ const PostForm = ({
         console.log("formData", formData)
         if (!editMode) {
           dispatch(createRoomPostThunk(formData))
+          router.push(`/room/${roomId}`, { scroll: false })
         } else {
           if (initialData?._id) {
             console.log("Редактирование комнаты", formData)

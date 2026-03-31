@@ -8,7 +8,9 @@ export const Paginator = ({
   page: number
 }) => {
   return (
-    <div style={{ marginTop: 20 }}>
+    <div
+    // style={{ marginTop: 20 }}
+    >
       {Array.from({ length: pages }, (_, i) => i + 1).map((num) => (
         <button
           key={num}

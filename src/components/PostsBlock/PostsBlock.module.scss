@@ -1,4 +1,4 @@
-.wrapper {
+.postsBlock {
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,30 @@
   h2 {
     text-align: center;
   }
-  .containerPosts {
+  &__searchNameWrapper {
+    display: flex;
+    gap: 10px;
+    button {
+      background: rgb(110, 90, 239);
+      padding: 5px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: white;
+      &:hover {
+        background: rgba(133, 72, 203, 0.711);
+      }
+      &:active {
+        background: rgba(110, 90, 239, 0.455);
+      }
+    }
+  }
+  &__searchName {
+    background: white;
+    width: min(700px, 100%);
+    border-radius: 12px;
+    padding: 3px 10px 3px;
+  }
+  &__containerPosts {
     display: flex;
     flex-direction: column;
     gap: 20px;

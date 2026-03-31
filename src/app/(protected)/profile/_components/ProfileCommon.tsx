@@ -26,12 +26,13 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   const searchParams = useSearchParams()
   const pageFromUrl = Number(searchParams?.get("page")) || 1
   // // const profileData = useAppSelector((state: RootState) => state.profile)
+  const searchNameUrl = searchParams?.get("searchName")
 
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const playerId = useAppSelector((state: RootState) => state.auth.userId)
   // const posts = useAppSelector((state: RootState) => state.userPost.posts)
   const { posts, page, pages, loading } = useAppSelector(
-    (state) => state.userPost
+    (state) => state.userPost,
   )
   // console.log("posts************", posts)
   useEffect(() => {
@@ -40,15 +41,23 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
       if (isMyProfilePage) {
         dispatch(setUserPage(pageFromUrl))
         // dispatch(getMyProfileThunk())
-        dispatch(getUserPostsThunk(pageFromUrl))
+        dispatch(
+          getUserPostsThunk({ page: pageFromUrl, searchName: searchNameUrl }),
+        )
       } else if (userId) {
         dispatch(setUserPage(pageFromUrl))
 
         // dispatch(getUserProfileThunk(userId))
-        dispatch(getUserPostsByIdThunk({ userId, page: pageFromUrl }))
+        dispatch(
+          getUserPostsByIdThunk({
+            userId,
+            page: pageFromUrl,
+            searchName: searchNameUrl,
+          }),
+        )
       }
     }
-  }, [isMyProfilePage, userId, isAuth, dispatch, pageFromUrl])
+  }, [isMyProfilePage, userId, isAuth, dispatch, pageFromUrl, searchNameUrl])
   // dispatch(setRoomPage(pageFromUrl))
   // dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
 
@@ -67,18 +76,48 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   // console.log("isMyProfilePage ", isMyProfilePage)
   // console.log("playerId", playerId)
   // console.log("userId ", userId)
+
+  const handleSearchNameChange = (searchName: string) => {
+    const params = new URLSearchParams(searchParams?.toString())
+
+    const trimmed = searchName.trim()
+
+    if (trimmed) {
+      params.set("searchName", trimmed)
+    } else {
+      params.delete("searchName") // чище, чем пустая строка в URL
+    }
+    params.delete("pageRoom")
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+  const handleSearchNameDelete = () => {
+    const params = new URLSearchParams(searchParams?.toString())
+    params.delete("searchName")
+    params.delete("pageRoom")
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+
   return (
     <div>
       <ProfileBlock isMyProfilePage={isMyProfilePage} userId={userId} />
       <Suspense fallback={<div>Загрузка...</div>}>
         <PostsBlock
+          isProfile
           posts={posts}
           userId={playerId}
-          isProfile
           page={page}
           pages={pages}
           onPageChange={handlePageChange}
           loading={loading}
+          searchNameUrl={searchNameUrl}
+          handleSearchNameChange={handleSearchNameChange}
+          handleSearchNameDelete={handleSearchNameDelete}
         />
       </Suspense>
       {loading && <SpinnerWindow />}

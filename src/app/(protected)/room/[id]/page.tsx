@@ -37,25 +37,17 @@ const Room = () => {
   const pageRoomFromUrl = Number(searchParams?.get("pageRoom")) || 1
   const pageUserFriendsFromUrl =
     Number(searchParams?.get("pageUserFriends")) || 1
+  const searchNameUrl = searchParams?.get("searchName")
   const isAuth = useAppSelector((state: RootState) => state.auth.isAuth)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
-  // console.log("userId", userId)
   const room = useAppSelector((state: RootState) => state.rooms.room)
-  // const members = useAppSelector((state: RootState) => state.rooms.room?.members)
-
-  // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)
-  // const avatar = useAppSelector((state: RootState) => state.rooms.room?.avatar)
-  // const owner = useAppSelector((state: RootState) => state.rooms.room?.owner)
-  // const members = useAppSelector((state: RootState) => state.rooms.members)
-  // const owner = useAppSelector((state: RootState) => state.rooms.owner)
-  // const loading = useAppSelector((state) => state.rooms.loading)
   const {
     users: friends,
     page: friendsPage,
     pages: friendsPages,
   } = useAppSelector((state) => state.users.friends)
   const { posts, page, pages, loading } = useAppSelector(
-    (state) => state.roomPost
+    (state) => state.roomPost,
   )
   const dispatch = useAppDispatch()
   const params = useParams<{ id: string }>()
@@ -99,9 +91,15 @@ const Room = () => {
   useEffect(() => {
     if (isAuth && typeof id === "string") {
       dispatch(setRoomPage(pageRoomFromUrl))
-      dispatch(getRoomPostsThunk({ roomId: id, page: pageRoomFromUrl }))
+      dispatch(
+        getRoomPostsThunk({
+          roomId: id,
+          page: pageRoomFromUrl,
+          searchName: searchNameUrl,
+        }),
+      )
     }
-  }, [isAuth, dispatch, id, pageRoomFromUrl])
+  }, [isAuth, dispatch, id, pageRoomFromUrl, searchNameUrl])
 
   useEffect(() => {
     if (isAuth && typeof id === "string") {
@@ -112,7 +110,10 @@ const Room = () => {
   useEffect(() => {
     if (addFriendsToRoom) {
       dispatch(
-        getUserRelationsThunk({ type: "friends", page: pageUserFriendsFromUrl })
+        getUserRelationsThunk({
+          type: "friends",
+          page: pageUserFriendsFromUrl,
+        }),
       )
     }
   }, [addFriendsToRoom, dispatch, pageUserFriendsFromUrl])
@@ -123,11 +124,11 @@ const Room = () => {
 
   const handleRoomAvatarUpload = async (
     file: File,
-    context?: { roomId?: string }
+    context?: { roomId?: string },
   ) => {
     if (!context?.roomId) return
     await dispatch(
-      changeAvatarRoomThunk({ file, roomId: context.roomId })
+      changeAvatarRoomThunk({ file, roomId: context.roomId }),
     ).unwrap()
   }
 
@@ -151,6 +152,32 @@ const Room = () => {
   const handleChangeUrlFriendsPage = (newPage: number) => {
     const params = new URLSearchParams(searchParams?.toString())
     params.set("pageUserFriends", String(newPage))
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+
+  const handleSearchNameChange = (searchName: string) => {
+    const params = new URLSearchParams(searchParams?.toString())
+
+    const trimmed = searchName.trim()
+
+    if (trimmed) {
+      params.set("searchName", trimmed)
+    } else {
+      params.delete("searchName") // чище, чем пустая строка в URL
+    }
+    params.delete("pageRoom")
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+    // dispatch(setRoomPage(newPage)) // переключаем страницу в Redux
+  }
+  const handleSearchNameDelete = () => {
+    const params = new URLSearchParams(searchParams?.toString())
+    params.delete("searchName")
+    params.delete("pageRoom")
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
@@ -240,6 +267,9 @@ const Room = () => {
           onPageChange={handlePageChange}
           loading={loading}
           isOwner={isOwner}
+          searchNameUrl={searchNameUrl}
+          handleSearchNameChange={handleSearchNameChange}
+          handleSearchNameDelete={handleSearchNameDelete}
         />
       </Suspense>
       {loading && <SpinnerWindow />}

@@ -64,14 +64,14 @@ export const getRoomPostsThunk = createAsyncThunk<
     total: number
     pages: number
   }, // тип данных, которые вернутся — массив пользователей
-  { roomId: string; page: number }, // параметр тип данных которые отправляю
+  { roomId: string; page: number; searchName: string | null }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("roomPost/getPosts", async ({ roomId, page }, thunkAPI) => {
+>("roomPost/getPosts", async ({ roomId, page, searchName }, thunkAPI) => {
   const state = thunkAPI.getState() as RootState
   // const page = state.roomPost.page // если хранится в сторе
   const limit = state.roomPost.limit
   try {
-    const data = await roomPostAPI.getRoomPosts(roomId, page, limit)
+    const data = await roomPostAPI.getRoomPosts(roomId, page, searchName, limit)
     return data
   } catch (error: unknown) {
     // Проверка, является ли ошибка ошибкой Axios
@@ -91,22 +91,35 @@ export const delRoomPostsThunk = createAsyncThunk<
     total: number
     pages: number
   }, // тип данных, которые вернутся — массив пользователей
-  { postId: string; roomId: string | null; page: number }, // параметр тип данных которые отправляю
+  {
+    postId: string
+    roomId: string | null
+    page: number
+    searchName: string | null
+  }, // параметр тип данных которые отправляю
   { rejectValue: string }
->("roomPost/delPosts", async ({ postId, roomId, page }, thunkAPI) => {
-  try {
-    const data = await roomPostAPI.delRoomPost(postId, roomId, page)
-    return data
-  } catch (error: unknown) {
-    // Проверка, является ли ошибка ошибкой Axios
-    if (axios.isAxiosError(error) && error.response?.data?.message) {
-      return thunkAPI.rejectWithValue(error.response.data.message)
-    }
+>(
+  "roomPost/delPosts",
+  async ({ postId, roomId, page, searchName }, thunkAPI) => {
+    try {
+      const data = await roomPostAPI.delRoomPost(
+        postId,
+        roomId,
+        page,
+        searchName,
+      )
+      return data
+    } catch (error: unknown) {
+      // Проверка, является ли ошибка ошибкой Axios
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
 
-    // если это вообще не ошибка axios или нет message
-    return thunkAPI.rejectWithValue("Ошибка при удалении поста")
-  }
-})
+      // если это вообще не ошибка axios или нет message
+      return thunkAPI.rejectWithValue("Ошибка при удалении поста")
+    }
+  },
+)
 export const createRoomCommentThunk = createAsyncThunk(
   "roomPost/createComment",
   async ({ postId, roomId, comment }: Record<string, string>, thunkAPI) => {

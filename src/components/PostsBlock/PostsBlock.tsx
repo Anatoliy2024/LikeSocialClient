@@ -23,6 +23,9 @@ type PostsBlockProps = {
   onPageChange: (page: number) => void
   loading: boolean
   isOwner?: boolean
+  searchNameUrl: string | null
+  handleSearchNameChange: (searchName: string) => void
+  handleSearchNameDelete: () => void
 }
 
 const PostsBlock = ({
@@ -34,6 +37,9 @@ const PostsBlock = ({
   onPageChange,
   loading,
   isOwner,
+  searchNameUrl,
+  handleSearchNameChange,
+  handleSearchNameDelete,
 }: PostsBlockProps) =>
   //  {
   //   posts: userPostType[]
@@ -42,6 +48,7 @@ const PostsBlock = ({
   // }
   {
     const [activeCreateNewPost, setActiveCreateNewPost] = useState(false)
+    const [searchText, setSearchText] = useState("")
     // console.log("pages", pages)
     // const playerId = useAppSelector((state: RootState) => state.auth.userId)
 
@@ -75,46 +82,56 @@ const PostsBlock = ({
     // console.log("selectedPost", selectedPost)
     // const isMyPost = !userId || playerId === userId
 
-    const openPostModal = (id: string, page: number) => {
-      const searchParams = new URLSearchParams()
+    const openPostModal = (
+      id: string,
+      // page: number
+    ) => {
+      const searchParams = new URLSearchParams(window.location.search)
+      // const searchParams = new URLSearchParams()
       searchParams.set("postId", id)
-      // if (page !== 1) {
-      if (roomId) {
-        searchParams.set("pageRoom", page.toString())
-      } else {
-        searchParams.set("page", page.toString())
-      }
+
+      // if (roomId) {
+      //   searchParams.set("pageRoom", page.toString())
+      // } else {
+      //   searchParams.set("page", page.toString())
       // }
-      // pageRoom=2
-      // console.log("searchParams", searchParams)
 
       const url = roomId
         ? `/room/${roomId}?${searchParams.toString()}`
         : profileUserId
-        ? `/profile/${profileUserId}?${searchParams.toString()}`
-        : `/profile?${searchParams.toString()}`
+          ? `/profile/${profileUserId}?${searchParams.toString()}`
+          : `/profile?${searchParams.toString()}`
 
       router.push(url, { scroll: false }) // <--- ВАЖНО!
     }
     const closeModal = () => {
-      const searchParams = new URLSearchParams()
+      const searchParams = new URLSearchParams(window.location.search)
+      searchParams.delete("postId")
+      // const searchParams = new URLSearchParams()
 
-      // if (page !== 1) {
-      if (roomId) {
-        searchParams.set("pageRoom", page.toString())
-      } else {
-        searchParams.set("page", page.toString())
-      }
+      // if (roomId) {
+      //   searchParams.set("pageRoom", page.toString())
+      // } else {
+      //   searchParams.set("page", page.toString())
       // }
 
       const url = roomId
         ? `/room/${roomId}?${searchParams}`
         : profileUserId
-        ? `/profile/${profileUserId}?${searchParams}`
-        : `/profile?${searchParams}`
+          ? `/profile/${profileUserId}?${searchParams}`
+          : `/profile?${searchParams}`
 
       router.push(url, { scroll: false })
     }
+
+    useEffect(() => {
+      if (searchNameUrl) {
+        setSearchText(searchNameUrl)
+      } else {
+        setSearchText("")
+      }
+    }, [searchNameUrl])
+
     useEffect(() => {
       if (selectedPost) {
         document.body.classList.add("no-scroll")
@@ -129,7 +146,7 @@ const PostsBlock = ({
 
     return (
       <>
-        <div className={style.wrapper}>
+        <div className={style.postsBlock}>
           {/* <h2>PostsBlock</h2> */}
           {(!profileUserId || roomId) && (
             <ButtonMenu
@@ -150,10 +167,24 @@ const PostsBlock = ({
               }}
             />
           )}
+          <div className={style.postsBlock__searchNameWrapper}>
+            <input
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className={style.postsBlock__searchName}
+            />
+            <button onClick={() => handleSearchNameChange(searchText)}>
+              Поиск
+            </button>
+            {searchNameUrl && (
+              <button onClick={handleSearchNameDelete}>Очистить</button>
+            )}
+          </div>
           {pages > 1 && (
             <Paginator pages={pages} onPageChange={onPageChange} page={page} />
           )}
-          <div className={style.containerPosts}>
+          <div className={style.postsBlock__containerPosts}>
             {posts.length > 0
               ? posts
                   .filter((post) => {
@@ -188,11 +219,17 @@ const PostsBlock = ({
                         isProfile={isProfile}
                         roomId={roomId}
                         genres={post.genres}
-                        onClick={() => openPostModal(post._id, page)}
+                        onClick={() =>
+                          openPostModal(
+                            post._id,
+                            // , page
+                          )
+                        }
                         comments={post.comments}
                         votesCount={post.votesCount}
                         // avatarPublicId={post.avatarPublicId}
                         page={page}
+                        searchNameUrl={searchNameUrl}
                       />
                     )
                   })
