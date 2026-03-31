@@ -11,7 +11,7 @@ import {
   getUserPostsThunk,
 } from "@/store/thunks/userPostThunk"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { setUserPage } from "@/store/slices/userPostsSlice"
+import { clearUserPosts, setUserPage } from "@/store/slices/userPostsSlice"
 import SpinnerWindow from "@/components/ui/spinner/SpinnerWindow"
 
 type Props =
@@ -38,6 +38,7 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
   useEffect(() => {
     if (!isAuth) return
     if (isAuth) {
+      dispatch(clearUserPosts())
       if (isMyProfilePage) {
         dispatch(setUserPage(pageFromUrl))
         // dispatch(getMyProfileThunk())
@@ -58,6 +59,12 @@ const ProfileCommon = ({ isMyProfilePage = false, userId }: Props) => {
       }
     }
   }, [isMyProfilePage, userId, isAuth, dispatch, pageFromUrl, searchNameUrl])
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearUserPosts())
+    }
+  }, [dispatch])
   // dispatch(setRoomPage(pageFromUrl))
   // dispatch(getRoomPostsThunk({ roomId: id, page: pageFromUrl }))
 

@@ -85,6 +85,14 @@ const roomPostSlice = createSlice({
     setRoomPage: (state, action: PayloadAction<number>) => {
       state.page = action.payload
     },
+    clearRoomPosts: (state) => {
+      state.posts = []
+      state.loading = false
+      state.error = null
+      state.page = 1
+      state.total = 0
+      state.pages = 0
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -171,7 +179,7 @@ const roomPostSlice = createSlice({
         state.loading = false
         const updatedPost = action.payload
         state.posts = state.posts.map((post) =>
-          post._id === updatedPost._id ? updatedPost : post
+          post._id === updatedPost._id ? updatedPost : post,
         )
         //  action.payload
         // state.rooms = state.rooms.map((room) =>
@@ -201,6 +209,6 @@ const roomPostSlice = createSlice({
     // })
   },
 })
-export const { setRoomPage } = roomPostSlice.actions
+export const { setRoomPage, clearRoomPosts } = roomPostSlice.actions
 
 export default roomPostSlice.reducer

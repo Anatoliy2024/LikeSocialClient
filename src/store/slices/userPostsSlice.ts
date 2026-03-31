@@ -87,6 +87,14 @@ const userPostSlice = createSlice({
     setUserPage: (state, action: PayloadAction<number>) => {
       state.page = action.payload
     },
+    clearUserPosts: (state) => {
+      state.posts = []
+      state.loading = false
+      state.error = null
+      state.page = 1
+      state.total = 0
+      state.pages = 0
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -119,7 +127,7 @@ const userPostSlice = createSlice({
         const postData = action.payload.post
         console.log("postData*** updateUserPostThunk", postData)
         state.posts = state.posts.map((post) =>
-          post._id === postData._id ? postData : post
+          post._id === postData._id ? postData : post,
         )
 
         // state.posts.unshift(action.payload) // добавим новый пост в начало
@@ -196,7 +204,7 @@ const userPostSlice = createSlice({
         const updatedPost = action.payload
         // console.log("createUserCommentThunk", action.payload)
         state.posts = state.posts.map((post) =>
-          post._id === updatedPost._id ? updatedPost : post
+          post._id === updatedPost._id ? updatedPost : post,
         )
         //  action.payload
         // state.rooms = state.rooms.map((room) =>
@@ -227,5 +235,5 @@ const userPostSlice = createSlice({
     // })
   },
 })
-export const { setUserPage } = userPostSlice.actions
+export const { setUserPage, clearUserPosts } = userPostSlice.actions
 export default userPostSlice.reducer

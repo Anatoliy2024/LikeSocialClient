@@ -20,7 +20,7 @@ import ButtonMenu from "@/components/ui/button/Button"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 // import Image from "next/image"
 import { ChangeAvatarModal } from "@/components/changeAvatarModal/ChangeAvatarModal"
-import { setRoomPage } from "@/store/slices/roomPostsSlice"
+import { clearRoomPosts, setRoomPage } from "@/store/slices/roomPostsSlice"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { RootState } from "@/store/store"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
@@ -100,6 +100,12 @@ const Room = () => {
       )
     }
   }, [isAuth, dispatch, id, pageRoomFromUrl, searchNameUrl])
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearRoomPosts())
+    }
+  }, [dispatch])
 
   useEffect(() => {
     if (isAuth && typeof id === "string") {
