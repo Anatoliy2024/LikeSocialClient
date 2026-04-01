@@ -21,6 +21,7 @@ export const parseMessage = (text: string) => {
         target="_blank"
         rel="noopener noreferrer"
         style={{ color: "#4da6ff", textDecoration: "underline" }}
+        onClick={(e) => e.stopPropagation()}
       >
         {url}
       </a>,
