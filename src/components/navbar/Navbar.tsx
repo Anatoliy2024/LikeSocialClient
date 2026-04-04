@@ -103,6 +103,16 @@ export default function Navbar({
           Want To See
         </Link>
       </li>
+      <li>
+        <Link
+          href="/games"
+          onClick={handleLinkClick}
+          prefetch={false}
+          className={style.navbar__item}
+        >
+          Games
+        </Link>
+      </li>
 
       {role === "admin" && (
         <li>

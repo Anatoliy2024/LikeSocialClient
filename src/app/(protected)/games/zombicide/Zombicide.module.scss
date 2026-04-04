@@ -1,0 +1,31 @@
+.zombicide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    // align-items: center;
+
+    li {
+      a {
+        display: flex;
+        justify-content: center;
+        background: rgb(108, 63, 198);
+        min-width: 200px;
+        padding: 5px;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        &:hover {
+          background: rgba(108, 63, 198, 0.764);
+        }
+        &:hover {
+          background: rgba(108, 63, 198, 0.404);
+        }
+      }
+    }
+  }
+}
