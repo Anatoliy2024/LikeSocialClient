@@ -9,6 +9,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-wrap: wrap;
     div {
       display: flex;
       gap: 10px;
@@ -53,6 +54,13 @@
   &__toolActive {
     border: 2px solid black;
     // padding: 5px;
+  }
+  &__selectSeparation {
+    font-size: 30px;
+    option {
+      text-align: center;
+      cursor: pointer;
+    }
   }
 
   &__map {

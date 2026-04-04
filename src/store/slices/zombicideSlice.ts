@@ -7,13 +7,20 @@ import {
   joinRoomThunk,
   fetchMyMapsThunk,
   saveMapThunk,
+  fetchMapsThunk,
+  fetchMapByIdThunk,
 } from "@/store/thunks/zombicideThunks"
 
 const initialState: ZombicideState = {
   rooms: [],
   currentRoom: null,
   gameState: null,
-  savedMaps: [],
+  maps: [],
+  currentMap: null,
+  page: 1,
+  limit: 10,
+  total: 0,
+  pages: 0,
   status: "idle",
   error: null,
 }
@@ -94,7 +101,7 @@ const zombicideSlice = createSlice({
         state.error = action.payload ?? "Не удалось войти в комнату"
       })
 
-    // --- fetchMyMaps ---
+    // --- fetchMaps ---
     builder
       .addCase(fetchMyMapsThunk.pending, (state) => {
         state.status = "loading"
@@ -104,12 +111,45 @@ const zombicideSlice = createSlice({
         fetchMyMapsThunk.fulfilled,
         (state, action: PayloadAction<GameMap[]>) => {
           state.status = "idle"
-          state.savedMaps = action.payload
+          state.maps = action.payload
         },
       )
       .addCase(fetchMyMapsThunk.rejected, (state, action) => {
         state.status = "error"
         state.error = action.payload ?? "Не удалось загрузить карты"
+      })
+
+    builder
+      .addCase(fetchMapsThunk.pending, (state) => {
+        state.status = "loading"
+        state.error = null
+      })
+      .addCase(fetchMapsThunk.fulfilled, (state, action) => {
+        state.status = "idle"
+
+        state.maps = action.payload.maps
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
+      })
+      .addCase(fetchMapsThunk.rejected, (state, action) => {
+        state.status = "error"
+        state.error = action.payload ?? "Не удалось загрузить  карты"
+      })
+    builder
+      .addCase(fetchMapByIdThunk.pending, (state) => {
+        state.status = "loading"
+        state.error = null
+      })
+      .addCase(fetchMapByIdThunk.fulfilled, (state, action) => {
+        state.status = "idle"
+
+        state.currentMap = action.payload.map
+      })
+      .addCase(fetchMapByIdThunk.rejected, (state, action) => {
+        state.status = "error"
+        state.error = action.payload ?? "Не удалось загрузить  карту"
       })
 
     // --- saveMap ---
@@ -118,13 +158,10 @@ const zombicideSlice = createSlice({
         state.status = "loading"
         state.error = null
       })
-      .addCase(
-        saveMapThunk.fulfilled,
-        (state, action: PayloadAction<GameMap>) => {
-          state.status = "idle"
-          state.savedMaps.push(action.payload)
-        },
-      )
+      .addCase(saveMapThunk.fulfilled, (state, action) => {
+        state.status = "idle"
+        state.maps.push(action.payload.map)
+      })
       .addCase(saveMapThunk.rejected, (state, action) => {
         state.status = "error"
         state.error = action.payload ?? "Не удалось сохранить карту"

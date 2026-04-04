@@ -1,6 +1,6 @@
 // types/zombicide.ts
 
-export type ZoneType = "floor" | "room" | "spawn" | "exit" | "wall" | "empty"
+// export type ZoneType = "floor" | "room" | "spawn" | "exit" | "wall" | "empty"
 
 export type Phase = "waiting" | "player_turn" | "zombie_turn" | "game_over"
 
@@ -10,19 +10,36 @@ export type ZombieType = "walker" | "runner" | "fatty"
 
 // --- карта ---
 
-export interface Zone {
-  id: number
-  type: ZoneType
-  neighbors: number[] // id соседних зон
+// export interface Zone {
+//   id: number
+//   type: ZoneType
+//   neighbors: number[] // id соседних зон
+// }
+
+export type CellType =
+  | "empty"
+  | "street"
+  | "room"
+  | "spawn"
+  | "exit"
+  | "entrance"
+export interface Cell {
+  type: CellType
+  borders: {
+    top: "none" | "wall" | "door"
+    right: "none" | "wall" | "door"
+    bottom: "none" | "wall" | "door"
+    left: "none" | "wall" | "door"
+  }
 }
 
 export interface GameMap {
-  id: string
+  _id: string
   name: string
-  createdBy: string // userId
+  createdBy: { username: string; avatar: string; _id: string } // userId
   cols: number
   rows: number
-  zones: Zone[]
+  cells: Cell[]
   createdAt: string
 }
 
@@ -67,7 +84,7 @@ export interface GameState {
   currentPlayerId: string | null
   players: Player[]
   zombies: Zombie[]
-  map: Zone[]
+  map: Cell[]
   noiseMap: Record<number, number> // zoneId → уровень шума
   winner: "players" | "zombies" | null
 }
@@ -93,7 +110,12 @@ export interface ZombicideState {
   rooms: Room[]
   currentRoom: Room | null
   gameState: GameState | null
-  savedMaps: GameMap[]
+  maps: GameMap[]
+  currentMap: GameMap | null
+  page: number
+  limit: number
+  total: number
+  pages: number
   status: "idle" | "loading" | "error"
   error: string | null
 }

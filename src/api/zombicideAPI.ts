@@ -1,3 +1,4 @@
+import { Cell } from "@/types/zombicide"
 import instance from "./instance"
 
 export const zombicideAPI = {
@@ -14,14 +15,24 @@ export const zombicideAPI = {
       .post(`games/zombicide/${roomId}/join-room`)
       .then((response) => response.data)
   },
-  getMyMaps() {
+  getMyMaps(page: number, limit?: number) {
     return instance
-      .get(`games/zombicide/get-my-maps`)
+      .get(`games/zombicide/get-my-maps`, { params: { page, limit } })
       .then((response) => response.data)
   },
-  saveMap(name: string, cols: number, rows: number, zones: unknown) {
+  getMaps(page: number, limit?: number) {
     return instance
-      .post(`games/zombicide/save-map`, { name, cols, rows, zones })
+      .get(`games/zombicide/get-maps`, { params: { page, limit } })
+      .then((response) => response.data)
+  },
+  getMapById(id: string) {
+    return instance
+      .get(`games/zombicide/get-map/${id}`)
+      .then((response) => response.data)
+  },
+  saveMap(name: string, cols: number, rows: number, cells: Cell[]) {
+    return instance
+      .post(`games/zombicide/save-map`, { name, cols, rows, cells })
       .then((response) => response.data)
   },
 }

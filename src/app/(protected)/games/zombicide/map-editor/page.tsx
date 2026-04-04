@@ -4,20 +4,11 @@ import style from "./map-editor.module.scss"
 import { useState } from "react"
 import { getBorderClass } from "@/utils/borderClass"
 import { floorColor, floorImage } from "@/utils/floorImage"
-
-type ZoneType = "empty" | "street" | "room" | "spawn" | "exit" | "entrance"
+import { useAppDispatch } from "@/store/hooks"
+import { saveMapThunk } from "@/store/thunks/zombicideThunks"
+import { Cell, CellType } from "@/types/zombicide"
 
 type ToolsType = "floor" | "separator" | "clear" | null
-
-interface Cell {
-  type: ZoneType
-  borders: {
-    top: "none" | "wall" | "door"
-    right: "none" | "wall" | "door"
-    bottom: "none" | "wall" | "door"
-    left: "none" | "wall" | "door"
-  }
-}
 type separatorType = "wall" | "door" | "none"
 
 const instant: Cell = {
@@ -31,6 +22,8 @@ const instant: Cell = {
 }
 
 export default function MapEditor() {
+  const dispatch = useAppDispatch()
+  const [mapName, setMapName] = useState("")
   const [cols, setCols] = useState(6) // значение в input
   const [rows, setRows] = useState(5) // значение в input
   const [appliedCols, setAppliedCols] = useState(0) // применённые после кнопки
@@ -38,7 +31,7 @@ export default function MapEditor() {
   const [grid, setGrid] = useState<Cell[]>([])
   const [targetItem, setTargetItem] = useState<number | null>(null)
   const [tool, setIsTool] = useState<ToolsType>(null)
-  const [floor, setFloor] = useState<ZoneType>("empty")
+  const [floor, setFloor] = useState<CellType>("empty")
   const [separator, setSeparator] = useState<separatorType>("none")
 
   const handleCreate = () => {
@@ -52,6 +45,10 @@ export default function MapEditor() {
       .fill(null)
       .map(() => ({ ...instant }))
     setGrid(cells)
+  }
+  const handleSaveMap = () => {
+    if (!mapName || grid.length === 0) return
+    dispatch(saveMapThunk({ name: mapName, cols, rows, cells: grid }))
   }
 
   const setBorder = (
@@ -100,44 +97,93 @@ export default function MapEditor() {
     })
   }
 
-  const getNeighbors = (idx: number, grid: Cell[], cols: number) => {
-    const neighbors: number[] = []
-    const row = Math.floor(idx / cols)
-    const col = idx % cols
+  // const getNeighbors = (idx: number, grid: Zone[], cols: number) => {
+  //   const neighbors: number[] = []
+  //   const row = Math.floor(idx / cols)
+  //   const col = idx % cols
 
-    // левый сосед — только если нет стены слева
-    if (
-      col > 0 &&
-      grid[idx].borders.left === "none" &&
-      grid[idx - 1].type !== "empty"
-    )
-      neighbors.push(idx - 1)
+  //   // левый сосед — только если нет стены слева
+  //   if (
+  //     col > 0 &&
+  //     grid[idx].borders.left === "none" &&
+  //     grid[idx - 1].type !== "empty"
+  //   )
+  //     neighbors.push(idx - 1)
 
-    // правый сосед
-    if (
-      col < cols - 1 &&
-      grid[idx].borders.right === "none" &&
-      grid[idx + 1].type !== "empty"
-    )
-      neighbors.push(idx + 1)
+  //   // правый сосед
+  //   if (
+  //     col < cols - 1 &&
+  //     grid[idx].borders.right === "none" &&
+  //     grid[idx + 1].type !== "empty"
+  //   )
+  //     neighbors.push(idx + 1)
 
-    // верхний сосед
-    if (
-      row > 0 &&
-      grid[idx].borders.top === "none" &&
-      grid[idx - cols].type !== "empty"
-    )
-      neighbors.push(idx - cols)
+  //   // верхний сосед
+  //   if (
+  //     row > 0 &&
+  //     grid[idx].borders.top === "none" &&
+  //     grid[idx - cols].type !== "empty"
+  //   )
+  //     neighbors.push(idx - cols)
 
-    // нижний сосед
-    if (
-      row < rows - 1 &&
-      grid[idx].borders.bottom === "none" &&
-      grid[idx + cols].type !== "empty"
-    )
-      neighbors.push(idx + cols)
+  //   // нижний сосед
+  //   if (
+  //     row < rows - 1 &&
+  //     grid[idx].borders.bottom === "none" &&
+  //     grid[idx + cols].type !== "empty"
+  //   )
+  //     neighbors.push(idx + cols)
 
-    return neighbors
+  //   return neighbors
+  // }
+
+  const clearItem = (idx: number) => {
+    setGrid((prev) => {
+      const next = [...prev]
+
+      // сбрасываем текущую ячейку
+      next[idx] = { ...instant }
+
+      const currentRow = Math.floor(idx / cols)
+
+      const neighbors = [
+        {
+          offset: -cols,
+          side: "bottom" as const,
+          isValid: idx - cols >= 0,
+        },
+        {
+          offset: +cols,
+          side: "top" as const,
+          isValid: idx + cols < next.length,
+        },
+        {
+          offset: -1,
+          side: "right" as const,
+          isValid: Math.floor((idx - 1) / cols) === currentRow,
+        },
+        {
+          offset: +1,
+          side: "left" as const,
+          isValid: Math.floor((idx + 1) / cols) === currentRow,
+        },
+      ]
+
+      neighbors.forEach(({ offset, side, isValid }) => {
+        const neighborIdx = idx + offset
+        if (isValid && neighborIdx >= 0 && neighborIdx < next.length) {
+          next[neighborIdx] = {
+            ...next[neighborIdx],
+            borders: {
+              ...next[neighborIdx].borders,
+              [side]: "none",
+            },
+          }
+        }
+      })
+
+      return next
+    })
   }
 
   return (
@@ -145,6 +191,15 @@ export default function MapEditor() {
       <Link href="/games/zombicide">Отмена</Link>
       <div>
         <div className={style.mapEditor__tools}>
+          <div>
+            <label htmlFor="map-name">Название карты</label>
+            <input
+              type="string"
+              id="map-name"
+              value={mapName}
+              onChange={(e) => setMapName(e.target.value)}
+            />
+          </div>
           <div>
             <label htmlFor="row">Рядов</label>
             <input
@@ -168,6 +223,7 @@ export default function MapEditor() {
             />
           </div>
           <button onClick={handleCreate}>Создать каркас</button>
+          <button onClick={handleSaveMap}>Сохранить карту</button>
         </div>
         <div>
           <label htmlFor="floor">Пол</label>
@@ -176,7 +232,7 @@ export default function MapEditor() {
             id="floor"
             onChange={(e) => {
               setIsTool("floor")
-              setFloor(e.target.value as ZoneType)
+              setFloor(e.target.value as CellType)
             }}
           >
             <option value="empty">Пусто</option>
@@ -257,86 +313,92 @@ export default function MapEditor() {
                 } else if (tool === "separator" && separator !== "none") {
                   setTargetItem(idx)
                 } else if (tool === "clear") {
-                  setGrid((prev) => {
-                    const next = [...prev]
+                  clearItem(idx)
+                  // setGrid((prev) => {
+                  //   const next = [...prev]
 
-                    // сбрасываем текущую ячейку
-                    next[idx] = { ...instant }
+                  //   // сбрасываем текущую ячейку
+                  //   next[idx] = { ...instant }
 
-                    const currentRow = Math.floor(idx / cols)
+                  //   const currentRow = Math.floor(idx / cols)
 
-                    const neighbors = [
-                      {
-                        offset: -cols,
-                        side: "bottom" as const,
-                        isValid: idx - cols >= 0,
-                      },
-                      {
-                        offset: +cols,
-                        side: "top" as const,
-                        isValid: idx + cols < next.length,
-                      },
-                      {
-                        offset: -1,
-                        side: "right" as const,
-                        isValid: Math.floor((idx - 1) / cols) === currentRow,
-                      },
-                      {
-                        offset: +1,
-                        side: "left" as const,
-                        isValid: Math.floor((idx + 1) / cols) === currentRow,
-                      },
-                    ]
+                  //   const neighbors = [
+                  //     {
+                  //       offset: -cols,
+                  //       side: "bottom" as const,
+                  //       isValid: idx - cols >= 0,
+                  //     },
+                  //     {
+                  //       offset: +cols,
+                  //       side: "top" as const,
+                  //       isValid: idx + cols < next.length,
+                  //     },
+                  //     {
+                  //       offset: -1,
+                  //       side: "right" as const,
+                  //       isValid: Math.floor((idx - 1) / cols) === currentRow,
+                  //     },
+                  //     {
+                  //       offset: +1,
+                  //       side: "left" as const,
+                  //       isValid: Math.floor((idx + 1) / cols) === currentRow,
+                  //     },
+                  //   ]
 
-                    neighbors.forEach(({ offset, side, isValid }) => {
-                      const neighborIdx = idx + offset
-                      if (
-                        isValid &&
-                        neighborIdx >= 0 &&
-                        neighborIdx < next.length
-                      ) {
-                        next[neighborIdx] = {
-                          ...next[neighborIdx],
-                          borders: {
-                            ...next[neighborIdx].borders,
-                            [side]: "none",
-                          },
-                        }
-                      }
-                    })
+                  //   neighbors.forEach(({ offset, side, isValid }) => {
+                  //     const neighborIdx = idx + offset
+                  //     if (
+                  //       isValid &&
+                  //       neighborIdx >= 0 &&
+                  //       neighborIdx < next.length
+                  //     ) {
+                  //       next[neighborIdx] = {
+                  //         ...next[neighborIdx],
+                  //         borders: {
+                  //           ...next[neighborIdx].borders,
+                  //           [side]: "none",
+                  //         },
+                  //       }
+                  //     }
+                  //   })
 
-                    return next
-                  })
+                  //   return next
+                  // })
                 }
               }}
             >
               {cell.type !== "empty" ? cell.type : ""}
               {idx === targetItem && (
                 <select
+                  className={style.mapEditor__selectSeparation}
                   name="separator"
                   id="separator"
                   onChange={(e) => {
-                    const side = e.target.value as
-                      | "top"
-                      | "right"
-                      | "bottom"
-                      | "left"
-                    const currentValue = grid[idx].borders[side]
-                    // const typeSeparator = currentValue === separator
-                    setBorder(
-                      idx,
-                      side,
-                      currentValue === separator ? "none" : separator,
-                    )
+                    if (e.target.value !== "none") {
+                      const side = e.target.value as
+                        | "top"
+                        | "right"
+                        | "bottom"
+                        | "left"
+                      const currentValue = grid[idx].borders[side]
+                      // const typeSeparator = currentValue === separator
+                      setBorder(
+                        idx,
+                        side,
+                        currentValue === separator ? "none" : separator,
+                      )
+                    } else {
+                      clearItem(idx)
+                    }
                   }}
                   // multiple
                   size={5}
                 >
-                  <option value="none">Не выбрано</option>
-                  <option value="top">Верх</option>
-                  <option value="right">Право</option>
-                  <option value="left">Лево</option>
-                  <option value="bottom">Низ</option>
+                  <option value="none">---</option>
+                  <option value="top"> ↑</option>
+                  <option value="right">→</option>
+                  <option value="left">←</option>
+                  <option value="bottom">↓</option>
                 </select>
               )}
               {idx === targetItem && (

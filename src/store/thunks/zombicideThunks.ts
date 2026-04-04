@@ -1,7 +1,7 @@
 // store/thunks/zombicideThunks.ts
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
-import { Room, GameMap, Zone } from "@/types/zombicide"
+import { Room, GameMap, Cell } from "@/types/zombicide"
 import { zombicideAPI } from "@/api/zombicideAPI"
 
 // --- лобби ---
@@ -58,11 +58,11 @@ export const joinRoomThunk = createAsyncThunk<
 
 export const fetchMyMapsThunk = createAsyncThunk<
   GameMap[],
-  void,
+  number,
   { rejectValue: string }
->("zombicide/fetchMyMaps", async (_, thunkAPI) => {
+>("zombicide/fetchMyMaps", async (page, thunkAPI) => {
   try {
-    const data = await zombicideAPI.getMyMaps()
+    const data = await zombicideAPI.getMyMaps(page)
     return data
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {
@@ -71,14 +71,52 @@ export const fetchMyMapsThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue("Не удалось загрузить карты")
   }
 })
+export const fetchMapsThunk = createAsyncThunk<
+  {
+    maps: GameMap[]
+    page: number
+    limit: number
+    total: number
+    pages: number
+  },
+  number,
+  { rejectValue: string }
+>("zombicide/fetchMaps", async (page, thunkAPI) => {
+  try {
+    const data = await zombicideAPI.getMaps(page)
+    return data
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+    return thunkAPI.rejectWithValue("Не удалось загрузить карты")
+  }
+})
+export const fetchMapByIdThunk = createAsyncThunk<
+  {
+    map: GameMap
+  },
+  string,
+  { rejectValue: string }
+>("zombicide/fetchMapById", async (id, thunkAPI) => {
+  try {
+    const data = await zombicideAPI.getMapById(id)
+    return data
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.message) {
+      return thunkAPI.rejectWithValue(error.response.data.message)
+    }
+    return thunkAPI.rejectWithValue("Не удалось загрузить карту")
+  }
+})
 
 export const saveMapThunk = createAsyncThunk<
-  GameMap,
-  { name: string; cols: number; rows: number; zones: Zone[] },
+  { map: GameMap },
+  { name: string; cols: number; rows: number; cells: Cell[] },
   { rejectValue: string }
->("zombicide/saveMap", async ({ name, cols, rows, zones }, thunkAPI) => {
+>("zombicide/saveMap", async ({ name, cols, rows, cells }, thunkAPI) => {
   try {
-    const data = await zombicideAPI.saveMap(name, cols, rows, zones)
+    const data = await zombicideAPI.saveMap(name, cols, rows, cells)
     return data
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {

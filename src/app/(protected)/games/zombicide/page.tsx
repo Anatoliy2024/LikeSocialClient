@@ -15,6 +15,9 @@ export default function Zombicide() {
           <Link href="zombicide/map-editor">Редактор карт</Link>
         </li>
         <li>
+          <Link href="zombicide/maps">Карты</Link>
+        </li>
+        <li>
           <Link href="/games">Назад</Link>
         </li>
       </ul>

@@ -13,13 +13,13 @@ import server from "./slices/serverSlice"
 import userMovies from "./slices/userMoviesSlice"
 import notifications from "./slices/notificationsSlice"
 import onlineStatus from "./slices/onlineStatusSlice"
-// import dialogsReducer from "./slices/dialogsSlice"
 import callReducer from "./slices/callSlice"
 import conversationsReducer from "./slices/conversationsSlice"
 import groupCallReducer from "./slices/groupCallSlice"
 import adminReducer from "./slices/adminSlice"
 import settingsReducer from "./slices/settingsSlice"
 import pushNotificationsReducer from "./slices/pushNotificationsSlice"
+import zombicideReducer from "./slices/zombicideSlice"
 // import pushDevicesReducer from "./slices/pushDevicesSlice"
 // import messagesReducer from "./slices/messagesSlice"
 
@@ -36,13 +36,14 @@ export const store = configureStore({
     userMovies: userMovies,
     notifications: notifications,
     onlineStatus: onlineStatus,
-    // dialogs: dialogsReducer,
+
     call: callReducer,
     groupCall: groupCallReducer,
     conversations: conversationsReducer,
     admin: adminReducer,
     settings: settingsReducer,
     pushNotifications: pushNotificationsReducer,
+    zombicideSlice: zombicideReducer,
     // pushDevices: pushDevicesReducer,
     // messages: messagesReducer,
     // добавь другие редьюсеры здесь

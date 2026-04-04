@@ -1,0 +1,18 @@
+.maps {
+  padding: 20px;
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    li {
+      a {
+        border: 1px solid black;
+        border-radius: 8px;
+        padding: 5px;
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+      }
+    }
+  }
+}

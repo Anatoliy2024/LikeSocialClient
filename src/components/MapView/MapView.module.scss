@@ -1,0 +1,58 @@
+.mapView {
+  &__item {
+    border: 1px solid black;
+    height: 80;
+    border-radius: 4;
+
+    position: relative;
+    select {
+      max-width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      background: white;
+    }
+  }
+}
+
+// классы границ идут отдельно — без !important
+.borderTop__wall {
+  border-top: 4px solid #444;
+}
+.borderTop__door {
+  border-top: 4px dashed #8b6914;
+}
+.borderTop__none {
+  border-top: 1px solid #eee;
+}
+
+.borderRight__wall {
+  border-right: 4px solid #444;
+}
+.borderRight__door {
+  border-right: 4px dashed #8b6914;
+}
+.borderRight__none {
+  border-right: 1px solid #eee;
+}
+
+.borderBottom__wall {
+  border-bottom: 4px solid #444;
+}
+.borderBottom__door {
+  border-bottom: 4px dashed #8b6914;
+}
+.borderBottom__none {
+  border-bottom: 1px solid #eee;
+}
+
+.borderLeft__wall {
+  border-left: 4px solid #444;
+}
+.borderLeft__door {
+  border-left: 4px dashed #8b6914;
+}
+.borderLeft__none {
+  border-left: 1px solid #eee;
+}

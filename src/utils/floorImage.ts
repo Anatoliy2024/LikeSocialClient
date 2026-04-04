@@ -7,7 +7,7 @@ export const floorImage: Record<FloorType, string> = {
   room: "url('/games/zombicide/tiles/room.jpg')",
   entrance: "url('/games/zombicide/tiles/entrance.png')",
   exit: "url('/games/zombicide/tiles/exit.png')",
-  spawn: "url('/games/zombicide/tiles/spawn.png')",
+  spawn: "url('/games/zombicide/tiles/spawn.jpg')",
 }
 
 export const floorColor: Record<FloorType, string> = {
