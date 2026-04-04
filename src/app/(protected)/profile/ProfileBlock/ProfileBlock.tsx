@@ -397,8 +397,12 @@ const ProfileBlock = ({
                   {!isMyProfilePage && (
                     <div
                       className={style.button}
-                      onClick={handleCall}
-                      // onClick={status?.isOnline ? handleCall : undefined}
+                      // onClick={handleCall}
+                      onClick={
+                        status?.isOnline
+                          ? handleCall
+                          : () => alert("Юзер офлайн")
+                      }
                       title={
                         status?.isOnline ? "Позвонить юзеру" : "Юзер офлайн"
                       }
