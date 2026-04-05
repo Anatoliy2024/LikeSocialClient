@@ -6,10 +6,17 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect } from "react"
 import style from "./Map.module.scss"
+import { clearCurrentMap } from "@/store/slices/zombicideSlice"
 export default function Map() {
   const dispatch = useAppDispatch()
   const cols = useAppSelector((state) => state.zombicideSlice.currentMap?.cols)
   const rows = useAppSelector((state) => state.zombicideSlice.currentMap?.rows)
+  const hEdges = useAppSelector(
+    (state) => state.zombicideSlice.currentMap?.hEdges,
+  )
+  const vEdges = useAppSelector(
+    (state) => state.zombicideSlice.currentMap?.vEdges,
+  )
   const cells = useAppSelector(
     (state) => state.zombicideSlice.currentMap?.cells,
   )
@@ -22,13 +29,27 @@ export default function Map() {
   useEffect(() => {
     dispatch(fetchMapByIdThunk(id))
   }, [dispatch, id])
-  if (!cols || !rows || !cells) return <div>...Загрузка</div>
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearCurrentMap())
+    }
+  }, [dispatch])
+
+  if (!cols || !rows || !cells || !hEdges || !vEdges)
+    return <div>...Загрузка</div>
 
   return (
     <div className={style.map}>
       <div>Название карты: {name}</div>
       <Link href="/games/zombicide/maps">Отмена</Link>
-      <MapView cols={cols} rows={rows} cells={cells} />
+      <MapView
+        cols={cols}
+        rows={rows}
+        cells={cells}
+        hEdges={hEdges}
+        vEdges={vEdges}
+      />
     </div>
   )
 }

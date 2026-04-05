@@ -2,7 +2,7 @@
 import { useEffect } from "react"
 import style from "./Maps.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { fetchMapsThunk } from "@/store/thunks/zombicideThunks"
+import { deleteMapThunk, fetchMapsThunk } from "@/store/thunks/zombicideThunks"
 import Link from "next/link"
 import { Paginator } from "@/components/Paginator/Paginator"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -29,6 +29,10 @@ export default function MapsPage() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
+  const handleDeleteMap = (mapId: string) => {
+    dispatch(deleteMapThunk(mapId))
+  }
+
   return (
     <div className={style.maps}>
       <h1>Карты</h1>
@@ -44,6 +48,14 @@ export default function MapsPage() {
               </span>
               <span>колонок:{map.cols}</span>
               <span>рядов:{map.rows}</span>
+              <span
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleDeleteMap(map._id)
+                }}
+              >
+                Удалить
+              </span>
             </Link>
           </li>
         ))}

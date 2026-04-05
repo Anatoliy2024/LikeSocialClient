@@ -57,7 +57,13 @@ export const joinRoomThunk = createAsyncThunk<
 // --- карты ---
 
 export const fetchMyMapsThunk = createAsyncThunk<
-  GameMap[],
+  {
+    maps: GameMap[]
+    page: number
+    limit: number
+    total: number
+    pages: number
+  },
   number,
   { rejectValue: string }
 >("zombicide/fetchMyMaps", async (page, thunkAPI) => {
@@ -112,16 +118,48 @@ export const fetchMapByIdThunk = createAsyncThunk<
 
 export const saveMapThunk = createAsyncThunk<
   { map: GameMap },
-  { name: string; cols: number; rows: number; cells: Cell[] },
+  {
+    name: string
+    cols: number
+    rows: number
+    cells: Cell[]
+    hEdges: unknown
+    vEdges: unknown
+  },
   { rejectValue: string }
->("zombicide/saveMap", async ({ name, cols, rows, cells }, thunkAPI) => {
+>(
+  "zombicide/saveMap",
+  async ({ name, cols, rows, cells, hEdges, vEdges }, thunkAPI) => {
+    try {
+      const data = await zombicideAPI.saveMap(
+        name,
+        cols,
+        rows,
+        cells,
+        hEdges,
+        vEdges,
+      )
+      return data
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message)
+      }
+      return thunkAPI.rejectWithValue("Не удалось сохранить карту")
+    }
+  },
+)
+export const deleteMapThunk = createAsyncThunk<
+  { mapId: string },
+  string,
+  { rejectValue: string }
+>("zombicide/deleteMap", async (id, thunkAPI) => {
   try {
-    const data = await zombicideAPI.saveMap(name, cols, rows, cells)
+    const data = await zombicideAPI.deleteMap(id)
     return data
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data?.message) {
       return thunkAPI.rejectWithValue(error.response.data.message)
     }
-    return thunkAPI.rejectWithValue("Не удалось сохранить карту")
+    return thunkAPI.rejectWithValue("Не удалось удалить карту")
   }
 })

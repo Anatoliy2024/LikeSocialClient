@@ -23,14 +23,16 @@ export type CellType =
   | "spawn"
   | "exit"
   | "entrance"
+
+export type EdgeType = "none" | "wall" | "door"
 export interface Cell {
   type: CellType
-  borders: {
-    top: "none" | "wall" | "door"
-    right: "none" | "wall" | "door"
-    bottom: "none" | "wall" | "door"
-    left: "none" | "wall" | "door"
-  }
+  // borders: {
+  //   top: "none" | "wall" | "door"
+  //   right: "none" | "wall" | "door"
+  //   bottom: "none" | "wall" | "door"
+  //   left: "none" | "wall" | "door"
+  // }
 }
 
 export interface GameMap {
@@ -40,6 +42,8 @@ export interface GameMap {
   cols: number
   rows: number
   cells: Cell[]
+  hEdges: EdgeType[][] // (rows+1) × cols
+  vEdges: EdgeType[][] // rows × (cols+1)
   createdAt: string
 }
 

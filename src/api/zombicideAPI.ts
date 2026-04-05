@@ -30,9 +30,28 @@ export const zombicideAPI = {
       .get(`games/zombicide/get-map/${id}`)
       .then((response) => response.data)
   },
-  saveMap(name: string, cols: number, rows: number, cells: Cell[]) {
+  saveMap(
+    name: string,
+    cols: number,
+    rows: number,
+    cells: Cell[],
+    hEdges: unknown,
+    vEdges: unknown,
+  ) {
     return instance
-      .post(`games/zombicide/save-map`, { name, cols, rows, cells })
+      .post(`games/zombicide/save-map`, {
+        name,
+        cols,
+        rows,
+        cells,
+        hEdges,
+        vEdges,
+      })
+      .then((response) => response.data)
+  },
+  deleteMap(id: string) {
+    return instance
+      .delete(`games/zombicide/${id}/map`)
       .then((response) => response.data)
   },
 }

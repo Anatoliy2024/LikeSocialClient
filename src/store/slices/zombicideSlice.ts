@@ -1,6 +1,6 @@
 // store/slices/zombicideSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { ZombicideState, Room, GameState, GameMap } from "@/types/zombicide"
+import { ZombicideState, Room, GameState } from "@/types/zombicide"
 import {
   fetchRoomsThunk,
   createRoomThunk,
@@ -9,6 +9,7 @@ import {
   saveMapThunk,
   fetchMapsThunk,
   fetchMapByIdThunk,
+  deleteMapThunk,
 } from "@/store/thunks/zombicideThunks"
 
 const initialState: ZombicideState = {
@@ -42,6 +43,9 @@ const zombicideSlice = createSlice({
 
     clearError(state) {
       state.error = null
+    },
+    clearCurrentMap(state) {
+      state.currentMap = null
     },
   },
 
@@ -107,13 +111,14 @@ const zombicideSlice = createSlice({
         state.status = "loading"
         state.error = null
       })
-      .addCase(
-        fetchMyMapsThunk.fulfilled,
-        (state, action: PayloadAction<GameMap[]>) => {
-          state.status = "idle"
-          state.maps = action.payload
-        },
-      )
+      .addCase(fetchMyMapsThunk.fulfilled, (state, action) => {
+        state.status = "idle"
+        state.maps = action.payload.maps
+        state.page = action.payload.page
+        state.limit = action.payload.limit
+        state.total = action.payload.total
+        state.pages = action.payload.pages
+      })
       .addCase(fetchMyMapsThunk.rejected, (state, action) => {
         state.status = "error"
         state.error = action.payload ?? "Не удалось загрузить карты"
@@ -166,8 +171,26 @@ const zombicideSlice = createSlice({
         state.status = "error"
         state.error = action.payload ?? "Не удалось сохранить карту"
       })
+    // --- delMap ---
+    builder
+      .addCase(deleteMapThunk.pending, (state) => {
+        state.status = "loading"
+        state.error = null
+      })
+      .addCase(deleteMapThunk.fulfilled, (state, action) => {
+        state.status = "idle"
+        state.maps = state.maps.filter(
+          (map) => map._id !== action.payload.mapId,
+        )
+        // state.maps.push(action.payload.map)
+      })
+      .addCase(deleteMapThunk.rejected, (state, action) => {
+        state.status = "error"
+        state.error = action.payload ?? "Не удалось сохранить карту"
+      })
   },
 })
 
-export const { setGameState, leaveRoom, clearError } = zombicideSlice.actions
+export const { setGameState, leaveRoom, clearError, clearCurrentMap } =
+  zombicideSlice.actions
 export default zombicideSlice.reducer
