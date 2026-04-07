@@ -13,8 +13,8 @@ export default function MapsPage() {
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
   const maps = useAppSelector((state) => state.zombicideSlice.maps)
-  const page = useAppSelector((state) => state.zombicideSlice.page)
-  const pages = useAppSelector((state) => state.zombicideSlice.pages)
+  const page = useAppSelector((state) => state.zombicideSlice.pagination.page)
+  const pages = useAppSelector((state) => state.zombicideSlice.pagination.pages)
   const userId = useAppSelector((state) => state.auth.userId)
 
   useEffect(() => {

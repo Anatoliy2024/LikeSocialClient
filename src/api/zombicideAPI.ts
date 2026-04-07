@@ -1,4 +1,4 @@
-import { Cell } from "@/types/zombicide"
+import { Cell, EdgeType } from "@/types/zombicide"
 import instance from "./instance"
 
 export const zombicideAPI = {
@@ -34,9 +34,9 @@ export const zombicideAPI = {
     name: string,
     cols: number,
     rows: number,
-    cells: Cell[],
-    hEdges: unknown,
-    vEdges: unknown,
+    cells: Cell[][],
+    hEdges: EdgeType[][],
+    vEdges: EdgeType[][],
   ) {
     return instance
       .post(`games/zombicide/save-map`, {
