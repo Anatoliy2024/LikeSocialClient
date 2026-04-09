@@ -5,11 +5,16 @@ export const zombicideAPI = {
   getRooms() {
     return instance.get(`games/zombicide`).then((response) => response.data)
   },
-  createRoom(name: string, mapId: string, maxPlayersL: number) {
+  createRoom(name: string, mapId: string, maxPlayers: number) {
     return instance
-      .post(`games/zombicide/create-game`, { name, mapId, maxPlayersL })
+      .post(`games/zombicide/create-room`, { name, mapId, maxPlayers })
       .then((response) => response.data)
   },
+  // createLobby(name: string, mapId: string, maxPlayers: number) {
+  //   return instance
+  //     .post(`games/zombicide/create-game`, { name, mapId, maxPlayers })
+  //     .then((response) => response.data)
+  // },
   joinRoom(roomId: string) {
     return instance
       .post(`games/zombicide/${roomId}/join-room`)

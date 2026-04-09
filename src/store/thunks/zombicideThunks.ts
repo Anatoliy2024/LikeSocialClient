@@ -22,7 +22,7 @@ export const fetchRoomsThunk = createAsyncThunk<
   }
 })
 
-export const createRoomThunk = createAsyncThunk<
+export const createRoomZombicideThunk = createAsyncThunk<
   Room,
   { name: string; mapId: string; maxPlayers: number },
   { rejectValue: string }
@@ -165,6 +165,22 @@ export const deleteMapThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue("Не удалось удалить карту")
   }
 })
+
+// export const createRoomThunk = createAsyncThunk<
+//   { mapId: string },
+//   string,
+//   { rejectValue: string }
+// >("zombicide/createRoom", async (id, thunkAPI) => {
+//   try {
+//     const data = await zombicideAPI.deleteMap(id)
+//     return data
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response?.data?.message) {
+//       return thunkAPI.rejectWithValue(error.response.data.message)
+//     }
+//     return thunkAPI.rejectWithValue("Не удалось создать комнату")
+//   }
+// })
 
 // // store/thunks/zombicideThunks.ts
 // import { createAsyncThunk } from "@reduxjs/toolkit"

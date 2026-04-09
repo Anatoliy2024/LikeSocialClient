@@ -3,13 +3,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { ZombicideState, GameState } from "@/types/zombicide"
 import {
   fetchRoomsThunk,
-  createRoomThunk,
   joinRoomThunk,
   fetchMyMapsThunk,
   saveMapThunk,
   fetchMapsThunk,
   fetchMapByIdThunk,
   deleteMapThunk,
+  createRoomZombicideThunk,
 } from "@/store/thunks/zombicideThunks"
 
 const initialState: ZombicideState = {
@@ -65,16 +65,16 @@ const zombicideSlice = createSlice({
 
     // --- createRoom ---
     builder
-      .addCase(createRoomThunk.pending, (state) => {
+      .addCase(createRoomZombicideThunk.pending, (state) => {
         state.status = "loading"
         state.error = null
       })
-      .addCase(createRoomThunk.fulfilled, (state, action) => {
+      .addCase(createRoomZombicideThunk.fulfilled, (state, action) => {
         state.status = "idle"
         state.currentRoom = action.payload
-        state.rooms.push(action.payload)
+        // state.rooms.push(action.payload)
       })
-      .addCase(createRoomThunk.rejected, (state, action) => {
+      .addCase(createRoomZombicideThunk.rejected, (state, action) => {
         state.status = "error"
         state.error = action.payload ?? "Не удалось создать комнату"
       })
