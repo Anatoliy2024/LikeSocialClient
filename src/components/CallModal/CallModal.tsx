@@ -212,9 +212,10 @@ export const CallModal = () => {
   return (
     <div className={styles.overlay}>
       <div
-        className={`${styles.modal} ${
-          status === "inCall" ? styles.modalInCall : styles.modalRinging
-        }`}
+        className={`${styles.modal} 
+        ${status === "inCall" ? styles.modalInCall : styles.modalRinging}
+        ${hasLocalVideo || hasRemoteVideo ? styles.fullScreen : ""}
+        `}
       >
         {/* ---- RINGING STATE ---- */}
         {(status === "calling" || status === "incoming") && (
