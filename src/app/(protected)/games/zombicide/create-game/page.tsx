@@ -7,17 +7,21 @@ import {
   createRoomZombicideThunk,
   fetchMapsThunk,
 } from "@/store/thunks/zombicideThunks"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Paginator } from "@/components/Paginator/Paginator"
+// import {
+//   usePathname,
+//   useRouter,
+//     useSearchParams
+// } from "next/navigation"
+// import { Paginator } from "@/components/Paginator/Paginator"
 
 export default function CreateGame() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  // const router = useRouter()
+  // const pathname = usePathname()
+  // const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
   const maps = useAppSelector((state) => state.zombicideSlice.maps)
   const page = useAppSelector((state) => state.zombicideSlice.pagination.page)
-  const pages = useAppSelector((state) => state.zombicideSlice.pagination.pages)
+  // const pages = useAppSelector((state) => state.zombicideSlice.pagination.pages)
   const userId = useAppSelector((state) => state.auth.userId)
 
   const [gameName, setGameName] = useState("")
@@ -29,12 +33,12 @@ export default function CreateGame() {
     dispatch(fetchMapsThunk(page))
   }, [dispatch, userId, page])
 
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams?.toString())
-    params.set("page", String(newPage))
+  // const handlePageChange = (newPage: number) => {
+  //   const params = new URLSearchParams(searchParams?.toString())
+  //   params.set("page", String(newPage))
 
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
-  }
+  //   router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  // }
 
   const handleCreateGame = async () => {
     if (!gameName || !selectMap) return
@@ -85,13 +89,13 @@ export default function CreateGame() {
               {map.name}
             </option>
           ))}
-          {pages > 1 && (
+          {/* {pages > 1 && (
             <Paginator
               page={page}
               pages={pages}
-              onPageChange={handlePageChange}
+              // onPageChange={handlePageChange}
             />
-          )}
+          )} */}
         </select>
       </div>
       <button onClick={handleCreateGame}>Создать игру</button>
