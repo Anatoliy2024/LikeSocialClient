@@ -49,7 +49,7 @@ export default function CreateGame() {
         }),
       )
       console.log("lobbyData", lobbyData)
-      router.push(`/games/zombicide/lobby/${lobbyData._id}`)
+      // router.push(`/games/zombicide/lobby/${lobbyData._id}`)
     } catch (error) {
       console.log(error)
     }
