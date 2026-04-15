@@ -390,18 +390,18 @@
     border: 2px solid rgba(255, 255, 255, 0.15);
     z-index: 2;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    .videoEl {
-      object-fit: contain;
-    }
+    // .videoEl {
+    //   object-fit: contain;
+    // }
     // убери height: auto — aspect-ratio сам справится
   }
 
-  .videoEl {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  // .videoEl {
+  //   width: 100%;
+  //   height: 100%;
+  //   object-fit: cover;
+  //   display: block;
+  // }
   // flex: 1;
   // position: relative;
   // background: #111;
@@ -410,12 +410,15 @@
   // min-height: 160px;
 }
 
-// .videoEl {
-//   width: 100%;
-//   height: 100%;
-//   object-fit: cover;
-//   display: block;
-// }
+.videoEl {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.portrait {
+  object-fit: none;
+}
 
 .videoLabel {
   position: absolute;

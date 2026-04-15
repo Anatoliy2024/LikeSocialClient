@@ -97,6 +97,7 @@ interface VideoTileProps {
 
 const VideoTile = ({ stream, label, muted = false }: VideoTileProps) => {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const [isPortrait, setIsPortrait] = useState(false)
 
   useEffect(() => {
     const video = videoRef.current
@@ -105,8 +106,16 @@ const VideoTile = ({ stream, label, muted = false }: VideoTileProps) => {
     video.srcObject = stream ?? null
     if (stream) video.play().catch(() => {})
 
+    // ✅ Определяем ориентацию после загрузки метаданных
+    const handleMetadata = () => {
+      const { videoWidth, videoHeight } = video
+      setIsPortrait(videoHeight > videoWidth)
+    }
+    video.addEventListener("loadedmetadata", handleMetadata)
+
     // ✅ Фикс #2: очищаем srcObject при смене стрима или анмаунте
     return () => {
+      video.removeEventListener("loadedmetadata", handleMetadata)
       if (video) {
         video.srcObject = null
       }
@@ -120,7 +129,7 @@ const VideoTile = ({ stream, label, muted = false }: VideoTileProps) => {
         autoPlay
         playsInline
         muted={muted}
-        className={styles.videoEl}
+        className={`${styles.videoEl} ${isPortrait ? styles.portrait : ""}`}
       />
       <span className={styles.videoLabel}>{label}</span>
     </div>
