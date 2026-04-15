@@ -391,7 +391,7 @@
     z-index: 2;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     .videoEl {
-      object-fit: none;
+      object-fit: contain;
     }
     // убери height: auto — aspect-ratio сам справится
   }
