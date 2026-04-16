@@ -9,13 +9,14 @@ import {
   updateUserPostThunk,
   // uploadUserPostAvatarThunk,
 } from "../thunks/userPostThunk"
+import { PostTypeKey } from "@/constants/postTypes"
 
-export type RatingType = {
-  acting: number
-  specialEffects: number
-  story: number
-  stars: number
-}
+// export type RatingType = {
+//   acting: number
+//   specialEffects: number
+//   story: number
+//   stars: number
+// }
 export type authorIdType = {
   username: string
   avatar: string
@@ -34,8 +35,10 @@ export type userPostType = {
   // roomId: string | null
   title: string
   content: string | null
+  postType: PostTypeKey
   votesCount: number
-  ratings: RatingType
+  ratings: Record<string, number>
+  // ratings: RatingType
   comments: userCommentType[]
   genres: string[]
   showOnProfile: boolean

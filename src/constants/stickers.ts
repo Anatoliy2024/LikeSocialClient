@@ -433,6 +433,7 @@ const NIFFLER = [
   { id: "niffler-23", image: `${nifflerPath}niffler-23.webp` },
   { id: "niffler-24", image: `${nifflerPath}niffler-24.webp` },
 ]
+
 const wolfPath = "/stickers/wolf/"
 const WOLF = [
   { id: "wolf-1", image: `${wolfPath}wolf-1.webp` },

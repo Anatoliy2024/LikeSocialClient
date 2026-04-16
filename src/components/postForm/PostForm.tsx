@@ -1,5 +1,5 @@
 "use client"
-import { useForm } from "react-hook-form"
+import { useForm, Path } from "react-hook-form"
 import ButtonMenu from "../ui/button/Button"
 import style from "./PostForm.module.scss"
 
@@ -19,21 +19,23 @@ import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { compressImage } from "@/utils/compressImage"
 import { imageIdType } from "@/store/slices/userPostsSlice"
 import { useRouter } from "next/navigation"
+import { AllRatingKeys, POST_TYPES, PostTypeKey } from "@/constants/postTypes"
 
 export type FormCreatePost = {
   title: string
   content: string
   roomId: string | null
   genres: string[]
-  stars: number
-  acting: number
-  specialEffects: number
-  story: number
+  // stars: number
+  // acting: number
+  // specialEffects: number
+  // story: number
   avatarFile: FileList | null
   avatar?: string
   imageId?: imageIdType | null
   _id?: string
-}
+  postType: PostTypeKey
+} & Partial<Record<AllRatingKeys, number>>
 
 const PostForm = ({
   hiddenBlock,
@@ -49,6 +51,8 @@ const PostForm = ({
   initialData?: Partial<FormCreatePost>
 }) => {
   const [preview, setPreview] = useState<string | null>(null)
+  const [postType, setPostType] = useState<PostTypeKey>("movie")
+  console.log("typePost", postType)
   // const [loadingLocal, setIsLoadingLocal] = useState(false)
   const {
     register,
@@ -71,6 +75,7 @@ const PostForm = ({
 
       formData.append("title", dataForm.title)
       formData.append("content", dataForm.content)
+      formData.append("postType", postType)
 
       if (roomId) {
         formData.append("roomId", roomId)
@@ -82,13 +87,34 @@ const PostForm = ({
         formData.append("postId", initialData._id)
       }
 
-      formData.append("ratings[stars]", dataForm.stars?.toString())
-      formData.append("ratings[acting]", dataForm.acting?.toString())
-      formData.append(
-        "ratings[specialEffects]",
-        dataForm.specialEffects?.toString(),
-      )
-      formData.append("ratings[story]", dataForm.story?.toString())
+      // formData.append("ratings[stars]", dataForm.stars?.toString())
+      // formData.append("ratings[acting]", dataForm.acting?.toString())
+      // formData.append(
+      //   "ratings[specialEffects]",
+      //   dataForm.specialEffects?.toString(),
+      // )
+      // formData.append("ratings[story]", dataForm.story?.toString())
+
+      // Object.keys(POST_TYPES[postType].ratings).forEach((key) => {
+      //   const value = dataForm[key as keyof typeof dataForm]
+      //   if (value !== undefined && value !== null) {
+      //     formData.append(`ratings[${key}]`, value.toString())
+      //   }
+      // })
+
+      Object.entries(POST_TYPES[postType].ratings).forEach(([key, config]) => {
+        const value = dataForm[key as keyof typeof dataForm]
+
+        // Если значение есть — используем его, иначе — берём min из конфига (обычно 0)
+        const ratingValue =
+          value !== undefined && value !== null
+            ? Number(value)
+            : (config.min ?? 0)
+
+        // Всегда добавляем в FormData, clamp 0-5 на всякий случай
+        const clamped = Math.max(0, Math.min(5, ratingValue))
+        formData.append(`ratings[${key}]`, clamped.toString())
+      })
 
       if (dataForm.genres) {
         dataForm.genres?.forEach((genre) => {
@@ -222,6 +248,19 @@ const PostForm = ({
             />
             {errors.title && <p>{errors.title?.message as string}</p>}
           </div>
+          <div>
+            <select
+              name="typePost"
+              id="typePost"
+              onChange={(e) => setPostType(e.target.value as PostTypeKey)}
+            >
+              {Object.entries(POST_TYPES).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className={style.formImageBlock}>
             <label className={style.customFileUpload}>
               Загрузить аватарку
@@ -239,71 +278,96 @@ const PostForm = ({
               </div>
             )}
           </div>
-          <div className={style.genresBlock}>
-            <label>Жанры:</label>
-            <div>
-              <label>
-                <input type="checkbox" value="drama" {...register("genres")} />{" "}
-                Драма
-              </label>
-              <label>
-                <input type="checkbox" value="comedy" {...register("genres")} />{" "}
-                Комедия
-              </label>
-              <label>
-                <input type="checkbox" value="action" {...register("genres")} />{" "}
-                Боевик
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  value="thriller"
-                  {...register("genres")}
-                />{" "}
-                Триллер
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  value="fantasy"
-                  {...register("genres")}
-                />{" "}
-                Фэнтези
-              </label>
-              <label>
-                <input type="checkbox" value="sciFi" {...register("genres")} />{" "}
-                Научная фантастика
-              </label>
-              <label>
-                <input type="checkbox" value="horror" {...register("genres")} />{" "}
-                Ужасы
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  value="romance"
-                  {...register("genres")}
-                />{" "}
-                Романтика
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  value="adventure"
-                  {...register("genres")}
-                />{" "}
-                Приключения
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  value="mystery"
-                  {...register("genres")}
-                />{" "}
-                Детектив
-              </label>
+          {(postType === "movie" ||
+            postType === "episode" ||
+            postType === "letsplay") && (
+            <div className={style.genresBlock}>
+              <label>Жанры:</label>
+              <div>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="drama"
+                    {...register("genres")}
+                  />{" "}
+                  Драма
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="comedy"
+                    {...register("genres")}
+                  />{" "}
+                  Комедия
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="action"
+                    {...register("genres")}
+                  />{" "}
+                  Боевик
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="thriller"
+                    {...register("genres")}
+                  />{" "}
+                  Триллер
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="fantasy"
+                    {...register("genres")}
+                  />{" "}
+                  Фэнтези
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="sciFi"
+                    {...register("genres")}
+                  />{" "}
+                  Научная фантастика
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="horror"
+                    {...register("genres")}
+                  />{" "}
+                  Ужасы
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="romance"
+                    {...register("genres")}
+                  />{" "}
+                  Романтика
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="adventure"
+                    {...register("genres")}
+                  />{" "}
+                  Приключения
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="mystery"
+                    {...register("genres")}
+                  />{" "}
+                  Детектив
+                </label>
+              </div>
             </div>
-          </div>
+          )}
+
           <div className={style.textareaBlock}>
             <label htmlFor="content">Описание:</label>
             <textarea
@@ -320,8 +384,17 @@ const PostForm = ({
             {errors.content && <p>{errors.content?.message as string}</p>}
             {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
           </div>
-
-          <div>
+          {Object.entries(POST_TYPES[postType].ratings).map(([key, value]) => (
+            <div key={key}>
+              <span>{value.label}</span>
+              <StarRating<FormCreatePost>
+                name={key as Path<FormCreatePost>}
+                setValue={setValue}
+                watch={watch}
+              />
+            </div>
+          ))}
+          {/* <div>
             <span>Звёзды:</span>
             <StarRating<FormCreatePost, "stars">
               name="stars"
@@ -355,7 +428,7 @@ const PostForm = ({
               setValue={setValue}
               watch={watch}
             />
-          </div>
+          </div> */}
 
           <div className={style.buttonBlock}>
             <ButtonMenu type="submit" disabled={loading} loading={loading}>

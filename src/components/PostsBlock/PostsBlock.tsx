@@ -217,6 +217,7 @@ const PostsBlock = ({
                         content={post.content}
                         authorName={post.authorId.username}
                         ratings={post.ratings}
+                        postType={post.postType}
                         createdAt={post.createdAt}
                         id={post._id}
                         isMyPost={isMyPost}

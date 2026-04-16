@@ -16,7 +16,7 @@ import {
   // uploadRoomPostAvatarThunk,
 } from "@/store/thunks/roomPostThunk"
 import { Comment } from "../comment/Comment"
-import { useForm } from "react-hook-form"
+import { useForm, UseFormSetValue, UseFormWatch } from "react-hook-form"
 import StarRating from "../starRating/StarRating"
 
 // import { voiceAPI } from "@/api/api"
@@ -31,21 +31,23 @@ import { addUserMovieThunk } from "@/store/thunks/userMoviesThunk"
 import { RootState } from "@/store/store"
 import Spinner from "../ui/spinner/Spinner"
 import { voiceAPI } from "@/api/voiceAPI"
+import { POST_TYPES, PostTypeKey } from "@/constants/postTypes"
 // import { ProfileLink } from "../ProfileLink/ProfileLink"
 // import { RootState } from '@/store/store'
 
-export type RatingFormValues = {
-  stars: number
-  acting: number
-  specialEffects: number
-  story: number
-}
-
+// export type RatingFormValues = {
+//   stars: number
+//   acting: number
+//   specialEffects: number
+//   story: number
+// }
+export type RatingFormValues = Record<string, number>
 export type VotesType = {
   userId: { _id: string; username: string; avatar: string }
   postId: string
   roomId: string | null
-  ratings: RatingFormValues
+  ratings: Record<string, number>
+  // ratings: RatingFormValues
   createdAt: string
   _id: string
 }
@@ -127,47 +129,86 @@ const PostModal = ({
       setLoading(false)
     }
   }
+
+  const getDefaultRatingValues = (
+    postType: PostTypeKey | undefined,
+  ): RatingFormValues => {
+    const config = POST_TYPES[postType || "movie"].ratings
+    return Object.entries(config).reduce((acc, [key, { min = 0 }]) => {
+      acc[key] = min // обычно 0
+      return acc
+    }, {} as RatingFormValues)
+  }
+
   // ------- Голосование -------
   const { handleSubmit, setValue, watch, reset } = useForm<RatingFormValues>({
-    defaultValues: {
-      stars: 0,
-      acting: 0,
-      specialEffects: 0,
-      story: 0,
-    },
+    defaultValues: getDefaultRatingValues(post.postType),
   })
 
-  const handleVoteSubmit = async (values: {
-    stars: number | undefined
-    acting: number | undefined
-    specialEffects: number | undefined
-    story: number | undefined
-  }) => {
+  const handleVoteSubmit = async (values: RatingFormValues) => {
     setSendingVoice(true)
 
     try {
+      // Собираем только те рейтинги, которые есть в конфиге текущего типа поста
+      const ratingsPayload = Object.keys(
+        POST_TYPES[post.postType].ratings,
+      ).reduce(
+        (acc, key) => {
+          const value = values[key]
+          acc[key] = value !== undefined && value !== null ? Number(value) : 0
+          return acc
+        },
+        {} as Record<string, number>,
+      )
+
       const dataToSend = {
         postId,
         roomId: roomId || null,
-        ratings: {
-          stars: values.stars || 0,
-          acting: values.acting || 0,
-          specialEffects: values.specialEffects || 0,
-          story: values.story || 0,
-        },
+        ratings: ratingsPayload,
       }
+
       const res = await voiceAPI.createVoice(dataToSend)
-      // console.log("res.voices", res)
       setVotes(res.votes)
       setIsEditing(false)
-
-      reset() // очистка формы
+      reset()
     } catch (err) {
       console.error("Ошибка при голосовании:", err)
     } finally {
       setSendingVoice(false)
     }
   }
+
+  // const handleVoteSubmit = async (values: {
+  //   stars: number | undefined
+  //   acting: number | undefined
+  //   specialEffects: number | undefined
+  //   story: number | undefined
+  // }) => {
+  //   setSendingVoice(true)
+
+  //   try {
+  //     const dataToSend = {
+  //       postId,
+  //       roomId: roomId || null,
+  //       ratings: {
+  //         stars: values.stars || 0,
+  //         acting: values.acting || 0,
+  //         specialEffects: values.specialEffects || 0,
+  //         story: values.story || 0,
+  //       },
+  //     }
+  //     const res = await voiceAPI.createVoice(dataToSend)
+  //     // console.log("res.voices", res)
+  //     setVotes(res.votes)
+  //     setIsEditing(false)
+
+  //     reset() // очистка формы
+  //   } catch (err) {
+  //     console.error("Ошибка при голосовании:", err)
+  //   } finally {
+  //     setSendingVoice(false)
+  //   }
+  // }
 
   const showEditPost = () => {
     setEditPost(true)
@@ -177,21 +218,50 @@ const PostModal = ({
   }
 
   function adaptPostToForm(post: userPostType): FormCreatePost {
+    const allRatingKeys = Object.values(POST_TYPES).flatMap((type) =>
+      Object.keys(type.ratings),
+    )
+
+    // 🎯 Собираем рейтинги в отдельный объект
+    const ratingsFields = allRatingKeys.reduce(
+      (acc, key) => {
+        const value = post.ratings?.[key]
+        acc[key] = typeof value === "number" ? value : 0
+        return acc
+      },
+      {} as Record<string, number>,
+    ) // ← ключевой тип!
+
     return {
       title: post.title || "",
       content: post.content || "",
       roomId: post.roomId || null,
       genres: post.genres || [],
-      stars: post.ratings?.stars || 0,
-      acting: post.ratings?.acting || 0,
-      specialEffects: post.ratings?.specialEffects || 0,
-      story: post.ratings?.story || 0,
-      avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
-      // avatar: post.imageId?.url || "",
+
+      avatarFile: null,
       imageId: post.imageId,
       _id: post._id || "",
+      postType: post.postType,
+      ...ratingsFields,
     }
   }
+
+  // function adaptPostToForm(post: userPostType): FormCreatePost {
+  //   return {
+  //     title: post.title || "",
+  //     content: post.content || "",
+  //     roomId: post.roomId || null,
+  //     genres: post.genres || [],
+  //     stars: post.ratings?.stars || 0,
+  //     acting: post.ratings?.acting || 0,
+  //     specialEffects: post.ratings?.specialEffects || 0,
+  //     story: post.ratings?.story || 0,
+  //     avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
+  //     // avatar: post.imageId?.url || "",
+  //     imageId: post.imageId,
+  //     _id: post._id || "",
+  //   }
+  // }
   const addUserMovie = async () => {
     try {
       await dispatch(addUserMovieThunk({ postId, roomId })).then(() => {
@@ -200,6 +270,47 @@ const PostModal = ({
     } catch (e) {
       console.log(e)
     }
+  }
+
+  // Внутри компонента, перед return
+  const renderRatings = (
+    ratings: Record<string, number>,
+    postType: PostTypeKey | undefined,
+    readOnly = true,
+    formMethods?: {
+      setValue: UseFormSetValue<RatingFormValues>
+      watch: UseFormWatch<RatingFormValues>
+    },
+  ) => {
+    const config = POST_TYPES[postType || "movie"].ratings
+
+    return Object.entries(config).map(([key, { label, min = 0 }]) => {
+      const value = ratings?.[key] ?? min
+
+      if (readOnly) {
+        // Режим просмотра
+        return (
+          <div key={key}>
+            <div>{label}: </div>
+            <StarRatingView value={value} />
+          </div>
+        )
+      } else if (formMethods) {
+        // Режим формы (голосование)
+        const { setValue, watch } = formMethods
+        return (
+          <div key={key}>
+            <span>{label}:</span>
+            <StarRating
+              name={key as keyof RatingFormValues}
+              setValue={setValue}
+              watch={watch}
+            />
+          </div>
+        )
+      }
+      return null
+    })
   }
 
   // console.log("post", post)
@@ -252,7 +363,8 @@ const PostModal = ({
               </div>
               <div className={style.starsBlock}>
                 <h4>Оценка автора</h4>
-                <div>
+                {renderRatings(ratings, post.postType, true)}
+                {/* <div>
                   <div>Общая: </div>
                   <StarRatingView value={ratings.stars} />
                 </div>
@@ -267,14 +379,15 @@ const PostModal = ({
                 <div>
                   <div>Сюжет: </div>
                   <StarRatingView value={ratings.story} />
-                </div>
+                </div> */}
               </div>
               {playerId !== authorId._id && (
                 <div className={style.starsBlock}>
                   {myVoice && !isEditing ? (
                     <>
                       <h4>Моя оценка</h4>
-                      <div>
+                      {renderRatings(myVoice.ratings, post.postType, true)}
+                      {/* <div>
                         <div>Общая: </div>
                         <StarRatingView value={myVoice.ratings.stars} />
                       </div>
@@ -291,7 +404,7 @@ const PostModal = ({
                       <div>
                         <div>Сюжет: </div>
                         <StarRatingView value={myVoice.ratings.story} />
-                      </div>
+                      </div> */}
 
                       <ButtonMenu
                         onClick={() => {
@@ -308,7 +421,11 @@ const PostModal = ({
                           <Spinner />
                         </div>
                       )}
-                      <div>
+                      {renderRatings({}, post.postType, false, {
+                        setValue,
+                        watch,
+                      })}
+                      {/* <div>
                         <span>Звёзды:</span>
                         <StarRating
                           name="stars"
@@ -339,7 +456,7 @@ const PostModal = ({
                           setValue={setValue}
                           watch={watch}
                         />
-                      </div>
+                      </div> */}
 
                       <ButtonMenu
                         type="submit"
@@ -377,11 +494,9 @@ const PostModal = ({
                               <div>{v.userId.username}</div>
                             </div>
                           </ProfileLink>
-                          {/* <Link href={`/profile/${v.userId._id}`}>
-                            
-                          </Link> */}
+                          {renderRatings(v.ratings, post.postType, true)}
 
-                          <div>
+                          {/* <div>
                             <div>Общая: </div>
                             <StarRatingView value={v.ratings.stars} />
                           </div>
@@ -396,7 +511,7 @@ const PostModal = ({
                           <div>
                             <div>Сюжет: </div>
                             <StarRatingView value={v.ratings.story} />
-                          </div>
+                          </div> */}
                         </div>
                       ))
                   : "Других оценок нет"}

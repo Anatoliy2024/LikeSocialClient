@@ -14,19 +14,16 @@ import { userCommentType } from "@/store/slices/roomPostsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { useState } from "react"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
+import { POST_TYPES, PostTypeKey } from "@/constants/postTypes"
 
 type PostType = {
   title: string
   content: string | null
   authorName: string | null
   avatar: string | undefined | null
+  postType: PostTypeKey | undefined
   // avatarPublicId: string
-  ratings: {
-    acting: number
-    specialEffects: number
-    story: number
-    stars: number
-  }
+  ratings: Record<string, number>
   createdAt: string
   id: string
   isProfile: boolean
@@ -43,7 +40,7 @@ type PostType = {
 const Post = ({
   title,
   content,
-
+  postType,
   ratings,
   createdAt,
   id,
@@ -133,7 +130,20 @@ const Post = ({
             />
           </div>
           <div className={style.blockStars}>
-            <div>
+            {Object.entries(POST_TYPES[postType || "movie"].ratings).map(
+              ([key, config]) => {
+                // Берём значение из ratings, если нет — подставляем min из конфига (обычно 0)
+                const value = ratings?.[key] ?? config.min ?? 0
+
+                return (
+                  <div key={key}>
+                    <div>{config.label}: </div>
+                    <StarRatingView value={value} />
+                  </div>
+                )
+              },
+            )}
+            {/* <div>
               <div>Общая оценка: </div>
               <StarRatingView value={ratings.stars} />
             </div>
@@ -148,7 +158,7 @@ const Post = ({
             <div>
               <div>Сюжет: </div>
               <StarRatingView value={ratings.story} />
-            </div>
+            </div> */}
           </div>
         </div>
         {content && (

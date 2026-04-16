@@ -8,26 +8,17 @@ import {
   PathValue,
 } from "react-hook-form"
 import style from "./StarRating.module.scss"
-
-// Тип пропсов
-type Props<
-  TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>
-> = {
-  name: TName
+type Props<TFieldValues extends FieldValues> = {
+  name: Path<TFieldValues>
   setValue: UseFormSetValue<TFieldValues>
   watch: UseFormWatch<TFieldValues>
 }
 
-// Компонент
-const StarRating = <
-  TFieldValues extends FieldValues,
-  TName extends Path<TFieldValues>
->({
+const StarRating = <TFieldValues extends FieldValues>({
   name,
   setValue,
   watch,
-}: Props<TFieldValues, TName>) => {
+}: Props<TFieldValues>) => {
   const [hovered, setHovered] = useState(0)
   const selected = watch(name) || 0
 
@@ -39,7 +30,9 @@ const StarRating = <
           className={style.star}
           onMouseEnter={() => setHovered(star)}
           onMouseLeave={() => setHovered(0)}
-          onClick={() => setValue(name, star as PathValue<TFieldValues, TName>)}
+          onClick={() =>
+            setValue(name, star as PathValue<TFieldValues, Path<TFieldValues>>)
+          }
         >
           <input
             type="radio"
@@ -49,9 +42,7 @@ const StarRating = <
             readOnly
           />
           <span
-            className={`${style.starSymbol} ${
-              (hovered || selected) >= star ? style.active : ""
-            }`}
+            className={`${style.starSymbol} ${(hovered || selected) >= star ? style.active : ""}`}
           >
             ★
           </span>
@@ -62,35 +53,30 @@ const StarRating = <
 }
 
 export default StarRating
-
 // "use client"
 // import { useState } from "react"
-// import { UseFormSetValue, UseFormWatch,Path  } from "react-hook-form"
+// import {
+//   UseFormSetValue,
+//   UseFormWatch,
+//   Path, // добавлен импорт
+//   FieldValues,
+//   PathValue,
+// } from "react-hook-form"
 // import style from "./StarRating.module.scss"
 
-// // type RatingFormValues = {
-// //   stars: number
-// //   acting: number
-// //   specialEffects: number
-// //   story: number
-// // }
-
-// // type Props = {
-// //   name: keyof RatingFormValues
-// //   setValue: UseFormSetValue<RatingFormValues>
-// //   watch: UseFormWatch<RatingFormValues>
-// // }
-// type RatingKeys = "stars" | "acting" | "specialEffects" | "story"
-
-// type Props<TFieldValues, TName extends Path<TFieldValues>> = {
-//   name: TName
+// // Тип пропсов
+// type Props<TFieldValues extends FieldValues> = {
+//   name: Path<TFieldValues>
 //   setValue: UseFormSetValue<TFieldValues>
 //   watch: UseFormWatch<TFieldValues>
 // }
 
-// const StarRating = <TFieldValues, TName extends Path<TFieldValues>>({ name, setValue, watch }: Props<TFieldValues>) => {
-//   console.log("setValue", setValue)
-//   console.log("watch", watch)
+// // Компонент
+// const StarRating = <TFieldValues extends FieldValues>({
+//   name,
+//   setValue,
+//   watch,
+// }: Props<TFieldValues>) => {
 //   const [hovered, setHovered] = useState(0)
 //   const selected = watch(name) || 0
 
@@ -102,7 +88,7 @@ export default StarRating
 //           className={style.star}
 //           onMouseEnter={() => setHovered(star)}
 //           onMouseLeave={() => setHovered(0)}
-//           onClick={() => setValue(name, star)}
+//           onClick={() => setValue(name, star as PathValue<TFieldValues, Path<TFieldValues>>)}
 //         >
 //           <input
 //             type="radio"
