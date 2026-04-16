@@ -54,7 +54,7 @@ export const ModalUserMovie = ({
           newStatus:
             selectedMovie.status === "wantToSee" ? "watched" : "wantToSee",
           page,
-        })
+        }),
       )
 
       closeModal()
@@ -71,7 +71,7 @@ export const ModalUserMovie = ({
           status:
             selectedMovie.status === "wantToSee" ? "wantToSee" : "watched",
           page,
-        })
+        }),
       )
       closeModal()
     } catch (error) {
@@ -129,6 +129,7 @@ export const ModalUserMovie = ({
       content: "",
       roomId: location && location !== "profile" ? location : null,
       genres: movie.genres || [],
+      postType: "movie",
       stars: 0,
       acting: 0,
       specialEffects: 0,
