@@ -199,6 +199,7 @@ const PostModal = ({
       },
       {} as Record<string, number>,
     ) // ← ключевой тип!
+    console.log("ratingsFields***", ratingsFields)
 
     return {
       title: post.title || "",
