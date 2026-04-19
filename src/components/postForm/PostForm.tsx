@@ -259,6 +259,7 @@ const PostForm = ({
               name="typePost"
               id="typePost"
               onChange={(e) => setPostType(e.target.value as PostTypeKey)}
+              value={postType}
             >
               {Object.entries(POST_TYPES).map(([key, value]) => (
                 <option key={key} value={key}>
