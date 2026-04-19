@@ -228,6 +228,12 @@ const PostForm = ({
     handleInput()
   }, [watch("content")])
 
+  useEffect(() => {
+    if (initialData?.postType) {
+      setPostType(initialData.postType)
+    }
+  }, [initialData])
+
   return (
     <div
       className={style.wrapper}

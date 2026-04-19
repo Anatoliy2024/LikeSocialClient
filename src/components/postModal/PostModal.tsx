@@ -178,38 +178,6 @@ const PostModal = ({
     }
   }
 
-  // const handleVoteSubmit = async (values: {
-  //   stars: number | undefined
-  //   acting: number | undefined
-  //   specialEffects: number | undefined
-  //   story: number | undefined
-  // }) => {
-  //   setSendingVoice(true)
-
-  //   try {
-  //     const dataToSend = {
-  //       postId,
-  //       roomId: roomId || null,
-  //       ratings: {
-  //         stars: values.stars || 0,
-  //         acting: values.acting || 0,
-  //         specialEffects: values.specialEffects || 0,
-  //         story: values.story || 0,
-  //       },
-  //     }
-  //     const res = await voiceAPI.createVoice(dataToSend)
-  //     // console.log("res.voices", res)
-  //     setVotes(res.votes)
-  //     setIsEditing(false)
-
-  //     reset() // очистка формы
-  //   } catch (err) {
-  //     console.error("Ошибка при голосовании:", err)
-  //   } finally {
-  //     setSendingVoice(false)
-  //   }
-  // }
-
   const showEditPost = () => {
     setEditPost(true)
   }
