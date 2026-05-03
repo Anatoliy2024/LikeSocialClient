@@ -20,6 +20,7 @@ import adminReducer from "./slices/adminSlice"
 import settingsReducer from "./slices/settingsSlice"
 import pushNotificationsReducer from "./slices/pushNotificationsSlice"
 import zombicideReducer from "./slices/zombicideSlice"
+import cinemaHallReducer from "./slices/cinemaHallSlice"
 // import pushDevicesReducer from "./slices/pushDevicesSlice"
 // import messagesReducer from "./slices/messagesSlice"
 
@@ -44,6 +45,7 @@ export const store = configureStore({
     settings: settingsReducer,
     pushNotifications: pushNotificationsReducer,
     zombicideSlice: zombicideReducer,
+    cinemaHall: cinemaHallReducer,
     // pushDevices: pushDevicesReducer,
     // messages: messagesReducer,
     // добавь другие редьюсеры здесь
