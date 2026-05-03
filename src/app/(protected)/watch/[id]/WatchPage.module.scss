@@ -1,0 +1,10 @@
+.watchPage {
+  &__containerVideo {
+    height: 400px;
+
+    video {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
