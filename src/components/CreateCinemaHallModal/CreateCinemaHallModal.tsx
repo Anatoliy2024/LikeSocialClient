@@ -64,7 +64,7 @@ export const CreateCinemaHallModal = ({
           size: file.size,
         },
       },
-      (data) => {
+      (data: any) => {
         router.push(`/watch/${data.cinemaHallId}`)
       },
     )

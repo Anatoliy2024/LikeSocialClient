@@ -21,16 +21,21 @@ import { AddMembers } from "../AddMembers/AddMembers"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 import { RootState } from "@/store/store"
 import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
+import { CreateCinemaHallModal } from "../CreateCinemaHallModal/CreateCinemaHallModal"
+import { useSocket } from "@/providers/SocketProvider"
+import { getAllCinemaHall } from "@/store/slices/cinemaHallSlice"
 
 export function SettingsGroup() {
   const [changeAvatarGroup, setChangeAvatarGroup] = useState(false)
+  const socket = useSocket()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [showAddMemberModal, setShowAddMemberModal] = useState(false)
+  const [showCinemaHallModal, setShowCinemaHallModal] = useState(false)
   const dispatch = useAppDispatch()
   const currentConversation = useAppSelector(
-    (state) => state.conversations.currentConversation
+    (state) => state.conversations.currentConversation,
   )
   const loading = useAppSelector((state) => state.conversations.loading)
   const userId = useAppSelector((state) => state.auth.userId)
@@ -39,6 +44,8 @@ export function SettingsGroup() {
     page: friendsPage,
     pages: friendsPages,
   } = useAppSelector((state: RootState) => state.users.friends)
+
+  const cinemaHalls = useAppSelector((state) => state.cinemaHall.cinemaHalls)
 
   const params = useParams<{ id: string }>()
   const pageUserFriendsFromUrl =
@@ -55,13 +62,24 @@ export function SettingsGroup() {
 
   useEffect(() => {
     dispatch(
-      getUserRelationsThunk({ type: "friends", page: pageUserFriendsFromUrl })
+      getUserRelationsThunk({ type: "friends", page: pageUserFriendsFromUrl }),
     )
   }, [dispatch, pageUserFriendsFromUrl])
 
   useEffect(() => {
     dispatch(fetchItemConversationThunk(id))
   }, [dispatch, id])
+
+  useEffect(() => {
+    if (!socket || !id) return
+    socket.emit("cinema-hall:get-all", { groupId: id }, (data) => {
+      dispatch(getAllCinemaHall(data.cinemaHallList))
+    })
+
+    //  socket.on("cinema-hall:get-all", async (data, callback) => {
+    //       getAllCinemaHallHandler(io, socket, data, callback)
+    //     })
+  }, [socket, id, dispatch])
 
   const handleShowAddMembers = () => {
     setShowAddMemberModal(true)
@@ -72,7 +90,7 @@ export function SettingsGroup() {
   const handleAddMembers = async (members: string[]) => {
     try {
       const data = await dispatch(
-        addMemberToGroupThunk({ conversationId: id, members })
+        addMemberToGroupThunk({ conversationId: id, members }),
       )
       console.log("data handleAddMembers", data)
     } catch (error) {
@@ -89,7 +107,7 @@ export function SettingsGroup() {
         deleteMemberToGroupThunk({
           conversationId: currentConversation._id,
           memberId,
-        })
+        }),
       )
     } catch (error) {
       console.log(error)
@@ -102,16 +120,22 @@ export function SettingsGroup() {
   const handleShowChangeAvatarModal = () => {
     setChangeAvatarGroup(true)
   }
+  const handleCloseShowCinemaHallModal = () => {
+    setShowCinemaHallModal(false)
+  }
+  const handleShowCinemaHallModal = () => {
+    setShowCinemaHallModal(true)
+  }
   // const handleGroupAvatarUpload=()=>{
 
   // }
   const handleGroupAvatarUpload = async (
     file: File,
-    context?: { groupId?: string }
+    context?: { groupId?: string },
   ) => {
     if (!context?.groupId) return
     await dispatch(
-      changeAvatarGroupThunk({ file, groupId: context.groupId })
+      changeAvatarGroupThunk({ file, groupId: context.groupId }),
     ).unwrap()
   }
 
@@ -136,6 +160,13 @@ export function SettingsGroup() {
           onChangePageFriends={handlePageChange}
           page={friendsPage}
           pages={friendsPages}
+        />
+      )}
+
+      {showCinemaHallModal && (
+        <CreateCinemaHallModal
+          handleCloseCreateCinemaHallModal={handleCloseShowCinemaHallModal}
+          groupId={id}
         />
       )}
       <h1>Option Group</h1>
@@ -203,6 +234,29 @@ export function SettingsGroup() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+        <div>
+          <ButtonMenu onClick={handleShowCinemaHallModal}>
+            Создать видеозал
+          </ButtonMenu>
+          <div>
+            {cinemaHalls.length > 0 ? (
+              <ul>
+                {cinemaHalls.map((item) => (
+                  <li key={item.cinemaHallId}>
+                    <Link href={`/watch/${item.cinemaHallId}`}>
+                      <span>Названеи комнаты:{item.cinemaHallName}</span>
+                      <span>
+                        Количество участников:{item.participants.length}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div>Список залов пуст</div>
+            )}
           </div>
         </div>
       </div>

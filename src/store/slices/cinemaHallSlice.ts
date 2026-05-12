@@ -25,6 +25,10 @@ const cinemaHallSlice = createSlice({
       state.cinemaHallTarget = action.payload
       //   state.cinemaHallTarget.
     },
+    getAllCinemaHall(state, action) {
+      console.log("getAllCinemaHall state", action.payload)
+      state.cinemaHalls = action.payload
+    },
     setPlaying(state, action) {
       state.cinemaHallTarget.playing = action.payload
     },
@@ -43,6 +47,6 @@ const cinemaHallSlice = createSlice({
   },
 })
 
-export const { setCinemaHall } = cinemaHallSlice.actions
+export const { setCinemaHall, getAllCinemaHall } = cinemaHallSlice.actions
 
 export default cinemaHallSlice.reducer
