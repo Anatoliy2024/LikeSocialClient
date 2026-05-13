@@ -72,7 +72,7 @@ export function SettingsGroup() {
 
   useEffect(() => {
     if (!socket || !id) return
-    socket.emit("cinema-hall:get-all", { groupId: id }, (data) => {
+    socket.emit("cinema-hall:get-all", { groupId: id }, (data: any) => {
       dispatch(getAllCinemaHall(data.cinemaHallList))
     })
 
