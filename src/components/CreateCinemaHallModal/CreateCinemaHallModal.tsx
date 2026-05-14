@@ -3,16 +3,18 @@ import { useState, useRef, DragEvent, ChangeEvent, useEffect } from "react"
 import style from "./CreateCinemaHallModal.module.scss"
 import ButtonMenu from "../ui/button/Button"
 import { useSocket } from "@/providers/SocketProvider"
-import {
-  clearCinemaFile,
-  // getCinemaBlobUrl,
-  setCinemaFile,
-} from "@/store/cinemaFile"
+// import {
+//   clearCinemaFile,
+//   // getCinemaBlobUrl,
+//   setCinemaFile,
+// } from "@/store/cinemaFile"
 import { useRouter } from "next/navigation"
 import Spinner from "../ui/spinner/Spinner"
 // import WebTorrent from "webtorrent"
 
-type WebTorrentInstance = any
+// import { useTorrent } from "@/providers/TorrentProvider"
+
+// type WebTorrentInstance = any
 type TorrentInstance = any
 
 export const CreateCinemaHallModal = ({
@@ -22,6 +24,14 @@ export const CreateCinemaHallModal = ({
   handleCloseCreateCinemaHallModal: () => void
   groupId: string
 }) => {
+  // WatchPage.tsx
+
+  // const {
+  //   client,
+  //   isReady: isClientReady,
+  //   handleCreateMovieHall,
+  //   handleLeaveMovieHall,
+  // } = useTorrent()
   const router = useRouter()
   const [cinemaHallName, setCinemaHallName] = useState("")
   const [file, setFile] = useState<File | null>(null)
@@ -29,73 +39,55 @@ export const CreateCinemaHallModal = ({
   const socket = useSocket()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const clientRef = useRef<WebTorrentInstance>(null)
-  const torrentRef = useRef<TorrentInstance>(null)
+  // const clientRef = useRef<WebTorrentInstance>(null)
+  // const torrentRef = useRef<TorrentInstance>(null)
   // const [hashingProgress, setHashingProgress] = useState(0)
   const [magnetURI, setMagnetURI] = useState<string | null>(null)
   const [isHashing, setIsHashing] = useState(false)
 
   useEffect(() => {
-    let client: WebTorrentInstance | null = null
-
-    // Динамически импортируем библиотеку ТОЛЬКО в браузере
-    const initClient = async () => {
-      try {
-        // const WebTorrent = await import("webtorrent")
-
-        const config = {
-          dht: false,
-          webSeeds: false,
-          // tracker: false,
-        }
-
-        const WebTorrentModule =
-          await import("webtorrent/dist/webtorrent.min.js")
-
-        const WebTorrent = WebTorrentModule.default || WebTorrentModule
-
-        client = new WebTorrent(config) // Обратите внимание: .default при динамическом импорте
-        clientRef.current = client
-      } catch (err) {
-        console.error("Failed to load WebTorrent:", err)
-      }
-    }
-
-    initClient()
-
-    // Cleanup при размонтировании
-    return () => {
-      if (client) {
-        client.destroy()
-      }
-      clientRef.current = null
-
-      torrentRef.current?.destroy()
-      torrentRef.current = null
-    }
+    handleCreateMovieHall()
   }, [])
-
   // useEffect(() => {
-  //   const config = {
-  //     dht: false,
-  //     webSeeds: false,
-  //     tracker: {
-  //       announce: [],
-  //     },
+  //   let client: WebTorrentInstance | null = null
+
+  //   // Динамически импортируем библиотеку ТОЛЬКО в браузере
+  //   const initClient = async () => {
+  //     try {
+  //       // const WebTorrent = await import("webtorrent")
+
+  //       const config = {
+  //         dht: false,
+  //         webSeeds: false,
+  //         // tracker: false,
+  //       }
+
+  //       const WebTorrentModule =
+  //         await import("webtorrent/dist/webtorrent.min.js")
+
+  //       const WebTorrent = WebTorrentModule.default || WebTorrentModule
+
+  //       client = new WebTorrent(config) // Обратите внимание: .default при динамическом импорте
+  //       clientRef.current = client
+  //     } catch (err) {
+  //       console.error("Failed to load WebTorrent:", err)
+  //     }
   //   }
-  //   const client = new WebTorrent(config)
-  //   clientRef.current = client
 
+  //   initClient()
+
+  //   // Cleanup при размонтировании
   //   return () => {
-  //     // 1. Сначала убиваем активный торрент (если есть)
-  //     torrentRef.current?.destroy()
-
-  //     // 2. Потом убиваем клиента (закрывает ВСЕ соединения)
-  //     clientRef.current?.destroy()
-
-  //     // 3. Чистим рефы (опционально, но аккуратно)
-  //     torrentRef.current = null
+  //     // if (client) {
+  //     //   client.destroy()
+  //     // }
+  //     if (clientRef.current) {
+  //       clientRef.current.destroy()
+  //     }
   //     clientRef.current = null
+  //     torrentRef.current = null
+
+  //     // torrentRef.current?.destroy()
   //   }
   // }, [])
 
@@ -103,7 +95,7 @@ export const CreateCinemaHallModal = ({
     // проверяем что это видео
     if (!f.type.startsWith("video/")) return
     setFile(f)
-    setCinemaFile(f)
+    // setCinemaFile(f)
 
     // ✅ Добавьте это в начало:
     setIsHashing(true)
@@ -111,24 +103,29 @@ export const CreateCinemaHallModal = ({
 
     // Ждём клиента если ещё не готов
     let attempts = 0
-    while (!clientRef.current && attempts < 20) {
+    while (!client && attempts < 20) {
       await new Promise((r) => setTimeout(r, 100))
       attempts++
     }
 
     // Проверяем, что клиент уже инициализирован
-    if (!clientRef.current) {
+    if (!client) {
       console.error("WebTorrent client not initialized yet")
       setIsHashing(false)
       return
     }
-
-    if (torrentRef.current) {
-      torrentRef.current?.destroy()
-      torrentRef.current = null
+    if (!isClientReady) {
+      console.error("isClientReady isn`t ready")
+      setIsHashing(false)
+      return
     }
 
-    const torrent = clientRef.current.seed(
+    // if (torrentRef.current) {
+    //   torrentRef.current?.destroy()
+    //   torrentRef.current = null
+    // }
+
+    const torrent = client.seed(
       f,
       {
         announce: [
@@ -138,33 +135,19 @@ export const CreateCinemaHallModal = ({
       },
       (torrent) => {
         console.log("Magnet:", torrent.magnetURI)
+        torrent.on("ready", () => {
+          // Файл захэширован, magnet готов!
+          setMagnetURI(torrent.magnetURI)
+          setIsHashing(false)
+        })
       },
     )
-    torrentRef.current = torrent
-    torrent.on("ready", () => {
-      // Файл захэширован, magnet готов!
-      setMagnetURI(torrent.magnetURI)
-      setIsHashing(false)
-    })
-
-    // torrent.on("download", () => {
-    //   if (torrent.pieces) {
-    //     const progress = Math.round(torrent.progress * 100)
-    //     setHashingProgress(progress)
-    //   }
-    // })
-
-    // // Прогресс хэширования — через done кусков
-    // torrent.on("verified", () => {
-    //   const progress = torrent.pieces
-    //     ? Math.round((torrent.verified / torrent.pieces.length) * 100)
-    //     : 0
-    //   setHashingProgress(progress)
-    // })
-
-    // torrent.on("progress", (progress) => {
-    //   // Обновляем прогресс-бар (0.0 → 1.0)
-    //   setHashingProgress(Math.round(progress * 100))
+    // torrentRef.current = torrent
+    console.log("создался торрент в модалке", torrent)
+    // torrent.on("ready", () => {
+    //   // Файл захэширован, magnet готов!
+    //   setMagnetURI(torrent.magnetURI)
+    //   setIsHashing(false)
     // })
 
     torrent.on("error", (err) => {
@@ -216,7 +199,7 @@ export const CreateCinemaHallModal = ({
     )
   }
   const handleCloseModal = () => {
-    clearCinemaFile()
+    // clearCinemaFile()
     handleCloseCreateCinemaHallModal()
   }
 
