@@ -21,7 +21,7 @@ import { AddMembers } from "../AddMembers/AddMembers"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 import { RootState } from "@/store/store"
 import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
-import { CreateCinemaHallModal } from "../CreateCinemaHallModal/CreateCinemaHallModal"
+// import { CreateCinemaHallModal } from "../CreateCinemaHallModal/CreateCinemaHallModal"
 import { useSocket } from "@/providers/SocketProvider"
 import { getAllCinemaHall } from "@/store/slices/cinemaHallSlice"
 
@@ -32,7 +32,7 @@ export function SettingsGroup() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [showAddMemberModal, setShowAddMemberModal] = useState(false)
-  const [showCinemaHallModal, setShowCinemaHallModal] = useState(false)
+  // const [showCinemaHallModal, setShowCinemaHallModal] = useState(false)
   const dispatch = useAppDispatch()
   const currentConversation = useAppSelector(
     (state) => state.conversations.currentConversation,
@@ -120,11 +120,11 @@ export function SettingsGroup() {
   const handleShowChangeAvatarModal = () => {
     setChangeAvatarGroup(true)
   }
-  const handleCloseShowCinemaHallModal = () => {
-    setShowCinemaHallModal(false)
-  }
-  const handleShowCinemaHallModal = () => {
-    setShowCinemaHallModal(true)
+
+  const handleLinkMovieHall = () => {
+    const cinemaHallId = crypto.randomUUID()
+    router.push(`/watch/${cinemaHallId}?group=${id}`)
+    // setShowCinemaHallModal(true)
   }
   // const handleGroupAvatarUpload=()=>{
 
@@ -163,12 +163,12 @@ export function SettingsGroup() {
         />
       )}
 
-      {showCinemaHallModal && (
+      {/* {showCinemaHallModal && (
         <CreateCinemaHallModal
           handleCloseCreateCinemaHallModal={handleCloseShowCinemaHallModal}
           groupId={id}
         />
-      )}
+      )} */}
       <h1>Option Group</h1>
 
       <Link
@@ -237,7 +237,7 @@ export function SettingsGroup() {
           </div>
         </div>
         <div>
-          <ButtonMenu onClick={handleShowCinemaHallModal}>
+          <ButtonMenu onClick={handleLinkMovieHall}>
             Создать видеозал
           </ButtonMenu>
           <div>

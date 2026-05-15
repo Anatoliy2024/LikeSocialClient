@@ -15,7 +15,7 @@ import Spinner from "../ui/spinner/Spinner"
 // import { useTorrent } from "@/providers/TorrentProvider"
 
 // type WebTorrentInstance = any
-type TorrentInstance = any
+// type TorrentInstance = any
 
 export const CreateCinemaHallModal = ({
   handleCloseCreateCinemaHallModal,
@@ -45,9 +45,9 @@ export const CreateCinemaHallModal = ({
   const [magnetURI, setMagnetURI] = useState<string | null>(null)
   const [isHashing, setIsHashing] = useState(false)
 
-  useEffect(() => {
-    handleCreateMovieHall()
-  }, [])
+  // useEffect(() => {
+  //   handleCreateMovieHall()
+  // }, [])
   // useEffect(() => {
   //   let client: WebTorrentInstance | null = null
 

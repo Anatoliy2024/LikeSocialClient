@@ -1,19 +1,21 @@
 import { CinemaHallStateType } from "@/types/cinemaHall.types"
 import { createSlice } from "@reduxjs/toolkit"
 
+const initialCinemaHallTarget = {
+  cinemaHallId: null,
+  cinemaHallName: null,
+  hostId: null,
+  participants: [],
+  file: { name: null, size: 0 },
+  currentTime: 0,
+  playing: false,
+  updatedAt: null,
+  chat: [],
+}
+
 const initialState: CinemaHallStateType = {
   cinemaHalls: [],
-  cinemaHallTarget: {
-    cinemaHallId: null,
-    cinemaHallName: null,
-    hostId: null,
-    participants: [],
-    file: { name: null, size: 0 },
-    currentTime: 0,
-    playing: false,
-    updatedAt: null,
-    chat: [],
-  },
+  cinemaHallTarget: { ...initialCinemaHallTarget },
 }
 
 const cinemaHallSlice = createSlice({
@@ -21,8 +23,11 @@ const cinemaHallSlice = createSlice({
   initialState,
   reducers: {
     setCinemaHall(state, action) {
-      //   console.log("action", action)
-      state.cinemaHallTarget = action.payload
+      console.log("action", action)
+      state.cinemaHallTarget = {
+        ...state.cinemaHallTarget,
+        ...action.payload,
+      }
       //   state.cinemaHallTarget.
     },
     getAllCinemaHall(state, action) {
@@ -34,6 +39,12 @@ const cinemaHallSlice = createSlice({
     },
     setCurrentTime(state, action) {
       state.cinemaHallTarget.currentTime = action.payload
+    },
+    clearCinemaHall(state) {
+      state.cinemaHallTarget = {
+        ...initialCinemaHallTarget,
+        file: { ...initialCinemaHallTarget.file }, // Копируем вложенный объект
+      }
     },
     // participantFileReady(state, action) {
     //   const p = state.cinemaHallTarget.participants.find(
@@ -47,6 +58,7 @@ const cinemaHallSlice = createSlice({
   },
 })
 
-export const { setCinemaHall, getAllCinemaHall } = cinemaHallSlice.actions
+export const { setCinemaHall, getAllCinemaHall, clearCinemaHall } =
+  cinemaHallSlice.actions
 
 export default cinemaHallSlice.reducer
