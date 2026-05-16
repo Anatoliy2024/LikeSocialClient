@@ -15,11 +15,11 @@ export type SubscribeResult =
 
 // 1. Регистрация сервис-воркера
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration> {
-  if (!("serviceWorker" in navigator)) {
-    throw new Error("Service Worker не поддерживается в этом браузере")
-  }
+  // if (!("serviceWorker" in navigator)) {
+  //   throw new Error("Service Worker не поддерживается в этом браузере")
+  // }
 
-  await navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
+  // await navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
 
   // ready резолвится только когда воркер активен — надёжнее чем слушать statechange
   return navigator.serviceWorker.ready

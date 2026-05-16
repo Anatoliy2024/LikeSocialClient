@@ -71,6 +71,16 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    // Регистрируем один раз при загрузке приложения
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js", { scope: "/" })
+        .then((reg) => console.log("✅ SW зарегистрирован", reg))
+        .catch((err) => console.error("❌ SW ошибка", err))
+    }
+  }, [])
+
   //Таймер включения сервера
   useEffect(() => {
     if (!server?.loading) return

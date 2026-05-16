@@ -4,7 +4,7 @@ export type CinemaHallTargetType = {
   cinemaHallName: string | null
   hostId: string | null
   participants: ParticipantsType[]
-  file: FileType | null
+  file: FileType
   currentTime: number
   playing: boolean
   updatedAt: string | null

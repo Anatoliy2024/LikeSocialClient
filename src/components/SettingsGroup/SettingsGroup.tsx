@@ -24,6 +24,8 @@ import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
 // import { CreateCinemaHallModal } from "../CreateCinemaHallModal/CreateCinemaHallModal"
 import { useSocket } from "@/providers/SocketProvider"
 import { getAllCinemaHall } from "@/store/slices/cinemaHallSlice"
+import { CinemaHallTargetType } from "@/types/cinemaHall.types"
+import { StorageTorrentManager } from "../StorageManager/StorageTorrentManager"
 
 export function SettingsGroup() {
   const [changeAvatarGroup, setChangeAvatarGroup] = useState(false)
@@ -59,7 +61,9 @@ export function SettingsGroup() {
 
   if (!params || !params.id) throw new Error("Параметр id не найден")
   const id = params.id
-
+  const LinkMovieHallRoom = (roomId: string) => {
+    return `/watch/${roomId}?group=${id}`
+  }
   useEffect(() => {
     dispatch(
       getUserRelationsThunk({ type: "friends", page: pageUserFriendsFromUrl }),
@@ -72,9 +76,13 @@ export function SettingsGroup() {
 
   useEffect(() => {
     if (!socket || !id) return
-    socket.emit("cinema-hall:get-all", { groupId: id }, (data: any) => {
-      dispatch(getAllCinemaHall(data.cinemaHallList))
-    })
+    socket.emit(
+      "cinema-hall:get-all",
+      { groupId: id },
+      (data: { cinemaHallList: CinemaHallTargetType[] }) => {
+        dispatch(getAllCinemaHall(data.cinemaHallList))
+      },
+    )
 
     //  socket.on("cinema-hall:get-all", async (data, callback) => {
     //       getAllCinemaHallHandler(io, socket, data, callback)
@@ -123,7 +131,9 @@ export function SettingsGroup() {
 
   const handleLinkMovieHall = () => {
     const cinemaHallId = crypto.randomUUID()
-    router.push(`/watch/${cinemaHallId}?group=${id}`)
+
+    LinkMovieHallRoom(cinemaHallId)
+    router.push(LinkMovieHallRoom(cinemaHallId))
     // setShowCinemaHallModal(true)
   }
   // const handleGroupAvatarUpload=()=>{
@@ -240,15 +250,20 @@ export function SettingsGroup() {
           <ButtonMenu onClick={handleLinkMovieHall}>
             Создать видеозал
           </ButtonMenu>
+          <StorageTorrentManager />
           <div>
             {cinemaHalls.length > 0 ? (
               <ul>
                 {cinemaHalls.map((item) => (
                   <li key={item.cinemaHallId}>
-                    <Link href={`/watch/${item.cinemaHallId}`}>
+                    <Link href={LinkMovieHallRoom(item.cinemaHallId as string)}>
                       <span>Названеи комнаты:{item.cinemaHallName}</span>
                       <span>
                         Количество участников:{item.participants.length}
+                      </span>
+                      <span>
+                        Размер файла:
+                        {(item.file.size / 1024 / 1024 / 1024).toFixed(2)} ГБ
                       </span>
                     </Link>
                   </li>
