@@ -50,8 +50,10 @@ export function SettingsGroup() {
   const cinemaHalls = useAppSelector((state) => state.cinemaHall.cinemaHalls)
 
   const params = useParams<{ id: string }>()
+
   const pageUserFriendsFromUrl =
     Number(searchParams?.get("pageUserFriends")) || 1
+
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams?.toString())
     params.set("pageUserFriends", String(newPage))
@@ -61,6 +63,7 @@ export function SettingsGroup() {
 
   if (!params || !params.id) throw new Error("Параметр id не найден")
   const id = params.id
+
   const LinkMovieHallRoom = (roomId: string) => {
     return `/watch/${roomId}?group=${id}`
   }
@@ -132,7 +135,7 @@ export function SettingsGroup() {
   const handleLinkMovieHall = () => {
     const cinemaHallId = crypto.randomUUID()
 
-    LinkMovieHallRoom(cinemaHallId)
+    // LinkMovieHallRoom(cinemaHallId)
     router.push(LinkMovieHallRoom(cinemaHallId))
     // setShowCinemaHallModal(true)
   }

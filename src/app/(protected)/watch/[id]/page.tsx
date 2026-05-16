@@ -19,6 +19,7 @@ import {
   TorrentStatus,
   WebTorrentInstance,
 } from "@/types/webtorrent.types"
+import { ChatMovieHall } from "@/components/ChatMovieHall/ChatMovieHall"
 
 // type WebTorrentInstance = any
 // type TorrentInstance = any
@@ -75,7 +76,7 @@ const WEBTORRENT_CONFIG = {
 export default function WatchPage() {
   const { id } = useParams() as { id: string }
   const searchParams = useSearchParams()
-  const groupId = searchParams.get("group")
+  const groupId = searchParams.get("group") as string
 
   const dispatch = useAppDispatch()
   const socket = useSocket()
@@ -407,98 +408,101 @@ export default function WatchPage() {
     )
   }
 
-  // ─── Рендер ──────────────────────────────────────────────────────────────────
-  if (!cinemaHallName) {
-    return (
-      <div className={style.createCinemaHallModal}>
-        <div
-          className={style.createCinemaHallModal__container}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h3>Создать кинозал</h3>
-          <div>
-            <label htmlFor="movie-name">Название фильма</label>
-            <input
-              placeholder="Введите название..."
-              type="text"
-              id="movie-name"
-              value={movieName}
-              onChange={(e) => setMovieName(e.target.value)}
-            />
-          </div>
-
+  return (
+    <>
+      {!cinemaHallName && (
+        <div className={style.createCinemaHallModal}>
           <div
-            className={`${style.dropZone} ${isDragging ? style.dropZone__active : ""}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => inputRef.current?.click()}
+            className={style.createCinemaHallModal__container}
+            onClick={(e) => e.stopPropagation()}
           >
-            {file ? (
-              <div className={style.fileInfo}>
-                <span>{file.name}</span>
-                <span>{(file.size / 1024 / 1024 / 1024).toFixed(2)} ГБ</span>
-              </div>
-            ) : (
-              <p>Перетащи файл сюда или нажми чтобы выбрать</p>
-            )}
-          </div>
+            <h3>Создать кинозал</h3>
+            <div>
+              <label htmlFor="movie-name">Название фильма</label>
+              <input
+                placeholder="Введите название..."
+                type="text"
+                id="movie-name"
+                value={movieName}
+                onChange={(e) => setMovieName(e.target.value)}
+              />
+            </div>
 
-          {isHashing && (
-            <span>
-              Хеширование... <Spinner />
-            </span>
-          )}
-          {magnetURI && !isHashing && <div>✅ Файл готов к раздаче</div>}
-
-          <input
-            ref={inputRef}
-            type="file"
-            accept="video/*"
-            style={{ display: "none" }}
-            onChange={handleInputChange}
-          />
-
-          <div className={style.createCinemaHallModal__buttonContainer}>
-            <ButtonMenu
-              disabled={!file || !magnetURI || isHashing}
-              onClick={createHandle}
+            <div
+              className={`${style.dropZone} ${isDragging ? style.dropZone__active : ""}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => inputRef.current?.click()}
             >
-              Создать Кинозал
-            </ButtonMenu>
-            <ButtonMenu onClick={() => history.back()}>Отмена</ButtonMenu>
+              {file ? (
+                <div className={style.fileInfo}>
+                  <span>{file.name}</span>
+                  <span>{(file.size / 1024 / 1024 / 1024).toFixed(2)} ГБ</span>
+                </div>
+              ) : (
+                <p>Перетащи файл сюда или нажми чтобы выбрать</p>
+              )}
+            </div>
+
+            {isHashing && (
+              <span>
+                Хеширование... <Spinner />
+              </span>
+            )}
+            {magnetURI && !isHashing && <div>✅ Файл готов к раздаче</div>}
+
+            <input
+              ref={inputRef}
+              type="file"
+              accept="video/*"
+              style={{ display: "none" }}
+              onChange={handleInputChange}
+            />
+
+            <div className={style.createCinemaHallModal__buttonContainer}>
+              <ButtonMenu
+                disabled={!file || !magnetURI || isHashing}
+                onClick={createHandle}
+              >
+                Создать Кинозал
+              </ButtonMenu>
+              <ButtonMenu onClick={() => history.back()}>Отмена</ButtonMenu>
+            </div>
           </div>
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className={style.watchPage}>
-      <h1>{cinemaHallName}</h1>
-
-      <video
-        ref={videoRef}
-        controls
-        style={{
-          width: "100%",
-          display:
-            torrentStatus === "buffering" || torrentStatus === "ready"
-              ? "visible"
-              : "hidden",
-          height:
-            torrentStatus === "buffering" || torrentStatus === "ready"
-              ? "auto"
-              : "0",
-        }}
-      />
-
-      <div>Статус: {torrentStatus}</div>
-      {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>}
-      {torrentStatus === "buffering" && (
-        <p>⏳ Буферизация: {bufferProgress}%</p>
       )}
-      {torrentStatus === "error" && <p>❌ Ошибка подключения.</p>}
-    </div>
+
+      {cinemaHallName && (
+        <div className={style.watchPage}>
+          <h1>{cinemaHallName}</h1>
+
+          <video
+            ref={videoRef}
+            controls
+            style={{
+              width: "100%",
+              display:
+                torrentStatus === "buffering" || torrentStatus === "ready"
+                  ? "visible"
+                  : "hidden",
+              height:
+                torrentStatus === "buffering" || torrentStatus === "ready"
+                  ? "auto"
+                  : "0",
+            }}
+          />
+
+          <div>Статус: {torrentStatus}</div>
+          {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>}
+          {torrentStatus === "buffering" && (
+            <p>⏳ Буферизация: {bufferProgress}%</p>
+          )}
+          {torrentStatus === "error" && <p>❌ Ошибка подключения.</p>}
+
+          <ChatMovieHall cinemaHallId={id} groupId={groupId} socket={socket} />
+        </div>
+      )}
+    </>
   )
 }

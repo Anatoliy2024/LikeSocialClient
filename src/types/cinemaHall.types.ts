@@ -8,7 +8,7 @@ export type CinemaHallTargetType = {
   currentTime: number
   playing: boolean
   updatedAt: string | null
-  chat: ChatType[]
+  chat: ChatMessageType[]
 }
 
 export type FileType = {
@@ -21,10 +21,11 @@ export type ParticipantsType = {
   username: string | null
   fileReady: string | null
 }
-export type ChatType = {
-  user: string | null
+export type ChatMessageType = {
+  id: string | null
+  username: string | null
   text: string | null
-  dataAt: string | null
+  dateAt: string | null
 }
 
 export type CinemaHallStateType = {

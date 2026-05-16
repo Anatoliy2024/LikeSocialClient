@@ -47,6 +47,12 @@ const cinemaHallSlice = createSlice({
         file: { ...initialCinemaHallTarget.file }, // Копируем вложенный объект
       }
     },
+    addChatMessage(state, action) {
+      state.cinemaHallTarget.chat.push(action.payload)
+    },
+    getAllChatMessage(state, action) {
+      state.cinemaHallTarget.chat = action.payload
+    },
     // participantFileReady(state, action) {
     //   const p = state.cinemaHallTarget.participants.find(
     //     (p) => p.userId === action.payload,
@@ -59,7 +65,12 @@ const cinemaHallSlice = createSlice({
   },
 })
 
-export const { setCinemaHall, getAllCinemaHall, clearCinemaHall } =
-  cinemaHallSlice.actions
+export const {
+  setCinemaHall,
+  getAllCinemaHall,
+  clearCinemaHall,
+  addChatMessage,
+  getAllChatMessage,
+} = cinemaHallSlice.actions
 
 export default cinemaHallSlice.reducer
