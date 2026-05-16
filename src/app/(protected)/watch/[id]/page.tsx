@@ -107,6 +107,7 @@ export default function WatchPage() {
         const shortHash = hash.slice(0, 8)
 
         // Ищем папку которая заканчивается на наш hash
+        // @ts-ignore
         for await (const [name] of root.entries()) {
           if (name.endsWith(shortHash)) {
             await root.removeEntry(name, { recursive: true })

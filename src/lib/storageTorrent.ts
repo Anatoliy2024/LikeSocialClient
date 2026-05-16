@@ -5,6 +5,7 @@ async function getDirSize(
   dirHandle: FileSystemDirectoryHandle,
 ): Promise<number> {
   let total = 0
+  // @ts-ignore
   for await (const [, handle] of dirHandle.entries()) {
     if (handle.kind === "file") {
       const file = await handle.getFile()
@@ -34,7 +35,7 @@ export function formatBytes(bytes: number): string {
 export async function getOPFSFolders(): Promise<TorrentFolder[]> {
   const root = await navigator.storage.getDirectory()
   const folders: TorrentFolder[] = []
-
+  // @ts-ignore
   for await (const [name, handle] of root.entries()) {
     if (handle.kind === "directory") {
       const size = await getDirSize(handle)
@@ -54,6 +55,7 @@ export async function deleteOPFSFolder(name: string): Promise<void> {
 // Удалить ВСЁ
 export async function clearAllOPFS(): Promise<void> {
   const root = await navigator.storage.getDirectory()
+  // @ts-ignore
   for await (const [name] of root.entries()) {
     await root.removeEntry(name, { recursive: true })
   }
