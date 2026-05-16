@@ -10,13 +10,22 @@ import { clearCinemaHall, setCinemaHall } from "@/store/slices/cinemaHallSlice"
 import ButtonMenu from "@/components/ui/button/Button"
 import Spinner from "@/components/ui/spinner/Spinner"
 import { initWebTorrentWithSW } from "@/lib/webtorrent-sw"
+// import { CinemaHallRoomType } from "@/types/cinemaHall"
+import { CinemaHallTargetType } from "@/types/cinemaHall.types"
+import {
+  TorrentFile,
+  // AddTorrentOptions,
+  TorrentInstance,
+  TorrentStatus,
+  WebTorrentInstance,
+} from "@/types/webtorrent.types"
 
-type WebTorrentInstance = any
-type TorrentInstance = any
+// type WebTorrentInstance = any
+// type TorrentInstance = any
 
 // ─── Вспомогалка: ждём пока clientRef заполнится ─────────────────────────────
 function waitForClient(
-  clientRef: React.MutableRefObject<WebTorrentInstance>,
+  clientRef: React.RefObject<WebTorrentInstance | null>,
   timeoutMs = 10000,
 ): Promise<WebTorrentInstance> {
   return new Promise((resolve, reject) => {
@@ -34,6 +43,50 @@ function waitForClient(
   })
 }
 
+// ─── Типы для socket callbacks ────────────────────────────────────────────────
+
+interface JoinHallResponse {
+  hall: CinemaHallTargetType
+  error?: string
+}
+
+// interface CreateHallResponse {
+//   hall: CinemaHallTargetType
+// }
+
+// interface CreateHallPayload {
+//   cinemaHallId: string
+//   cinemaHallName: string
+//   groupId: string | null
+//   file: {
+//     name: string
+//     size: number
+//     magnet: string
+//   }
+// }
+
+// ─── Константы ────────────────────────────────────────────────────────────────
+
+const TRACKERS: string[] = [
+  "wss://tracker.openwebtorrent.com",
+  "wss://tracker.webtorrent.dev",
+]
+
+const VIDEO_EXTENSIONS = [".mp4", ".mkv", ".webm"] as const
+
+const WEBTORRENT_CONFIG = {
+  dht: false,
+  tracker: {
+    rtcConfig: {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun.cloudflare.com:3478" },
+      ],
+    },
+  },
+} as const
+
 export default function WatchPage() {
   const { id } = useParams() as { id: string }
   const searchParams = useSearchParams()
@@ -47,7 +100,14 @@ export default function WatchPage() {
   const [magnetURI, setMagnetURI] = useState<string | null>(null)
   const [isHashing, setIsHashing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [torrentStatus, setTorrentStatus] = useState<TorrentStatus>("idle")
+  const [bufferProgress, setBufferProgress] = useState(0)
+
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const clientRef = useRef<WebTorrentInstance | null>(null)
+  const torrentRef = useRef<TorrentInstance | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const lastLoggedProgress = useRef(0)
 
   const cinemaHallName = useAppSelector(
     (state) => state.cinemaHall.cinemaHallTarget.cinemaHallName,
@@ -56,16 +116,6 @@ export default function WatchPage() {
     (state) => state.cinemaHall.cinemaHallTarget.hostId,
   )
   const userId = useAppSelector((state) => state.auth.userId)
-
-  const [torrentStatus, setTorrentStatus] = useState<
-    "idle" | "connecting" | "buffering" | "ready" | "error"
-  >("idle")
-  const [bufferProgress, setBufferProgress] = useState(0)
-
-  const clientRef = useRef<WebTorrentInstance>(null)
-  const torrentRef = useRef<TorrentInstance>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const lastLoggedProgress = useRef(0)
 
   // ─── 1. Инициализируем WebTorrent ОДИН РАЗ при маунте ──────────────────────
   useEffect(() => {
@@ -77,20 +127,20 @@ export default function WatchPage() {
           await import("webtorrent/dist/webtorrent.min.js")
         const WebTorrent = WebTorrentModule.default || WebTorrentModule
 
-        const config = {
-          dht: false,
-          tracker: {
-            rtcConfig: {
-              iceServers: [
-                { urls: "stun:stun.l.google.com:19302" },
-                { urls: "stun:stun1.l.google.com:19302" },
-                { urls: "stun:stun.cloudflare.com:3478" },
-              ],
-            },
-          },
-        }
+        // const config = {
+        //   dht: false,
+        //   tracker: {
+        //     rtcConfig: {
+        //       iceServers: [
+        //         { urls: "stun:stun.l.google.com:19302" },
+        //         { urls: "stun:stun1.l.google.com:19302" },
+        //         { urls: "stun:stun.cloudflare.com:3478" },
+        //       ],
+        //     },
+        //   },
+        // }
 
-        const client = new WebTorrent(config)
+        const client = new WebTorrent(WEBTORRENT_CONFIG)
 
         if (cancelled) {
           client.destroy()
@@ -126,26 +176,30 @@ export default function WatchPage() {
   useEffect(() => {
     if (!socket || !id) return
 
-    socket.emit("cinema-hall:join", { cinemaHallId: id }, async (data: any) => {
-      if (data.error) {
-        console.error(data.error)
-        return
-      }
-
-      dispatch(setCinemaHall(data.hall))
-
-      // Зритель: если в зале уже есть magnet — подключаемся
-      if (data.hall?.file?.magnet && hostId !== userId) {
-        try {
-          setTorrentStatus("connecting")
-          const client = await waitForClient(clientRef)
-          await connectMagnet(client, data.hall.file.magnet)
-        } catch (err) {
-          console.error("Ошибка подключения:", err)
-          setTorrentStatus("error")
+    socket.emit(
+      "cinema-hall:join",
+      { cinemaHallId: id },
+      async (data: JoinHallResponse) => {
+        if (data.error) {
+          console.error(data.error)
+          return
         }
-      }
-    })
+
+        dispatch(setCinemaHall(data.hall))
+
+        // Зритель: если в зале уже есть magnet — подключаемся
+        if (data.hall?.file?.magnet && hostId !== userId) {
+          try {
+            setTorrentStatus("connecting")
+            const client = await waitForClient(clientRef)
+            await connectMagnet(client, data.hall.file.magnet)
+          } catch (err) {
+            console.error("Ошибка подключения:", err)
+            setTorrentStatus("error")
+          }
+        }
+      },
+    )
 
     return () => {
       socket.emit("cinema-hall:leave", { cinemaHallId: id, groupId })
@@ -197,7 +251,8 @@ export default function WatchPage() {
       )
     })
 
-    torrent.on("wire", (wire: any, addr: string) => {
+    // @ts-ignore: отключаем проверку типов для события wire
+    torrent.on("wire", (wire, addr: string) => {
       console.log(`🔗 Пир: ${addr}, тип: ${wire.type}`)
       clearInterval(peerCheck) // нашли пира — стоп
     })
@@ -210,11 +265,14 @@ export default function WatchPage() {
       console.log("✅ Торрент готов:", torrent.name)
 
       // Ищем видеофайл
-      const videoFile = torrent.files.find(
-        (f: any) =>
-          f.name.endsWith(".mp4") ||
-          f.name.endsWith(".mkv") ||
-          f.name.endsWith(".webm"),
+      // const videoFile = torrent.files.find(
+      //   (f: any) =>
+      //     f.name.endsWith(".mp4") ||
+      //     f.name.endsWith(".mkv") ||
+      //     f.name.endsWith(".webm"),
+      // )
+      const videoFile = (torrent.files as TorrentFile[]).find((f) =>
+        VIDEO_EXTENSIONS.some((ext) => f.name.endsWith(ext)),
       )
 
       if (!videoFile) {
@@ -223,20 +281,19 @@ export default function WatchPage() {
         return
       }
 
-      // // ✅ Деселектируем все файлы сначала
-      // torrent.files.forEach((f: any) => f.deselect())
-
-      // // ✅ Селектируем только нужный с нормальным приоритетом
-      // videoFile.select()
-
       if (!videoRef.current) return
 
       // ✅ streamTo — настоящий стриминг без ожидания полной загрузки
       // Требует Service Worker (initWebTorrentWithSW)
-      videoFile.streamTo(videoRef.current)
-      setTorrentStatus("ready")
-
-      //  ;(window as any).__torrent = torrent
+      if (videoFile?.streamTo) {
+        videoFile.streamTo(videoRef.current)
+        setTorrentStatus("ready")
+      } else {
+        console.warn("⚠️ Видеофайл не найден или streamTo не определён")
+        setTorrentStatus("error")
+      }
+      // videoFile.streamTo(videoRef.current)
+      // setTorrentStatus("ready")
     })
 
     torrent.on("download", () => {
@@ -251,8 +308,8 @@ export default function WatchPage() {
       if (torrentStatus !== "ready") setTorrentStatus("buffering")
     })
 
-    torrent.on("warning", (err: any) => console.warn("⚠️", err))
-    torrent.on("error", (err: any) => {
+    torrent.on("warning", (err) => console.warn("⚠️", err))
+    torrent.on("error", (err) => {
       console.error("❌", err)
       setTorrentStatus("error")
     })
@@ -269,10 +326,11 @@ export default function WatchPage() {
       const client = await waitForClient(clientRef)
 
       const torrent = client.seed(f, {
-        announce: [
-          "wss://tracker.openwebtorrent.com",
-          "wss://tracker.webtorrent.dev",
-        ],
+        announce: TRACKERS,
+        // announce: [
+        //   "wss://tracker.openwebtorrent.com",
+        //   "wss://tracker.webtorrent.dev",
+        // ],
       })
 
       torrentRef.current = torrent
@@ -283,7 +341,7 @@ export default function WatchPage() {
         setIsHashing(false)
       })
 
-      torrent.on("error", (err: any) => {
+      torrent.on("error", (err) => {
         console.error("Ошибка хэширования:", err)
         setIsHashing(false)
       })
@@ -293,12 +351,12 @@ export default function WatchPage() {
     }
   }
 
-  const handleDragOver = (e: any) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(true)
   }
   const handleDragLeave = () => setIsDragging(false)
-  const handleDrop = (e: any) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
     const dropped = e.dataTransfer.files[0]
@@ -320,7 +378,7 @@ export default function WatchPage() {
         groupId,
         file: { name: file.name, size: file.size, magnet: magnetURI },
       },
-      (data: any) => {
+      (data: { hall: CinemaHallTargetType }) => {
         console.log("Зал создан:", data.hall)
         dispatch(setCinemaHall(data.hall))
       },

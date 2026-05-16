@@ -1,4 +1,5 @@
 export type CinemaHallTargetType = {
+  groupId: string | null
   cinemaHallId: string | null
   cinemaHallName: string | null
   hostId: string | null
@@ -13,6 +14,7 @@ export type CinemaHallTargetType = {
 export type FileType = {
   name: string | null
   size: number
+  magnet: string | null
 }
 
 export type ParticipantsType = {
@@ -26,6 +28,6 @@ export type ChatType = {
 }
 
 export type CinemaHallStateType = {
-  cinemaHalls: any[]
+  cinemaHalls: CinemaHallTargetType[]
   cinemaHallTarget: CinemaHallTargetType
 }

@@ -1,9 +1,17 @@
 // lib/webtorrent-sw.ts
-export async function initWebTorrentWithSW(client: any): Promise<boolean> {
+
+export interface WebTorrentClient {
+  createServer(opts: { controller: ServiceWorkerRegistration }): void
+  // Добавь другие методы, которые используешь в проекте
+}
+
+export async function initWebTorrentWithSW(
+  client: WebTorrentClient,
+): Promise<boolean> {
   if (!("serviceWorker" in navigator)) return false
 
   try {
-    const reg = await navigator.serviceWorker.register("/sw.min.js")
+    await navigator.serviceWorker.register("/sw.min.js")
     const controller = await navigator.serviceWorker.ready
     // Передаём контроллер клиенту
     client.createServer({ controller })

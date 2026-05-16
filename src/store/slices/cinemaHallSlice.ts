@@ -2,11 +2,12 @@ import { CinemaHallStateType } from "@/types/cinemaHall.types"
 import { createSlice } from "@reduxjs/toolkit"
 
 const initialCinemaHallTarget = {
+  groupId: null,
   cinemaHallId: null,
   cinemaHallName: null,
   hostId: null,
   participants: [],
-  file: { name: null, size: 0 },
+  file: { name: null, size: 0, magnet: null },
   currentTime: 0,
   playing: false,
   updatedAt: null,
