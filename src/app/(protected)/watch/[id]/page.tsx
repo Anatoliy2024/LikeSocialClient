@@ -94,6 +94,7 @@ export default function WatchPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const torrentInfoHashRef = useRef<string | null>(null)
   const lastLoggedProgress = useRef(0)
+  const blobUrlRef = useRef<string | null>(null)
 
   const cinemaHallName = useAppSelector(
     (state) => state.cinemaHall.cinemaHallTarget.cinemaHallName,
@@ -129,6 +130,15 @@ export default function WatchPage() {
       deleteTorrentFiles(shortHash)
     }
   }, []) // пустой массив — только при размонтировании
+
+  // cleanup blob movie creater:
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current)
+      }
+    }
+  }, [])
 
   // ─── 1. Инициализируем WebTorrent ОДИН РАЗ при маунте ──────────────────────
   useEffect(() => {
@@ -207,18 +217,6 @@ export default function WatchPage() {
     }
   }, [socket, id]) // dispatch, groupId стабильны
 
-  // // ─── 3. Хост: когда зал создан — запускаем его видео локально ───────────────
-  // useEffect(() => {
-  //   if (cinemaHallName && hostId === userId && file && videoRef.current) {
-  //     if (videoRef.current.src?.startsWith("blob:")) {
-  //       URL.revokeObjectURL(videoRef.current.src)
-  //     }
-  //     // Хост смотрит свой файл напрямую (он уже есть локально)
-  //     videoRef.current.src = URL.createObjectURL(file)
-  //     setTorrentStatus("ready")
-  //   }
-  // }, [cinemaHallName, hostId, userId, file])
-
   // ─── Настройка плеера для торрента (универсальная) ───────────────────────────
   const setupTorrentPlayer = (torrent: TorrentInstance) => {
     torrentRef.current = torrent
@@ -270,30 +268,10 @@ export default function WatchPage() {
       console.log("Name:", torrent.name)
       console.log("Progress:", torrent.progress)
       console.log("Downloaded:", torrent.downloaded, "of", torrent.length)
-      // console.log(
-      //   "Files:",
-      //   torrent.files.map((f: any) => ({
-      //     name: f.name,
-      //     length: f.length,
-      //     downloaded: f.downloaded,
-      //     progress: f.progress,
-      //   })),
-      // )
 
       const videoFile = (torrent.files as TorrentFile[]).find((f) =>
         VIDEO_EXTENSIONS.some((ext) => f.name.endsWith(ext)),
       )
-
-      // if (videoFile) {
-      //   console.log("✅ Видеофайл найден:", videoFile.name)
-      //   console.log("📦 Его прогресс:", videoFile.progress)
-      //   console.log(
-      //     "🔧 Доступные методы:",
-      //     Object.keys(videoFile).filter(
-      //       (k) => typeof videoFile[k] === "function",
-      //     ),
-      //   )
-      // }
 
       if (!videoFile) {
         console.error("Видеофайл не найден в торренте")
@@ -336,10 +314,7 @@ export default function WatchPage() {
       client.add(magnet, {
         announce: TRACKERS,
       })
-    // const TRACKERS: string[] = [
-    //   "wss://tracker.openwebtorrent.com",
-    //   "wss://tracker.webtorrent.dev",
-    // ]
+
     // ✅ Если торрент уже готов — сразу настраиваем плеер
     if (torrent.ready) {
       setupTorrentPlayer(torrent)
@@ -347,86 +322,6 @@ export default function WatchPage() {
       // Иначе ждём ready
       torrent.on("ready", () => setupTorrentPlayer(torrent))
     }
-
-    // torrentRef.current = torrent
-
-    // // Отладка пиров
-    // const peerCheck = setInterval(() => {
-    //   if (!torrentRef.current) return clearInterval(peerCheck)
-    //   console.log(`🔍 Пиров: ${torrent.numPeers}`)
-    // }, 5000)
-
-    // torrent.on("metadata", () => {
-    //   console.log(
-    //     "📦 Метаданные:",
-    //     torrent.name,
-    //     torrent.files?.length,
-    //     "файлов",
-    //   )
-    // })
-
-    // // @ts-ignore: отключаем проверку типов для события wire
-    // torrent.on("wire", (wire, addr: string) => {
-    //   console.log(`🔗 Пир: ${addr}, тип: ${wire.type}`)
-    //   clearInterval(peerCheck) // нашли пира — стоп
-    // })
-
-    // torrent.on("noPeers", () => {
-    //   console.warn("⚠️ Нет пиров")
-    // })
-
-    // torrent.on("ready", () => {
-    //   console.log("✅ Торрент готов:", torrent.name)
-
-    //   // Ищем видеофайл
-    //   // const videoFile = torrent.files.find(
-    //   //   (f: any) =>
-    //   //     f.name.endsWith(".mp4") ||
-    //   //     f.name.endsWith(".mkv") ||
-    //   //     f.name.endsWith(".webm"),
-    //   // )
-    //   const videoFile = (torrent.files as TorrentFile[]).find((f) =>
-    //     VIDEO_EXTENSIONS.some((ext) => f.name.endsWith(ext)),
-    //   )
-
-    //   if (!videoFile) {
-    //     console.error("Видеофайл не найден в торренте")
-    //     setTorrentStatus("error")
-    //     return
-    //   }
-
-    //   if (!videoRef.current) return
-
-    //   // ✅ streamTo — настоящий стриминг без ожидания полной загрузки
-    //   // Требует Service Worker (initWebTorrentWithSW)
-    //   if (videoFile?.streamTo) {
-    //     videoFile.streamTo(videoRef.current)
-    //     setTorrentStatus("ready")
-    //   } else {
-    //     console.warn("⚠️ Видеофайл не найден или streamTo не определён")
-    //     setTorrentStatus("error")
-    //   }
-    //   // videoFile.streamTo(videoRef.current)
-    //   // setTorrentStatus("ready")
-    // })
-
-    // torrent.on("download", () => {
-    //   const percent = Math.round(torrent.progress * 100)
-    //   if (percent % 5 === 0 && percent !== lastLoggedProgress.current) {
-    //     lastLoggedProgress.current = percent
-    //     console.log(
-    //       `📥 ${percent}% | пиров: ${torrent.numPeers} | ${(torrent.downloadSpeed / 1024).toFixed(1)} KB/s`,
-    //     )
-    //   }
-    //   setBufferProgress(percent)
-    //   if (torrentStatus !== "ready") setTorrentStatus("buffering")
-    // })
-
-    // torrent.on("warning", (err) => console.warn("⚠️", err))
-    // torrent.on("error", (err) => {
-    //   console.error("❌", err)
-    //   setTorrentStatus("error")
-    // })
   }
 
   // ─── Хеширование файла хостом ────────────────────────────────────────────────
@@ -449,6 +344,7 @@ export default function WatchPage() {
         console.log("🧲 Magnet:", torrent.magnetURI)
         setMagnetURI(torrent.magnetURI)
         setIsHashing(false)
+        torrentInfoHashRef.current = torrent.infoHash
         // setupTorrentPlayer(torrent)
       })
 
@@ -493,7 +389,17 @@ export default function WatchPage() {
         console.log("Зал создан:", data.hall)
         if (torrentRef.current) {
           await dispatch(setCinemaHall(data.hall))
-          setupTorrentPlayer(torrentRef.current)
+
+          // Создатель смотрит локальный файл напрямую — без торрента
+          if (videoRef.current && file) {
+            const blobUrl = URL.createObjectURL(file)
+            blobUrlRef.current = blobUrl
+            videoRef.current.src = blobUrl
+            videoRef.current.play().catch(() => {})
+            setTorrentStatus("ready")
+          }
+
+          // setupTorrentPlayer(torrentRef.current)
         }
         // initClient()
       },
