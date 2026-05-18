@@ -420,7 +420,9 @@ export default function WatchPage() {
     const infoHash = hashMatch[1]
 
     // 2. Проверяем, не качаем ли мы это уже
-    const existing = client.torrents.find((t: any) => t.infoHash === infoHash)
+    const existing = client.torrents.find(
+      (t: TorrentInstance) => t.infoHash === infoHash,
+    )
 
     if (existing) {
       console.log("✅ Торрент уже добавлен, используем существующий")

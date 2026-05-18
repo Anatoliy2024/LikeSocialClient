@@ -30,7 +30,7 @@ export type ParticipantsType = {
   disconnectTimer: number | null
 }
 export type ChatMessageType = {
-  id: string | null
+  userId: string | null
   username: string | null
   text: string | null
   dateAt: string | null

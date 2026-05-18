@@ -51,7 +51,7 @@ export function ChatMovieHall({
       <h3>Chat</h3>
       <ul>
         {chat.map((message) => (
-          <li key={message.id}>
+          <li key={message.userId}>
             <span>{message.dateAt}</span>
             {message.text}
           </li>

@@ -11,6 +11,10 @@ import {
   removeParticipant,
 } from "@/store/slices/cinemaHallSlice"
 import { TorrentInstance } from "@/types/webtorrent.types"
+import {
+  CinemaHallTargetType,
+  ParticipantsType,
+} from "@/types/cinemaHall.types"
 
 interface UseCinemaHallSyncProps {
   cinemaHallId: string
@@ -73,20 +77,23 @@ const safePlay = async (video: HTMLVideoElement) => {
     console.log("🔊 Вызываем video.play()...")
     await video.play()
     console.log("✅ video.play() успешно")
-  } catch (e: any) {
-    // AbortError — это нормально, если play() прервали паузой
-    if (e.name === "AbortError") {
-      console.log("ℹ️ play() прерван (AbortError) — это ок")
-      return
+  } catch (e: unknown) {
+    if (e instanceof DOMException) {
+      // AbortError — это нормально, если play() прервали паузой
+      if (e.name === "AbortError") {
+        console.log("ℹ️ play() прерван (AbortError) — это ок")
+        return
+      }
+      // NotAllowedError — браузер заблокировал автоплей со звуком
+      if (e.name === "NotAllowedError") {
+        console.warn(
+          "⚠️ Автоплей заблокирован браузером (попробуй muted или клик пользователя)",
+        )
+        return
+      }
+      console.error("❌ Ошибка play():", e.name, e.message)
     }
-    // NotAllowedError — браузер заблокировал автоплей со звуком
-    if (e.name === "NotAllowedError") {
-      console.warn(
-        "⚠️ Автоплей заблокирован браузером (попробуй muted или клик пользователя)",
-      )
-      return
-    }
-    console.error("❌ Ошибка play():", e.name, e.message)
+    console.error("❌ Неизвестная ошибка play():", e)
   }
 }
 
@@ -176,7 +183,11 @@ export function useCinemaHallSync({
       // })
     }
 
-    const onSocketPause = (data) => {
+    const onSocketPause = (data: {
+      currentTime: number
+      playbackUpdatedAt: number
+      seqNum: number
+    }) => {
       dispatch(applyPause(data))
       if (!videoRef.current || !isActiveRef.current) return
 
@@ -187,7 +198,12 @@ export function useCinemaHallSync({
       videoRef.current.pause()
     }
 
-    const onSocketForcePause = (data) => {
+    const onSocketForcePause = (data: {
+      currentTime: number
+      playbackUpdatedAt: number
+      seqNum: number
+      waitingFor: ParticipantsType[]
+    }) => {
       dispatch(applyPause(data))
       if (!videoRef.current || !isActiveRef.current) return
       isProgrammaticSeekRef.current = true // 👈 Добавь
@@ -196,7 +212,12 @@ export function useCinemaHallSync({
       videoRef.current.currentTime = data.currentTime
       videoRef.current.pause()
     }
-    const onSocketSeek = (data) => {
+    const onSocketSeek = (data: {
+      position: number
+      playing: boolean
+      playbackUpdatedAt: number
+      seqNum: number
+    }) => {
       dispatch(applySeek(data))
       if (!videoRef.current || !isActiveRef.current) return
 
@@ -214,10 +235,13 @@ export function useCinemaHallSync({
       }
     }
 
-    const onUserReady = (data) => {
+    const onUserReady = (data: {
+      userId: string
+      waitingFor: ParticipantsType[]
+    }) => {
       dispatch(applyWaitingFor(data.waitingFor))
     }
-    const onUserLeft = ({ userId }) => {
+    const onUserLeft = ({ userId }: { userId: string }) => {
       dispatch(removeParticipant(userId))
     }
     socket.on("cinema-hall:play", onSocketPlay)
@@ -355,7 +379,7 @@ export function useCinemaHallSync({
     socket.emit(
       "cinema-hall:sync",
       { cinemaHallId, groupId },
-      (res: { success: boolean; hall?: any }) => {
+      (res: { success: boolean; hall?: CinemaHallTargetType }) => {
         if (!res.success || !res.hall) return
         dispatch(setCinemaHall(res.hall))
 
@@ -363,6 +387,9 @@ export function useCinemaHallSync({
         // isRemoteActionRef.current = true
 
         const hall = res.hall
+
+        if (!hall.playbackUpdatedAt) return
+
         const realTime = hall.playing
           ? hall.currentTime + (Date.now() - hall.playbackUpdatedAt) / 1000
           : hall.currentTime
