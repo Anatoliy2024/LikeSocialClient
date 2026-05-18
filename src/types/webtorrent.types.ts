@@ -37,12 +37,7 @@ export interface WebTorrentConfig {
   webSeeds?: boolean
 }
 
-export type TorrentStatus =
-  | "idle"
-  | "connecting"
-  | "buffering"
-  | "ready"
-  | "error"
+export type TorrentStatus = "idle" | "connecting" | "ready" | "error"
 
 export interface AddTorrentOptions {
   announce?: string[]

@@ -12,6 +12,9 @@ const initialCinemaHallTarget = {
   playing: false,
   updatedAt: null,
   chat: [],
+  playbackUpdatedAt: null, // когда последний раз менялось состояние
+  seqNum: 0, // порядковый номер команды
+  waitingForUsers: [], // кто сейчас буферизует
 }
 
 const initialState: CinemaHallStateType = {
@@ -35,16 +38,13 @@ const cinemaHallSlice = createSlice({
       console.log("getAllCinemaHall state", action.payload)
       state.cinemaHalls = action.payload
     },
-    setPlaying(state, action) {
-      state.cinemaHallTarget.playing = action.payload
-    },
-    setCurrentTime(state, action) {
-      state.cinemaHallTarget.currentTime = action.payload
-    },
     clearCinemaHall(state) {
       state.cinemaHallTarget = {
         ...initialCinemaHallTarget,
-        file: { ...initialCinemaHallTarget.file }, // Копируем вложенный объект
+        file: { ...initialCinemaHallTarget.file }, // Копируем вложенный объект,
+        participants: [],
+        chat: [],
+        waitingForUsers: [],
       }
     },
     addChatMessage(state, action) {
@@ -53,24 +53,68 @@ const cinemaHallSlice = createSlice({
     getAllChatMessage(state, action) {
       state.cinemaHallTarget.chat = action.payload
     },
-    // participantFileReady(state, action) {
-    //   const p = state.cinemaHallTarget.participants.find(
-    //     (p) => p.userId === action.payload,
-    //   )
-    //   if (p) p.fileReady = true
-    // },
-    // addChatMessage(state, action) {
-    //   state.cinemaHallTarget.chat.push(action.payload)
-    // },
+
+    applyPlay(state, action) {
+      const { currentTime, playbackUpdatedAt, seqNum } = action.payload
+      state.cinemaHallTarget.playing = true
+      state.cinemaHallTarget.currentTime = currentTime
+      state.cinemaHallTarget.playbackUpdatedAt = playbackUpdatedAt
+      state.cinemaHallTarget.seqNum = seqNum
+      state.cinemaHallTarget.waitingForUsers = []
+    },
+
+    // Вызывается когда сервер прислал pause или force-pause
+    applyPause(state, action) {
+      const { currentTime, playbackUpdatedAt, seqNum, waitingFor } =
+        action.payload
+      state.cinemaHallTarget.playing = false
+      state.cinemaHallTarget.currentTime = currentTime
+      state.cinemaHallTarget.playbackUpdatedAt = playbackUpdatedAt
+      state.cinemaHallTarget.seqNum = seqNum
+      if (waitingFor !== undefined) {
+        state.cinemaHallTarget.waitingForUsers = waitingFor
+      }
+    },
+
+    // Вызывается когда сервер прислал seek
+    applySeek(state, action) {
+      const { position, playing, playbackUpdatedAt, seqNum } = action.payload
+      state.cinemaHallTarget.currentTime = position
+      state.cinemaHallTarget.playing = playing
+      state.cinemaHallTarget.playbackUpdatedAt = playbackUpdatedAt
+      state.cinemaHallTarget.seqNum = seqNum
+      state.cinemaHallTarget.waitingForUsers = []
+    },
+
+    // Кто-то буферизует / перестал буферизовать
+    applyWaitingFor(state, action) {
+      state.cinemaHallTarget.waitingForUsers = action.payload
+    },
+
+    removeParticipant(state, action) {
+      state.cinemaHallTarget.participants =
+        state.cinemaHallTarget.participants.filter(
+          (p) => p.userId !== action.payload,
+        )
+    },
   },
 })
 
 export const {
+  //work room
   setCinemaHall,
   getAllCinemaHall,
   clearCinemaHall,
+  //chat
   addChatMessage,
   getAllChatMessage,
+  //player
+  applyPlay,
+  applyPause,
+  applySeek,
+  applyWaitingFor,
+
+  removeParticipant,
 } = cinemaHallSlice.actions
 
 export default cinemaHallSlice.reducer
