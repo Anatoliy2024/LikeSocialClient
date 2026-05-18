@@ -650,7 +650,7 @@ export default function WatchPage() {
 
         <video
           ref={videoRef}
-          controls
+          // controls
           onPlay={handleNativePlay}
           onPause={handleNativePause}
           //           onPlay={handleNativePlay}
