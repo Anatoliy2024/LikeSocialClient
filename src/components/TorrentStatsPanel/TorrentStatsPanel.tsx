@@ -5,7 +5,7 @@ import style from "./TorrentStatsPanel.module.scss"
 import { TorrentInstance } from "@/types/webtorrent.types"
 
 interface TorrentStatsPanelProps {
-  torrentRef: React.RefObject<TorrentInstance> // или импортируй TorrentInstance
+  torrentRef: React.RefObject<TorrentInstance | null> // или импортируй TorrentInstance
   className?: string
   collapsed?: boolean // Сворачиваемая панель
 }
