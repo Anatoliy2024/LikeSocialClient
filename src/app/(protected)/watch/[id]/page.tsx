@@ -21,6 +21,7 @@ import {
 } from "@/types/webtorrent.types"
 import { ChatMovieHall } from "@/components/ChatMovieHall/ChatMovieHall"
 import { useCinemaHallSync } from "@/hooks/useCinemaHallSync"
+import { CinemaVideoPlayer } from "@/components/CinemaVideoPlayer/CinemaVideoPlayer"
 
 // type WebTorrentInstance = any
 // type TorrentInstance = any
@@ -151,6 +152,17 @@ export default function WatchPage() {
   const cinemaHallName = useAppSelector(
     (state) => state.cinemaHall.cinemaHallTarget.cinemaHallName,
   )
+
+  const playing = useAppSelector(
+    (state) => state.cinemaHall.cinemaHallTarget.playing,
+  )
+  const currentTime = useAppSelector(
+    (state) => state.cinemaHall.cinemaHallTarget.currentTime,
+  )
+  const magnet = useAppSelector(
+    (state) => state.cinemaHall.cinemaHallTarget.file.magnet,
+  )
+
   const username = useAppSelector((state) => state.auth.username)
   const avatar = useAppSelector((state) => state.auth.avatar)
 
@@ -550,21 +562,21 @@ export default function WatchPage() {
     }
   }, [])
 
-  const togglePiP = async () => {
-    if (!videoRef.current) return
+  // const togglePiP = async () => {
+  //   if (!videoRef.current) return
 
-    try {
-      if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture()
-      } else {
-        await videoRef.current.requestPictureInPicture()
-      }
-    } catch (err) {
-      console.error("❌ PiP ошибка:", err)
-      // Браузер может блокировать авто-запрос, если не было клика
-      alert("Чтобы видео играло в фоне, включите режим «Картинка в картинке»")
-    }
-  }
+  //   try {
+  //     if (document.pictureInPictureElement) {
+  //       await document.exitPictureInPicture()
+  //     } else {
+  //       await videoRef.current.requestPictureInPicture()
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ PiP ошибка:", err)
+  //     // Браузер может блокировать авто-запрос, если не было клика
+  //     alert("Чтобы видео играло в фоне, включите режим «Картинка в картинке»")
+  //   }
+  // }
 
   return (
     <>
@@ -647,8 +659,30 @@ export default function WatchPage() {
         // }}
       >
         <h1>{cinemaHallName}</h1>
-
-        <video
+        <CinemaVideoPlayer
+          // Реф
+          videoRef={videoRef}
+          className={style.video}
+          // Источник
+          src={blobUrlRef.current}
+          magnet={magnet}
+          // 👇 Нативные хендлеры (события видео)
+          onNativePlay={handleNativePlay}
+          onNativePause={handleNativePause}
+          onNativeSeeked={handleSeeked}
+          onNativeWaiting={handleWaiting}
+          onNativeCanPlay={handleCanPlay}
+          // 👇 Хендлеры действий пользователя (кнопки)
+          onUserPlay={handlePlayRequest}
+          onUserPause={handlePauseRequest}
+          onUserSeek={handleSeekRequest}
+          // 👇 Управляющие пропсы (от сервера)
+          externalPlaying={playing}
+          externalTime={currentTime}
+          // volume={volume}
+          // playbackRate={playbackRate}
+        />
+        {/* <video
           ref={videoRef}
           // controls
           onPlay={handleNativePlay}
@@ -673,7 +707,7 @@ export default function WatchPage() {
           {document.pictureInPictureElement
             ? "🔙 Вернуть видео"
             : "📺 Играть в фоне (PiP)"}
-        </button>
+        </button> */}
 
         {torrentStatus === "ready" && <div>Файл готов к скачке...</div>}
         {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>}

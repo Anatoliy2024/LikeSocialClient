@@ -29,74 +29,6 @@ interface PlayData {
   seqNum: number
 }
 
-const safePlay = async (video: HTMLVideoElement) => {
-  // 1. Проверка: есть ли источник?
-  if (!video.src) {
-    console.warn("⚠️ safePlay: video.src пуст, пропускаем play()")
-    return
-  }
-
-  // 👇 Спец-обработка для blob URL (локальные файлы хоста)
-  if (video.src.startsWith("blob:") && video.readyState < 2) {
-    console.log("⏳ safePlay: blob, ждём readyState >= 2...")
-
-    const onLoadedMetadata = () => {
-      video.removeEventListener("loadedmetadata", onLoadedMetadata)
-      // Рекурсивно пробуем сыграть, когда метаданные точно загружены
-      safePlay(video).catch(() => {})
-    }
-    video.addEventListener("loadedmetadata", onLoadedMetadata, { once: true })
-
-    // Страховка: если через 2 сек не загрузилось — пробуем играть всё равно
-    setTimeout(() => {
-      video.removeEventListener("loadedmetadata", onLoadedMetadata)
-      if (video.paused) safePlay(video).catch(() => {})
-    }, 2000)
-    return
-  }
-
-  // 2. Проверка: готово ли видео к воспроизведению?
-  // readyState: 0=ничего, 1=метаданные, 2=данные, 3=можно играть, 4=полностью
-  if (video.readyState < 2) {
-    console.warn(
-      `⚠️ safePlay: video не готов (readyState: ${video.readyState}), ждём canplay...`,
-    )
-
-    // Пробуем сыграть, когда видео будет готово (одноразовый слушатель)
-    const onCanPlay = () => {
-      video.removeEventListener("canplay", onCanPlay)
-      // Рекурсивно вызываем safePlay, теперь видео готово
-      safePlay(video).catch(() => {})
-    }
-    video.addEventListener("canplay", onCanPlay, { once: true })
-    return
-  }
-
-  // 3. Пытаемся воспроизвести
-  try {
-    console.log("🔊 Вызываем video.play()...")
-    await video.play()
-    console.log("✅ video.play() успешно")
-  } catch (e: unknown) {
-    if (e instanceof DOMException) {
-      // AbortError — это нормально, если play() прервали паузой
-      if (e.name === "AbortError") {
-        console.log("ℹ️ play() прерван (AbortError) — это ок")
-        return
-      }
-      // NotAllowedError — браузер заблокировал автоплей со звуком
-      if (e.name === "NotAllowedError") {
-        console.warn(
-          "⚠️ Автоплей заблокирован браузером (попробуй muted или клик пользователя)",
-        )
-        return
-      }
-      console.error("❌ Ошибка play():", e.name, e.message)
-    }
-    console.error("❌ Неизвестная ошибка play():", e)
-  }
-}
-
 export function useCinemaHallSync({
   cinemaHallId,
   groupId,
@@ -143,6 +75,79 @@ export function useCinemaHallSync({
   // Вызови это из компонента после setCinemaHall
   const activate = () => {
     isActiveRef.current = true
+  }
+
+  const safePlay = async (video: HTMLVideoElement) => {
+    // 1. Проверка: есть ли источник?
+    if (!video.src) {
+      console.warn("⚠️ safePlay: video.src пуст, пропускаем play()")
+      return
+    }
+
+    if (!playingRef.current) {
+      console.log("🚫 safePlay: сервер говорит пауза, пропускаем play()")
+      return
+    }
+
+    // 👇 Спец-обработка для blob URL (локальные файлы хоста)
+    if (video.src.startsWith("blob:") && video.readyState < 2) {
+      console.log("⏳ safePlay: blob, ждём readyState >= 2...")
+
+      const onLoadedMetadata = () => {
+        video.removeEventListener("loadedmetadata", onLoadedMetadata)
+        // Рекурсивно пробуем сыграть, когда метаданные точно загружены
+        safePlay(video).catch(() => {})
+      }
+      video.addEventListener("loadedmetadata", onLoadedMetadata, { once: true })
+
+      // Страховка: если через 2 сек не загрузилось — пробуем играть всё равно
+      setTimeout(() => {
+        video.removeEventListener("loadedmetadata", onLoadedMetadata)
+        if (video.paused) safePlay(video).catch(() => {})
+      }, 2000)
+      return
+    }
+
+    // 2. Проверка: готово ли видео к воспроизведению?
+    // readyState: 0=ничего, 1=метаданные, 2=данные, 3=можно играть, 4=полностью
+    if (video.readyState < 2) {
+      console.warn(
+        `⚠️ safePlay: video не готов (readyState: ${video.readyState}), ждём canplay...`,
+      )
+
+      // Пробуем сыграть, когда видео будет готово (одноразовый слушатель)
+      const onCanPlay = () => {
+        video.removeEventListener("canplay", onCanPlay)
+        // Рекурсивно вызываем safePlay, теперь видео готово
+        safePlay(video).catch(() => {})
+      }
+      video.addEventListener("canplay", onCanPlay, { once: true })
+      return
+    }
+
+    // 3. Пытаемся воспроизвести
+    try {
+      console.log("🔊 Вызываем video.play()...")
+      await video.play()
+      console.log("✅ video.play() успешно")
+    } catch (e: unknown) {
+      if (e instanceof DOMException) {
+        // AbortError — это нормально, если play() прервали паузой
+        if (e.name === "AbortError") {
+          console.log("ℹ️ play() прерван (AbortError) — это ок")
+          return
+        }
+        // NotAllowedError — браузер заблокировал автоплей со звуком
+        if (e.name === "NotAllowedError") {
+          console.warn(
+            "⚠️ Автоплей заблокирован браузером (попробуй muted или клик пользователя)",
+          )
+          return
+        }
+        console.error("❌ Ошибка play():", e.name, e.message)
+      }
+      console.error("❌ Неизвестная ошибка play():", e)
+    }
   }
 
   // --- Входящие события от сервера ---
@@ -498,6 +503,9 @@ export function useCinemaHallSync({
       console.log("🚫 Программный seek, не отправляем на сервер")
       return
     }
+
+    // 2. Если пауза — не отправляем seek на сервер
+    if (!playingRef.current) return
 
     if (!isActiveRef.current) return
     if (isCommandPendingRef.current) {
