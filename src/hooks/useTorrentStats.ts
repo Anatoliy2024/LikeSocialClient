@@ -1,5 +1,5 @@
 // hooks/useTorrentStats.ts
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { TorrentInstance } from "@/types/webtorrent.types"
 
 export interface WireStats {
@@ -23,7 +23,8 @@ export interface TorrentStats {
 }
 
 // Безопасный геттер для разных версий WebTorrent
-const getVal = (obj: any, key: string, fallback = 0) => {
+// @ts-ignore
+const getVal = (obj, key: string, fallback = 0) => {
   if (!obj) return fallback
   const val = obj[key]
   return typeof val === "function" ? val() : val || fallback
@@ -51,7 +52,8 @@ export function useTorrentStats(
       if (!torrent) return // Пока торрент не назначен — пропускаем тик
 
       const wires: WireStats[] =
-        torrent.wires?.map((wire: any) => ({
+        // @ts-ignore
+        torrent.wires?.map((wire) => ({
           peerId: wire.peerId || "unknown",
           type: wire.type || "webrtc",
           downloaded: wire.downloaded || 0,
