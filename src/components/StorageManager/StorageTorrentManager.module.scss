@@ -1,0 +1,33 @@
+.StorageTorrentManager {
+  max-width: 500px;
+  min-width: 300px;
+  border-top: 1px solid white;
+  border-radius: 12px;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  h3 {
+    font-size: 1.8rem;
+  }
+  button {
+    padding: 5px 10px;
+    background: rgb(65, 59, 145);
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    &:hover {
+      background: rgba(65, 59, 145, 0.282);
+      color: white;
+    }
+    &:active {
+      background: rgba(65, 59, 145, 0.008);
+      color: white;
+    }
+  }
+}

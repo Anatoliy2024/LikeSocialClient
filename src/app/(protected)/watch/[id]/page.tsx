@@ -19,41 +19,12 @@ import {
   TorrentStatus,
   WebTorrentInstance,
 } from "@/types/webtorrent.types"
-import { ChatMovieHall } from "@/components/ChatMovieHall/ChatMovieHall"
+
 import { useCinemaHallSync } from "@/hooks/useCinemaHallSync"
-import { CinemaVideoPlayer } from "@/components/CinemaVideoPlayer/CinemaVideoPlayer"
+
 import { TorrentStatsPanel } from "@/components/TorrentStatsPanel/TorrentStatsPanel"
+import { VideoAndChatContainer } from "@/components/VideoAndChatContainer/VideoAndChatContainer"
 
-// type WebTorrentInstance = any
-// type TorrentInstance = any
-
-// // ─── Вспомогалка: ждём пока clientRef заполнится ─────────────────────────────
-// function waitForClient(
-//   clientRef: React.RefObject<WebTorrentInstance | null>,
-//   timeoutMs = 10000,
-// ): Promise<WebTorrentInstance> {
-//   return new Promise((resolve, reject) => {
-//     let cancelled = false // ← Флаг отмены
-
-//     if (clientRef.current) return resolve(clientRef.current)
-//     const start = Date.now()
-//     const interval = setInterval(() => {
-//       if (cancelled) return // ← Проверяем флаг
-//       if (clientRef.current) {
-//         clearInterval(interval)
-//         resolve(clientRef.current)
-//       } else if (Date.now() - start > timeoutMs) {
-//         clearInterval(interval)
-//         reject(new Error("WebTorrent client timeout"))
-//       }
-//     }, 100)
-
-//     // Возвращаем функцию очистки (опционально, если вызывающий код поддержит)
-//     return () => {
-//       cancelled = true
-//     }
-//   })
-// }
 // Исправление: передавать AbortSignal
 function waitForClient(
   clientRef: React.RefObject<WebTorrentInstance | null>,
@@ -400,27 +371,6 @@ export default function WatchPage() {
     }
   }
 
-  // // ─── Подключение к торренту для зрителя ─────────────────────────────────────
-  // const connectMagnet = async (client: WebTorrentInstance, magnet: string) => {
-  //   console.log("connectMagnet:", magnet)
-
-  //   // Не добавляем дважды
-  //   const existing = await client.get(magnet)
-  //   const torrent =
-  //     existing ??
-  //     client.add(magnet, {
-  //       announce: TRACKERS,
-  //     })
-
-  //   // ✅ Если торрент уже готов — сразу настраиваем плеер
-  //   if (torrent.ready) {
-  //     setupTorrentPlayer(torrent)
-  //   } else {
-  //     // Иначе ждём ready
-  //     torrent.on("ready", () => setupTorrentPlayer(torrent))
-  //   }
-  // }
-
   const connectMagnet = async (client: WebTorrentInstance, magnet: string) => {
     console.log("connectMagnet:", magnet)
 
@@ -563,22 +513,6 @@ export default function WatchPage() {
     }
   }, [])
 
-  // const togglePiP = async () => {
-  //   if (!videoRef.current) return
-
-  //   try {
-  //     if (document.pictureInPictureElement) {
-  //       await document.exitPictureInPicture()
-  //     } else {
-  //       await videoRef.current.requestPictureInPicture()
-  //     }
-  //   } catch (err) {
-  //     console.error("❌ PiP ошибка:", err)
-  //     // Браузер может блокировать авто-запрос, если не было клика
-  //     alert("Чтобы видео играло в фоне, включите режим «Картинка в картинке»")
-  //   }
-  // }
-
   return (
     <>
       {!cinemaHallName && (
@@ -645,23 +579,10 @@ export default function WatchPage() {
       )}
 
       {/* {cinemaHallName && ( */}
-      <div
-        className={style.watchPage}
-        // style={{
-        //   width: "100%",
-        //   display:
-        //     torrentStatus === "buffering" || torrentStatus === "ready"
-        //       ? "visible"
-        //       : "hidden",
-        //   height:
-        //     torrentStatus === "buffering" || torrentStatus === "ready"
-        //       ? "auto"
-        //       : "0",
-        // }}
-      >
+      <div className={style.watchPage}>
         <h1>{cinemaHallName}</h1>
-        <CinemaVideoPlayer
-          // Реф
+        <VideoAndChatContainer
+          // CinemaVideoPlayer
           videoRef={videoRef}
           className={style.video}
           // Источник
@@ -680,35 +601,55 @@ export default function WatchPage() {
           // 👇 Управляющие пропсы (от сервера)
           externalPlaying={playing}
           externalTime={currentTime}
+          //chat
+
           // volume={volume}
           // playbackRate={playbackRate}
-        />
-        {/* <video
-          ref={videoRef}
-          // controls
-          onPlay={handleNativePlay}
-          onPause={handleNativePause}
-          //           onPlay={handleNativePlay}
-          // onPause={handleNativePause}
 
-          onSeeked={handleSeeked}
-          onWaiting={handleWaiting}
-          onCanPlay={handleCanPlay}
+          //ChatMovieHall
+
+          cinemaHallId={id}
+          groupId={groupId}
+          socket={socket}
         />
-        <button onClick={handlePlayRequest}>▶️ Играть</button>
-        <button onClick={handlePauseRequest}>⏸ Пауза</button>
-        <button
-          onClick={() =>
-            handleSeekRequest((videoRef.current?.currentTime || 0) + 30)
-          }
-        >
-          ⏩ +30с
-        </button>
-        <button onClick={togglePiP} style={{ marginRight: 8 }}>
-          {document.pictureInPictureElement
-            ? "🔙 Вернуть видео"
-            : "📺 Играть в фоне (PiP)"}
-        </button> */}
+        {/* <div className={style.watchPage__container}>
+          <CinemaVideoPlayer
+            // Реф
+            videoRef={videoRef}
+            className={style.video}
+            // Источник
+            src={blobUrlRef.current}
+            magnet={magnet}
+            // 👇 Нативные хендлеры (события видео)
+            onNativePlay={handleNativePlay}
+            onNativePause={handleNativePause}
+            onNativeSeeked={handleSeeked}
+            onNativeWaiting={handleWaiting}
+            onNativeCanPlay={handleCanPlay}
+            // 👇 Хендлеры действий пользователя (кнопки)
+            onUserPlay={handlePlayRequest}
+            onUserPause={handlePauseRequest}
+            onUserSeek={handleSeekRequest}
+            // 👇 Управляющие пропсы (от сервера)
+            externalPlaying={playing}
+            externalTime={currentTime}
+            //chat
+            handleShowChat={handleShowChat}
+            handleCloseChat={handleCloseChat}
+            showChat={showChat}
+            handleShowFullscreenVideo={handleShowFullscreenVideo}
+            handleCloseFullscreenVideo={handleCloseFullscreenVideo}
+            // volume={volume}
+            // playbackRate={playbackRate}
+          />
+          <ChatMovieHall
+            showChat={showChat}
+            fullscreenVideo={fullscreenVideo}
+            cinemaHallId={id}
+            groupId={groupId}
+            socket={socket}
+          />
+        </div> */}
 
         {torrentStatus === "ready" && <div>Файл готов к скачке...</div>}
         {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>}
@@ -719,14 +660,11 @@ export default function WatchPage() {
         )}
         {torrentStatus === "error" && <p>❌ Ошибка подключения.</p>}
 
-        <ChatMovieHall cinemaHallId={id} groupId={groupId} socket={socket} />
-        {process.env.NODE_ENV === "development" && (
-          <TorrentStatsPanel
-            torrentRef={torrentRef}
-            className={style.statsPanel}
-            collapsed={true} // По умолчанию свёрнута
-          />
-        )}
+        <TorrentStatsPanel
+          torrentRef={torrentRef}
+          className={style.statsPanel}
+          collapsed={true} // По умолчанию свёрнута
+        />
       </div>
       {/* )} */}
     </>
