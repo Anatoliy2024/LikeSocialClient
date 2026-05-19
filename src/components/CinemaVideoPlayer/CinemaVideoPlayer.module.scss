@@ -1,0 +1,101 @@
+.player {
+  flex: 0 0 70%;
+  position: relative;
+  display: flex; // 👈 Чтобы видео внутри тоже растягивалось
+  flex-direction: column;
+  min-height: 0; // 🔑 Обязательно!
+  border-radius: 12px;
+  overflow: hidden;
+  // 👇 Добавь это для центрирования видео любого формата:
+  align-items: center; // Центрирует по горизонтали
+  justify-content: center; // Центрирует по вертикали
+  background: #000; // Фон для пустых областей
+
+  // 👇 Опционально: тёмный фон с градиентом для эстетики:
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 40%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  video {
+    width: 100%;
+    height: 100%; // 👈 Видео занимает всю высоту контейнера
+    object-fit: contain; // 👈 Чтобы видео не обрезалось
+    display: block;
+    margin: auto;
+    z-index: 1;
+  }
+  &__controls {
+    position: absolute;
+    width: 100%;
+    // display: flex;
+    // flex-direction: column;
+    padding: 10px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.362);
+    color: white;
+    transition: 0.3s;
+    user-select: none;
+    z-index: 2;
+  }
+  &__controlsHidden {
+    opacity: 0;
+  }
+  &__controlsTopLine {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+    // width: 100%;
+  }
+  &__progressBar {
+    min-width: 97%;
+    cursor: pointer;
+  }
+  &__controlsBottomLine {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    // justify-content: space-between;
+  }
+  &__controlsMainControls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  &__controlsExtraControls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  &__controlsItem {
+    padding: 5px;
+    border-radius: 20px;
+    transition: 0.3s;
+    cursor: pointer;
+    &:hover {
+      background: rgb(140, 135, 205);
+    }
+  }
+  &__volumeControl {
+    input {
+      cursor: pointer;
+    }
+  }
+}
+.fullscreen {
+  flex: 1 1 auto !important; // 🔑 Занимает ВСЁ доступное место
+  width: 100% !important;
+  height: 100% !important;
+  justify-content: stretch;
+  align-items: stretch;
+}

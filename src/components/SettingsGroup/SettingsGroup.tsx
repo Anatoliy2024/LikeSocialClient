@@ -191,7 +191,7 @@ export function SettingsGroup() {
         Back
       </Link>
       <div className={style.settingsGroup__content}>
-        <div>
+        <div className={style.settingsGroup__avatarWrapperContainer}>
           <div
             className={style.settingsGroup__avatarWrapper}
             onClick={handleShowChangeAvatarModal}
@@ -249,31 +249,44 @@ export function SettingsGroup() {
             </ul>
           </div>
         </div>
-        <div>
+        <div className={style.cinemaHall}>
           <ButtonMenu onClick={handleLinkMovieHall}>
             Создать видеозал
           </ButtonMenu>
           <StorageTorrentManager />
-          <div>
+          <div className={style.cinemaHall__list}>
+            <h3>Список доступных залов:</h3>
             {cinemaHalls.length > 0 ? (
               <ul>
                 {cinemaHalls.map((item) => (
-                  <li key={item.cinemaHallId}>
+                  <li
+                    key={item.cinemaHallId}
+                    className={style.cinemaHall__item}
+                  >
                     <Link href={LinkMovieHallRoom(item.cinemaHallId as string)}>
-                      <span>Названеи комнаты:{item.cinemaHallName}</span>
-                      <span>
-                        Количество участников:{item.participants.length}
-                      </span>
-                      <span>
-                        Размер файла:
-                        {(item.file.size / 1024 / 1024 / 1024).toFixed(2)} ГБ
-                      </span>
+                      <div className={style.cinemaHall__itemName}>
+                        <span>Название:</span>
+                        <span>{item.cinemaHallName}</span>
+                      </div>
+                      <div>
+                        <div>
+                          <span>Участники:</span>
+                          <span>{item.participants.length}</span>
+                        </div>
+                        <div>
+                          <span> Размер:</span>
+                          <span>
+                            {(item.file.size / 1024 / 1024 / 1024).toFixed(2)}{" "}
+                            ГБ
+                          </span>
+                        </div>
+                      </div>
                     </Link>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div>Список залов пуст</div>
+              <div>Пусто...</div>
             )}
           </div>
         </div>

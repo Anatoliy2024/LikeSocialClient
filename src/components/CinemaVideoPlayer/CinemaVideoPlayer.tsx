@@ -1,8 +1,9 @@
 // components/CinemaVideoPlayer/CinemaVideoPlayer.tsx
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import style from "./CinemaVideoPlayer.module.scss"
+import { formatTime } from "@/utils/formatTime"
 
-interface CinemaVideoPlayerProps {
+export interface CinemaVideoPlayerProps {
   // 👇 Видео-источники
   src: string | null
   magnet: string | null
@@ -35,14 +36,19 @@ interface CinemaVideoPlayerProps {
 
   // 👇 UI-пропсы
   className?: string
-}
 
-// Вспомогательная функция (можно вынести в utils)
-const formatTime = (seconds: number): string => {
-  if (!seconds || isNaN(seconds)) return "0:00"
-  const mins = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
-  return `${mins}:${secs.toString().padStart(2, "0")}`
+  //chat
+  // handleShowChat: () => void
+  // handleCloseChat: () => void
+  // showChat: boolean
+  // isCustomFullscreen: boolean
+  // handleShowFullscreenVideo: () => void
+  // handleCloseFullscreenVideo: () => void
+  // 👇 ЗАМЕНИ старые пропсы на эти:
+  toggleFullscreen?: () => void // Функция для кнопки
+  isFullscreen?: boolean // Реальный статус от родителя
+  showChat?: boolean // Показывать ли чат
+  onToggleChat?: () => void // Переключатель чата
 }
 
 export function CinemaVideoPlayer({
@@ -65,8 +71,14 @@ export function CinemaVideoPlayer({
   externalPlaying,
   externalTime,
   volume = 100,
+
+  //chat
+
+  toggleFullscreen, // Функция для кнопки
+  isFullscreen, // Реальный статус от родителя
+  showChat, // Показывать ли чат
+  onToggleChat, // Переключатель чата
   // playbackRate = 1,
-  className,
 }: CinemaVideoPlayerProps) {
   // Локальные стейты только для UI контролов
   const [localVolume, setLocalVolume] = useState(volume)
@@ -75,13 +87,17 @@ export function CinemaVideoPlayer({
   const [duration, setDuration] = useState(0)
   const [isMuted, setIsMuted] = useState(false)
 
+  const [showValue, setShowValue] = useState(false)
+  const [showControl, setShowControl] = useState(false)
+  // В начале компонента, рядом с другими useState/useRef:
+  const playerContainerRef = useRef<HTMLDivElement>(null)
+
+  // Переключатель
+
   // 👇 Синхронизация внешних пропсов с локальным стейтом
   useEffect(() => {
     setLocalVolume(volume)
   }, [volume])
-  // useEffect(() => {
-  //   setLocalRate(playbackRate)
-  // }, [playbackRate])
 
   // 👇 Применение внешних команд к видео (от сервера)
   useEffect(() => {
@@ -126,14 +142,6 @@ export function CinemaVideoPlayer({
       }
     }
   }
-
-  // const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const rate = Number(e.target.value)
-  //   setLocalRate(rate)
-  //   if (videoRef.current) {
-  //     videoRef.current.playbackRate = rate
-  //   }
-  // }
 
   const togglePiP = async () => {
     if (!videoRef.current) return
@@ -182,7 +190,10 @@ export function CinemaVideoPlayer({
   }
 
   return (
-    <div className={`${style.player} ${className || ""}`}>
+    <div
+      className={`${style.player} ${isFullscreen ? style.fullscreen : ""}`}
+      ref={playerContainerRef}
+    >
       {/* 👇 Видео с правильными хендлерами */}
       <video
         ref={videoRef} // 👇 Реф приходит из WatchPage
@@ -200,78 +211,110 @@ export function CinemaVideoPlayer({
       />
 
       {/* 👇 Кастомные контролы */}
-      <div className={style.controls}>
+      <div
+        className={`${style.player__controls} ${!showControl ? style.player__controlsHidden : ""}`}
+        onMouseEnter={() => setShowControl(true)}
+        onMouseLeave={() => setShowControl(false)}
+      >
         {/* Кнопки плей/пауза (действия пользователя) */}
-        <div className={style.progressControl}>
+        <div className={style.player__controlsTopLine}>
           <input
             type="range"
             min={0}
             max={100}
             value={progress}
             onChange={handleProgressChange}
-            className={style.progressBar}
+            className={style.player__progressBar}
             step={0.1}
           />
-          {/* Опционально: время */}
-          <span className={style.timeDisplay}>
-            {formatTime(videoRef.current?.currentTime || 0)} /{" "}
-            {formatTime(duration)}
-          </span>
         </div>
-
-        <div className={style.mainControls}>
-          <button onClick={onUserPlay}>▶️</button>
-          <button onClick={onUserPause}>⏸</button>
-        </div>
-
-        {/* Громкость */}
-        <div className={style.volumeControl}>
-          <button
-            onClick={() => {
-              if (videoRef.current) {
-                videoRef.current.muted = !videoRef.current.muted
-                setIsMuted(!isMuted)
+        <div className={style.player__controlsBottomLine}>
+          <div className={style.player__controlsMainControls}>
+            <div className={style.player__controlsItem}>
+              {!externalPlaying && <button onClick={onUserPlay}>▶️</button>}
+              {externalPlaying && <button onClick={onUserPause}>⏸</button>}
+            </div>
+            {/* Громкость */}
+            <div
+              className={`${style.player__volumeControl} ${style.player__controlsItem}`}
+              onMouseEnter={() => setShowValue(true)}
+              onMouseLeave={() => setShowValue(false)}
+            >
+              <button
+                onClick={() => {
+                  if (videoRef.current) {
+                    videoRef.current.muted = !videoRef.current.muted
+                    setIsMuted(!isMuted)
+                  }
+                }}
+              >
+                {isMuted || localVolume === 0 ? "🔇" : "🔊"}
+              </button>
+              {showValue && (
+                <input
+                  // className={style.player__controlsItem}
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={localVolume}
+                  onChange={handleVolumeChange}
+                />
+              )}
+            </div>
+            <div className={style.progressControl}>
+              {/* Опционально: время */}
+              <span className={style.timeDisplay}>
+                {formatTime(videoRef.current?.currentTime || 0)} /{" "}
+                {formatTime(duration)}
+              </span>
+            </div>
+            <button
+              className={style.player__controlsItem}
+              onClick={() =>
+                onUserSeek?.((videoRef.current?.currentTime || 0) + 30)
               }
-            }}
+            >
+              ⏩ +30с
+            </button>
+          </div>
+
+          {/* Кнопки дополнительных действий */}
+          <div
+            className={style.player__controlsExtraControls}
+            title="Окно в окне"
           >
-            {isMuted || localVolume === 0 ? "🔇" : "🔊"}
-          </button>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={localVolume}
-            onChange={handleVolumeChange}
-          />
-        </div>
+            {isFullscreen && (
+              <div>
+                <button
+                  style={{ background: showChat ? "rgba(255,0,0,0.3)" : "" }}
+                  onClick={onToggleChat}
+                >
+                  💬 {showChat ? "Скрыть" : "Показать"}
+                </button>
+              </div>
+            )}
 
-        {/* Скорость
-        <div className={style.rateControl}>
-          <span>⚡</span>
-          <input
-            type="range"
-            min={0.5}
-            max={2}
-            step={0.1}
-            value={localRate}
-            onChange={handleRateChange}
-          />
-          <span>{localRate.toFixed(1)}x</span>
-        </div> */}
-
-        {/* Кнопки дополнительных действий */}
-        <div className={style.extraControls}>
-          <button onClick={togglePiP}>
-            {document.pictureInPictureElement ? "🔙 Вернуть" : "📺 PiP"}
-          </button>
-
-          <button
-            onClick={() =>
-              onUserSeek?.((videoRef.current?.currentTime || 0) + 30)
-            }
-          >
-            ⏩ +30с
-          </button>
+            <div>
+              <button
+                onClick={togglePiP}
+                className={style.player__controlsItem}
+              >
+                {document.pictureInPictureElement ? "🔙 Вернуть" : "📺 "}
+              </button>
+            </div>
+            <div>
+              <button
+                onClick={toggleFullscreen}
+                className={style.player__controlsItem}
+                title={
+                  isFullscreen ? "Выйти из полноэкранного" : "На весь экран"
+                }
+              >
+                {isFullscreen ? "⛶" : "⛶"}
+                {/* Замени иконки на свои, например: 🔲 / ⛶ */}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

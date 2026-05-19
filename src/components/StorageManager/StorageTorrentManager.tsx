@@ -9,6 +9,8 @@ import {
   TorrentFolder,
   formatBytes,
 } from "@/lib/storageTorrent"
+import style from "./StorageTorrentManager.module.scss"
+import ButtonMenu from "../ui/button/Button"
 
 export function StorageTorrentManager() {
   const [folders, setFolders] = useState<TorrentFolder[]>([])
@@ -41,13 +43,14 @@ export function StorageTorrentManager() {
   if (loading) return <p>Подсчёт...</p>
 
   return (
-    <div>
+    <div className={style.StorageTorrentManager}>
+      <h3>Хранилище файлов</h3>
       <div>
         <span>Занято: {totalSize}</span>
         <button onClick={handleClearAll}>🗑 Очистить всё</button>
       </div>
 
-      {folders.length === 0 && <p>Хранилище пустое</p>}
+      {folders.length === 0 && <p>Пусто...</p>}
 
       {folders.map((folder) => (
         <div key={folder.name}>
