@@ -27,6 +27,7 @@ export function ChatMovieHall({
   isFullscreen,
 }: ChatMovieHallType) {
   const chat = useAppSelector((state) => state.cinemaHall.cinemaHallTarget.chat)
+  const userId = useAppSelector((state) => state.auth.userId)
   const dispatch = useAppDispatch()
   const chatListRef = useRef<HTMLUListElement>(null)
   // 👇 Этот эффект срабатывает каждый раз, когда меняется массив 'chat'
@@ -54,7 +55,9 @@ export function ChatMovieHall({
 
     const handleGetNewMessage = (data: { message: ChatMessageType }): void => {
       console.log("Пришло новое сообщение ", data.message)
-      speakText(data.message.text)
+      if (userId !== data.message.userId) {
+        speakText(data.message.text)
+      }
       dispatch(addChatMessage(data.message))
     }
     socket.on("cinema-hall:new-message", handleGetNewMessage)
@@ -75,7 +78,7 @@ export function ChatMovieHall({
             {/* <span>{getHoursMinutes(message.dateAt)}</span> */}
             <div className={style.ChatMovieHall__imgContainer}>
               <CloudinaryImage
-                src={message.avatar ? message.avatar : "/1.png"}
+                src={message.avatar ? message.avatar : "/images/anonym.jpeg"}
                 alt="avatar"
                 width={70}
                 height={70}
