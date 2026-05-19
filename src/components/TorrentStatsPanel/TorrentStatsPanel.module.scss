@@ -1,0 +1,165 @@
+// components/TorrentStatsPanel/TorrentStatsPanel.module.scss
+
+.panel {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  color: #eee;
+  max-width: 400px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 12px;
+
+  h4 {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .toggleBtn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .label {
+    color: #888;
+    font-size: 11px;
+  }
+
+  .value {
+    font-weight: 600;
+    color: #fff;
+  }
+}
+
+.limiters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: #222;
+  border-radius: 4px;
+}
+
+.limiter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  label {
+    font-size: 11px;
+    color: #aaa;
+    min-width: 140px;
+  }
+
+  input {
+    width: 70px;
+    padding: 4px 8px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+  }
+
+  button {
+    padding: 4px 12px;
+    background: #4a69bd;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 11px;
+    cursor: pointer;
+
+    &:hover {
+      background: #3c5aa6;
+    }
+  }
+}
+
+.peersSection {
+  border-top: 1px solid #333;
+  padding-top: 12px;
+
+  h5 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #ccc;
+  }
+}
+
+.peersList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.peerItem {
+  padding: 8px;
+  background: #222;
+  border-radius: 4px;
+  border-left: 3px solid #4a69bd;
+}
+
+.peerHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+
+  .peerId {
+    font-family: monospace;
+    color: #888;
+  }
+
+  .peerType {
+    font-size: 10px;
+    color: #666;
+    background: #333;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+}
+
+.peerStats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.peerProgress {
+  small {
+    color: #666;
+  }
+}

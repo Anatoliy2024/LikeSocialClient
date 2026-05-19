@@ -29,6 +29,50 @@ interface PlayData {
   seqNum: number
 }
 
+// 👇 1. Проверяет, загрузил ли браузер данные видео для текущей позиции воспроизведения
+const isCurrentTimeBuffered = (video: HTMLVideoElement): boolean => {
+  const time = video.currentTime
+  for (let i = 0; i < video.buffered.length; i++) {
+    const start = video.buffered.start(i)
+    const end = video.buffered.end(i)
+    // Если текущее время попадает в любой загруженный диапазон — данные есть
+    if (time >= start && time <= end) return true
+  }
+  return false
+}
+// 👇 Проверяет, есть ли буфер хотя бы на N секунд вперёд от текущей позиции
+const hasBufferHeadroom = (
+  video: HTMLVideoElement,
+  minSeconds = 5,
+): boolean => {
+  const currentTime = video.currentTime
+  for (let i = 0; i < video.buffered.length; i++) {
+    const end = video.buffered.end(i)
+    // Если конец любого буфера хотя бы на minSeconds впереди — ок
+    if (end - currentTime >= minSeconds) {
+      return true
+    }
+  }
+  return false
+}
+
+// 👇 2. Проверяет, скачал ли WebTorrent достаточно байтов файла для текущей секунды
+const hasTorrentHeadroom = (
+  video: HTMLVideoElement,
+  torrent: TorrentInstance, // или импортируй TorrentInstance из своих типов
+  minSeconds = 5,
+  marginBytes = 1 * 1024 * 1024, // 2MB запас на опережение
+): boolean => {
+  if (!torrent || !video.duration || !isFinite(video.duration)) return false
+
+  // На какой секунде мы + запас
+  const targetSecond = Math.min(video.duration, video.currentTime + minSeconds)
+  const progressRatio = targetSecond / video.duration
+  const neededBytes = Math.floor(torrent.length * progressRatio) + marginBytes
+
+  return torrent.downloaded >= neededBytes
+}
+
 export function useCinemaHallSync({
   cinemaHallId,
   groupId,
@@ -49,6 +93,8 @@ export function useCinemaHallSync({
   const playingRef = useRef(playing)
   const isCommandPendingRef = useRef(false)
   const isProgrammaticSeekRef = useRef(false)
+  const readyCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const justSentReadyRef = useRef(false)
 
   // true = команда пришла с сервера, не эхоим обратно
   // const isRemoteActionRef = useRef(false)
@@ -76,6 +122,46 @@ export function useCinemaHallSync({
   const activate = () => {
     isActiveRef.current = true
   }
+
+  // 👇 Функция запуска проверки
+  const startReadyCheck = () => {
+    if (readyCheckIntervalRef.current) return // Уже запущен
+
+    readyCheckIntervalRef.current = setInterval(() => {
+      const video = videoRef.current
+      const torrent = torrentRef?.current
+
+      if (!video || !torrent || !isActiveRef.current) return
+
+      // 👇 Комбинированная проверка:
+      const isReady =
+        video.readyState >= 3 && // HAVE_FUTURE_DATA
+        isCurrentTimeBuffered(video) && // Текущая позиция в буфере
+        hasBufferHeadroom(video, 5) && // 👈 НОВ: +5 секунд вперёд
+        hasTorrentHeadroom(video, torrent, 5) // 👈 НОВ: торрент скачал +5 секунд
+
+      if (isReady) {
+        console.log("✅ Все проверки пройдены — отправляем ready")
+        stopReadyCheck()
+        emitReady() // 👈 Отправляем на сервер!
+      }
+    }, 500) // Проверяем каждые 0.5 сек
+  }
+
+  // 👇 Функция остановки проверки
+  const stopReadyCheck = () => {
+    if (readyCheckIntervalRef.current) {
+      clearInterval(readyCheckIntervalRef.current)
+      readyCheckIntervalRef.current = null
+    }
+  }
+
+  // 👇 Не забудь очистить интервал при размонтировании
+  useEffect(() => {
+    return () => {
+      stopReadyCheck()
+    }
+  }, [])
 
   const safePlay = async (video: HTMLVideoElement) => {
     // 1. Проверка: есть ли источник?
@@ -279,6 +365,20 @@ export function useCinemaHallSync({
       const actualTime = videoRef.current.currentTime
       const diff = expectedTime - actualTime
 
+      // 👇 НОВОЕ: Если отстал больше чем на 10 секунд — синхронизируемся СРАЗУ
+      if (Math.abs(diff) > 10) {
+        console.log(
+          `🚀 Большой рассинхрон (${diff.toFixed(1)}с) — немедленная синхронизация`,
+        )
+        isProgrammaticSeekRef.current = true
+        videoRef.current.currentTime = expectedTime
+        // Не меняем playbackRate, пусть сразу играет с нужной позиции
+        setTimeout(() => {
+          isProgrammaticSeekRef.current = false
+        }, 100)
+        return
+      }
+
       if (Math.abs(diff) > 2) {
         isProgrammaticSeekRef.current = true // 👈 Добавь
         // isRemoteActionRef.current = true
@@ -313,10 +413,17 @@ export function useCinemaHallSync({
     socket.emit(
       "cinema-hall:play",
       { cinemaHallId, groupId, seqNum: seqNumRef.current },
-      (res: { success: boolean; error?: string }) => {
+      (res: {
+        success: boolean
+        error?: string
+        waitingForUsers: string[]
+      }) => {
         isCommandPendingRef.current = false
         console.log("📥 emitPlay callback:", res)
-        if (!res.success) console.warn("play rejected:", res.error)
+        if (!res.success) {
+          console.warn("play rejected:", res.error)
+          console.log("waitingForUsers", res.waitingForUsers)
+        }
       },
     )
   }
@@ -369,6 +476,9 @@ export function useCinemaHallSync({
 
   const emitReady = () => {
     if (!socket || !isActiveRef.current) return
+
+    justSentReadyRef.current = true
+
     socket.emit(
       "cinema-hall:ready",
       { cinemaHallId, groupId },
@@ -377,6 +487,11 @@ export function useCinemaHallSync({
         if (!res.success) console.warn("play rejected:", res.error)
       },
     )
+
+    // 👇 Игнорируем onWaiting следующие 800мс (время на "раскачку" видео)
+    setTimeout(() => {
+      justSentReadyRef.current = false
+    }, 800)
   }
 
   const emitSync = useCallback(() => {
@@ -388,11 +503,12 @@ export function useCinemaHallSync({
         if (!res.success || !res.hall) return
         dispatch(setCinemaHall(res.hall))
 
+        playingRef.current = res.hall.playing
+
         if (!videoRef.current) return
         // isRemoteActionRef.current = true
 
         const hall = res.hall
-
         if (!hall.playbackUpdatedAt) return
 
         const realTime = hall.playing
@@ -533,48 +649,77 @@ export function useCinemaHallSync({
   //     isBufferingRef.current = false
   //   })
   // }
+  // const handleWaiting = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+  //   if (!isActiveRef.current) return
+  //   if (document.visibilityState === "hidden") return // 👈 Игнорируем, если вкладка скрыта
+
+  //   // 👇 НОВАЯ ПРОВЕРКА: Если торрент почти готов — не шлем буферизацию
+  //   // Это предотвратит ложные срабатывания, когда данные есть, но плеер "тупит"
+  //   const torrent = torrentRef?.current
+  //   const currentPos = videoRef.current?.currentTime || 0
+  //   const duration = videoRef.current?.duration || 1
+
+  //   // Вычисляем, какой байт нам нужен прямо сейчас
+  //   const neededByte = torrent?.length
+  //     ? Math.floor((currentPos / duration) * torrent.length)
+  //     : 0
+
+  //   // Если торрент скачал больше, чем нам нужно + запас 1МБ — мы готовы!
+  //   const hasEnoughData =
+  //     torrent && torrent.downloaded >= neededByte + 1024 * 1024
+
+  //   if (hasEnoughData) {
+  //     console.log("⚠️ onWaiting сработал, но данных достаточно — игнорируем")
+  //     return // 👈 НЕ отправляем buffering на сервер!
+  //   }
+
+  //   // Если реально не хватает данных — шлем сигнал
+  //   if (isBufferingRef.current) return
+  //   isBufferingRef.current = true
+
+  //   console.log(
+  //     "📡 Реальная буферизация: скачано",
+  //     torrent?.downloaded,
+  //     "нужно",
+  //     neededByte,
+  //   )
+
+  //   emitBuffering(e.currentTarget.currentTime, () => {
+  //     isBufferingRef.current = false
+  //   })
+  // }
+  // 👇 Запускаем проверку, когда видео "заголодало"
   const handleWaiting = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    if (!isActiveRef.current) return
-    if (document.visibilityState === "hidden") return // 👈 Игнорируем, если вкладка скрыта
-
-    // 👇 НОВАЯ ПРОВЕРКА: Если торрент почти готов — не шлем буферизацию
-    // Это предотвратит ложные срабатывания, когда данные есть, но плеер "тупит"
-    const torrent = torrentRef?.current
-    const currentPos = videoRef.current?.currentTime || 0
-    const duration = videoRef.current?.duration || 1
-
-    // Вычисляем, какой байт нам нужен прямо сейчас
-    const neededByte = torrent?.length
-      ? Math.floor((currentPos / duration) * torrent.length)
-      : 0
-
-    // Если торрент скачал больше, чем нам нужно + запас 1МБ — мы готовы!
-    const hasEnoughData =
-      torrent && torrent.downloaded >= neededByte + 1024 * 1024
-
-    if (hasEnoughData) {
-      console.log("⚠️ onWaiting сработал, но данных достаточно — игнорируем")
-      return // 👈 НЕ отправляем buffering на сервер!
+    // 👇 Если только что отправили ready — игнорируем onWaiting (грациозный период)
+    if (justSentReadyRef.current) {
+      console.log("⚠️ onWaiting в грациозном периоде после ready — игнорируем")
+      return
     }
 
-    // Если реально не хватает данных — шлем сигнал
-    if (isBufferingRef.current) return
-    isBufferingRef.current = true
+    if (!isActiveRef.current) return
+    if (document.visibilityState === "hidden") return
 
-    console.log(
-      "📡 Реальная буферизация: скачано",
-      torrent?.downloaded,
-      "нужно",
-      neededByte,
-    )
-
-    emitBuffering(e.currentTarget.currentTime, () => {
-      isBufferingRef.current = false
-    })
+    // Если реально не хватает данных — шлем буферизацию
+    if (!isBufferingRef.current) {
+      isBufferingRef.current = true
+      emitBuffering(e.currentTarget.currentTime, () => {
+        // 👇 Когда сервер подтвердил — запускаем периодическую проверку готовности
+        startReadyCheck()
+      })
+    }
   }
 
   const handleCanPlay = () => {
+    console.log("✅ handleCanPlay вызван:", {
+      isActive: isActiveRef.current,
+      isBuffering: isBufferingRef.current,
+      currentTime: videoRef.current?.currentTime,
+      buffered: videoRef.current?.buffered.length,
+      torrentProgress: torrentRef?.current?.progress,
+    })
+
     if (!isActiveRef.current) return
+    stopReadyCheck()
     // if (isRemoteActionRef.current) return // это мы сами применили команду — не реагируем
     if (!isBufferingRef.current) return // не буферили — игнорируем
     isBufferingRef.current = false

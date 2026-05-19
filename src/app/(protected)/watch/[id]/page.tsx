@@ -22,6 +22,7 @@ import {
 import { ChatMovieHall } from "@/components/ChatMovieHall/ChatMovieHall"
 import { useCinemaHallSync } from "@/hooks/useCinemaHallSync"
 import { CinemaVideoPlayer } from "@/components/CinemaVideoPlayer/CinemaVideoPlayer"
+import { TorrentStatsPanel } from "@/components/TorrentStatsPanel/TorrentStatsPanel"
 
 // type WebTorrentInstance = any
 // type TorrentInstance = any
@@ -719,6 +720,13 @@ export default function WatchPage() {
         {torrentStatus === "error" && <p>❌ Ошибка подключения.</p>}
 
         <ChatMovieHall cinemaHallId={id} groupId={groupId} socket={socket} />
+        {process.env.NODE_ENV === "development" && (
+          <TorrentStatsPanel
+            torrentRef={torrentRef}
+            className={style.statsPanel}
+            collapsed={true} // По умолчанию свёрнута
+          />
+        )}
       </div>
       {/* )} */}
     </>
