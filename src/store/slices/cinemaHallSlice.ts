@@ -38,6 +38,17 @@ const cinemaHallSlice = createSlice({
       console.log("getAllCinemaHall state", action.payload)
       state.cinemaHalls = action.payload
     },
+    getCinemaHallList(state, action) {
+      console.log("getCinemaHall state", action.payload)
+      state.cinemaHalls.push(action.payload)
+    },
+    delCinemaHallList(state, action) {
+      console.log("getCinemaHall state", action.payload)
+
+      state.cinemaHalls = state.cinemaHalls.filter(
+        (hall) => hall.cinemaHallId !== action.payload,
+      )
+    },
     clearCinemaHall(state) {
       state.cinemaHallTarget = {
         ...initialCinemaHallTarget,
@@ -47,6 +58,16 @@ const cinemaHallSlice = createSlice({
         waitingForUsers: [],
       }
     },
+    joinUser(state, action) {
+      state.cinemaHallTarget.participants.push(action.payload)
+    },
+    leftUser(state, action) {
+      state.cinemaHallTarget.participants =
+        state.cinemaHallTarget.participants.filter(
+          (user) => user.userId !== action.payload,
+        )
+    },
+
     addChatMessage(state, action) {
       state.cinemaHallTarget.chat.push(action.payload)
     },
@@ -104,7 +125,12 @@ export const {
   //work room
   setCinemaHall,
   getAllCinemaHall,
+  getCinemaHallList,
+
+  delCinemaHallList,
   clearCinemaHall,
+  joinUser,
+  leftUser,
   //chat
   addChatMessage,
   getAllChatMessage,

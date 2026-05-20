@@ -24,10 +24,10 @@ export type ParticipantsType = {
   userId: string | null
   username: string | null
   avatar: string | null
-  fileReady: string | null
-  bufferring: boolean
-  connected: boolean
-  disconnectTimer: number | null
+  // fileReady: string | null
+  buffering: boolean
+  // connected: boolean
+  disconnectTimer?: number | null
 }
 export type ChatMessageType = {
   id: string

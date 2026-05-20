@@ -11,6 +11,8 @@ import { ChatMessageType } from "@/types/cinemaHall.types"
 import { speakText } from "@/utils/speakText"
 
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+import { SpeakChatOff } from "@/assets/icons/speakChatOff"
+import { SpeakChatOn } from "@/assets/icons/speakChatOn"
 export type ChatMovieHallType = {
   cinemaHallId: string
   groupId: string
@@ -30,6 +32,8 @@ export function ChatMovieHall({
   const userId = useAppSelector((state) => state.auth.userId)
   const dispatch = useAppDispatch()
   const chatListRef = useRef<HTMLUListElement>(null)
+  const [isSpeakText, setIsSpeakText] = useState(true)
+
   // 👇 Этот эффект срабатывает каждый раз, когда меняется массив 'chat'
   useEffect(() => {
     // Если список существует и в нём есть сообщения
@@ -55,7 +59,7 @@ export function ChatMovieHall({
 
     const handleGetNewMessage = (data: { message: ChatMessageType }): void => {
       console.log("Пришло новое сообщение ", data.message)
-      if (userId !== data.message.userId) {
+      if (userId !== data.message.userId && isSpeakText) {
         speakText(data.message.text)
       }
       dispatch(addChatMessage(data.message))
@@ -64,12 +68,23 @@ export function ChatMovieHall({
     return () => {
       socket.off("cinema-hall:new-message", handleGetNewMessage)
     }
-  }, [socket, dispatch])
+  }, [socket, dispatch, isSpeakText])
   return (
     <div
       className={`${style.ChatMovieHall} ${!showChat ? style.hidden : ""} ${isFullscreen ? style.fullscreen : ""} `}
     >
-      <h3>Chat</h3>
+      <div className={style.ChatMovieHall__header}>
+        <h3>Chat:</h3>
+        <div
+          title={
+            isSpeakText ? "Отключить озвучку чата" : "Включить озвучку чата"
+          }
+          className={style.ChatMovieHall__speakTextButton}
+          onClick={() => setIsSpeakText((prev) => !prev)}
+        >
+          <button>{isSpeakText ? <SpeakChatOn /> : <SpeakChatOff />}</button>
+        </div>
+      </div>
 
       <ul ref={chatListRef}>
         <div style={{ flex: 1, minHeight: 0 }} />
