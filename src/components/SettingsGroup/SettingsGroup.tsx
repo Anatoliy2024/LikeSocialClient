@@ -21,9 +21,13 @@ import { AddMembers } from "../AddMembers/AddMembers"
 import { getUserRelationsThunk } from "@/store/thunks/usersThunk"
 import { RootState } from "@/store/store"
 import { ChangeAvatarModal } from "../changeAvatarModal/ChangeAvatarModal"
-// import { CreateCinemaHallModal } from "../CreateCinemaHallModal/CreateCinemaHallModal"
 import { useSocket } from "@/providers/SocketProvider"
-import { getAllCinemaHall } from "@/store/slices/cinemaHallSlice"
+import {
+  delCinemaHallList,
+  getAllCinemaHall,
+  getCinemaHall,
+  getCinemaHallList,
+} from "@/store/slices/cinemaHallSlice"
 import { CinemaHallTargetType } from "@/types/cinemaHall.types"
 import { StorageTorrentManager } from "../StorageManager/StorageTorrentManager"
 
@@ -152,6 +156,33 @@ export function SettingsGroup() {
     ).unwrap()
   }
 
+  useEffect(() => {
+    if (!socket) return
+    const handleGetNewRoom = (data: { hall: CinemaHallTargetType }) => {
+      console.log("handleGetNewRoom data", data)
+      dispatch(getCinemaHallList(data.hall))
+    }
+    const handleDellRoom = (data: { hall: string }) => {
+      console.log("handleGetNewRoom data", data)
+      dispatch(delCinemaHallList(data.hall))
+    }
+    socket.on("cinema-hall:get-new-room", handleGetNewRoom)
+    socket.on("cinema-hall:dell-room", handleDellRoom)
+    return () => {
+      socket.off("cinema-hall:get-new-room", handleGetNewRoom)
+      socket.off("cinema-hall:dell-room", handleDellRoom)
+    }
+  }, [socket, dispatch])
+
+  useEffect(() => {
+    if (!socket) return
+
+    socket.emit("settings-group:join", id)
+    return () => {
+      socket.emit("settings-group:leave", id)
+    }
+  }, [socket, dispatch, id])
+
   if (!currentConversation) return
 
   return (
@@ -176,12 +207,6 @@ export function SettingsGroup() {
         />
       )}
 
-      {/* {showCinemaHallModal && (
-        <CreateCinemaHallModal
-          handleCloseCreateCinemaHallModal={handleCloseShowCinemaHallModal}
-          groupId={id}
-        />
-      )} */}
       <h1>Option Group</h1>
 
       <Link
@@ -294,15 +319,3 @@ export function SettingsGroup() {
     </div>
   )
 }
-// _id: string
-//   type: "private" | "group"
-//   title: string // для групп
-//   avatar: string // для групп
-//   members: MemberFullType[]
-//   lastMessageId?: MessageType
-//   updatedAt: string
-
-//user
-// _id: string
-//   username: string
-//   avatar: string

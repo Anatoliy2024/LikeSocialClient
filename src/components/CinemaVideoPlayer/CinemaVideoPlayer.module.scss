@@ -86,6 +86,9 @@
       background: rgb(140, 135, 205);
     }
   }
+  &__controlsItemActive {
+    background: rgb(44, 38, 133);
+  }
   &__volumeControl {
     input {
       cursor: pointer;

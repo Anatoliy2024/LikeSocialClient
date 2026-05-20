@@ -10,6 +10,32 @@
   padding: 10px;
   box-sizing: border-box;
   overflow: hidden; // 🔑 Обрезает всё, что вылезает
+  &__header {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  &__speakTextButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    &:hover {
+      background: rgb(126, 118, 164);
+    }
+    &:active {
+      background: rgb(153, 139, 221);
+    }
+    button {
+    }
+  }
+  .active {
+    background: #8c75c1;
+  }
 
   ul {
     // max-height: 200px;

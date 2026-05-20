@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react"
 import style from "./CinemaVideoPlayer.module.scss"
 import { formatTime } from "@/utils/formatTime"
+import { ChatWithSmile } from "@/assets/icons/chatWithSmile"
 
 export interface CinemaVideoPlayerProps {
   // 👇 Видео-источники
@@ -279,17 +280,15 @@ export function CinemaVideoPlayer({
           </div>
 
           {/* Кнопки дополнительных действий */}
-          <div
-            className={style.player__controlsExtraControls}
-            title="Окно в окне"
-          >
+          <div className={style.player__controlsExtraControls} title="Чат">
             {isFullscreen && (
               <div>
                 <button
-                  style={{ background: showChat ? "rgba(255,0,0,0.3)" : "" }}
+                  className={`${style.player__controlsItem}  ${showChat ? style.player__controlsItemActive : ""}`}
+                  // style={{ background: showChat ? "rgba(255,0,0,0.3)" : "" }}
                   onClick={onToggleChat}
                 >
-                  💬 {showChat ? "Скрыть" : "Показать"}
+                  <ChatWithSmile />
                 </button>
               </div>
             )}

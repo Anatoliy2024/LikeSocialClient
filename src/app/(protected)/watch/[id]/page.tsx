@@ -1,6 +1,4 @@
 "use client"
-// WatchPage.tsx — исправленная версия
-
 import { useSocket } from "@/providers/SocketProvider"
 import { useParams, useSearchParams } from "next/navigation"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
@@ -10,18 +8,14 @@ import { clearCinemaHall, setCinemaHall } from "@/store/slices/cinemaHallSlice"
 import ButtonMenu from "@/components/ui/button/Button"
 import Spinner from "@/components/ui/spinner/Spinner"
 import { initWebTorrentWithSW } from "@/lib/webtorrent-sw"
-// import { CinemaHallRoomType } from "@/types/cinemaHall"
 import { CinemaHallTargetType } from "@/types/cinemaHall.types"
 import {
   TorrentFile,
-  // AddTorrentOptions,
   TorrentInstance,
   TorrentStatus,
   WebTorrentInstance,
 } from "@/types/webtorrent.types"
-
 import { useCinemaHallSync } from "@/hooks/useCinemaHallSync"
-
 import { TorrentStatsPanel } from "@/components/TorrentStatsPanel/TorrentStatsPanel"
 import { VideoAndChatContainer } from "@/components/VideoAndChatContainer/VideoAndChatContainer"
 
@@ -108,8 +102,6 @@ export default function WatchPage() {
   const peerCheckRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const {
-    //     handleUserPlayRequest,
-    // handleNativePlay,
     handleSeeked,
     handleNativePlay,
     handleNativePause,
@@ -578,7 +570,6 @@ export default function WatchPage() {
         </div>
       )}
 
-      {/* {cinemaHallName && ( */}
       <div className={style.watchPage}>
         <h1>{cinemaHallName}</h1>
         <VideoAndChatContainer
@@ -602,54 +593,10 @@ export default function WatchPage() {
           externalPlaying={playing}
           externalTime={currentTime}
           //chat
-
-          // volume={volume}
-          // playbackRate={playbackRate}
-
-          //ChatMovieHall
-
           cinemaHallId={id}
           groupId={groupId}
           socket={socket}
         />
-        {/* <div className={style.watchPage__container}>
-          <CinemaVideoPlayer
-            // Реф
-            videoRef={videoRef}
-            className={style.video}
-            // Источник
-            src={blobUrlRef.current}
-            magnet={magnet}
-            // 👇 Нативные хендлеры (события видео)
-            onNativePlay={handleNativePlay}
-            onNativePause={handleNativePause}
-            onNativeSeeked={handleSeeked}
-            onNativeWaiting={handleWaiting}
-            onNativeCanPlay={handleCanPlay}
-            // 👇 Хендлеры действий пользователя (кнопки)
-            onUserPlay={handlePlayRequest}
-            onUserPause={handlePauseRequest}
-            onUserSeek={handleSeekRequest}
-            // 👇 Управляющие пропсы (от сервера)
-            externalPlaying={playing}
-            externalTime={currentTime}
-            //chat
-            handleShowChat={handleShowChat}
-            handleCloseChat={handleCloseChat}
-            showChat={showChat}
-            handleShowFullscreenVideo={handleShowFullscreenVideo}
-            handleCloseFullscreenVideo={handleCloseFullscreenVideo}
-            // volume={volume}
-            // playbackRate={playbackRate}
-          />
-          <ChatMovieHall
-            showChat={showChat}
-            fullscreenVideo={fullscreenVideo}
-            cinemaHallId={id}
-            groupId={groupId}
-            socket={socket}
-          />
-        </div> */}
 
         {torrentStatus === "ready" && <div>Файл готов к скачке...</div>}
         {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>}
@@ -666,7 +613,6 @@ export default function WatchPage() {
           collapsed={true} // По умолчанию свёрнута
         />
       </div>
-      {/* )} */}
     </>
   )
 }
