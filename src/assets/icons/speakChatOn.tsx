@@ -7,7 +7,7 @@ export function SpeakChatOn() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_211_63127)">
+      <g clipPath="url(#clip0_211_63127)">
         <path
           d="M15 8C15.621 8.46574 16.125 9.06966 16.4721 9.76393C16.8193 10.4582 17 11.2238 17 12C17 12.7762 16.8193 13.5418 16.4721 14.2361C16.125 14.9303 15.621 15.5343 15 16"
           stroke="currentColor"

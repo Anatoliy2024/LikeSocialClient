@@ -25,7 +25,6 @@ import { useSocket } from "@/providers/SocketProvider"
 import {
   delCinemaHallList,
   getAllCinemaHall,
-  getCinemaHall,
   getCinemaHallList,
 } from "@/store/slices/cinemaHallSlice"
 import { CinemaHallTargetType } from "@/types/cinemaHall.types"
@@ -175,11 +174,11 @@ export function SettingsGroup() {
   }, [socket, dispatch])
 
   useEffect(() => {
-    if (!socket) return
+    if (!socket && !id) return
 
-    socket.emit("settings-group:join", id)
+    socket?.emit("settings-group:join", id)
     return () => {
-      socket.emit("settings-group:leave", id)
+      socket?.emit("settings-group:leave", id)
     }
   }, [socket, dispatch, id])
 

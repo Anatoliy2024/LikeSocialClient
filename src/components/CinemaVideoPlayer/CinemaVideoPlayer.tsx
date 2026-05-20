@@ -298,7 +298,7 @@ export function CinemaVideoPlayer({
                 onClick={togglePiP}
                 className={style.player__controlsItem}
               >
-                {document.pictureInPictureElement ? "🔙 Вернуть" : "📺 "}
+                {document?.pictureInPictureElement ? "🔙 Вернуть" : "📺 "}
               </button>
             </div>
             <div>

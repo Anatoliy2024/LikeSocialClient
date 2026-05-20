@@ -46,4 +46,32 @@
 }
 
 .watchPage {
+  &__userInRoomContainer {
+    display: flex;
+    gap: 20px;
+    font-size: 1.3rem;
+  }
+  &__userInRoomList {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    ul {
+      display: flex;
+      // flex-direction: column;
+      // gap: 10px;
+      li {
+        margin-left: -5px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+    }
+  }
+  &__imgContainer {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
 }

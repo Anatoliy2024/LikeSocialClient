@@ -4,11 +4,19 @@ import { useParams, useSearchParams } from "next/navigation"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import style from "./WatchPage.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { clearCinemaHall, setCinemaHall } from "@/store/slices/cinemaHallSlice"
+import {
+  clearCinemaHall,
+  joinUser,
+  leftUser,
+  setCinemaHall,
+} from "@/store/slices/cinemaHallSlice"
 import ButtonMenu from "@/components/ui/button/Button"
 import Spinner from "@/components/ui/spinner/Spinner"
 import { initWebTorrentWithSW } from "@/lib/webtorrent-sw"
-import { CinemaHallTargetType } from "@/types/cinemaHall.types"
+import {
+  CinemaHallTargetType,
+  ParticipantsType,
+} from "@/types/cinemaHall.types"
 import {
   TorrentFile,
   TorrentInstance,
@@ -18,6 +26,7 @@ import {
 import { useCinemaHallSync } from "@/hooks/useCinemaHallSync"
 import { TorrentStatsPanel } from "@/components/TorrentStatsPanel/TorrentStatsPanel"
 import { VideoAndChatContainer } from "@/components/VideoAndChatContainer/VideoAndChatContainer"
+import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 
 // Исправление: передавать AbortSignal
 function waitForClient(
@@ -125,6 +134,12 @@ export default function WatchPage() {
   )
   const magnet = useAppSelector(
     (state) => state.cinemaHall.cinemaHallTarget.file.magnet,
+  )
+  const roomUsers = useAppSelector(
+    (state) => state.cinemaHall.cinemaHallTarget.participants,
+  )
+  const waitingForUsers = useAppSelector(
+    (state) => state.cinemaHall.cinemaHallTarget.waitingForUsers,
   )
 
   const username = useAppSelector((state) => state.auth.username)
@@ -363,6 +378,23 @@ export default function WatchPage() {
     }
   }
 
+  useEffect(() => {
+    if (!socket) return
+    const joinUserHandler = (data: ParticipantsType) => {
+      dispatch(joinUser(data))
+    }
+    const leftUserHandler = (data: { userId: string }) => {
+      dispatch(leftUser(data.userId))
+    }
+    socket?.on("cinema-hall:user-joined", joinUserHandler)
+    socket?.on("cinema-hall:user-left", leftUserHandler)
+
+    return () => {
+      socket?.off("cinema-hall:user-joined", joinUserHandler)
+      socket?.off("cinema-hall:user-left", leftUserHandler)
+    }
+  }, [socket, dispatch])
+
   const connectMagnet = async (client: WebTorrentInstance, magnet: string) => {
     console.log("connectMagnet:", magnet)
 
@@ -598,6 +630,55 @@ export default function WatchPage() {
           socket={socket}
         />
 
+        <div className={style.watchPage__userInRoomContainer}>
+          <div className={style.watchPage__userInRoomList}>
+            <h4>Юзеры в комнате:</h4>
+            <ul>
+              {roomUsers.map((user) => (
+                <li key={user.userId}>
+                  <div
+                    className={style.watchPage__imgContainer}
+                    title={user.username || ""}
+                  >
+                    <CloudinaryImage
+                      src={user.avatar ? user.avatar : "/images/anonym.jpeg"}
+                      alt="avatar"
+                      width={80}
+                      height={80}
+                    />
+                  </div>
+                  {/* <div>{user.username}</div> */}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className={style.watchPage__userInRoomList}>
+            <h4>Ожидаемые юзеры:</h4>
+            <ul>
+              {waitingForUsers.map((userId) => {
+                console.log("waitingForUsers", waitingForUsers)
+                const user = roomUsers.find((user) => user.userId === userId)
+                if (!user) return
+                return (
+                  <li key={userId}>
+                    <div
+                      className={style.watchPage__imgContainer}
+                      title={user.username || ""}
+                    >
+                      <CloudinaryImage
+                        src={user.avatar ? user.avatar : "/images/anonym.jpeg"}
+                        alt="avatar"
+                        width={100}
+                        height={100}
+                      />
+                    </div>
+                    {/* <div>{user.username}</div> */}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        </div>
         {torrentStatus === "ready" && <div>Файл готов к скачке...</div>}
         {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>}
         {bufferingStatus && bufferProgress !== 100 ? (

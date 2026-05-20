@@ -58,6 +58,16 @@ const cinemaHallSlice = createSlice({
         waitingForUsers: [],
       }
     },
+    joinUser(state, action) {
+      state.cinemaHallTarget.participants.push(action.payload)
+    },
+    leftUser(state, action) {
+      state.cinemaHallTarget.participants =
+        state.cinemaHallTarget.participants.filter(
+          (user) => user.userId !== action.payload,
+        )
+    },
+
     addChatMessage(state, action) {
       state.cinemaHallTarget.chat.push(action.payload)
     },
@@ -119,6 +129,8 @@ export const {
 
   delCinemaHallList,
   clearCinemaHall,
+  joinUser,
+  leftUser,
   //chat
   addChatMessage,
   getAllChatMessage,
