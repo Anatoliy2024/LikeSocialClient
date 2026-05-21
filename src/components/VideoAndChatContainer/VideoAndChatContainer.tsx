@@ -23,7 +23,6 @@ export function VideoAndChatContainer({
   onUserSeek,
   externalPlaying,
   externalTime,
-
   cinemaHallId,
   groupId,
   socket,
@@ -85,7 +84,6 @@ export function VideoAndChatContainer({
         externalPlaying={externalPlaying}
         externalTime={externalTime}
         //chat
-
         showChat={showChat}
         toggleFullscreen={toggleFullscreen}
         onToggleChat={() => setShowChat((prev) => !prev)}
@@ -99,7 +97,6 @@ export function VideoAndChatContainer({
         socket={socket}
         isFullscreen={isFullscreen}
       />
-      {/* </div> */}
     </div>
   )
 }

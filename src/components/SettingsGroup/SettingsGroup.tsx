@@ -37,7 +37,6 @@ export function SettingsGroup() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [showAddMemberModal, setShowAddMemberModal] = useState(false)
-  // const [showCinemaHallModal, setShowCinemaHallModal] = useState(false)
   const dispatch = useAppDispatch()
   const currentConversation = useAppSelector(
     (state) => state.conversations.currentConversation,
@@ -89,10 +88,6 @@ export function SettingsGroup() {
         dispatch(getAllCinemaHall(data.cinemaHallList))
       },
     )
-
-    //  socket.on("cinema-hall:get-all", async (data, callback) => {
-    //       getAllCinemaHallHandler(io, socket, data, callback)
-    //     })
   }, [socket, id, dispatch])
 
   const handleShowAddMembers = () => {
@@ -137,14 +132,9 @@ export function SettingsGroup() {
 
   const handleLinkMovieHall = () => {
     const cinemaHallId = crypto.randomUUID()
-
-    // LinkMovieHallRoom(cinemaHallId)
     router.push(LinkMovieHallRoom(cinemaHallId))
-    // setShowCinemaHallModal(true)
   }
-  // const handleGroupAvatarUpload=()=>{
 
-  // }
   const handleGroupAvatarUpload = async (
     file: File,
     context?: { groupId?: string },
