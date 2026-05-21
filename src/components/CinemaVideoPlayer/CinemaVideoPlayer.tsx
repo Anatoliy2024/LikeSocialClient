@@ -280,9 +280,9 @@ export function CinemaVideoPlayer({
           </div>
 
           {/* Кнопки дополнительных действий */}
-          <div className={style.player__controlsExtraControls} title="Чат">
+          <div className={style.player__controlsExtraControls}>
             {isFullscreen && (
-              <div>
+              <div title="Чат">
                 <button
                   className={`${style.player__controlsItem}  ${showChat ? style.player__controlsItemActive : ""}`}
                   // style={{ background: showChat ? "rgba(255,0,0,0.3)" : "" }}
@@ -293,7 +293,7 @@ export function CinemaVideoPlayer({
               </div>
             )}
 
-            <div>
+            <div title="Мини-плеер">
               <button
                 onClick={togglePiP}
                 className={style.player__controlsItem}

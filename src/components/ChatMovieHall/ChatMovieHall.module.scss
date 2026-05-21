@@ -51,7 +51,6 @@
     li {
       display: flex;
       gap: 5px;
-
       align-items: flex-start;
       flex: 0 0 auto; // 🔑 Элементы не растягиваются
       word-break: break-word; // Чтобы длинные слова не ломали вёрстку
@@ -97,18 +96,42 @@
 
 // 👇 МОДИФИКАТОР ДЛЯ ПОЛНОГО ЭКРАНА
 // Этот класс добавится, когда проп isFullscreen === true
+// .fullscreen {
+//   flex: 0 0 320px !important; // 🔑 Фиксированная ширина
+//   height: 100% !important;
+//   background: rgba(10, 10, 15, 0.95) !important;
+//   color: #acaccb;
+//   backdrop-filter: blur(8px) !important;
+//   border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+//   border-radius: 0 !important;
+//   margin: 0 !important;
+//   transition:
+//     flex 0.15s ease,
+//     opacity 0.15s ease !important;
+// }
 .fullscreen {
-  flex: 0 0 320px !important; // 🔑 Фиксированная ширина
-  height: 100% !important;
-  background: rgba(10, 10, 15, 0.95) !important;
-  color: #acaccb;
-  backdrop-filter: blur(8px) !important;
-  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 0 !important;
-  margin: 0 !important;
-  transition:
-    flex 0.15s ease,
-    opacity 0.15s ease !important;
+  position: absolute;
+  top: 15%;
+
+  right: 0;
+
+  flex: 0 0 320px !important; // 🔑 Фиксированная шири
+  height: 70%;
+  background: rgba(15, 15, 20, 0.53);
+  color: rgba(254, 254, 254, 0.868);
+  border-radius: 12px 0 0 12px;
+
+  // backdrop-filter: blur(1px);
+
+  z-index: 2;
+  ul {
+    li {
+      span {
+        max-width: 220px;
+        word-break: break-word;
+      }
+    }
+  }
 }
 
 // 👇 Класс для скрытия (работает и в обычном режиме, и в фулскрине)

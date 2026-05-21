@@ -95,8 +95,15 @@
     }
   }
 }
+// .fullscreen {
+//   flex: 1 1 auto !important; // 🔑 Занимает ВСЁ доступное место
+//   width: 100% !important;
+//   height: 100% !important;
+//   justify-content: stretch;
+//   align-items: stretch;
+// }
 .fullscreen {
-  flex: 1 1 auto !important; // 🔑 Занимает ВСЁ доступное место
+  flex: none;
   width: 100% !important;
   height: 100% !important;
   justify-content: stretch;
