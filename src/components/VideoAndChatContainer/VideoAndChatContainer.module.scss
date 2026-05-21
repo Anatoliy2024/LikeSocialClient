@@ -11,8 +11,9 @@
 
 // 👇 ПОЛНОЭКРАННЫЙ РЕЖИМ (как у YouTube)
 .videoAndChatContainer__container:fullscreen {
-  display: flex;
-  flex-direction: row; // 👈 Располагаем в РЯД, а не накладываем
+  position: relative;
+  // display: flex;
+  // flex-direction: row; // 👈 Располагаем в РЯД, а не накладываем
   height: 100vh;
   width: 100vw;
   background: #000;
