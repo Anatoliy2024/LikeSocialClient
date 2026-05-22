@@ -1,8 +1,10 @@
 // components/CinemaVideoPlayer/CinemaVideoPlayer.tsx
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import style from "./CinemaVideoPlayer.module.scss"
 import { formatTime } from "@/utils/formatTime"
 import { ChatWithSmile } from "@/assets/icons/chatWithSmile"
+import { PauseIcon } from "@/assets/icons/pauseIcon"
+import { PlayIcon } from "@/assets/icons/playIcon"
 
 export interface CinemaVideoPlayerProps {
   // 👇 Видео-источники
@@ -25,8 +27,8 @@ export interface CinemaVideoPlayerProps {
   onNativeCanPlay?: () => void
 
   // 👇 Обработчики действий пользователя (клик по кнопкам → сервер)
-  onUserPlay?: () => void
-  onUserPause?: () => void
+  onUserPlay: () => void
+  onUserPause: () => void
   onUserSeek?: (time: number) => void
 
   // 👇 Управляющие пропсы (сервер → клиент)
@@ -52,29 +54,25 @@ export interface CinemaVideoPlayerProps {
   onToggleChat?: () => void // Переключатель чата
 }
 
+const HIDE_DELAY = 3000
 export function CinemaVideoPlayer({
   src,
   videoRef, // 👇 Получаем реф извне
-
   // Нативные хендлеры (события видео)
   onNativePlay,
   onNativePause,
   onNativeSeeked,
   onNativeWaiting,
   onNativeCanPlay,
-
   // Хендлеры действий пользователя (кнопки)
   onUserPlay,
   onUserPause,
   onUserSeek,
-
   // Управляющие пропсы
   externalPlaying,
   externalTime,
   volume = 100,
-
   //chat
-
   toggleFullscreen, // Функция для кнопки
   isFullscreen, // Реальный статус от родителя
   showChat, // Показывать ли чат
@@ -87,13 +85,37 @@ export function CinemaVideoPlayer({
   const [progress, setProgress] = useState(0)
   const [duration, setDuration] = useState(0)
   const [isMuted, setIsMuted] = useState(false)
+  const [controlsVisible, setControlsVisible] = useState(false)
 
   const [showValue, setShowValue] = useState(false)
-  const [showControl, setShowControl] = useState(false)
+  const [animationKey, setAnimationKey] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  // const [showControl, setShowControl] = useState(false)
   // В начале компонента, рядом с другими useState/useRef:
-  const playerContainerRef = useRef<HTMLDivElement>(null)
 
-  // Переключатель
+  const playerContainerRef = useRef<HTMLDivElement>(null)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // const containerRef = useRef<HTMLDivElement>(null);
+
+  const showControls = useCallback(() => {
+    setControlsVisible(true)
+
+    // Сбрасываем предыдущий таймер
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current)
+    }
+
+    // Запускаем новый таймер на скрытие
+    hideTimerRef.current = setTimeout(() => {
+      setControlsVisible(false)
+    }, HIDE_DELAY)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    }
+  }, [])
 
   // 👇 Синхронизация внешних пропсов с локальным стейтом
   useEffect(() => {
@@ -189,11 +211,35 @@ export function CinemaVideoPlayer({
       onUserSeek(newTime)
     }
   }
+  const onUserPlayWithAnimation = () => {
+    onUserPlay()
+    setIsPlaying(true)
+    setAnimationKey((prev) => prev + 1)
+  }
+  const onUserPauseWithAnimation = () => {
+    onUserPause()
+    setIsPlaying(false)
+    setAnimationKey((prev) => prev + 1)
+  }
+
+  // useEffect(() => {
+  //   if (externalPlaying === undefined) return
+  //   setIsPlaying(externalPlaying)
+  //   setAnimationKey((prev) => prev + 1) // перезапускает анимацию
+  // }, [externalPlaying])
 
   return (
     <div
-      className={`${style.player} ${isFullscreen ? style.fullscreen : ""}`}
+      className={`${style.player} ${isFullscreen ? style.fullscreen : ""} ${!controlsVisible ? style.hiddenCursor : ""}`}
       ref={playerContainerRef}
+      onMouseMove={showControls}
+      onMouseEnter={showControls}
+      onMouseLeave={() => {
+        // Сразу скрываем при уходе курсора с видео (опционально)
+        if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+        setControlsVisible(false)
+      }}
+      // style={{ position: "relative", width: "100%", cursor: controlsVisible ? "default" : "none" }}
     >
       {/* 👇 Видео с правильными хендлерами */}
       <video
@@ -209,13 +255,21 @@ export function CinemaVideoPlayer({
         // 👇 Новые события для прогресс-бара
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onClick={(e) => {
+          e.preventDefault()
+          if (externalPlaying) {
+            onUserPauseWithAnimation()
+          } else {
+            onUserPlayWithAnimation()
+          }
+          // {!externalPlaying && <button onClick={onUserPlay}>▶️</button>}
+          //     {externalPlaying && <button onClick={onUserPause}>⏸</button>}
+        }}
       />
 
       {/* 👇 Кастомные контролы */}
       <div
-        className={`${style.player__controls} ${!showControl ? style.player__controlsHidden : ""}`}
-        onMouseEnter={() => setShowControl(true)}
-        onMouseLeave={() => setShowControl(false)}
+        className={`${style.player__controls} ${!controlsVisible ? style.player__controlsHidden : ""}`}
       >
         {/* Кнопки плей/пауза (действия пользователя) */}
         <div className={style.player__controlsTopLine}>
@@ -232,8 +286,12 @@ export function CinemaVideoPlayer({
         <div className={style.player__controlsBottomLine}>
           <div className={style.player__controlsMainControls}>
             <div className={style.player__controlsItem}>
-              {!externalPlaying && <button onClick={onUserPlay}>▶️</button>}
-              {externalPlaying && <button onClick={onUserPause}>⏸</button>}
+              {!externalPlaying && (
+                <button onClick={onUserPlayWithAnimation}>▶️</button>
+              )}
+              {externalPlaying && (
+                <button onClick={onUserPauseWithAnimation}>⏸</button>
+              )}
             </div>
             {/* Громкость */}
             <div
@@ -315,6 +373,9 @@ export function CinemaVideoPlayer({
             </div>
           </div>
         </div>
+      </div>
+      <div key={animationKey} className={style.player__showStatusAnimation}>
+        {isPlaying ? <PlayIcon /> : <PauseIcon />}
       </div>
     </div>
   )
