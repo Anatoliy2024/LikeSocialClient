@@ -10,6 +10,7 @@
   align-items: center; // Центрирует по горизонтали
   justify-content: center; // Центрирует по вертикали
   background: #000; // Фон для пустых областей
+  // cursor: default;
 
   // 👇 Опционально: тёмный фон с градиентом для эстетики:
   &::before {
@@ -47,9 +48,12 @@
     transition: 0.3s;
     user-select: none;
     z-index: 2;
+    // opacity: 1;
+    // pointer-events: "auto";
   }
   &__controlsHidden {
     opacity: 0;
+    pointer-events: "none";
   }
   &__controlsTopLine {
     display: flex;
@@ -94,6 +98,22 @@
       cursor: pointer;
     }
   }
+  &__showStatusAnimation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    background: black;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 20px;
+    pointer-events: none;
+    animation: showStatusAnimation 0.8s ease-out forwards;
+  }
 }
 // .fullscreen {
 //   flex: 1 1 auto !important; // 🔑 Занимает ВСЁ доступное место
@@ -108,4 +128,26 @@
   height: 100% !important;
   justify-content: stretch;
   align-items: stretch;
+}
+.hiddenCursor {
+  cursor: none;
+}
+
+@keyframes showStatusAnimation {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
