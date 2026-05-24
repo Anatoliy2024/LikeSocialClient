@@ -26,13 +26,14 @@ export function VideoAndChatContainer({
   cinemaHallId,
   groupId,
   socket,
+  isHost,
 }: Omit<CinemaVideoPlayerProps, "isFullscreen" | "showChat"> &
-  Omit<ChatMovieHallType, "isFullscreen" | "showChat">) {
+  Omit<ChatMovieHallType, "isFullscreen" | "showChat"> & { isHost: boolean }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   //   const [isCustomFullscreen, setIsCustomFullscreen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showChat, setShowChat] = useState(true)
-  console.log("showChat", showChat)
+  // console.log("showChat", showChat)
 
   useEffect(() => {
     const handleFullscreenChange = () =>
@@ -88,6 +89,9 @@ export function VideoAndChatContainer({
         toggleFullscreen={toggleFullscreen}
         onToggleChat={() => setShowChat((prev) => !prev)}
         isFullscreen={isFullscreen}
+        isHost={isHost}
+        cinemaHallId={cinemaHallId}
+        groupId={groupId}
       />
 
       <ChatMovieHall

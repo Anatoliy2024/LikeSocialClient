@@ -5,6 +5,9 @@ import { formatTime } from "@/utils/formatTime"
 import { ChatWithSmile } from "@/assets/icons/chatWithSmile"
 import { PauseIcon } from "@/assets/icons/pauseIcon"
 import { PlayIcon } from "@/assets/icons/playIcon"
+import { useSocket } from "@/providers/SocketProvider"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import { changeMemberControl } from "@/store/slices/cinemaHallSlice"
 
 export interface CinemaVideoPlayerProps {
   // 👇 Видео-источники
@@ -52,6 +55,9 @@ export interface CinemaVideoPlayerProps {
   isFullscreen?: boolean // Реальный статус от родителя
   showChat?: boolean // Показывать ли чат
   onToggleChat?: () => void // Переключатель чата
+  isHost: boolean
+  cinemaHallId: string
+  groupId: string
 }
 
 const HIDE_DELAY = 3000
@@ -77,8 +83,13 @@ export function CinemaVideoPlayer({
   isFullscreen, // Реальный статус от родителя
   showChat, // Показывать ли чат
   onToggleChat, // Переключатель чата
+  isHost,
+  cinemaHallId,
+  groupId,
   // playbackRate = 1,
 }: CinemaVideoPlayerProps) {
+  const socket = useSocket()
+  const dispatch = useAppDispatch()
   // Локальные стейты только для UI контролов
   const [localVolume, setLocalVolume] = useState(volume)
   // const [localRate, setLocalRate] = useState(playbackRate)
@@ -96,6 +107,10 @@ export function CinemaVideoPlayer({
   const playerContainerRef = useRef<HTMLDivElement>(null)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // const containerRef = useRef<HTMLDivElement>(null);
+
+  const isMembersControl = useAppSelector(
+    (state) => state.cinemaHall.cinemaHallTarget.isMembersControl,
+  )
 
   const showControls = useCallback(() => {
     setControlsVisible(true)
@@ -166,18 +181,18 @@ export function CinemaVideoPlayer({
     }
   }
 
-  const togglePiP = async () => {
-    if (!videoRef.current) return
-    try {
-      if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture()
-      } else {
-        await videoRef.current.requestPictureInPicture()
-      }
-    } catch (err) {
-      console.error("❌ PiP ошибка:", err)
-    }
-  }
+  // const togglePiP = async () => {
+  //   if (!videoRef.current) return
+  //   try {
+  //     if (document.pictureInPictureElement) {
+  //       await document.exitPictureInPicture()
+  //     } else {
+  //       await videoRef.current.requestPictureInPicture()
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ PiP ошибка:", err)
+  //   }
+  // }
 
   // 👇 Обновление прогресса при воспроизведении
   const handleTimeUpdate = () => {
@@ -222,12 +237,36 @@ export function CinemaVideoPlayer({
     setAnimationKey((prev) => prev + 1)
   }
 
-  // useEffect(() => {
-  //   if (externalPlaying === undefined) return
-  //   setIsPlaying(externalPlaying)
-  //   setAnimationKey((prev) => prev + 1) // перезапускает анимацию
-  // }, [externalPlaying])
+  useEffect(() => {
+    if (!socket) return
+    const changeMemberControlHandler = (data: {
+      isMembersControl: boolean
+    }) => {
+      dispatch(changeMemberControl(data.isMembersControl))
+    }
+    socket.on("cinema-hall:change-member-control", changeMemberControlHandler)
+    return () => {
+      socket.off(
+        "cinema-hall:change-member-control",
+        changeMemberControlHandler,
+      )
+    }
+  }, [socket, dispatch])
 
+  const onToggleMemberControl = () => {
+    if (!socket) return
+    socket.emit(
+      "cinema-hall:toggle-members-control",
+      { groupId, cinemaHallId },
+      (data: { success: boolean; isMembersControl: boolean }) => {
+        if (data.success) {
+          dispatch(changeMemberControl(data.isMembersControl))
+        }
+      },
+    )
+  }
+
+  const isBlockButtonControl = !isHost && isMembersControl
   return (
     <div
       className={`${style.player} ${isFullscreen ? style.fullscreen : ""} ${!controlsVisible ? style.hiddenCursor : ""}`}
@@ -257,6 +296,7 @@ export function CinemaVideoPlayer({
         onLoadedMetadata={handleLoadedMetadata}
         onClick={(e) => {
           e.preventDefault()
+          if (isBlockButtonControl) return
           if (externalPlaying) {
             onUserPauseWithAnimation()
           } else {
@@ -281,16 +321,27 @@ export function CinemaVideoPlayer({
             onChange={handleProgressChange}
             className={style.player__progressBar}
             step={0.1}
+            disabled={isBlockButtonControl}
           />
         </div>
         <div className={style.player__controlsBottomLine}>
           <div className={style.player__controlsMainControls}>
             <div className={style.player__controlsItem}>
               {!externalPlaying && (
-                <button onClick={onUserPlayWithAnimation}>▶️</button>
+                <button
+                  onClick={onUserPlayWithAnimation}
+                  disabled={isBlockButtonControl}
+                >
+                  ▶️
+                </button>
               )}
               {externalPlaying && (
-                <button onClick={onUserPauseWithAnimation}>⏸</button>
+                <button
+                  onClick={onUserPauseWithAnimation}
+                  disabled={isBlockButtonControl}
+                >
+                  ⏸
+                </button>
               )}
             </div>
             {/* Громкость */}
@@ -332,6 +383,7 @@ export function CinemaVideoPlayer({
               onClick={() =>
                 onUserSeek?.((videoRef.current?.currentTime || 0) + 30)
               }
+              disabled={isBlockButtonControl}
             >
               ⏩ +30с
             </button>
@@ -339,6 +391,17 @@ export function CinemaVideoPlayer({
 
           {/* Кнопки дополнительных действий */}
           <div className={style.player__controlsExtraControls}>
+            <div title="Заблокировать контроль видео всем юзерам">
+              <button
+                className={`${style.player__controlsItem}  ${isMembersControl ? style.player__controlsItemActive : ""}`}
+                // style={{ background: showChat ? "rgba(255,0,0,0.3)" : "" }}
+                disabled={!isHost}
+                onClick={onToggleMemberControl}
+              >
+                <div>X</div>
+              </button>
+            </div>
+
             {isFullscreen && (
               <div title="Чат">
                 <button
@@ -351,14 +414,14 @@ export function CinemaVideoPlayer({
               </div>
             )}
 
-            <div title="Мини-плеер">
+            {/* <div title="Мини-плеер">
               <button
                 onClick={togglePiP}
                 className={style.player__controlsItem}
               >
                 {document?.pictureInPictureElement ? "🔙 Вернуть" : "📺 "}
               </button>
-            </div>
+            </div> */}
             <div>
               <button
                 onClick={toggleFullscreen}

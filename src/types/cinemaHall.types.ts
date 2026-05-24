@@ -5,6 +5,7 @@ export type CinemaHallTargetType = {
   hostId: string | null
   participants: ParticipantsType[]
   file: FileType
+  isMembersControl: boolean
   currentTime: number
   playing: boolean
   updatedAt: string | null
