@@ -29,6 +29,7 @@ export type ParticipantsType = {
   buffering: boolean
   // connected: boolean
   disconnectTimer?: number | null
+  peerId: string | null
 }
 export type ChatMessageType = {
   id: string

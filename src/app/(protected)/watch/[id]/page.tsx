@@ -6,6 +6,7 @@ import style from "./WatchPage.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   clearCinemaHall,
+  getPeerId,
   joinUser,
   leftUser,
   setCinemaHall,
@@ -66,6 +67,8 @@ interface JoinHallResponse {
 const TRACKERS: string[] = [
   "wss://tracker.openwebtorrent.com",
   "wss://tracker.webtorrent.dev",
+  "wss://tracker.files.fm:7073/announce", // ← добавь
+  "wss://spacetradersapi-chatgpt.herokuapp.com:443/announce", // запасной
 ]
 
 const VIDEO_EXTENSIONS = [".mp4", ".mkv", ".webm"] as const
@@ -255,9 +258,15 @@ export default function WatchPage() {
             setTorrentStatus("connecting")
 
             const client = await waitForClient(clientRef, ac.signal)
+
             // const client = await waitForClient(clientRef)
 
             await connectMagnet(client, data.hall.file.magnet)
+            socket.emit("cinema-hall:set-peer-id", {
+              cinemaHallId: id,
+              groupId,
+              peerId: client.peerId,
+            })
           } catch (err) {
             console.error("Ошибка подключения:", err)
             setTorrentStatus("error")
@@ -399,6 +408,19 @@ export default function WatchPage() {
     }
   }, [socket, dispatch])
 
+  useEffect(() => {
+    if (!socket) return
+    const getPeerIdHandler = (data: { user: ParticipantsType }) => {
+      console.log("getPeerIdHandler data", data)
+      dispatch(getPeerId(data.user))
+    }
+    socket.on("cinema-hall:get-peer-id", getPeerIdHandler)
+
+    return () => {
+      socket.off("cinema-hall:get-peer-id", getPeerIdHandler)
+    }
+  }, [socket, dispatch])
+
   const connectMagnet = async (client: WebTorrentInstance, magnet: string) => {
     // console.log("connectMagnet:", magnet)
 
@@ -443,6 +465,7 @@ export default function WatchPage() {
 
     try {
       const client = await waitForClient(clientRef, ac.signal)
+
       // const client = await waitForClient(clientRef)
 
       const torrent = client.seed(f, {
@@ -486,7 +509,8 @@ export default function WatchPage() {
   }
 
   const createHandle = () => {
-    if (!socket || !file || !magnetURI) return
+    if (!socket || !file || !magnetURI || !clientRef.current || !movieName)
+      return
 
     socket.emit(
       "cinema-hall:create",
@@ -497,6 +521,7 @@ export default function WatchPage() {
         avatar,
         groupId,
         file: { name: file.name, size: file.size, magnet: magnetURI },
+        peerId: clientRef.current.peerId,
       },
       async (data: { hall: CinemaHallTargetType }) => {
         // console.log("Зал создан:", data.hall)

@@ -129,6 +129,16 @@ const cinemaHallSlice = createSlice({
     changeMemberControl(state, action) {
       state.cinemaHallTarget.isMembersControl = action.payload
     },
+    getPeerId(state, action) {
+      state.cinemaHallTarget.participants =
+        state.cinemaHallTarget.participants.map((user) => {
+          if (user.userId === action.payload.userId) {
+            return user
+          } else {
+            return action.payload
+          }
+        })
+    },
   },
 })
 
@@ -153,6 +163,7 @@ export const {
 
   removeParticipant,
   changeMemberControl,
+  getPeerId,
 } = cinemaHallSlice.actions
 
 export default cinemaHallSlice.reducer
