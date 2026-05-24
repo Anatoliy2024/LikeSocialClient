@@ -141,7 +141,7 @@ export function useCinemaHallSync({
         hasTorrentHeadroom(video, torrent, 5) // 👈 НОВ: торрент скачал +5 секунд
 
       if (isReady) {
-        console.log("✅ Все проверки пройдены — отправляем ready")
+        // console.log("✅ Все проверки пройдены — отправляем ready")
         stopReadyCheck()
         emitReady() // 👈 Отправляем на сервер!
       }
@@ -177,7 +177,7 @@ export function useCinemaHallSync({
 
     // 👇 Спец-обработка для blob URL (локальные файлы хоста)
     if (video.src.startsWith("blob:") && video.readyState < 2) {
-      console.log("⏳ safePlay: blob, ждём readyState >= 2...")
+      // console.log("⏳ safePlay: blob, ждём readyState >= 2...")
 
       const onLoadedMetadata = () => {
         video.removeEventListener("loadedmetadata", onLoadedMetadata)
@@ -213,14 +213,14 @@ export function useCinemaHallSync({
 
     // 3. Пытаемся воспроизвести
     try {
-      console.log("🔊 Вызываем video.play()...")
+      // console.log("🔊 Вызываем video.play()...")
       await video.play()
-      console.log("✅ video.play() успешно")
+      // console.log("✅ video.play() успешно")
     } catch (e: unknown) {
       if (e instanceof DOMException) {
         // AbortError — это нормально, если play() прервали паузой
         if (e.name === "AbortError") {
-          console.log("ℹ️ play() прерван (AbortError) — это ок")
+          // console.log("ℹ️ play() прерван (AbortError) — это ок")
           return
         }
         // NotAllowedError — браузер заблокировал автоплей со звуком
@@ -241,7 +241,7 @@ export function useCinemaHallSync({
     if (!socket) return
 
     const onSocketPlay = (data: PlayData) => {
-      console.log("🎬 onPlay получен с сервера:", data)
+      // console.log("🎬 onPlay получен с сервера:", data)
       dispatch(applyPlay(data))
       if (!videoRef.current || !isActiveRef.current) {
         console.warn("❌ onPlay: videoRef или isActive не готовы", {
@@ -256,18 +256,18 @@ export function useCinemaHallSync({
       // isCommandPendingRef.current = false // 🔓 Разблокируем после серверного ответа
       const realTime =
         data.currentTime + (Date.now() - data.playbackUpdatedAt) / 1000
-      console.log(
-        "⏱ onPlay: устанавливаем время",
-        realTime,
-        "video.currentTime был:",
-        videoRef.current.currentTime,
-      )
+      // console.log(
+      //   "⏱ onPlay: устанавливаем время",
+      //   realTime,
+      //   "video.currentTime был:",
+      //   videoRef.current.currentTime,
+      // )
 
       // 👇 Помечаем, что меняем время программно
       isProgrammaticSeekRef.current = true
 
       videoRef.current.currentTime = realTime
-      console.log("🔊 onPlay: вызываем safePlay...")
+      // console.log("🔊 onPlay: вызываем safePlay...")
       safePlay(videoRef.current) // возможно нужно оставить это
       // videoRef.current.play().catch((e) => {
       //   console.warn("⚠️ Не удалось авто-воспроизведение:", e.message)
@@ -367,9 +367,9 @@ export function useCinemaHallSync({
 
       // 👇 НОВОЕ: Если отстал больше чем на 10 секунд — синхронизируемся СРАЗУ
       if (Math.abs(diff) > 10) {
-        console.log(
-          `🚀 Большой рассинхрон (${diff.toFixed(1)}с) — немедленная синхронизация`,
-        )
+        // console.log(
+        //   `🚀 Большой рассинхрон (${diff.toFixed(1)}с) — немедленная синхронизация`,
+        // )
         isProgrammaticSeekRef.current = true
         videoRef.current.currentTime = expectedTime
         // Не меняем playbackRate, пусть сразу играет с нужной позиции
@@ -401,12 +401,12 @@ export function useCinemaHallSync({
   // --- Исходящие команды ---
 
   const emitPlay = () => {
-    console.log(
-      "📤 emitPlay: socket?",
-      !!socket,
-      "isActive?",
-      isActiveRef.current,
-    )
+    // console.log(
+    //   "📤 emitPlay: socket?",
+    //   !!socket,
+    //   "isActive?",
+    //   isActiveRef.current,
+    // )
     if (!socket || !isActiveRef.current) return
 
     isCommandPendingRef.current = true // 🔒 Блокируем
@@ -419,10 +419,10 @@ export function useCinemaHallSync({
         waitingForUsers: string[]
       }) => {
         isCommandPendingRef.current = false
-        console.log("📥 emitPlay callback:", res)
+        // console.log("📥 emitPlay callback:", res)
         if (!res.success) {
           console.warn("play rejected:", res.error)
-          console.log("waitingForUsers", res.waitingForUsers)
+          // console.log("waitingForUsers", res.waitingForUsers)
         }
       },
     )
@@ -465,7 +465,7 @@ export function useCinemaHallSync({
       "cinema-hall:buffering",
       { cinemaHallId, groupId, currentTime },
       (res: { success: boolean; error?: string }) => {
-        console.log("success", res.success)
+        // console.log("success", res.success)
         if (res.success) {
           onSuccess()
         }
@@ -483,7 +483,7 @@ export function useCinemaHallSync({
       "cinema-hall:ready",
       { cinemaHallId, groupId },
       (res: { success: boolean; error?: string }) => {
-        console.log("success", res.success)
+        // console.log("success", res.success)
         if (!res.success) console.warn("play rejected:", res.error)
       },
     )
@@ -528,9 +528,11 @@ export function useCinemaHallSync({
   // --- Синхронизация когда вкладка снова активна ---
   useEffect(() => {
     if (!socket) return
-
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible" && isActiveRef.current) {
+        const isMobile = window.matchMedia("(pointer: coarse)").matches
+        if (!isMobile) return
+
         emitSync()
       }
     }
@@ -546,77 +548,56 @@ export function useCinemaHallSync({
   const handleNativePlay = () => {
     // Просто обновляем локальный UI, если нужно
     // Например, синхронизируем иконку кнопки с состоянием видео
-    console.log("🎬 Видео играет (локально)")
+    // console.log("🎬 Видео играет (локально)")
     // НИКАКОГО emitPlay() здесь!
   }
 
   const handleNativePause = () => {
-    console.log("⏸ Видео на паузе (локально)")
+    // console.log("⏸ Видео на паузе (локально)")
     // НИКАКОГО emitPause() здесь!
   }
   const handlePauseRequest = () => {
-    console.log("⏸ Пользователь нажал Паузу")
+    // console.log("⏸ Пользователь нажал Паузу")
     if (!isActiveRef.current) return
     if (isCommandPendingRef.current) return
     emitPause() // 👈 ОТПРАВЛЯЕМ НА СЕРВЕР
   }
   const handleSeekRequest = (position: number) => {
-    console.log("🔍 Пользователь перемотал на", position)
+    // console.log("🔍 Пользователь перемотал на", position)
     if (!isActiveRef.current) return
     if (isCommandPendingRef.current) return
     emitSeek(position) // 👈 ОТПРАВЛЯЕМ НА СЕРВЕР
   }
-  // const handleUserPlayRequest = () => {
-  //   console.log(" Видео перемотка(локально)")
-  //   // НИКАКОГО emitPause() здесь!
-  // }
 
   const handlePlayRequest = () => {
-    console.log("▶️ handlePlay вызван", {
-      // isRemote: isRemoteActionRef.current,
-      isActive: isActiveRef.current,
-      hasVideo: !!videoRef.current, // boolean вместо объекта
-      videoSrc: videoRef.current?.src, // string вместо элемента
-      readyState: videoRef.current?.readyState, // number
-    })
-    // if (isRemoteActionRef.current) {
-    //   isRemoteActionRef.current = false
-    //   return
-    // }
+    // console.log("▶️ handlePlay вызван", {
+    //   // isRemote: isRemoteActionRef.current,
+    //   isActive: isActiveRef.current,
+    //   hasVideo: !!videoRef.current, // boolean вместо объекта
+    //   videoSrc: videoRef.current?.src, // string вместо элемента
+    //   readyState: videoRef.current?.readyState, // number
+    // })
 
     if (!isActiveRef.current) {
       console.warn("❌ handlePlay: хук не активен")
       return
     }
     if (isCommandPendingRef.current) {
-      console.log("⏳ Предыдущая команда ещё не выполнена, ждём...")
+      // console.log("⏳ Предыдущая команда ещё не выполнена, ждём...")
       return
     }
 
-    console.log("📡 Отправляем emitPlay...")
+    // console.log("📡 Отправляем emitPlay...")
     emitPlay()
   }
 
-  // const handlePause = () => {
-  //   if (isRemoteActionRef.current) {
-  //     isRemoteActionRef.current = false
-  //     return
-  //   }
-  //   if (!isActiveRef.current) return
-  //   if (isCommandPendingRef.current) {
-  //     console.log("⏳ Предыдущая команда ещё не выполнена, ждём...")
-  //     return
-  //   }
-  //   emitPause()
-  // }
-
   const handleSeeked = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    console.log("🔍 Пользователь перемотал видео (или сработал seeked)")
+    // console.log("🔍 Пользователь перемотал видео (или сработал seeked)")
 
     // 👇 Если время менял код — игнорируем, сбрасываем флаг и выходим
     if (isProgrammaticSeekRef.current) {
       isProgrammaticSeekRef.current = false
-      console.log("🚫 Программный seek, не отправляем на сервер")
+      // console.log("🚫 Программный seek, не отправляем на сервер")
       return
     }
 
@@ -625,69 +606,13 @@ export function useCinemaHallSync({
 
     if (!isActiveRef.current) return
     if (isCommandPendingRef.current) {
-      console.log("⏳ Предыдущая команда ещё не выполнена, ждём...")
+      // console.log("⏳ Предыдущая команда ещё не выполнена, ждём...")
       return
     }
     const newPosition = e.currentTarget.currentTime
     emitSeek(newPosition)
   }
 
-  // const handleWaiting = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-  //   if (!isActiveRef.current) return
-  //   // 👇 Добавить проверку: если вкладка скрыта — не шлём buffering
-  //   if (document.visibilityState === "hidden") return
-  //   if (isBufferingRef.current) return
-  //   isBufferingRef.current = true
-
-  //   const timeoutId = setTimeout(() => {
-  //     isBufferingRef.current = false // Страховка
-  //     console.warn("⚠️ Buffering signal timeout")
-  //   }, 10000) // 10 секунд
-
-  //   emitBuffering(e.currentTarget.currentTime, () => {
-  //     clearTimeout(timeoutId)
-  //     isBufferingRef.current = false
-  //   })
-  // }
-  // const handleWaiting = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-  //   if (!isActiveRef.current) return
-  //   if (document.visibilityState === "hidden") return // 👈 Игнорируем, если вкладка скрыта
-
-  //   // 👇 НОВАЯ ПРОВЕРКА: Если торрент почти готов — не шлем буферизацию
-  //   // Это предотвратит ложные срабатывания, когда данные есть, но плеер "тупит"
-  //   const torrent = torrentRef?.current
-  //   const currentPos = videoRef.current?.currentTime || 0
-  //   const duration = videoRef.current?.duration || 1
-
-  //   // Вычисляем, какой байт нам нужен прямо сейчас
-  //   const neededByte = torrent?.length
-  //     ? Math.floor((currentPos / duration) * torrent.length)
-  //     : 0
-
-  //   // Если торрент скачал больше, чем нам нужно + запас 1МБ — мы готовы!
-  //   const hasEnoughData =
-  //     torrent && torrent.downloaded >= neededByte + 1024 * 1024
-
-  //   if (hasEnoughData) {
-  //     console.log("⚠️ onWaiting сработал, но данных достаточно — игнорируем")
-  //     return // 👈 НЕ отправляем buffering на сервер!
-  //   }
-
-  //   // Если реально не хватает данных — шлем сигнал
-  //   if (isBufferingRef.current) return
-  //   isBufferingRef.current = true
-
-  //   console.log(
-  //     "📡 Реальная буферизация: скачано",
-  //     torrent?.downloaded,
-  //     "нужно",
-  //     neededByte,
-  //   )
-
-  //   emitBuffering(e.currentTarget.currentTime, () => {
-  //     isBufferingRef.current = false
-  //   })
-  // }
   // 👇 Запускаем проверку, когда видео "заголодало"
   const handleWaiting = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     // 👇 Если только что отправили ready — игнорируем onWaiting (грациозный период)

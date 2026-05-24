@@ -242,6 +242,10 @@ export function CinemaVideoPlayer({
     const changeMemberControlHandler = (data: {
       isMembersControl: boolean
     }) => {
+      // console.log(
+      //   "changeMemberControlHandler data.isMembersControl",
+      //   data.isMembersControl,
+      // )
       dispatch(changeMemberControl(data.isMembersControl))
     }
     socket.on("cinema-hall:change-member-control", changeMemberControlHandler)
@@ -267,6 +271,9 @@ export function CinemaVideoPlayer({
   }
 
   const isBlockButtonControl = !isHost && isMembersControl
+  // console.log("!isHost", !isHost)
+  // console.log("isMembersControl", isMembersControl)
+  // console.log("isBlockButtonControl", isBlockButtonControl)
   return (
     <div
       className={`${style.player} ${isFullscreen ? style.fullscreen : ""} ${!controlsVisible ? style.hiddenCursor : ""}`}
