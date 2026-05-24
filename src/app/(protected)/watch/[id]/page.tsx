@@ -125,6 +125,10 @@ export default function WatchPage() {
   const cinemaHallName = useAppSelector(
     (state) => state.cinemaHall.cinemaHallTarget.cinemaHallName,
   )
+  const hostId = useAppSelector(
+    (state) => state.cinemaHall.cinemaHallTarget.hostId,
+  )
+  const userId = useAppSelector((state) => state.auth.userId)
 
   const playing = useAppSelector(
     (state) => state.cinemaHall.cinemaHallTarget.playing,
@@ -628,6 +632,7 @@ export default function WatchPage() {
           cinemaHallId={id}
           groupId={groupId}
           socket={socket}
+          isHost={hostId === userId}
         />
 
         <div className={style.watchPage__userInRoomContainer}>

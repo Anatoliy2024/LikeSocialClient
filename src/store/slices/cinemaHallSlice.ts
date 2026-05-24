@@ -8,6 +8,7 @@ const initialCinemaHallTarget = {
   hostId: null,
   participants: [],
   file: { name: null, size: 0, magnet: null },
+  isMembersControl: true,
   currentTime: 0,
   playing: false,
   updatedAt: null,
@@ -118,6 +119,9 @@ const cinemaHallSlice = createSlice({
           (p) => p.userId !== action.payload,
         )
     },
+    changeMemberControl(state, action) {
+      state.cinemaHallTarget.isMembersControl = action.payload
+    },
   },
 })
 
@@ -141,6 +145,7 @@ export const {
   applyWaitingFor,
 
   removeParticipant,
+  changeMemberControl,
 } = cinemaHallSlice.actions
 
 export default cinemaHallSlice.reducer
