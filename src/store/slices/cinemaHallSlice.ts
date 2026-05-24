@@ -36,15 +36,15 @@ const cinemaHallSlice = createSlice({
       //   state.cinemaHallTarget.
     },
     getAllCinemaHall(state, action) {
-      console.log("getAllCinemaHall state", action.payload)
+      // console.log("getAllCinemaHall state", action.payload)
       state.cinemaHalls = action.payload
     },
     getCinemaHallList(state, action) {
-      console.log("getCinemaHall state", action.payload)
+      // console.log("getCinemaHall state", action.payload)
       state.cinemaHalls.push(action.payload)
     },
     delCinemaHallList(state, action) {
-      console.log("getCinemaHall state", action.payload)
+      // console.log("getCinemaHall state", action.payload)
 
       state.cinemaHalls = state.cinemaHalls.filter(
         (hall) => hall.cinemaHallId !== action.payload,
@@ -60,7 +60,14 @@ const cinemaHallSlice = createSlice({
       }
     },
     joinUser(state, action) {
-      state.cinemaHallTarget.participants.push(action.payload)
+      const already = state.cinemaHallTarget.participants.find(
+        (p) => p.userId === action.payload.userId,
+      )
+      if (!already) {
+        state.cinemaHallTarget.participants.push(action.payload)
+      }
+
+      // state.cinemaHallTarget.participants.push(action.payload)
     },
     leftUser(state, action) {
       state.cinemaHallTarget.participants =

@@ -339,10 +339,10 @@ export default function WatchPage() {
     })
 
     const startPlayer = () => {
-      console.log("=== DEBUG: Torrent Ready ===")
-      console.log("Name:", torrent.name)
-      console.log("Progress:", torrent.progress)
-      console.log("Downloaded:", torrent.downloaded, "of", torrent.length)
+      // console.log("=== DEBUG: Torrent Ready ===")
+      // console.log("Name:", torrent.name)
+      // console.log("Progress:", torrent.progress)
+      // console.log("Downloaded:", torrent.downloaded, "of", torrent.length)
 
       const videoFile = (torrent.files as TorrentFile[]).find((f) =>
         VIDEO_EXTENSIONS.some((ext) => f.name.endsWith(ext)),
@@ -353,13 +353,13 @@ export default function WatchPage() {
         setTorrentStatus("error")
         return
       }
-      console.log("videoRef.current", videoRef.current)
+      // console.log("videoRef.current", videoRef.current)
       if (!videoRef.current) return
 
-      console.log(
-        "videoFile?.streamTo изменение на ready",
-        !!videoFile?.streamTo,
-      )
+      // console.log(
+      //   "videoFile?.streamTo изменение на ready",
+      //   !!videoFile?.streamTo,
+      // )
       if (videoFile?.streamTo) {
         videoFile.streamTo(videoRef.current)
         setTorrentStatus("ready")
@@ -370,13 +370,13 @@ export default function WatchPage() {
     }
     // 🎯 ГЛАВНЫЙ ФИКС: Проверяем, не готов ли торрент УЖЕ СЕЙЧАС
     if (torrent.ready) {
-      console.log("⚡ Торрент УЖЕ готов, запускаем плеер немедленно")
+      // console.log("⚡ Торрент УЖЕ готов, запускаем плеер немедленно")
       startPlayer()
     } else {
       // Иначе ждём событие ready как обычно
-      console.log("⏳ Ждём события ready...")
+      // console.log("⏳ Ждём события ready...")
       torrent.on("ready", () => {
-        console.log("✅ Событие ready сработало")
+        // console.log("✅ Событие ready сработало")
         startPlayer()
       })
     }
@@ -400,7 +400,7 @@ export default function WatchPage() {
   }, [socket, dispatch])
 
   const connectMagnet = async (client: WebTorrentInstance, magnet: string) => {
-    console.log("connectMagnet:", magnet)
+    // console.log("connectMagnet:", magnet)
 
     // 1. Парсим infoHash из magnet ссылки (формат: ...btih:HASH&...)
     const hashMatch = magnet.match(/btih:([a-zA-Z0-9]+)/)
@@ -416,7 +416,7 @@ export default function WatchPage() {
     )
 
     if (existing) {
-      console.log("✅ Торрент уже добавлен, используем существующий")
+      // console.log("✅ Торрент уже добавлен, используем существующий")
       setupTorrentPlayer(existing)
       return
     }
@@ -452,7 +452,7 @@ export default function WatchPage() {
       torrentRef.current = torrent
 
       torrent.on("ready", () => {
-        console.log("🧲 Magnet:", torrent.magnetURI)
+        // console.log("🧲 Magnet:", torrent.magnetURI)
         setMagnetURI(torrent.magnetURI)
         setIsHashing(false)
         torrentInfoHashRef.current = torrent.infoHash
@@ -499,7 +499,7 @@ export default function WatchPage() {
         file: { name: file.name, size: file.size, magnet: magnetURI },
       },
       async (data: { hall: CinemaHallTargetType }) => {
-        console.log("Зал создан:", data.hall)
+        // console.log("Зал создан:", data.hall)
         if (torrentRef.current) {
           await dispatch(setCinemaHall(data.hall))
           activate()
@@ -661,7 +661,7 @@ export default function WatchPage() {
             <h4>Ожидаемые юзеры:</h4>
             <ul>
               {waitingForUsers.map((userId) => {
-                console.log("waitingForUsers", waitingForUsers)
+                // console.log("waitingForUsers", waitingForUsers)
                 const user = roomUsers.find((user) => user.userId === userId)
                 if (!user) return
                 return (
