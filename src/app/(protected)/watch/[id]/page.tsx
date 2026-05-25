@@ -35,7 +35,8 @@ import { useCinemaHallSync } from "@/hooks/useCinemaHallSync"
 import { TorrentStatsPanel } from "@/components/TorrentStatsPanel/TorrentStatsPanel"
 import { VideoAndChatContainer } from "@/components/VideoAndChatContainer/VideoAndChatContainer"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
-import SimplePeer from "simple-peer"
+import { calculateSeedingDelay } from "@/utils/calculateSeedingDelay"
+// import SimplePeer from "simple-peer"
 
 // Исправление: передавать AbortSignal
 function waitForClient(
@@ -72,18 +73,19 @@ interface JoinHallResponse {
 
 // ─── Константы ────────────────────────────────────────────────────────────────
 
-// const TRACKERS: string[] = [
-//   "wss://tracker.openwebtorrent.com",
-//   "wss://tracker.webtorrent.dev",
-//   // "wss://tracker.files.fm:7073/announce", // ← добавь
-// ]
-const TRACKERS: string[] = []
+const TRACKERS: string[] = [
+  "wss://tracker.openwebtorrent.com",
+  "wss://tracker.webtorrent.dev",
+  // "wss://tracker.files.fm:7073/announce", // ← добавь
+]
+// const TRACKERS: string[] = []
 
 const VIDEO_EXTENSIONS = [".mp4", ".mkv", ".webm"] as const
 
 const WEBTORRENT_CONFIG = {
   dht: false,
   tracker: {
+    announce: TRACKERS, // ← ДОБАВИТЬ ЭТУ СТРОКУ
     rtcConfig: {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -118,6 +120,9 @@ export default function WatchPage() {
   const [torrentStatus, setTorrentStatus] = useState<TorrentStatus>("idle")
   const [bufferingStatus, setBufferingStatus] = useState<boolean>(false)
   const [bufferProgress, setBufferProgress] = useState(0)
+  const [isFilePrepared, setIsFilePrepared] = useState(false) // файл готов локально
+
+  const [isSeedingActive, setIsSeedingActive] = useState(false) // ← НОВОЕ: файл готов И раздача стабильна
 
   const inputRef = useRef<HTMLInputElement | null>(null)
   const clientRef = useRef<WebTorrentInstance | null>(null)
@@ -128,8 +133,7 @@ export default function WatchPage() {
   const blobUrlRef = useRef<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const peerCheckRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const peerConnectionsRef = useRef<Map<string, SimplePeer.Instance>>(new Map())
-  const [isFilePrepared, setIsFilePrepared] = useState(false) // файл готов локально
+  // const peerConnectionsRef = useRef<Map<string, SimplePeer.Instance>>(new Map())
 
   const {
     handleSeeked,
@@ -170,64 +174,65 @@ export default function WatchPage() {
   const username = useAppSelector((state) => state.auth.username)
   const avatar = useAppSelector((state) => state.auth.avatar)
 
-  const createPeerConnection = useCallback(
-    (
-      torrent: TorrentInstance,
-      targetSocketId: string,
-      isInitiator: boolean,
-    ): SimplePeer.Instance | undefined => {
-      if (peerConnectionsRef.current.has(targetSocketId)) return
+  // const createPeerConnection = useCallback(
+  //   (
+  //     torrent: TorrentInstance,
+  //     targetSocketId: string,
+  //     isInitiator: boolean,
+  //   ): SimplePeer.Instance | undefined => {
+  //       console.log(`🆕 Peer создан: ${targetSocketId}, initiator: ${isInitiator}`)
+  //     if (peerConnectionsRef.current.has(targetSocketId)) return
 
-      console.log(
-        `🔧 Создаём SimplePeer с ${targetSocketId}, initiator: ${isInitiator}`,
-      )
+  //     console.log(
+  //       `🔧 Создаём SimplePeer с ${targetSocketId}, initiator: ${isInitiator}`,
+  //     )
 
-      const peer = new SimplePeer({
-        initiator: isInitiator,
-        trickle: true,
-        config: {
-          iceServers: [
-            { urls: "stun:stun.l.google.com:19302" },
-            { urls: "stun:stun1.l.google.com:19302" },
-            { urls: "stun:stun.cloudflare.com:3478" },
-          ],
-        },
-      })
+  //     const peer = new SimplePeer({
+  //       initiator: isInitiator,
+  //       trickle: true,
+  //       config: {
+  //         iceServers: [
+  //           { urls: "stun:stun.l.google.com:19302" },
+  //           { urls: "stun:stun1.l.google.com:19302" },
+  //           { urls: "stun:stun.cloudflare.com:3478" },
+  //         ],
+  //       },
+  //     })
 
-      // Храним SimplePeer инстанс
-      peerConnectionsRef.current.set(targetSocketId, peer)
+  //     // Храним SimplePeer инстанс
+  //     peerConnectionsRef.current.set(targetSocketId, peer)
 
-      // signal — это offer/answer/ICE всё в одном
-      peer.on("signal", (data) => {
-        socket?.emit("webrtc:signal", {
-          targetSocketId,
-          signal: data,
-        })
-        console.log(`📤 Signal → ${targetSocketId}`, data.type)
-      })
+  //     // signal — это offer/answer/ICE всё в одном
+  //     peer.on("signal", (data) => {
+  //       socket?.emit("webrtc:signal", {
+  //         targetSocketId,
+  //         signal: data,
+  //       })
+  //       console.log(`📤 Signal → ${targetSocketId}`, data.type)
+  //     })
 
-      peer.on("connect", () => {
-        console.log(`✅ SimplePeer соединён с ${targetSocketId}`)
-        // @ts-ignore
-        const wire = torrent._addPeer(peer)
-        console.log(`📊 wire:`, wire)
-        // torrent.addPeer(peer)
-      })
+  //     peer.on("connect", () => {
+  //       console.log(`✅ SimplePeer соединён с ${targetSocketId}`)
+  //       // @ts-ignore
+  //       const wire = torrent._addPeer(peer)
+  //       console.log(`📊 wire:`, wire)
+  //       // torrent.addPeer(peer)
+  //     })
 
-      peer.on("error", (err) => {
-        console.error(`❌ SimplePeer ошибка [${targetSocketId}]:`, err)
-        peerConnectionsRef.current.delete(targetSocketId)
-      })
+  //     peer.on("error", (err) => {
+  //       console.error(`❌ SimplePeer ошибка [${targetSocketId}]:`, err)
+  //       peerConnectionsRef.current.delete(targetSocketId)
+  //     })
 
-      peer.on("close", () => {
-        console.log(`🔌 SimplePeer закрыт [${targetSocketId}]`)
-        peerConnectionsRef.current.delete(targetSocketId)
-      })
+  //     peer.on("close", () => {
+  //       console.log(`🔌 SimplePeer закрыт [${targetSocketId}]`)
+  //       peerConnectionsRef.current.delete(targetSocketId)
+  //     })
 
-      return peer
-    },
-    [socket],
-  )
+  //     return peer
+  //   },
+  //   [socket],
+  // )
 
   useEffect(() => {
     return () => {
@@ -236,56 +241,56 @@ export default function WatchPage() {
       abortControllerRef.current?.abort()
 
       // SimplePeer использует destroy() а не close()
-      peerConnectionsRef.current.forEach((peer) => {
-        try {
-          ;(peer as unknown as SimplePeer.Instance).destroy()
-        } catch {}
-      })
-      peerConnectionsRef.current.clear()
+      // peerConnectionsRef.current.forEach((peer) => {
+      //   try {
+      //     ;(peer as unknown as SimplePeer.Instance).destroy()
+      //   } catch {}
+      // })
+      // peerConnectionsRef.current.clear()
 
       const torrent = torrentRef.current
       if (torrent) torrent.removeAllListeners()
     }
   }, [])
 
-  useEffect(() => {
-    if (!socket) return
+  // useEffect(() => {
+  //   if (!socket) return
 
-    const handleSignal = ({
-      signal,
-      fromSocketId,
-    }: {
-      signal: SimplePeer.SignalData
-      fromSocketId: string
-    }) => {
-      console.log(`📥 Signal от ${fromSocketId}`, signal.type)
+  //   const handleSignal = ({
+  //     signal,
+  //     fromSocketId,
+  //   }: {
+  //     signal: SimplePeer.SignalData
+  //     fromSocketId: string
+  //   }) => {
+  //     console.log(`📥 Signal от ${fromSocketId}`, signal.type)
 
-      let peer = peerConnectionsRef.current.get(fromSocketId) as
-        | SimplePeer.Instance
-        | undefined
+  //     let peer = peerConnectionsRef.current.get(fromSocketId) as
+  //       | SimplePeer.Instance
+  //       | undefined
 
-      // Если пира нет — мы не-инициатор, создаём
-      if (!peer) {
-        const torrent = torrentRef.current
-        if (!torrent) {
-          console.warn("⚠️ Signal получен но торрент не готов")
-          return
-        }
-        peer = createPeerConnection(
-          torrent,
-          fromSocketId,
-          false,
-        ) as SimplePeer.Instance
-      }
+  //     // Если пира нет — мы не-инициатор, создаём
+  //     if (!peer) {
+  //       const torrent = torrentRef.current
+  //       if (!torrent) {
+  //         console.warn("⚠️ Signal получен но торрент не готов")
+  //         return
+  //       }
+  //       peer = createPeerConnection(
+  //         torrent,
+  //         fromSocketId,
+  //         false,
+  //       ) as SimplePeer.Instance
+  //     }
 
-      peer?.signal(signal)
-    }
+  //     peer?.signal(signal)
+  //   }
 
-    socket.on("webrtc:signal", handleSignal)
-    return () => {
-      socket.off("webrtc:signal", handleSignal)
-    }
-  }, [socket, createPeerConnection])
+  //   socket.on("webrtc:signal", handleSignal)
+  //   return () => {
+  //     socket.off("webrtc:signal", handleSignal)
+  //   }
+  // }, [socket, createPeerConnection])
 
   useEffect(() => {
     async function deleteTorrentFiles(hash: string): Promise<void> {
@@ -415,19 +420,19 @@ export default function WatchPage() {
               peerId: client.peerId,
             })
 
-            const torrent = torrentRef.current
-            if (torrent) {
-              data.hall.participants.forEach((participant) => {
-                if (!participant.socketId) return
-                // Не подключаемся к себе
-                if (participant.socketId === socket.id) return
+            // const torrent = torrentRef.current
+            // if (torrent) {
+            //   data.hall.participants.forEach((participant) => {
+            //     if (!participant.socketId) return
+            //     // Не подключаемся к себе
+            //     if (participant.socketId === socket.id) return
 
-                console.log(
-                  `🔧 Инициируем соединение с ${participant.username}`,
-                )
-                createPeerConnection(torrent, participant.socketId, true)
-              })
-            }
+            //     console.log(
+            //       `🔧 Инициируем соединение с ${participant.username}`,
+            //     )
+            //     createPeerConnection(torrent, participant.socketId, true)
+            //   })
+            // }
           } catch (err) {
             console.error("Ошибка подключения:", err)
             setTorrentStatus("error")
@@ -597,18 +602,20 @@ export default function WatchPage() {
   useEffect(() => {
     if (!socket) return
     const getPeerIdHandler = (data: { user: ParticipantsType }) => {
-      console.log("getPeerIdHandler data", data)
+      //    console.log(`🔍 getPeerId для ${data.user.socketId}, peer в ref:`,
+      // peerConnectionsRef.current.has(data.user.socketId))
+      //   console.log("getPeerIdHandler data", data)
       dispatch(getPeerId(data.user))
 
       // ← НОВОЕ: если мы хост и у нас есть торрент — добавляем пира напрямую
       const torrent = torrentRef.current
       if (!torrent) return
 
-      const viewerPeerId = data.user.peerId
-      if (!viewerPeerId) return
+      // const viewerPeerId = data.user.peerId
+      // if (!viewerPeerId) return
 
-      console.log("🔗 Добавляем пира вручную:", viewerPeerId)
-      torrent.addPeer(viewerPeerId)
+      // console.log("🔗 Добавляем пира вручную:", viewerPeerId)
+      // torrent.addPeer(viewerPeerId)
     }
     socket.on("cinema-hall:get-peer-id", getPeerIdHandler)
 
@@ -657,6 +664,7 @@ export default function WatchPage() {
   const handleFile = async (f: File) => {
     if (!f.type.startsWith("video/")) return
 
+    const fileSize = f.size
     setFile(f)
     setIsHashing(true)
     setIsFilePrepared(false)
@@ -696,6 +704,18 @@ export default function WatchPage() {
         console.log("🎉 done: торрент полностью готов!")
         setIsFilePrepared(true)
         setIsHashing(false)
+
+        // 🔥 Динамический буфер на основе размера файла
+        const delay = calculateSeedingDelay(fileSize)
+        console.log("file", fileSize)
+        console.log(
+          `⏳ Буфер готовности: ${delay / 1000} сек (файл: ${(fileSize / 1024 / 1024 / 1024).toFixed(1)} ГБ)`,
+        )
+
+        setTimeout(() => {
+          setIsSeedingActive(true)
+          console.log("✅ Раздача стабильна, можно создавать комнату")
+        }, delay)
       })
 
       torrent.on("error", (err) => {
@@ -788,9 +808,10 @@ export default function WatchPage() {
       !!movieName.trim() &&
       !!magnetURI &&
       isFilePrepared &&
+      isSeedingActive && // ← НОВОЕ: ждём не только done, но и буфер
       !isHashing
     )
-  }, [file, movieName, magnetURI, isFilePrepared, isHashing])
+  }, [file, movieName, magnetURI, isFilePrepared, isSeedingActive, isHashing])
 
   return (
     <>
@@ -829,7 +850,7 @@ export default function WatchPage() {
               )}
             </div>
 
-            {isHashing && (
+            {/* {isHashing && (
               <div className={style.hashingStatus}>
                 <Spinner />
                 <span>Подготовка файла к раздаче...</span>
@@ -842,6 +863,35 @@ export default function WatchPage() {
             {isFilePrepared && !isHashing && (
               <div className={style.statusReady}>
                 ✅ Файл готов. Можно создавать кинозал
+              </div>
+            )} */}
+            {/* Стало */}
+            {isHashing && (
+              <div className={style.hashingStatus}>
+                <Spinner />
+                <span>Подготовка файла к раздаче...</span>
+                <span className={style.hint}>
+                  Чем больше файл, тем дольше это займёт
+                </span>
+              </div>
+            )}
+            {isFilePrepared && !isSeedingActive && file && (
+              <div className={style.statusReady}>
+                <Spinner />
+                <span>
+                  Файл обработан. Готовим раздачу...
+                  <br />
+                  <small>
+                    ~{Math.round(calculateSeedingDelay(file.size) / 1000)} сек (
+                    {(file.size / 1024 / 1024 / 1024).toFixed(1)} ГБ)
+                  </small>
+                </span>
+              </div>
+            )}
+
+            {isSeedingActive && (
+              <div className={style.statusReady}>
+                ✅ Раздача стабильна. Можно создавать кинозал!
               </div>
             )}
 
