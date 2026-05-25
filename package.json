@@ -33,7 +33,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/simple-peer": "^9.11.8",
+    "@types/simple-peer": "^9.11.9",
     "@types/webtorrent": "^0.110.1",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",

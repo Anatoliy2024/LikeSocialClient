@@ -75,3 +75,24 @@
     overflow: hidden;
   }
 }
+
+.hashingStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  color: #aaa;
+  font-size: 0.95rem;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.statusReady {
+  color: #4caf50;
+  margin: 1rem 0;
+  font-weight: 500;
+}

@@ -39,7 +39,7 @@ export function TorrentStatsPanel({
   const sortedWires = useMemo(() => {
     return [...stats.wires].sort((a, b) => b.downloadSpeed - a.downloadSpeed)
   }, [stats.wires])
-  console.log("sortedWires", sortedWires)
+  // console.log("sortedWires", sortedWires)
   if (!torrentRef.current) {
     return (
       <div className={`${style.panel} ${className ?? ""}`}>
@@ -99,16 +99,13 @@ export function TorrentStatsPanel({
             <div className={style.peersSection}>
               <h5>Подключенные пиры ({sortedWires.length}):</h5>
               <ul className={style.peersList}>
-                {sortedWires.map((wire) => {
+                {sortedWires.map((wire, i) => {
                   const participant = participants.find(
                     (user) => user.peerId === wire.peerId,
                   )
-                  console.log("participants", participants)
+                  // console.log("participants", participants)
                   return (
-                    <li
-                      key={`${wire.peerId}-${wire.type}`}
-                      className={style.peerItem}
-                    >
+                    <li key={i} className={style.peerItem}>
                       <div className={style.peerHeader}>
                         <div className={style.userInfo}>
                           {participants.length > 0 && (

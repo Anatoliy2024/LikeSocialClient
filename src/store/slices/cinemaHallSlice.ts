@@ -6,6 +6,7 @@ const initialCinemaHallTarget = {
   cinemaHallId: null,
   cinemaHallName: null,
   hostId: null,
+  hostSocketId: null,
   participants: [],
   file: { name: null, size: 0, magnet: null },
   isMembersControl: true,
@@ -63,6 +64,12 @@ const cinemaHallSlice = createSlice({
       const already = state.cinemaHallTarget.participants.find(
         (p) => p.userId === action.payload.userId,
       )
+      console.log(
+        " state.cinemaHallTarget.participants.",
+        state.cinemaHallTarget.participants,
+      )
+      console.log("Slice joinUser", action.payload)
+      console.log("already", already)
       if (!already) {
         state.cinemaHallTarget.participants.push(action.payload)
       }
@@ -133,9 +140,9 @@ const cinemaHallSlice = createSlice({
       state.cinemaHallTarget.participants =
         state.cinemaHallTarget.participants.map((user) => {
           if (user.userId === action.payload.userId) {
-            return user
+            return { ...user, ...action.payload }
           } else {
-            return action.payload
+            return user
           }
         })
     },
