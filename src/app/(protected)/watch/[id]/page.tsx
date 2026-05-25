@@ -1,11 +1,19 @@
 "use client"
 import { useSocket } from "@/providers/SocketProvider"
 import { useParams, useSearchParams } from "next/navigation"
-import { ChangeEvent, useEffect, useRef, useState } from "react"
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import style from "./WatchPage.module.scss"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import {
   clearCinemaHall,
+  getPeerId,
   joinUser,
   leftUser,
   setCinemaHall,
@@ -27,11 +35,12 @@ import { useCinemaHallSync } from "@/hooks/useCinemaHallSync"
 import { TorrentStatsPanel } from "@/components/TorrentStatsPanel/TorrentStatsPanel"
 import { VideoAndChatContainer } from "@/components/VideoAndChatContainer/VideoAndChatContainer"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
+import SimplePeer from "simple-peer"
 
 // Исправление: передавать AbortSignal
 function waitForClient(
   clientRef: React.RefObject<WebTorrentInstance | null>,
-  signal: AbortSignal,
+  signal?: AbortSignal,
   timeoutMs = 10000,
 ): Promise<WebTorrentInstance> {
   return new Promise((resolve, reject) => {
@@ -63,10 +72,12 @@ interface JoinHallResponse {
 
 // ─── Константы ────────────────────────────────────────────────────────────────
 
-const TRACKERS: string[] = [
-  "wss://tracker.openwebtorrent.com",
-  "wss://tracker.webtorrent.dev",
-]
+// const TRACKERS: string[] = [
+//   "wss://tracker.openwebtorrent.com",
+//   "wss://tracker.webtorrent.dev",
+//   // "wss://tracker.files.fm:7073/announce", // ← добавь
+// ]
+const TRACKERS: string[] = []
 
 const VIDEO_EXTENSIONS = [".mp4", ".mkv", ".webm"] as const
 
@@ -82,6 +93,14 @@ const WEBTORRENT_CONFIG = {
     },
   },
 } as const
+
+// const ICE_SERVERS = {
+//   iceServers: [
+//     { urls: "stun:stun.l.google.com:19302" },
+//     { urls: "stun:stun1.l.google.com:19302" },
+//     { urls: "stun:stun.cloudflare.com:3478" },
+//   ],
+// }
 
 export default function WatchPage() {
   const { id } = useParams() as { id: string }
@@ -109,6 +128,8 @@ export default function WatchPage() {
   const blobUrlRef = useRef<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const peerCheckRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const peerConnectionsRef = useRef<Map<string, SimplePeer.Instance>>(new Map())
+  const [isFilePrepared, setIsFilePrepared] = useState(false) // файл готов локально
 
   const {
     handleSeeked,
@@ -149,6 +170,123 @@ export default function WatchPage() {
   const username = useAppSelector((state) => state.auth.username)
   const avatar = useAppSelector((state) => state.auth.avatar)
 
+  const createPeerConnection = useCallback(
+    (
+      torrent: TorrentInstance,
+      targetSocketId: string,
+      isInitiator: boolean,
+    ): SimplePeer.Instance | undefined => {
+      if (peerConnectionsRef.current.has(targetSocketId)) return
+
+      console.log(
+        `🔧 Создаём SimplePeer с ${targetSocketId}, initiator: ${isInitiator}`,
+      )
+
+      const peer = new SimplePeer({
+        initiator: isInitiator,
+        trickle: true,
+        config: {
+          iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "stun:stun1.l.google.com:19302" },
+            { urls: "stun:stun.cloudflare.com:3478" },
+          ],
+        },
+      })
+
+      // Храним SimplePeer инстанс
+      peerConnectionsRef.current.set(targetSocketId, peer)
+
+      // signal — это offer/answer/ICE всё в одном
+      peer.on("signal", (data) => {
+        socket?.emit("webrtc:signal", {
+          targetSocketId,
+          signal: data,
+        })
+        console.log(`📤 Signal → ${targetSocketId}`, data.type)
+      })
+
+      peer.on("connect", () => {
+        console.log(`✅ SimplePeer соединён с ${targetSocketId}`)
+        // @ts-ignore
+        const wire = torrent._addPeer(peer)
+        console.log(`📊 wire:`, wire)
+        // torrent.addPeer(peer)
+      })
+
+      peer.on("error", (err) => {
+        console.error(`❌ SimplePeer ошибка [${targetSocketId}]:`, err)
+        peerConnectionsRef.current.delete(targetSocketId)
+      })
+
+      peer.on("close", () => {
+        console.log(`🔌 SimplePeer закрыт [${targetSocketId}]`)
+        peerConnectionsRef.current.delete(targetSocketId)
+      })
+
+      return peer
+    },
+    [socket],
+  )
+
+  useEffect(() => {
+    return () => {
+      if (peerCheckRef.current) clearInterval(peerCheckRef.current)
+
+      abortControllerRef.current?.abort()
+
+      // SimplePeer использует destroy() а не close()
+      peerConnectionsRef.current.forEach((peer) => {
+        try {
+          ;(peer as unknown as SimplePeer.Instance).destroy()
+        } catch {}
+      })
+      peerConnectionsRef.current.clear()
+
+      const torrent = torrentRef.current
+      if (torrent) torrent.removeAllListeners()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!socket) return
+
+    const handleSignal = ({
+      signal,
+      fromSocketId,
+    }: {
+      signal: SimplePeer.SignalData
+      fromSocketId: string
+    }) => {
+      console.log(`📥 Signal от ${fromSocketId}`, signal.type)
+
+      let peer = peerConnectionsRef.current.get(fromSocketId) as
+        | SimplePeer.Instance
+        | undefined
+
+      // Если пира нет — мы не-инициатор, создаём
+      if (!peer) {
+        const torrent = torrentRef.current
+        if (!torrent) {
+          console.warn("⚠️ Signal получен но торрент не готов")
+          return
+        }
+        peer = createPeerConnection(
+          torrent,
+          fromSocketId,
+          false,
+        ) as SimplePeer.Instance
+      }
+
+      peer?.signal(signal)
+    }
+
+    socket.on("webrtc:signal", handleSignal)
+    return () => {
+      socket.off("webrtc:signal", handleSignal)
+    }
+  }, [socket, createPeerConnection])
+
   useEffect(() => {
     async function deleteTorrentFiles(hash: string): Promise<void> {
       try {
@@ -157,10 +295,23 @@ export default function WatchPage() {
 
         // Ищем папку которая заканчивается на наш hash
         // @ts-ignore
-        for await (const [name] of root.entries()) {
-          if (name.endsWith(shortHash)) {
-            await root.removeEntry(name, { recursive: true })
-            console.log(`✅ Удалено: ${name}`)
+        for await (const name of root.keys()) {
+          if ((name as string).endsWith(shortHash)) {
+            try {
+              await root.removeEntry(name, { recursive: true })
+              console.log(`✅ Удалено: ${name}`)
+            } catch (e) {
+              // NoModificationAllowedError — файл уже удалён WebTorrent'ом, игнорируем
+              if (
+                e instanceof DOMException &&
+                e.name === "NoModificationAllowedError"
+              )
+                return
+              throw e
+            }
+
+            // await root.removeEntry(name, { recursive: true })
+            // console.log(`✅ Удалено: ${name}`)
             return
           }
         }
@@ -234,8 +385,8 @@ export default function WatchPage() {
   // ─── 2. Подключение к залу через socket ─────────────────────────────────────
   useEffect(() => {
     if (!socket || !id) return
-    const ac = new AbortController()
-    abortControllerRef.current = ac // ← сохраняем
+    // const ac = new AbortController()
+    // abortControllerRef.current = ac // ← сохраняем
 
     socket.emit(
       "cinema-hall:join",
@@ -254,10 +405,29 @@ export default function WatchPage() {
             // setMagnetURI(data.hall?.file?.magnet)
             setTorrentStatus("connecting")
 
-            const client = await waitForClient(clientRef, ac.signal)
-            // const client = await waitForClient(clientRef)
+            const client = await waitForClient(clientRef)
+            // const client = await waitForClient(clientRef, ac.signal)
 
             await connectMagnet(client, data.hall.file.magnet)
+            socket.emit("cinema-hall:set-peer-id", {
+              cinemaHallId: id,
+              groupId,
+              peerId: client.peerId,
+            })
+
+            const torrent = torrentRef.current
+            if (torrent) {
+              data.hall.participants.forEach((participant) => {
+                if (!participant.socketId) return
+                // Не подключаемся к себе
+                if (participant.socketId === socket.id) return
+
+                console.log(
+                  `🔧 Инициируем соединение с ${participant.username}`,
+                )
+                createPeerConnection(torrent, participant.socketId, true)
+              })
+            }
           } catch (err) {
             console.error("Ошибка подключения:", err)
             setTorrentStatus("error")
@@ -280,9 +450,18 @@ export default function WatchPage() {
   }, [socket, id, groupId]) // dispatch, groupId стабильны
 
   // ─── Настройка плеера для торрента (универсальная) ───────────────────────────
-  const setupTorrentPlayer = (torrent: TorrentInstance) => {
+  const setupTorrentPlayer = (
+    torrent: TorrentInstance,
+    existingPeerIds: string[] = [],
+  ) => {
     torrentRef.current = torrent
     torrentInfoHashRef.current = torrent.infoHash
+
+    existingPeerIds.forEach((peerId) => {
+      console.log("🔗 Добавляем пира:", peerId)
+      const result = torrent.addPeer(peerId)
+      console.log("🔗 addPeer результат:", result) // true/false — сработало или нет
+    })
 
     // Отладка пиров
     peerCheckRef.current = setInterval(() => {
@@ -312,16 +491,32 @@ export default function WatchPage() {
       setBufferProgress(percent)
       setBufferingStatus(percent < 100)
     })
+
+    // // WebTorrent не даёт прогресс хеширования напрямую
+    // // Но даёт событие на каждый кусок
+    // // @ts-ignore
+    // torrent.on("verified", (index: number) => {
+    //   console.log("verified is work*************************************")
+    //   const total = torrent.pieces?.length || 1
+    //   const percent = Math.round((index / total) * 100)
+    //   setHashProgress(percent)
+    //   console.log(`🔨 Хеширование: ${percent}%`)
+    // })
+
     // @ts-ignore
     torrent.on("wire", (wire, addr: string) => {
-      console.log(`🔗 Пир: ${addr}, тип: ${wire.type}`)
+      // console.log(`🔗 Пир: ${addr}, тип: ${wire.type}`)
+      console.log(
+        `✅ СОЕДИНЕНИЕ УСТАНОВЛЕНО! Пир: ${addr}, тип: ${wire.type}, peerId: ${wire.peerId}`,
+      )
       if (peerCheckRef.current) {
         clearInterval(peerCheckRef.current)
       }
     })
 
     torrent.on("noPeers", () => {
-      console.warn("⚠️ Нет пиров")
+      // console.warn("⚠️ Нет пиров")
+      console.warn("❌ Нет пиров — addPeer не сработал")
     })
 
     torrent.on("warning", (err) => {
@@ -399,7 +594,34 @@ export default function WatchPage() {
     }
   }, [socket, dispatch])
 
-  const connectMagnet = async (client: WebTorrentInstance, magnet: string) => {
+  useEffect(() => {
+    if (!socket) return
+    const getPeerIdHandler = (data: { user: ParticipantsType }) => {
+      console.log("getPeerIdHandler data", data)
+      dispatch(getPeerId(data.user))
+
+      // ← НОВОЕ: если мы хост и у нас есть торрент — добавляем пира напрямую
+      const torrent = torrentRef.current
+      if (!torrent) return
+
+      const viewerPeerId = data.user.peerId
+      if (!viewerPeerId) return
+
+      console.log("🔗 Добавляем пира вручную:", viewerPeerId)
+      torrent.addPeer(viewerPeerId)
+    }
+    socket.on("cinema-hall:get-peer-id", getPeerIdHandler)
+
+    return () => {
+      socket.off("cinema-hall:get-peer-id", getPeerIdHandler)
+    }
+  }, [socket, dispatch])
+
+  const connectMagnet = async (
+    client: WebTorrentInstance,
+    magnet: string,
+    existingPeerIds: string[] = [],
+  ) => {
     // console.log("connectMagnet:", magnet)
 
     // 1. Парсим infoHash из magnet ссылки (формат: ...btih:HASH&...)
@@ -417,7 +639,7 @@ export default function WatchPage() {
 
     if (existing) {
       // console.log("✅ Торрент уже добавлен, используем существующий")
-      setupTorrentPlayer(existing)
+      setupTorrentPlayer(existing, existingPeerIds)
       return
     }
 
@@ -425,9 +647,9 @@ export default function WatchPage() {
     const torrent = client.add(magnet, { announce: TRACKERS })
 
     if (torrent.ready) {
-      setupTorrentPlayer(torrent)
+      setupTorrentPlayer(torrent, existingPeerIds)
     } else {
-      torrent.on("ready", () => setupTorrentPlayer(torrent))
+      torrent.on("ready", () => setupTorrentPlayer(torrent, existingPeerIds))
     }
   }
 
@@ -437,13 +659,20 @@ export default function WatchPage() {
 
     setFile(f)
     setIsHashing(true)
+    setIsFilePrepared(false)
+    setMagnetURI(null)
+    setTorrentStatus("idle")
 
     const ac = new AbortController()
     abortControllerRef.current = ac // ← сохраняем
 
     try {
       const client = await waitForClient(clientRef, ac.signal)
+
       // const client = await waitForClient(clientRef)
+      if (torrentRef.current) {
+        torrentRef.current.destroy()
+      }
 
       const torrent = client.seed(f, {
         announce: TRACKERS,
@@ -453,10 +682,20 @@ export default function WatchPage() {
 
       torrent.on("ready", () => {
         // console.log("🧲 Magnet:", torrent.magnetURI)
+
         setMagnetURI(torrent.magnetURI)
-        setIsHashing(false)
+        // setIsHashing(false)
         torrentInfoHashRef.current = torrent.infoHash
         // setupTorrentPlayer(torrent)
+
+        // Но не считаем "готовым для зала", пока не пойдёт отдача
+      })
+
+      // ✅ ВСЕ куски верифицированы — финальная готовность
+      torrent.on("done", () => {
+        console.log("🎉 done: торрент полностью готов!")
+        setIsFilePrepared(true)
+        setIsHashing(false)
       })
 
       torrent.on("error", (err) => {
@@ -486,7 +725,8 @@ export default function WatchPage() {
   }
 
   const createHandle = () => {
-    if (!socket || !file || !magnetURI) return
+    if (!socket || !file || !magnetURI || !clientRef.current || !movieName)
+      return
 
     socket.emit(
       "cinema-hall:create",
@@ -497,6 +737,7 @@ export default function WatchPage() {
         avatar,
         groupId,
         file: { name: file.name, size: file.size, magnet: magnetURI },
+        peerId: clientRef.current.peerId,
       },
       async (data: { hall: CinemaHallTargetType }) => {
         // console.log("Зал создан:", data.hall)
@@ -541,6 +782,16 @@ export default function WatchPage() {
     }
   }, [])
 
+  const canCreateHall = useMemo(() => {
+    return (
+      !!file &&
+      !!movieName.trim() &&
+      !!magnetURI &&
+      isFilePrepared &&
+      !isHashing
+    )
+  }, [file, movieName, magnetURI, isFilePrepared, isHashing])
+
   return (
     <>
       {!cinemaHallName && (
@@ -579,11 +830,20 @@ export default function WatchPage() {
             </div>
 
             {isHashing && (
-              <span>
-                Хеширование... <Spinner />
-              </span>
+              <div className={style.hashingStatus}>
+                <Spinner />
+                <span>Подготовка файла к раздаче...</span>
+                <span className={style.hint}>
+                  Чем больше файл, тем дольше это займёт
+                </span>
+              </div>
             )}
-            {magnetURI && !isHashing && <div>✅ Файл готов к раздаче</div>}
+
+            {isFilePrepared && !isHashing && (
+              <div className={style.statusReady}>
+                ✅ Файл готов. Можно создавать кинозал
+              </div>
+            )}
 
             <input
               ref={inputRef}
@@ -594,13 +854,16 @@ export default function WatchPage() {
             />
 
             <div className={style.createCinemaHallModal__buttonContainer}>
-              <ButtonMenu
-                disabled={!file || !magnetURI || isHashing}
-                onClick={createHandle}
-              >
+              <ButtonMenu disabled={!canCreateHall} onClick={createHandle}>
                 Создать Кинозал
               </ButtonMenu>
-              <ButtonMenu onClick={() => history.back()}>Отмена</ButtonMenu>
+              <ButtonMenu
+                onClick={() => {
+                  history.back()
+                }}
+              >
+                Отмена
+              </ButtonMenu>
             </div>
           </div>
         </div>

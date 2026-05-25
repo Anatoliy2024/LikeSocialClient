@@ -2,7 +2,9 @@
 import type WebTorrent from "webtorrent"
 
 // Берём типы напрямую из библиотеки
-export type WebTorrentInstance = WebTorrent.Instance
+export type WebTorrentInstance = WebTorrent.Instance & {
+  peerId?: string
+}
 // export type TorrentInstance = WebTorrent.Torrent
 // export type TorrentFile = WebTorrent.TorrentFile
 

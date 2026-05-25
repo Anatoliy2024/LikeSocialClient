@@ -3,6 +3,7 @@ export type CinemaHallTargetType = {
   cinemaHallId: string | null
   cinemaHallName: string | null
   hostId: string | null
+  hostSocketId: string | null
   participants: ParticipantsType[]
   file: FileType
   isMembersControl: boolean
@@ -29,6 +30,8 @@ export type ParticipantsType = {
   buffering: boolean
   // connected: boolean
   disconnectTimer?: number | null
+  peerId: string | null
+  socketId: string | null
 }
 export type ChatMessageType = {
   id: string
