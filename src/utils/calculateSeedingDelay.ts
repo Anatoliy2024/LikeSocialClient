@@ -10,7 +10,7 @@
 export const calculateSeedingDelay = (fileSizeBytes: number): number => {
   const MIN_DELAY = 5000 // минимум 5 сек
   const MAX_DELAY = 45000 // максимум 45 сек
-  const BYTES_PER_SEC = 250 * 1024 * 1024 // ~500 МБ/сек условной "стабилизации"
+  const BYTES_PER_SEC = 100 * 1024 * 1024 // ~100 МБ/сек условной "стабилизации"
 
   const calculated = Math.min(
     MAX_DELAY,

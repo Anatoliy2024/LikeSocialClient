@@ -1,11 +1,19 @@
 import axios from "axios"
 
-// Получаем базовый URL из env или fallback
+// // Получаем базовый URL из env или fallback
+// export const baseApiUrl = process.env.NEXT_PUBLIC_API_URL
+//   ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "") // убираем слеш в конце, если есть
+//   : process.env.NODE_ENV === "development"
+//     ? "http://localhost:5000"
+//     : "https://likesocial.onrender.com"
+
 export const baseApiUrl = process.env.NEXT_PUBLIC_API_URL
-  ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "") // убираем слеш в конце, если есть
-  : process.env.NODE_ENV === "development"
-    ? "http://localhost:5000"
-    : "https://likesocial.onrender.com"
+  ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")
+  : process.env.CODESPACES === "true" // ← НОВОЕ: проверка на Codespaces
+    ? "https://likesocial.onrender.com" // ← Использовать продакшен-сервер
+    : process.env.NODE_ENV === "development"
+      ? "http://localhost:5000"
+      : "https://likesocial.onrender.com"
 
 // Добавляем /api в конце
 export const baseURL = baseApiUrl + "/api"
