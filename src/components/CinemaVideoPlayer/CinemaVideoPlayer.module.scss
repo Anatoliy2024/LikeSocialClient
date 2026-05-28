@@ -82,10 +82,15 @@
     gap: 20px;
   }
   &__controlsItem {
+    min-width: 30px;
+    min-height: 30px;
     padding: 5px;
     border-radius: 20px;
     transition: 0.3s;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     &:hover {
       background: rgb(140, 135, 205);
     }

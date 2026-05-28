@@ -29,6 +29,8 @@ import { TorrentStatsPanel } from "@/components/TorrentStatsPanel/TorrentStatsPa
 import { VideoAndChatContainer } from "@/components/VideoAndChatContainer/VideoAndChatContainer"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
 import { calculateSeedingDelay } from "@/utils/calculateSeedingDelay"
+import { UserIcon } from "@/assets/icons/userIcon"
+import { UserWaiting } from "@/assets/icons/userWaiting"
 
 // Исправление: передавать AbortSignal
 function waitForClient(
@@ -593,6 +595,7 @@ export default function WatchPage() {
   }
 
   const createHandle = () => {
+    console.log("Что тут в кнопке")
     if (!socket || !file || !magnetURI || !clientRef.current || !movieName)
       return
 
@@ -669,9 +672,9 @@ export default function WatchPage() {
             className={style.createCinemaHallModal__container}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3>Создать кинозал</h3>
-            <div>
-              <label htmlFor="movie-name">Название фильма</label>
+            <h3>Создать кинозал:</h3>
+            <div className={style.createCinemaHallModal__inputName}>
+              <label htmlFor="movie-name">Название фильма:</label>
               <input
                 placeholder="Введите название..."
                 type="text"
@@ -752,7 +755,6 @@ export default function WatchPage() {
       )}
 
       <div className={style.watchPage}>
-        <h1>{cinemaHallName}</h1>
         <VideoAndChatContainer
           // CinemaVideoPlayer
           videoRef={videoRef}
@@ -781,8 +783,12 @@ export default function WatchPage() {
         />
 
         <div className={style.watchPage__userInRoomContainer}>
+          <h1>{cinemaHallName}</h1>
           <div className={style.watchPage__userInRoomList}>
-            <h4>Юзеры в комнате:</h4>
+            <h4 title="Юзеры в комнате">
+              <UserIcon />
+            </h4>
+            {/* <h4>Юзеры в комнате:</h4> */}
             <ul>
               {roomUsers.map((user) => (
                 <li key={user.userId}>
@@ -803,7 +809,10 @@ export default function WatchPage() {
             </ul>
           </div>
           <div className={style.watchPage__userInRoomList}>
-            <h4>Ожидаемые юзеры:</h4>
+            <h4 title="Ожидаемые юзеры">
+              <UserWaiting />
+            </h4>
+            {/* <h4>Ожидаемые юзеры:</h4> */}
             <ul>
               {waitingForUsers.map((userId) => {
                 // console.log("waitingForUsers", waitingForUsers)

@@ -3,11 +3,15 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import style from "./CinemaVideoPlayer.module.scss"
 import { formatTime } from "@/utils/formatTime"
 import { ChatWithSmile } from "@/assets/icons/chatWithSmile"
-import { PauseIcon } from "@/assets/icons/pauseIcon"
-import { PlayIcon } from "@/assets/icons/playIcon"
+import { PauseIcon, PauseIconFromControl } from "@/assets/icons/pauseIcon"
+import { PlayIcon, PlayIconFromControl } from "@/assets/icons/playIcon"
 import { useSocket } from "@/providers/SocketProvider"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { changeMemberControl } from "@/store/slices/cinemaHallSlice"
+import { ForwardPlayer } from "@/assets/icons/forwardPlayer"
+import { ShipWheel } from "@/assets/icons/shipWheel"
+import { VolumeHigh } from "@/assets/icons/volumeHigh"
+import { VolumeMute } from "@/assets/icons/volumeMute"
 
 export interface CinemaVideoPlayerProps {
   // 👇 Видео-источники
@@ -339,7 +343,8 @@ export function CinemaVideoPlayer({
                   onClick={onUserPlayWithAnimation}
                   disabled={isBlockButtonControl}
                 >
-                  ▶️
+                  <PlayIconFromControl />
+                  {/* ▶️ */}
                 </button>
               )}
               {externalPlaying && (
@@ -347,7 +352,8 @@ export function CinemaVideoPlayer({
                   onClick={onUserPauseWithAnimation}
                   disabled={isBlockButtonControl}
                 >
-                  ⏸
+                  <PauseIconFromControl />
+                  {/* ⏸ */}
                 </button>
               )}
             </div>
@@ -365,7 +371,7 @@ export function CinemaVideoPlayer({
                   }
                 }}
               >
-                {isMuted || localVolume === 0 ? "🔇" : "🔊"}
+                {isMuted || localVolume === 0 ? <VolumeMute /> : <VolumeHigh />}
               </button>
               {showValue && (
                 <input
@@ -392,20 +398,26 @@ export function CinemaVideoPlayer({
               }
               disabled={isBlockButtonControl}
             >
-              ⏩ +30с
+              {/* ⏩ */}
+              <ForwardPlayer />
+              <span>+30</span>
             </button>
           </div>
 
           {/* Кнопки дополнительных действий */}
           <div className={style.player__controlsExtraControls}>
-            <div title="Заблокировать контроль видео всем юзерам">
+            <div
+              title={
+                isMembersControl ? "контроль заблокирован" : "контроль разрешен"
+              }
+            >
               <button
                 className={`${style.player__controlsItem}  ${isMembersControl ? style.player__controlsItemActive : ""}`}
                 // style={{ background: showChat ? "rgba(255,0,0,0.3)" : "" }}
                 disabled={!isHost}
                 onClick={onToggleMemberControl}
               >
-                <div>X</div>
+                <ShipWheel />
               </button>
             </div>
 
