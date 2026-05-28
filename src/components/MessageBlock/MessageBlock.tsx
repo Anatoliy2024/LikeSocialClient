@@ -1,457 +1,73 @@
 "use client"
-import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { RootState } from "@/store/store"
-import {
-  delConversationThunk,
-  delHistoryMessagesThunk,
-  fetchMessagesThunk,
-} from "@/store/thunks/conversationsThunk"
-import { useParams, useRouter } from "next/navigation"
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+
+import { useParams } from "next/navigation"
 import style from "./MessageBlock.module.scss"
-// import { getSocket } from "@/lib/socket"
-import {
-  addMessageFromSocket,
-  clearMessages,
-  reactionUpdateFromSocket,
-  readUpdateFromSocket,
-  messageDeleteFromSocket,
-  messageEditedFromSocket,
-} from "@/store/slices/conversationsSlice"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
 import { ProfileLink } from "../ProfileLink/ProfileLink"
 import Spinner from "../ui/spinner/Spinner"
 import Link from "next/link"
 import { formatMessageTime } from "@/utils/formatMessageTime"
 import { ArrowBack } from "@/assets/icons/arrowBack"
-
 import { formatData } from "@/utils/formatData"
 import { TrashThree } from "@/assets/icons/trashThree"
 import { Clear } from "@/assets/icons/clear"
 import { OptionIcon } from "@/assets/icons/optionIcon"
-import { MessageType } from "@/types/conversation.types"
 import { StartGroupCallButton } from "../StartGroupCallButton/StartGroupCallButton"
 import { GroupCallBanner } from "../GroupCallBanner/GroupCallBanner"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
-
 import Image from "next/image"
 import { MessageReactions } from "../MessageReactions/MessageReactions"
 import { MessageModal } from "../MessageModal/MessageModal"
-
 import { getStickerImage } from "@/utils/getStickerImage"
 import { MessageBlockInput } from "../MessageBlockInput/MessageBlockInput"
-import { useSocket } from "@/providers/SocketProvider"
-import {
-  // updateNotificationIsRead,
-  updateNotificationIsReadMessage,
-} from "@/store/slices/notificationsSlice"
 import { MessageText } from "../MessageText/MessageText"
-// import { SoundToggle } from "../SoundToggle/SoundToggle"
+import { useMessageBlock } from "@/hooks/useMessageBlock/useMessageBlock"
 
 export const MessageBlock = () => {
-  const router = useRouter()
-
-  const [showOption, setShowOption] = useState(false)
-  const [confirmConfig, setConfirmConfig] = useState<{
-    title: string
-    message: string
-    onConfirm: () => void
-  } | null>(null)
-
-  const [fullImage, setFullImage] = useState<string | null>(null)
-  const [currentMessage, setCurrentMessage] = useState<string | null>(null)
-  const [messagePosition, setMessagePosition] = useState<{
-    top: number
-    left: number
-    right: number
-    isOwn: boolean
-  } | null>(null)
-  const [isAtBottom, setIsAtBottom] = useState(true)
-  const [isInitialized, setIsInitialized] = useState(false)
-
-  const [isEditMessage, setIsEditMessage] = useState({
-    messageId: "",
-    isEdit: false,
-    text: "",
-  })
-
-  const optionRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
-
-  // 🔥 НОВЫЙ: sentinel для автоподгрузки старых сообщений сверху
-  const topSentinelRef = useRef<HTMLDivElement>(null)
-
-  const dividerRef = useRef<HTMLDivElement>(null)
-  const initialScrollDoneRef = useRef(false)
-  const initializedIdRef = useRef<string | null>(null)
-  const restoreScrollRef = useRef<{
-    top: number
-    height: number
-  } | null>(null)
-
-  const isAtBottomRef = useRef(isAtBottom)
-
-  useEffect(() => {
-    isAtBottomRef.current = isAtBottom
-  }, [isAtBottom])
-
-  const initialLastReadIdRef = useRef<string | null | undefined>(undefined)
-
-  // const socket = getSocket()
-  const socket = useSocket()
-
-  const dispatch = useAppDispatch()
-
-  const {
-    messages,
-    currentConversation,
-    loading,
-    pagination: { hasMoreOlder, hasLoaded },
-    lastReadMessageId,
-
-    oldestMessageId,
-  } = useAppSelector((state) => state.conversations)
-
-  const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
-  const userId = useAppSelector((state: RootState) => state.auth.userId)
-
   const params = useParams<{ id: string }>()
   if (!params || !params.id) throw new Error("Параметр id не найден")
   const id = params.id
+  const {
+    currentConversation,
+    loading,
+    activeMessage,
+    messagePosition,
+    isGroup,
+    handleCloseCurrentMessage,
+    handleReaction,
+    handleDeleteMessage,
+    handleShowEditMessage,
+    fullImage,
+    setFullImage,
+    confirmConfig,
+    closeConfirm,
+    recipientId,
+    userId,
+    usersOnline,
+    status,
+    optionRef,
+    setShowOption,
+    showOption,
+    isOwner,
+    openConfirm,
+    delConversation,
+    delHistoryMessages,
+    messagesContainerRef,
+    hasMoreOlder,
+    topSentinelRef,
+    messages,
+    initialLastReadIdRef,
+    firstUnreadMessageId,
+    dividerRef,
+    handleCurrentMessage,
+    messagesEndRef,
+    isAtBottom,
+    scrollToBottom,
+    isEditMessage,
+    handleCloseEditMessage,
+  } = useMessageBlock(id)
 
-  const recipientId = currentConversation?.members.find(
-    (member) => member.user._id !== userId,
-  )?.user
-
-  const isGroup = currentConversation?.type === "group"
-  const isOwner = userId === currentConversation?.owner
-  const status = usersOnline[recipientId?._id as string] ?? {
-    isOnline: false,
-    lastSeen: null,
-  }
-
-  // ─────────────────────────────────────────
-  // Эффект 1: инициализация беседы
-  // ─────────────────────────────────────────
-  useEffect(() => {
-    if (!id) return
-    if (initializedIdRef.current === id) return
-
-    initializedIdRef.current = id
-    initialScrollDoneRef.current = false
-    initialLastReadIdRef.current = undefined
-
-    dispatch(clearMessages())
-    dispatch(fetchMessagesThunk({ conversationId: id, direction: "initial" }))
-
-    return () => {
-      initializedIdRef.current = null
-    }
-  }, [id, dispatch])
-
-  // ─────────────────────────────────────────
-  // Эффект 3: начальный скролл после загрузки
-  // ─────────────────────────────────────────
-  useEffect(() => {
-    if (!hasLoaded || initialScrollDoneRef.current) return
-    if (messages.length === 0) return
-
-    initialScrollDoneRef.current = true
-
-    messagesEndRef.current?.scrollIntoView({ behavior: "auto" })
-  }, [hasLoaded, messages.length])
-
-  // ─────────────────────────────────────────
-  // Эффект 4: сокет
-  // ─────────────────────────────────────────
-  useEffect(() => {
-    if (!socket) return
-
-    const messageHandler = (data: { message: MessageType }) => {
-      dispatch(addMessageFromSocket(data.message))
-
-      // Если мы в чате — сразу помечаем прочитанным
-      socket.emit("messages:read", {
-        conversationId: id,
-        lastReadMessageId: data.message._id,
-      })
-
-      if (isAtBottomRef.current) {
-        requestAnimationFrame(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-          // dispatch(clearPendingNewMessages())
-        })
-      }
-    }
-
-    const reactionHandler = (data: {
-      messageId: string
-      reactions: MessageType["reactions"]
-    }) => {
-      dispatch(reactionUpdateFromSocket(data))
-    }
-
-    const readUpdateHandler = (data: {
-      userId: string
-      lastReadMessageId: string
-    }) => {
-      dispatch(readUpdateFromSocket(data))
-    }
-    const deleteUpdateHandler = (data: { messageId: string }) => {
-      dispatch(messageDeleteFromSocket(data))
-    }
-    const editedUpdateHandler = (data: {
-      messageId: string
-      text: string
-      isEdited: boolean
-      editedAt: string
-    }) => {
-      dispatch(messageEditedFromSocket(data))
-    }
-
-    socket.emit("conversation:join", id)
-    socket.on("message:new", messageHandler)
-    socket.on("message:reaction:updated", reactionHandler)
-    socket.on("messages:read_update", readUpdateHandler)
-    socket.on("message:deleted_update", deleteUpdateHandler)
-    socket.on("message:edited_update", editedUpdateHandler)
-    // socket.on("messages:read_confirmed", readConfirmedHandler)
-
-    return () => {
-      socket.emit("conversation:leave", id)
-      socket.off("message:new", messageHandler)
-      socket.off("message:reaction:updated", reactionHandler)
-      socket.off("messages:read_update", readUpdateHandler)
-      socket.off("message:deleted_update", deleteUpdateHandler)
-      socket.off("message:edited_update", editedUpdateHandler)
-
-      // socket.off("messages:read_confirmed", readConfirmedHandler)
-    }
-  }, [id, dispatch, socket])
-
-  useEffect(() => {
-    if (!hasLoaded || !socket) return
-    if (initialLastReadIdRef.current !== undefined) return
-
-    initialLastReadIdRef.current = lastReadMessageId ?? null
-    setIsInitialized(true)
-
-    // Сразу помечаем всё прочитанным если есть сообщения
-    if (messages.length > 0) {
-      dispatch(updateNotificationIsReadMessage({ conversationId: id }))
-      const lastMessageId = messages[messages.length - 1]._id
-      socket.emit("messages:read", {
-        conversationId: id,
-        lastReadMessageId: lastMessageId,
-      })
-    }
-  }, [hasLoaded, socket, id])
-
-  // Убираешь старый useEffect с restoreScrollRef и заменяешь на:
-  useLayoutEffect(() => {
-    if (!restoreScrollRef.current || messages.length === 0) return
-    const container = messagesContainerRef.current
-    if (!container) return
-
-    const { top: prevTop, height: prevHeight } = restoreScrollRef.current
-    const newHeight = container.scrollHeight
-    // const newHeight = document.documentElement.scrollHeight
-    const diff = newHeight - prevHeight
-
-    if (diff !== 0) {
-      container.scrollTop = prevTop + diff
-      // document.documentElement.scrollTop = prevTop + diff
-    }
-
-    restoreScrollRef.current = null
-  }, [messages]) // 🔥 Зависимость от messages — ключевой момент!
-
-  // ─────────────────────────────────────────
-  // Отслеживаем позицию скролла — внизу или нет
-  // ─────────────────────────────────────────
-  const handleScroll = useCallback(() => {
-    const container = messagesContainerRef.current
-
-    if (!container) return
-
-    const threshold = 100
-    const atBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight <
-      threshold
-
-    setIsAtBottom(atBottom)
-  }, [])
-
-  const handleContainerRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      messagesContainerRef.current = node
-      if (!node) return
-      node.addEventListener("scroll", handleScroll, { passive: true })
-    },
-    [handleScroll],
-  )
-
-  // ─────────────────────────────────────────
-  // Click outside option menu
-  // ─────────────────────────────────────────
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (optionRef.current && !optionRef.current.contains(e.target as Node)) {
-        setShowOption(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
-  // ─────────────────────────────────────────
-  // Блокировка скролла при просмотре фото
-  // ─────────────────────────────────────────
-  useEffect(() => {
-    if (fullImage) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
-    return () => {
-      document.body.style.overflow = ""
-    }
-  }, [fullImage])
-
-  // ─────────────────────────────────────────
-  // 🔥 Handlers
-  // ─────────────────────────────────────────
-  const handleLoadOlder = useCallback(() => {
-    if (!hasMoreOlder || loading || !oldestMessageId) return
-    const container = messagesContainerRef.current
-    if (!container) return
-    // Сохраняем ДО диспатча
-    restoreScrollRef.current = {
-      top: container.scrollTop,
-      height: container.scrollHeight,
-    }
-
-    // Без await — просто запускаем, useLayoutEffect поймает изменение messages
-    dispatch(
-      fetchMessagesThunk({
-        conversationId: id,
-        direction: "older",
-        cursor: oldestMessageId,
-      }),
-    )
-  }, [hasMoreOlder, loading, oldestMessageId, id, dispatch])
-
-  useEffect(() => {
-    if (!hasMoreOlder || !topSentinelRef.current) return
-    const container = messagesContainerRef.current
-    if (!container) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading && oldestMessageId) {
-          handleLoadOlder()
-        }
-      },
-      {
-        root: container,
-        threshold: 0.1,
-      },
-    )
-
-    observer.observe(topSentinelRef.current)
-    return () => observer.disconnect()
-  }, [hasMoreOlder, oldestMessageId, loading, id, handleLoadOlder])
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
-  const delConversation = async () => {
-    try {
-      await dispatch(delConversationThunk(currentConversation!._id))
-      router.push(`/conversations/`)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const delHistoryMessages = () => {
-    dispatch(delHistoryMessagesThunk(currentConversation!._id))
-  }
-
-  const handleCurrentMessage = (
-    messageId: string,
-    isOwn: boolean,
-    e: React.MouseEvent,
-  ) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    setMessagePosition({
-      top: rect.top,
-      left: rect.left,
-      right: rect.right,
-      isOwn,
-    })
-    setCurrentMessage(messageId)
-  }
-
-  const handleCloseCurrentMessage = () => {
-    setMessagePosition(null)
-    setCurrentMessage(null)
-  }
-
-  const handleReaction = (messageId: string, reactionId: string) => {
-    if (!socket) return
-    socket.emit("message:reaction", { messageId, reactionId })
-    if (currentMessage === messageId) setCurrentMessage(null)
-  }
-
-  const activeMessage = currentMessage
-    ? messages.find((m) => m._id === currentMessage)
-    : null
-
-  const openConfirm = (config: typeof confirmConfig) => setConfirmConfig(config)
-  const closeConfirm = () => setConfirmConfig(null)
-
-  const firstUnreadMessageId = useMemo(() => {
-    if (!isInitialized) return null
-
-    const fixedId = initialLastReadIdRef.current
-
-    if (!fixedId) return null
-
-    const result = messages.find(
-      (m) => m.senderId._id !== userId && m._id > fixedId,
-    )?._id
-
-    return result ?? null
-  }, [messages, userId, isInitialized])
-
-  const handleDeleteMessage = (messageId: string) => {
-    if (!socket) return
-
-    socket.emit("messages:delete", {
-      messageId,
-    })
-    handleCloseCurrentMessage()
-  }
-
-  const handleShowEditMessage = (messageId: string, text?: string) => {
-    handleCloseCurrentMessage()
-    setIsEditMessage({ messageId, isEdit: true, text: text || "" })
-  }
-  const handleCloseEditMessage = () => {
-    setIsEditMessage({ messageId: "", isEdit: false, text: "" })
-    // setTextMessage("")
-  }
-  console.log("рендер")
+  // console.log("рендер")
   if (!currentConversation && loading) {
     return (
       <div style={{ paddingTop: "50px" }}>
@@ -637,7 +253,7 @@ export const MessageBlock = () => {
       {/* ── Список сообщений ── */}
       <div
         className={style.messageBlock__contentMessageBlock}
-        ref={handleContainerRef}
+        ref={messagesContainerRef}
       >
         {/* 🔥 Sentinel для автоподгрузки старых сообщений (вместо кнопки) */}
         {hasMoreOlder && <div ref={topSentinelRef} style={{ height: 1 }} />}

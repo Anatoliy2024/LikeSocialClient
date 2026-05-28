@@ -139,7 +139,7 @@ export const MessageBlockInput = ({
       setTextMessage(isEditMessage.text) // ← вот тут подхватываешь
     }
   }, [isEditMessage])
-  console.log("messageBlockInput ререндер")
+  // console.log("messageBlockInput ререндер")
   return (
     <div className={style.messageBlockInput}>
       {isEditMessage.isEdit && (

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-type OnlineStatus = {
+export type OnlineStatus = {
   isOnline: boolean
   lastSeen: string | null // null, если сейчас онлайн
 }
