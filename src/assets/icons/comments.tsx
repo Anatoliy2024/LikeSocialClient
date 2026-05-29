@@ -14,7 +14,7 @@ export const Comments = () => {
         />
       </g>
       <defs>
-        <clipPath id="clip0_732_801">
+        <clipPath>
           <rect width="24" height="24" fill="currentColor" />
         </clipPath>
       </defs>

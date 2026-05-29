@@ -8,7 +8,7 @@ import {
 import { useRouter } from "next/navigation"
 import { useMemo, useRef, useState } from "react"
 import { useSocketHandlers } from "./useSocketHandlers"
-import { useInitializationData } from "./useInitializationData"
+import { useInitMessageBlock } from "./useInitMessageBlock"
 import { useLoadOlderMessages } from "./useLoadOlderMessages"
 import { useClickOutside } from "./useClickOutside"
 import { useScrollManagement } from "./useScrollManagement"
@@ -83,7 +83,7 @@ export const useMessageBlock = (id: string): UseMessageBlockReturn => {
     lastSeen: null,
   }
 
-  useInitializationData(
+  useInitMessageBlock(
     socket,
     id,
     dispatch,

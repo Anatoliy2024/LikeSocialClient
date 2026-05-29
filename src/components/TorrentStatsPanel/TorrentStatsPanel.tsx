@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react"
-import { useTorrentStats } from "@/hooks/useTorrentStats"
+import { useTorrentStats } from "@/hooks/useCinemaHallPage/useTorrentStats"
 import style from "./TorrentStatsPanel.module.scss"
 import { TorrentInstance } from "@/types/webtorrent.types"
 import { useAppSelector } from "@/store/hooks"

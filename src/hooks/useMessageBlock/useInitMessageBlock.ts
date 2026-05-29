@@ -6,7 +6,7 @@ import { MessageType } from "@/types/conversation.types"
 import { Dispatch, RefObject, SetStateAction, useEffect } from "react"
 import { Socket } from "socket.io-client"
 
-export const useInitializationData = (
+export const useInitMessageBlock = (
   socket: Socket | null,
   conversationId: string,
   dispatch: AppDispatch,
