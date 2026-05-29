@@ -51,7 +51,11 @@ export const useSocketCinemaHall = (
   username?: string | null,
 ) => {
   const setupTorrentPlayer = useCallback(
-    (torrent: TorrentInstance, existingPeerIds: string[] = []) => {
+    (
+      torrent: TorrentInstance,
+      existingPeerIds: string[] = [],
+      onReady?: () => void,
+    ) => {
       // 1. Сначала очищаем старые слушатели, если торрент уже использовался
       torrent.removeAllListeners()
 
@@ -149,6 +153,7 @@ export const useSocketCinemaHall = (
           try {
             videoFile?.streamTo(videoRef.current)
             setTorrentStatus("ready")
+            onReady?.() // ✅ activate() вызывается здесь — видео уже имеет src
           } catch (e) {
             console.error("Stream error:", e)
             setTorrentStatus("error")
@@ -179,6 +184,7 @@ export const useSocketCinemaHall = (
       client: WebTorrentInstance,
       magnet: string,
       existingPeerIds: string[] = [],
+      onReady?: () => void,
     ) => {
       // console.log("connectMagnet:", magnet)
 
@@ -197,7 +203,7 @@ export const useSocketCinemaHall = (
 
       if (existing) {
         // console.log("✅ Торрент уже добавлен, используем существующий")
-        setupTorrentPlayer(existing, existingPeerIds)
+        setupTorrentPlayer(existing, existingPeerIds, onReady)
         return
       }
 
@@ -205,9 +211,11 @@ export const useSocketCinemaHall = (
       const torrent = client.add(magnet, { announce: TRACKERS })
 
       if (torrent.ready) {
-        setupTorrentPlayer(torrent, existingPeerIds)
+        setupTorrentPlayer(torrent, existingPeerIds, onReady)
       } else {
-        torrent.on("ready", () => setupTorrentPlayer(torrent, existingPeerIds))
+        torrent.on("ready", () =>
+          setupTorrentPlayer(torrent, existingPeerIds, onReady),
+        )
       }
     },
     [setupTorrentPlayer],
@@ -226,7 +234,7 @@ export const useSocketCinemaHall = (
         }
 
         dispatch(setCinemaHall(data.hall))
-        activate()
+        // activate()
         // Зритель: если в зале уже есть magnet — подключаемся
         if (data.hall?.file?.magnet) {
           try {
@@ -236,7 +244,7 @@ export const useSocketCinemaHall = (
             const client = await waitForClient(clientRef)
             // const client = await waitForClient(clientRef, ac.signal)
 
-            await connectMagnet(client, data.hall.file.magnet)
+            await connectMagnet(client, data.hall.file.magnet, [], activate)
             socket.emit("cinema-hall:set-peer-id", {
               cinemaHallId: id,
               groupId,

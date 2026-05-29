@@ -649,7 +649,7 @@ export function useCinemaHallSync({
   }
 
   // 👇 Запускаем проверку, когда видео "заголодало"
-  const handleWaiting = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+  const handleWaiting = () => {
     // 👇 Если только что отправили ready — игнорируем onWaiting (грациозный период)
     if (justSentReadyRef.current) {
       console.log("⚠️ onWaiting в грациозном периоде после ready — игнорируем")
@@ -662,7 +662,18 @@ export function useCinemaHallSync({
     // Если реально не хватает данных — шлем буферизацию
     if (!isBufferingRef.current) {
       isBufferingRef.current = true
-      emitBuffering(e.currentTarget.currentTime, () => {
+
+      // Берём время из стейта (currentTimeRef) а не из video.currentTime
+      // который может быть 0 пока видео не буферизовалось
+      // if (!playbackUpdatedAtRef.current) return
+
+      const actualCurrentTime =
+        playingRef.current && playbackUpdatedAtRef.current
+          ? currentTimeRef.current +
+            (getServerNow() - playbackUpdatedAtRef.current) / 1000
+          : currentTimeRef.current
+
+      emitBuffering(actualCurrentTime, () => {
         // 👇 Когда сервер подтвердил — запускаем периодическую проверку готовности
         startReadyCheck()
       })
