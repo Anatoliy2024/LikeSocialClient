@@ -16,6 +16,7 @@ import { useInitCinemaHall } from "./useInitCinemaHall"
 import { useSocketCinemaHall } from "./useSocketCinemaHall"
 import { waitForClient } from "@/utils/waitForClient"
 import { UseCinemaHallPageReturn } from "@/types/useCinemaHallPage.types"
+import { useClockSync } from "./useClockSync"
 
 export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
   const searchParams = useSearchParams()
@@ -71,6 +72,8 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
   )
   const username = useAppSelector((state) => state.auth.username)
   const avatar = useAppSelector((state) => state.auth.avatar)
+
+  useClockSync(socket)
 
   const {
     handleSeeked,

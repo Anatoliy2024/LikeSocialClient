@@ -15,6 +15,7 @@ import {
   CinemaHallTargetType,
   ParticipantsType,
 } from "@/types/cinemaHall.types"
+import { getServerNow } from "./useClockSync"
 
 interface UseCinemaHallSyncProps {
   cinemaHallId: string
@@ -95,6 +96,7 @@ export function useCinemaHallSync({
   const isProgrammaticSeekRef = useRef(false)
   const readyCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const justSentReadyRef = useRef(false)
+  const lastBufferingEmitRef = useRef(0)
 
   // true = команда пришла с сервера, не эхоим обратно
   // const isRemoteActionRef = useRef(false)
@@ -255,7 +257,7 @@ export function useCinemaHallSync({
       // isRemoteActionRef.current = true
       // isCommandPendingRef.current = false // 🔓 Разблокируем после серверного ответа
       const realTime =
-        data.currentTime + (Date.now() - data.playbackUpdatedAt) / 1000
+        data.currentTime + (getServerNow() - data.playbackUpdatedAt) / 1000
       // console.log(
       //   "⏱ onPlay: устанавливаем время",
       //   realTime,
@@ -317,7 +319,7 @@ export function useCinemaHallSync({
       isProgrammaticSeekRef.current = true // 👈 Добавь
       if (data.playing) {
         const realTime =
-          data.position + (Date.now() - data.playbackUpdatedAt) / 1000
+          data.position + (getServerNow() - data.playbackUpdatedAt) / 1000
         videoRef.current.currentTime = realTime
         safePlay(videoRef.current)
       } else {
@@ -361,18 +363,39 @@ export function useCinemaHallSync({
 
       const expectedTime =
         currentTimeRef.current +
-        (Date.now() - playbackUpdatedAtRef.current) / 1000
+        (getServerNow() - playbackUpdatedAtRef.current) / 1000
       const actualTime = videoRef.current.currentTime
       const diff = expectedTime - actualTime
 
-      // 👇 НОВОЕ: Если отстал больше чем на 10 секунд — синхронизируемся СРАЗУ
+      // // 👇 НОВОЕ: Если отстал больше чем на 10 секунд — синхронизируемся СРАЗУ
+      // if (Math.abs(diff) > 10) {
+      //   // console.log(
+      //   //   `🚀 Большой рассинхрон (${diff.toFixed(1)}с) — немедленная синхронизация`,
+      //   // )
+      //   isProgrammaticSeekRef.current = true
+      //   videoRef.current.currentTime = expectedTime
+      //   // Не меняем playbackRate, пусть сразу играет с нужной позиции
+      //   setTimeout(() => {
+      //     isProgrammaticSeekRef.current = false
+      //   }, 100)
+      //   return
+      // }
+
       if (Math.abs(diff) > 10) {
-        // console.log(
-        //   `🚀 Большой рассинхрон (${diff.toFixed(1)}с) — немедленная синхронизация`,
-        // )
+        // Если рассинхрон больше 5 минут — это явно баг часов, не трогаем
+        if (Math.abs(diff) > 300) {
+          console.warn(
+            `⚠️ Drift слишком большой (${diff.toFixed(0)}с) — пропускаем`,
+          )
+          return
+        }
+
+        const safeTime = Math.max(
+          0,
+          Math.min(videoRef.current.duration || Infinity, expectedTime),
+        )
         isProgrammaticSeekRef.current = true
-        videoRef.current.currentTime = expectedTime
-        // Не меняем playbackRate, пусть сразу играет с нужной позиции
+        videoRef.current.currentTime = safeTime
         setTimeout(() => {
           isProgrammaticSeekRef.current = false
         }, 100)
@@ -461,6 +484,15 @@ export function useCinemaHallSync({
 
   const emitBuffering = (currentTime: number, onSuccess: () => void) => {
     if (!socket || !isActiveRef.current) return
+
+    // ✅ Не спамим чаще раза в 3 секунды
+    const now = Date.now()
+    if (now - lastBufferingEmitRef.current < 3000) {
+      console.log("⏳ emitBuffering: throttle, пропускаем")
+      return
+    }
+    lastBufferingEmitRef.current = now
+
     socket.emit(
       "cinema-hall:buffering",
       { cinemaHallId, groupId, currentTime },
@@ -474,7 +506,7 @@ export function useCinemaHallSync({
     )
   }
 
-  const emitReady = () => {
+  const emitReady = (onSuccess?: () => void) => {
     if (!socket || !isActiveRef.current) return
 
     justSentReadyRef.current = true
@@ -483,6 +515,9 @@ export function useCinemaHallSync({
       "cinema-hall:ready",
       { cinemaHallId, groupId },
       (res: { success: boolean; error?: string }) => {
+        if (res.success) {
+          onSuccess?.() // ✅ сбрасываем isBuffering только здесь
+        }
         // console.log("success", res.success)
         if (!res.success) console.warn("play rejected:", res.error)
       },
@@ -512,7 +547,7 @@ export function useCinemaHallSync({
         if (!hall.playbackUpdatedAt) return
 
         const realTime = hall.playing
-          ? hall.currentTime + (Date.now() - hall.playbackUpdatedAt) / 1000
+          ? hall.currentTime + (getServerNow() - hall.playbackUpdatedAt) / 1000
           : hall.currentTime
 
         videoRef.current.currentTime = realTime
@@ -647,8 +682,12 @@ export function useCinemaHallSync({
     stopReadyCheck()
     // if (isRemoteActionRef.current) return // это мы сами применили команду — не реагируем
     if (!isBufferingRef.current) return // не буферили — игнорируем
-    isBufferingRef.current = false
-    emitReady()
+    // isBufferingRef.current = false
+    // emitReady()
+    // Сбрасываем ТОЛЬКО после подтверждения сервера
+    emitReady(() => {
+      isBufferingRef.current = false
+    })
   }
 
   return {
