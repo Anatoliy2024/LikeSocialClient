@@ -166,6 +166,7 @@ export function useCinemaHallSync({
   }, [])
 
   const safePlay = async (video: HTMLVideoElement) => {
+    // console.log("safePlay is play****************")
     // 1. Проверка: есть ли источник?
     if (!video.src) {
       console.warn("⚠️ safePlay: video.src пуст, пропускаем play()")
@@ -311,6 +312,7 @@ export function useCinemaHallSync({
       playbackUpdatedAt: number
       seqNum: number
     }) => {
+      // console.log("получение данных от сервере onSocketSeek data", data)
       dispatch(applySeek(data))
       if (!videoRef.current || !isActiveRef.current) return
 
@@ -318,9 +320,33 @@ export function useCinemaHallSync({
       // isCommandPendingRef.current = false // 🔓 Разблокируем после серверного ответа
       isProgrammaticSeekRef.current = true // 👈 Добавь
       if (data.playing) {
+        // console.log(
+        //   "получение данных от сервере onSocketSeek data.playing",
+        //   data.playing,
+        // )
+
         const realTime =
           data.position + (getServerNow() - data.playbackUpdatedAt) / 1000
         videoRef.current.currentTime = realTime
+        // console.log(
+        //   "получение данных от сервере onSocketSeek realTime",
+        //   realTime,
+        // )
+
+        // console.log("✅ currentTime установлен:", videoRef.current.currentTime)
+        // setTimeout(() => {
+        //   console.log(
+        //     "⏱ currentTime через 100мс:",
+        //     videoRef.current?.currentTime,
+        //   )
+        // }, 100)
+        // setTimeout(() => {
+        //   console.log(
+        //     "⏱ currentTime через 500мс:",
+        //     videoRef.current?.currentTime,
+        //   )
+        // }, 500)
+
         safePlay(videoRef.current)
       } else {
         videoRef.current.currentTime = data.position
@@ -476,6 +502,8 @@ export function useCinemaHallSync({
       "cinema-hall:seek",
       { cinemaHallId, groupId, seqNum: seqNumRef.current, position },
       (res: { success: boolean; error?: string }) => {
+        // console.log("emitSeek collback success", res.success)
+        // console.log("emitSeek collback error", res.error)
         isCommandPendingRef.current = false
         if (!res.success) console.warn("seek rejected:", res.error)
       },
@@ -510,6 +538,7 @@ export function useCinemaHallSync({
     if (!socket || !isActiveRef.current) return
 
     justSentReadyRef.current = true
+    lastBufferingEmitRef.current = 0
 
     socket.emit(
       "cinema-hall:ready",
@@ -601,6 +630,7 @@ export function useCinemaHallSync({
     // console.log("🔍 Пользователь перемотал на", position)
     if (!isActiveRef.current) return
     if (isCommandPendingRef.current) return
+    // console.log("handleSeekRequest", position)
     emitSeek(position) // 👈 ОТПРАВЛЯЕМ НА СЕРВЕР
   }
 

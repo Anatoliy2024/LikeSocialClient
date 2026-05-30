@@ -110,6 +110,7 @@ export function CinemaVideoPlayer({
 
   const playerContainerRef = useRef<HTMLDivElement>(null)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isBlockProgress = useRef<boolean>(false)
   // const containerRef = useRef<HTMLDivElement>(null);
 
   const isMembersControl = useAppSelector(
@@ -145,7 +146,11 @@ export function CinemaVideoPlayer({
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-
+    // console.log("🔄 externalTime effect:", {
+    //   externalPlaying,
+    //   externalTime,
+    //   videoCurrentTime: video.currentTime,
+    // })
     // 👇 1. ПРИОРИТЕТ: Если сервер сказал ПАУЗА — останавливаем сразу и выходим
     if (externalPlaying === false) {
       video.pause()
@@ -201,7 +206,7 @@ export function CinemaVideoPlayer({
   // 👇 Обновление прогресса при воспроизведении
   const handleTimeUpdate = () => {
     const video = videoRef.current
-    if (!video || !video.duration) return
+    if (!video || !video.duration || isBlockProgress.current) return
     setProgress((video.currentTime / video.duration) * 100)
   }
 
@@ -221,14 +226,34 @@ export function CinemaVideoPlayer({
     const newProgress = Number(e.target.value)
     setProgress(newProgress)
 
-    // Вычисляем новое время и применяем
-    const newTime = (newProgress / 100) * duration
-    video.currentTime = newTime
+    // // Вычисляем новое время и применяем
+    // const newTime = (newProgress / 100) * duration
+    // video.currentTime = newTime
 
-    // Если нужно отправить на сервер (синхронизация с другими)
-    if (onUserSeek) {
-      onUserSeek(newTime)
+    // // Если нужно отправить на сервер (синхронизация с другими)
+    // if (onUserSeek) {
+    //   onUserSeek(newTime)
+    // }
+  }
+  // Отправляем на сервер только когда отпустили
+  const handleProgressMouseUp = () =>
+    // e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>,
+    {
+      const video = videoRef.current
+      if (!video || !duration) return
+      isBlockProgress.current = false
+      const newTime = (progress / 100) * duration
+      // video.currentTime = newTime // ← применяем к видео
+      // console.log(
+      //   "Мы отправляем время на сервер handleProgressMouseUp newTime",
+      //   newTime,
+      // )
+      if (onUserSeek) {
+        onUserSeek(newTime) // ← отправляем на сервер один раз
+      }
     }
+  const handleBlockProgress = () => {
+    isBlockProgress.current = true
   }
   const onUserPlayWithAnimation = () => {
     onUserPlay()
@@ -330,6 +355,10 @@ export function CinemaVideoPlayer({
             max={100}
             value={progress}
             onChange={handleProgressChange}
+            onMouseUp={handleProgressMouseUp}
+            onMouseDown={handleBlockProgress}
+            onTouchEnd={handleProgressMouseUp} // для мобильных
+            onTouchStart={handleBlockProgress} // для мобильных
             className={style.player__progressBar}
             step={0.1}
             disabled={isBlockButtonControl}

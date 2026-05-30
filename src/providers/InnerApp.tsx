@@ -133,7 +133,7 @@ export default function InnerApp({ children }: { children: React.ReactNode }) {
   if (server?.error) {
     return <div>Сервер не отвечает...</div>
   }
-  console.log("rerender InnerApp")
+  // console.log("rerender InnerApp")
   return (
     <AuthProvider>
       <GroupCallProvider>

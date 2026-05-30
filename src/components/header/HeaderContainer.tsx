@@ -61,7 +61,7 @@ const HeaderContainer = ({
   }
 
   // const showHeader = useHideOnScroll()
-  console.log("Header rerender")
+  // console.log("Header rerender")
   return (
     <Header
       isAuth={isAuth}
