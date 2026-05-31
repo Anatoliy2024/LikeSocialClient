@@ -6,23 +6,22 @@ import {
   delHistoryMessagesThunk,
 } from "@/store/thunks/conversationsThunk"
 import { useRouter } from "next/navigation"
-import { useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 import { useSocketHandlers } from "./useSocketHandlers"
 import { useInitMessageBlock } from "./useInitMessageBlock"
 import { useLoadOlderMessages } from "./useLoadOlderMessages"
 import { useClickOutside } from "./useClickOutside"
 import { useScrollManagement } from "./useScrollManagement"
-import { UseMessageBlockReturn } from "@/types/useMessageBlock.types"
+import {
+  ConfirmConfigType,
+  UseMessageBlockReturn,
+} from "@/types/useMessageBlock.types"
 
 export const useMessageBlock = (id: string): UseMessageBlockReturn => {
   const router = useRouter()
 
   const [showOption, setShowOption] = useState(false)
-  const [confirmConfig, setConfirmConfig] = useState<{
-    title: string
-    message: string
-    onConfirm: () => void
-  } | null>(null)
+  const [confirmConfig, setConfirmConfig] = useState<ConfirmConfigType>(null)
 
   const [fullImage, setFullImage] = useState<string | null>(null)
   const [currentMessage, setCurrentMessage] = useState<string | null>(null)
@@ -59,15 +58,33 @@ export const useMessageBlock = (id: string): UseMessageBlockReturn => {
 
   const dispatch = useAppDispatch()
 
-  const {
-    messages,
-    currentConversation,
-    loading,
-    pagination: { hasMoreOlder, hasLoaded },
-    lastReadMessageId,
+  const messages = useAppSelector((state) => state.conversations.messages)
+  const currentConversation = useAppSelector(
+    (state) => state.conversations.currentConversation,
+  )
+  const loading = useAppSelector((state) => state.conversations.loading)
+  const hasMoreOlder = useAppSelector(
+    (state) => state.conversations.pagination.hasMoreOlder,
+  )
+  const hasLoaded = useAppSelector(
+    (state) => state.conversations.pagination.hasLoaded,
+  )
+  const lastReadMessageId = useAppSelector(
+    (state) => state.conversations.lastReadMessageId,
+  )
+  const oldestMessageId = useAppSelector(
+    (state) => state.conversations.oldestMessageId,
+  )
 
-    oldestMessageId,
-  } = useAppSelector((state) => state.conversations)
+  // const {
+  //   messages,
+  //   currentConversation,
+  //   loading,
+  //   pagination: { hasMoreOlder, hasLoaded },
+  //   lastReadMessageId,
+
+  //   oldestMessageId,
+  // } = useAppSelector((state) => state.conversations)
 
   const usersOnline = useAppSelector((state: RootState) => state.onlineStatus)
   const userId = useAppSelector((state: RootState) => state.auth.userId)
@@ -125,18 +142,18 @@ export const useMessageBlock = (id: string): UseMessageBlockReturn => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const delConversation = async () => {
+  const delConversation = useCallback(async () => {
     try {
       await dispatch(delConversationThunk(currentConversation!._id))
       router.push(`/conversations/`)
     } catch (error) {
       console.log(error)
     }
-  }
+  }, [currentConversation, dispatch, router])
 
-  const delHistoryMessages = () => {
+  const delHistoryMessages = useCallback(() => {
     dispatch(delHistoryMessagesThunk(currentConversation!._id))
-  }
+  }, [currentConversation, dispatch])
 
   const handleCurrentMessage = (
     messageId: string,
@@ -168,7 +185,8 @@ export const useMessageBlock = (id: string): UseMessageBlockReturn => {
     ? messages.find((m) => m._id === currentMessage)
     : null
 
-  const openConfirm = (config: typeof confirmConfig) => setConfirmConfig(config)
+  // const openConfirm =useCallback( (config: typeof confirmConfig) => setConfirmConfig(config),[])
+
   const closeConfirm = () => setConfirmConfig(null)
 
   const firstUnreadMessageId = useMemo(() => {
@@ -198,10 +216,10 @@ export const useMessageBlock = (id: string): UseMessageBlockReturn => {
     handleCloseCurrentMessage()
     setIsEditMessage({ messageId, isEdit: true, text: text || "" })
   }
-  const handleCloseEditMessage = () => {
+  const handleCloseEditMessage = useCallback(() => {
     setIsEditMessage({ messageId: "", isEdit: false, text: "" })
     // setTextMessage("")
-  }
+  }, [])
 
   return {
     currentConversation,
@@ -223,7 +241,8 @@ export const useMessageBlock = (id: string): UseMessageBlockReturn => {
     handleShowEditMessage,
     setFullImage,
     closeConfirm,
-    openConfirm,
+    // openConfirm,
+    setConfirmConfig,
     setShowOption,
     delConversation,
     delHistoryMessages,

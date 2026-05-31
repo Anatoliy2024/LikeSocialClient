@@ -538,6 +538,7 @@ export function useCinemaHallSync({
     if (!socket || !isActiveRef.current) return
 
     justSentReadyRef.current = true
+    //обнуление 3 секундного интервала чтобы обойти защиту в emitBuffering
     lastBufferingEmitRef.current = 0
 
     socket.emit(

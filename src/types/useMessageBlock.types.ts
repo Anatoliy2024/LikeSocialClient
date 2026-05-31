@@ -6,7 +6,7 @@ import { ConversationType, MessageType } from "./conversation.types"
 import { Dispatch, RefObject, SetStateAction } from "react"
 import { BaseMember } from "./base"
 
-type ConfirmConfigType = {
+export type ConfirmConfigType = {
   title: string
   message: string
   onConfirm: () => void
@@ -102,7 +102,7 @@ export interface UseMessageBlockReturn {
   closeConfirm: () => void
 
   /** Открыть модальное окно подтверждения с конфигами */
-  openConfirm: (config: ConfirmConfigType) => void
+  setConfirmConfig: Dispatch<SetStateAction<ConfirmConfigType>>
 
   // --- Меню опций беседы ---
 

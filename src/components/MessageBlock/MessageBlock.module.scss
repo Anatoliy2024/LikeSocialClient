@@ -10,60 +10,55 @@
     left: 0;
   }
 
-  // min-height: calc(100vh - 45px);
   // ─── Шапка — fixed top ───
-  &__userInfo {
-    position: fixed;
-    // top: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    background-color: #4571be;
-    min-width: calc(100% - 250px);
-    transition: transform 0.3s ease;
-    height: 45px;
-    z-index: 25;
-    // margin-top: 60px;
-    padding: 0 10px;
+  // &__userInfo {
+  //   position: fixed;
+  //   // top: 0;
+  //   display: flex;
+  //   justify-content: space-between;
+  //   align-items: center;
+  //   gap: 20px;
+  //   background-color: #4571be;
+  //   min-width: calc(100% - 250px);
+  //   transition: transform 0.3s ease;
+  //   height: 45px;
+  //   z-index: 25;
+  //   // margin-top: 60px;
+  //   padding: 0 10px;
 
-    @media (max-width: 768px) {
-      min-width: 100%;
-    }
-  }
+  //   @media (max-width: 768px) {
+  //     min-width: 100%;
+  //   }
+  // }
 
-  &__userInfoContainer {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+  // &__userInfoContainer {
+  //   display: flex;
+  //   gap: 10px;
+  //   align-items: center;
+  // }
 
-  &__groupInfo {
-    display: flex;
-    height: 40px;
-    align-items: center;
-    gap: 10px;
-  }
+  // &__groupInfo {
+  //   display: flex;
+  //   height: 40px;
+  //   align-items: center;
+  //   gap: 10px;
+  // }
 
-  &__groupInfoMain {
-    @media (max-width: 500px) {
-      display: none;
-    }
-  }
+  // &__groupInfoMain {
+  //   @media (max-width: 500px) {
+  //     display: none;
+  //   }
+  // }
 
-  &__groupInfoTitle {
-    font-size: 1.25rem;
-    line-height: 1;
-    // font-weight: 500;
-  }
+  // &__groupInfoTitle {
+  //   font-size: 1.25rem;
+  //   line-height: 1;
+  //   // font-weight: 500;
+  // }
 
-  &__groupInfoMemberCount {
-    text-wrap: nowrap;
-    font-size: 0.7rem;
-  }
-
-  // &__moveHeader {
-  //   transform: translateY(-200%);
+  // &__groupInfoMemberCount {
+  //   text-wrap: nowrap;
+  //   font-size: 0.7rem;
   // }
 
   // ─── Список сообщений — скроллится внутри ───
@@ -283,7 +278,9 @@
     cursor: pointer;
     z-index: 30;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
-    transition: background 0.2s, transform 0.15s;
+    transition:
+      background 0.2s,
+      transform 0.15s;
 
     &:hover {
       background: #11386d;
@@ -344,9 +341,9 @@
   //   }
   // }
 
-  &__moveNewMessageBlock {
-    transform: translateY(100%);
-  }
+  // &__moveNewMessageBlock {
+  //   transform: translateY(100%);
+  // }
 
   // &__newMessageBlockInput {
   //   flex: 1 1 200px;
@@ -461,109 +458,109 @@
   // }
 
   // ─── Шапка — навигация и прочее ───
-  &__buttonBackBlock {
-    border-radius: 50%;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  // &__buttonBackBlock {
+  //   border-radius: 50%;
+  //   padding: 5px;
+  //   display: flex;
+  //   align-items: center;
+  //   justify-content: center;
 
-    &:hover {
-      background-color: #11386d;
-      color: white;
-    }
-  }
+  //   &:hover {
+  //     background-color: #11386d;
+  //     color: white;
+  //   }
+  // }
 
-  &__userImgOnlineBlock {
-    width: 40px;
-    height: 40px;
-    position: relative;
-    flex-shrink: 0;
-  }
+  // &__userImgOnlineBlock {
+  //   width: 40px;
+  //   height: 40px;
+  //   position: relative;
+  //   flex-shrink: 0;
+  // }
 
-  &__blockImg {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    overflow: hidden;
+  // &__blockImg {
+  //   width: 40px;
+  //   height: 40px;
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+  //   border-radius: 50%;
+  //   overflow: hidden;
 
-    img {
-      object-fit: cover;
-      width: 100%;
-      height: 100%;
-    }
-  }
+  //   img {
+  //     object-fit: cover;
+  //     width: 100%;
+  //     height: 100%;
+  //   }
+  // }
 
-  &__onlineBlock {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #3edc00;
-    border: 1px solid white;
-  }
+  // &__onlineBlock {
+  //   position: absolute;
+  //   bottom: 2px;
+  //   right: 2px;
+  //   width: 10px;
+  //   height: 10px;
+  //   border-radius: 50%;
+  //   background-color: #3edc00;
+  //   border: 1px solid white;
+  // }
 
-  &__lastSeen {
-    font-size: 0.75rem;
-    opacity: 0.85;
-  }
+  // &__lastSeen {
+  //   font-size: 0.75rem;
+  //   opacity: 0.85;
+  // }
 
-  // ─── Меню опций ───
-  &__optionConversation {
-    display: flex;
-    gap: 10px;
-    position: relative;
+  // // ─── Меню опций ───
+  // &__optionConversation {
+  //   display: flex;
+  //   gap: 10px;
+  //   position: relative;
 
-    button {
-      padding: 3px;
-      cursor: pointer;
-      width: 100%;
+  //   button {
+  //     padding: 3px;
+  //     cursor: pointer;
+  //     width: 100%;
 
-      &:hover {
-        color: white;
-      }
-    }
+  //     &:hover {
+  //       color: white;
+  //     }
+  //   }
 
-    ul {
-      position: absolute;
-      top: 50px;
-      right: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      background: rgba(165, 176, 215, 0.97);
-      border-radius: 20px;
-      padding: 5px;
-      font-size: 1rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  //   ul {
+  //     position: absolute;
+  //     top: 50px;
+  //     right: 0;
+  //     display: flex;
+  //     flex-direction: column;
+  //     gap: 5px;
+  //     background: rgba(165, 176, 215, 0.97);
+  //     border-radius: 20px;
+  //     padding: 5px;
+  //     font-size: 1rem;
+  //     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 
-      li {
-        padding: 8px;
-        border-radius: 12px;
-        cursor: pointer;
-        display: flex;
-        gap: 5px;
-        align-items: center;
-        text-wrap: nowrap;
+  //     li {
+  //       padding: 8px;
+  //       border-radius: 12px;
+  //       cursor: pointer;
+  //       display: flex;
+  //       gap: 5px;
+  //       align-items: center;
+  //       text-wrap: nowrap;
 
-        &:hover {
-          color: white;
-        }
-      }
-    }
-  }
+  //       &:hover {
+  //         color: white;
+  //       }
+  //     }
+  //   }
+  // }
 
-  &__ButtonOption {
-    border-radius: 50%;
-  }
+  // &__ButtonOption {
+  //   border-radius: 50%;
+  // }
 
-  &__ButtonOptionShow {
-    background: rgba(0, 0, 0, 0.445);
-    color: rgba(255, 255, 255, 0.685);
-  }
+  // &__ButtonOptionShow {
+  //   background: rgba(0, 0, 0, 0.445);
+  //   color: rgba(255, 255, 255, 0.685);
+  // }
 }

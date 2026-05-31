@@ -1,19 +1,9 @@
 "use client"
-
 import { useParams } from "next/navigation"
 import style from "./MessageBlock.module.scss"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
-import { ProfileLink } from "../ProfileLink/ProfileLink"
 import Spinner from "../ui/spinner/Spinner"
-import Link from "next/link"
 import { formatMessageTime } from "@/utils/formatMessageTime"
-import { ArrowBack } from "@/assets/icons/arrowBack"
-import { formatData } from "@/utils/formatData"
-import { TrashThree } from "@/assets/icons/trashThree"
-import { Clear } from "@/assets/icons/clear"
-import { OptionIcon } from "@/assets/icons/optionIcon"
-import { StartGroupCallButton } from "../StartGroupCallButton/StartGroupCallButton"
-import { GroupCallBanner } from "../GroupCallBanner/GroupCallBanner"
 import ConfirmModal from "../ConfirmModal/ConfirmModal"
 import Image from "next/image"
 import { MessageReactions } from "../MessageReactions/MessageReactions"
@@ -22,6 +12,7 @@ import { getStickerImage } from "@/utils/getStickerImage"
 import { MessageBlockInput } from "../MessageBlockInput/MessageBlockInput"
 import { MessageText } from "../MessageText/MessageText"
 import { useMessageBlock } from "@/hooks/useMessageBlock/useMessageBlock"
+import { MessageBlockHeader } from "../MessageBlockHeader/MessageBlockHeader"
 
 export const MessageBlock = () => {
   const params = useParams<{ id: string }>()
@@ -49,7 +40,7 @@ export const MessageBlock = () => {
     setShowOption,
     showOption,
     isOwner,
-    openConfirm,
+    setConfirmConfig,
     delConversation,
     delHistoryMessages,
     messagesContainerRef,
@@ -66,7 +57,6 @@ export const MessageBlock = () => {
     isEditMessage,
     handleCloseEditMessage,
   } = useMessageBlock(id)
-
   // console.log("рендер")
   if (!currentConversation && loading) {
     return (
@@ -134,121 +124,22 @@ export const MessageBlock = () => {
       />
 
       {/* ── Шапка ── */}
-      <div className={style.messageBlock__userInfo}>
-        <div className={style.messageBlock__userInfoContainer}>
-          <Link
-            href="/conversations/"
-            className={style.messageBlock__buttonBackBlock}
-          >
-            <ArrowBack />
-          </Link>
-
-          {isGroup && (
-            <Link
-              href={`/conversation/${id}/settings`}
-              className={style.messageBlock__groupInfo}
-            >
-              {currentConversation.avatar && (
-                <div className={style.messageBlock__blockImg}>
-                  <CloudinaryImage
-                    src={currentConversation.avatar}
-                    alt="avatar"
-                    width={200}
-                    height={200}
-                  />
-                </div>
-              )}
-              <div className={style.messageBlock__groupInfoMain}>
-                <div className={style.messageBlock__groupInfoTitle}>
-                  {currentConversation.title}
-                </div>
-                <div className={style.messageBlock__groupInfoMemberCount}>
-                  {currentConversation.members.length} участника(ов)
-                </div>
-              </div>
-            </Link>
-          )}
-
-          {currentConversation?.type === "private" && recipientId && (
-            <>
-              <ProfileLink userId={recipientId._id} currentUserId={userId}>
-                <div className={style.messageBlock__userImgOnlineBlock}>
-                  <div className={style.messageBlock__blockImg}>
-                    <CloudinaryImage
-                      src={recipientId.avatar}
-                      alt="avatar"
-                      width={200}
-                      height={200}
-                    />
-                  </div>
-                  {usersOnline[recipientId._id]?.isOnline && (
-                    <div className={style.messageBlock__onlineBlock} />
-                  )}
-                </div>
-              </ProfileLink>
-              <div>
-                <div>{recipientId.username}</div>
-                {!status.isOnline && status.lastSeen && (
-                  <div className={style.messageBlock__lastSeen}>
-                    <span>был(а):</span>{" "}
-                    <span>{formatData(status.lastSeen)}</span>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-
-          <GroupCallBanner groupId={currentConversation._id} />
-        </div>
-
-        <div className={style.messageBlock__optionConversation} ref={optionRef}>
-          <button
-            onClick={() => setShowOption((prev) => !prev)}
-            className={`${style.messageBlock__ButtonOption} ${
-              showOption ? style.messageBlock__ButtonOptionShow : ""
-            }`}
-          >
-            <OptionIcon />
-          </button>
-          {showOption && (
-            <ul>
-              {(isOwner || !isGroup) && (
-                <>
-                  <li
-                    onClick={() =>
-                      openConfirm({
-                        title: `Удалить ${isGroup ? "группу" : "беседу"}`,
-                        message: "Вы уверены? Это действие нельзя отменить.",
-                        onConfirm: delConversation,
-                      })
-                    }
-                  >
-                    <TrashThree />
-                    <span>Удалить {isGroup ? "группу" : "беседу"}</span>
-                  </li>
-                  <li
-                    onClick={() =>
-                      openConfirm({
-                        title: "Очистить историю",
-                        message:
-                          "Вы уверены? История будет удалена безвозвратно.",
-                        onConfirm: delHistoryMessages,
-                      })
-                    }
-                  >
-                    <Clear /> <span>Очистить историю</span>
-                  </li>
-                </>
-              )}
-              {isGroup && (
-                <li>
-                  <StartGroupCallButton groupId={currentConversation._id} />
-                </li>
-              )}
-            </ul>
-          )}
-        </div>
-      </div>
+      <MessageBlockHeader
+        isGroup={isGroup}
+        id={id}
+        currentConversation={currentConversation}
+        recipientId={recipientId}
+        userId={userId}
+        usersOnline={usersOnline}
+        status={status}
+        optionRef={optionRef}
+        setShowOption={setShowOption}
+        showOption={showOption}
+        isOwner={isOwner}
+        delConversation={delConversation}
+        delHistoryMessages={delHistoryMessages}
+        setConfirmConfig={setConfirmConfig}
+      />
 
       {/* ── Список сообщений ── */}
       <div

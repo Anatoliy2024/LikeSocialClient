@@ -6,7 +6,7 @@ import Image from "next/image"
 import { StickersBlock } from "../StickersBlock/StickersBlock"
 import { Sticker } from "@/assets/icons/sticker"
 import style from "./MessageBlockInput.module.scss"
-import { useEffect, useRef, useState } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 // import { fileAPI } from "@/api/api"
 // import { getSocket } from "@/lib/socket"
 import { compressImage } from "@/utils/compressImage"
@@ -19,7 +19,7 @@ type IsEditMessageType = {
   text: string
 }
 
-export const MessageBlockInput = ({
+const MessageBlockInputComponent = ({
   id,
   isEditMessage,
   messagesEndRef,
@@ -35,7 +35,7 @@ export const MessageBlockInput = ({
   const [isUploading, setIsUploading] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [showStickers, setShowStickers] = useState(false)
-
+  // console.log("MessageBlockInputComponent render")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // const socket = getSocket()
@@ -245,3 +245,5 @@ export const MessageBlockInput = ({
     </div>
   )
 }
+
+export const MessageBlockInput = memo(MessageBlockInputComponent)
