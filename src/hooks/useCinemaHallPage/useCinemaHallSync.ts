@@ -112,41 +112,41 @@ const hasBufferHeadroom = (
 
 //   return torrent.downloaded >= neededBytes
 // }
-const hasTorrentHeadroom = (
-  video: HTMLVideoElement,
-  torrent: TorrentInstance,
-  minSeconds = 5,
-): boolean => {
-  if (!torrent || !video.duration || !isFinite(video.duration)) return false
+// const hasTorrentHeadroom = (
+//   video: HTMLVideoElement,
+//   torrent: TorrentInstance,
+//   minSeconds = 5,
+// ): boolean => {
+//   if (!torrent || !video.duration || !isFinite(video.duration)) return false
 
-  // 1. На какой байт файла приходится целевая секунда + запас
-  const targetSecond = Math.min(video.duration, video.currentTime + minSeconds)
-  const targetByte = Math.floor(
-    (targetSecond / video.duration) * torrent.length,
-  )
+//   // 1. На какой байт файла приходится целевая секунда + запас
+//   const targetSecond = Math.min(video.duration, video.currentTime + minSeconds)
+//   const targetByte = Math.floor(
+//     (targetSecond / video.duration) * torrent.length,
+//   )
 
-  // 2. Если есть доступ к кускам (pieces) — проверяем конкретный кусок
-  if (torrent.pieces && torrent.pieceLength) {
-    const pieceIndex = Math.floor(targetByte / torrent.pieceLength)
-    const piece = torrent.pieces[pieceIndex]
+//   // 2. Если есть доступ к кускам (pieces) — проверяем конкретный кусок
+//   if (torrent.pieces && torrent.pieceLength) {
+//     const pieceIndex = Math.floor(targetByte / torrent.pieceLength)
+//     const piece = torrent.pieces[pieceIndex]
 
-    // Если нужный кусок уже загружен — всё ок!
-    if (piece && !piece.missing) {
-      console.log("Я могу играть")
-      return true
-    }
-  }
-  console.log("Я не могу  играть")
+//     // Если нужный кусок уже загружен — всё ок!
+//     if (piece && !piece.missing) {
+//       console.log("Я могу играть")
+//       return true
+//     }
+//   }
+//   console.log("Я не могу  играть")
 
-  // 3. Фолбэк: если pieces недоступен, используем приблизительную эвристику
-  //    Допускаем, что для старта достаточно 10-20% от "нужного" прогресса
-  const progress = torrent.progress || 0
-  const neededProgress = targetByte / torrent.length
+//   // 3. Фолбэк: если pieces недоступен, используем приблизительную эвристику
+//   //    Допускаем, что для старта достаточно 10-20% от "нужного" прогресса
+//   const progress = torrent.progress || 0
+//   const neededProgress = targetByte / torrent.length
 
-  // Для старта: если есть хотя бы 15% от "нужного" — считаем, что можно играть
-  // (WebTorrent часто качает приоритетные куски первыми)
-  return progress >= neededProgress * 0.15
-}
+//   // Для старта: если есть хотя бы 15% от "нужного" — считаем, что можно играть
+//   // (WebTorrent часто качает приоритетные куски первыми)
+//   return progress >= neededProgress * 0.15
+// }
 
 export function useCinemaHallSync({
   cinemaHallId,
@@ -210,23 +210,24 @@ export function useCinemaHallSync({
 
   const checkIsReady = (minSeconds = 5): boolean => {
     const video = videoRef.current
-    const torrent = torrentRef?.current
+    // const torrent = torrentRef?.current
     if (!video) return false
 
     const r1 = video.readyState >= 3
     const r2 = isCurrentTimeBuffered(video)
     const r3 = hasBufferHeadroom(video, minSeconds)
-    const r4 = torrent ? hasTorrentHeadroom(video, torrent, minSeconds) : true
+    // const r4 = torrent ? hasTorrentHeadroom(video, torrent, minSeconds) : true
 
     console.log("checkIsReady", {
       r1,
       r2,
       r3,
-      r4,
+      // r4,
       readyState: video.readyState,
       currentTime: video.currentTime,
     })
-    return r1 && r2 && r3 && r4
+    return r1 && r2 && r3
+    //  && r4
   }
   // //функция проверки готово ли видео
   // const checkIsReady = (minSeconds = 5): boolean => {
