@@ -125,27 +125,43 @@ export function useCinemaHallSync({
     isActiveRef.current = true
   }
 
+  //функция проверки готово ли видео
+  const checkIsReady = (minSeconds = 5): boolean => {
+    const video = videoRef.current
+    const torrent = torrentRef?.current
+    if (!video) return false
+
+    return (
+      video.readyState >= 3 &&
+      isCurrentTimeBuffered(video) &&
+      hasBufferHeadroom(video, minSeconds) &&
+      (torrent ? hasTorrentHeadroom(video, torrent, minSeconds) : true)
+    )
+  }
+
   // 👇 Функция запуска проверки
   const startReadyCheck = () => {
     if (readyCheckIntervalRef.current) return // Уже запущен
 
     readyCheckIntervalRef.current = setInterval(() => {
-      const video = videoRef.current
-      const torrent = torrentRef?.current
+      // const video = videoRef.current
+      // const torrent = torrentRef?.current
 
-      if (!video || !torrent || !isActiveRef.current) return
+      // if (!video || !isActiveRef.current) return
 
-      // 👇 Комбинированная проверка:
-      const isReady =
-        video.readyState >= 3 && // HAVE_FUTURE_DATA
-        isCurrentTimeBuffered(video) && // Текущая позиция в буфере
-        hasBufferHeadroom(video, 5) && // 👈 НОВ: +5 секунд вперёд
-        hasTorrentHeadroom(video, torrent, 5) // 👈 НОВ: торрент скачал +5 секунд
+      // // 👇 Комбинированная проверка:
+      // const isReady =
+      //   video.readyState >= 3 && // HAVE_FUTURE_DATA
+      //   isCurrentTimeBuffered(video) && // Текущая позиция в буфере
+      //   hasBufferHeadroom(video, 5) && // 👈 НОВ: +5 секунд вперёд
+      //   (torrent ? hasTorrentHeadroom(video, torrent, 5) : true)
 
-      if (isReady) {
+      if (checkIsReady()) {
         // console.log("✅ Все проверки пройдены — отправляем ready")
         stopReadyCheck()
-        emitReady() // 👈 Отправляем на сервер!
+        emitReady(() => {
+          isBufferingRef.current = false
+        }) // 👈 Отправляем на сервер!
       }
     }, 500) // Проверяем каждые 0.5 сек
   }
@@ -178,6 +194,15 @@ export function useCinemaHallSync({
       return
     }
 
+    // 👇 Если видео в состоянии ожидания (waiting) — не пытайся играть
+    if (video.readyState < 2 || video.networkState === 3) {
+      // 3 = NETWORK_NO_SOURCE / buffering
+      console.log(
+        "⏳ safePlay: видео еще не готово (networkState/readyState), пропускаем",
+      )
+      return
+    }
+
     // 👇 Спец-обработка для blob URL (локальные файлы хоста)
     if (video.src.startsWith("blob:") && video.readyState < 2) {
       // console.log("⏳ safePlay: blob, ждём readyState >= 2...")
@@ -199,20 +224,20 @@ export function useCinemaHallSync({
 
     // 2. Проверка: готово ли видео к воспроизведению?
     // readyState: 0=ничего, 1=метаданные, 2=данные, 3=можно играть, 4=полностью
-    if (video.readyState < 2) {
-      console.warn(
-        `⚠️ safePlay: video не готов (readyState: ${video.readyState}), ждём canplay...`,
-      )
+    // if (video.readyState < 2) {
+    //   console.warn(
+    //     `⚠️ safePlay: video не готов (readyState: ${video.readyState}), ждём canplay...`,
+    //   )
 
-      // Пробуем сыграть, когда видео будет готово (одноразовый слушатель)
-      const onCanPlay = () => {
-        video.removeEventListener("canplay", onCanPlay)
-        // Рекурсивно вызываем safePlay, теперь видео готово
-        safePlay(video).catch(() => {})
-      }
-      video.addEventListener("canplay", onCanPlay, { once: true })
-      return
-    }
+    //   // Пробуем сыграть, когда видео будет готово (одноразовый слушатель)
+    //   const onCanPlay = () => {
+    //     video.removeEventListener("canplay", onCanPlay)
+    //     // Рекурсивно вызываем safePlay, теперь видео готово
+    //     safePlay(video).catch(() => {})
+    //   }
+    //   video.addEventListener("canplay", onCanPlay, { once: true })
+    //   return
+    // }
 
     // 3. Пытаемся воспроизвести
     try {
@@ -244,7 +269,6 @@ export function useCinemaHallSync({
     if (!socket) return
 
     const onSocketPlay = (data: PlayData) => {
-      // console.log("🎬 onPlay получен с сервера:", data)
       dispatch(applyPlay(data))
       if (!videoRef.current || !isActiveRef.current) {
         console.warn("❌ onPlay: videoRef или isActive не готовы", {
@@ -255,26 +279,24 @@ export function useCinemaHallSync({
         return
       }
 
-      // isRemoteActionRef.current = true
-      // isCommandPendingRef.current = false // 🔓 Разблокируем после серверного ответа
       const realTime =
         data.currentTime + (getServerNow() - data.playbackUpdatedAt) / 1000
-      // console.log(
-      //   "⏱ onPlay: устанавливаем время",
-      //   realTime,
-      //   "video.currentTime был:",
-      //   videoRef.current.currentTime,
-      // )
 
-      // 👇 Помечаем, что меняем время программно
       isProgrammaticSeekRef.current = true
 
       videoRef.current.currentTime = realTime
-      // console.log("🔊 onPlay: вызываем safePlay...")
-      safePlay(videoRef.current) // возможно нужно оставить это
-      // videoRef.current.play().catch((e) => {
-      //   console.warn("⚠️ Не удалось авто-воспроизведение:", e.message)
-      // })
+
+      // const canActuallyPlay =
+      //   isCurrentTimeBuffered(videoRef.current) &&
+      //   hasBufferHeadroom(videoRef.current, 2) // 2 секунды форы достаточно для старта
+
+      if (checkIsReady(2)) {
+        safePlay(videoRef.current)
+      } // возможно нужно оставить это
+      else {
+        // 👇 Если данных нет — не дергаем play(), пусть сработает handleWaiting
+        console.log("⏳ onSocketPlay: данных нет, ждем буферизации...")
+      }
     }
 
     const onSocketPause = (data: {
@@ -312,42 +334,26 @@ export function useCinemaHallSync({
       playbackUpdatedAt: number
       seqNum: number
     }) => {
-      // console.log("получение данных от сервере onSocketSeek data", data)
       dispatch(applySeek(data))
       if (!videoRef.current || !isActiveRef.current) return
 
-      // isRemoteActionRef.current = true
-      // isCommandPendingRef.current = false // 🔓 Разблокируем после серверного ответа
       isProgrammaticSeekRef.current = true // 👈 Добавь
       if (data.playing) {
-        // console.log(
-        //   "получение данных от сервере onSocketSeek data.playing",
-        //   data.playing,
-        // )
-
         const realTime =
           data.position + (getServerNow() - data.playbackUpdatedAt) / 1000
         videoRef.current.currentTime = realTime
-        // console.log(
-        //   "получение данных от сервере onSocketSeek realTime",
-        //   realTime,
-        // )
 
-        // console.log("✅ currentTime установлен:", videoRef.current.currentTime)
-        // setTimeout(() => {
-        //   console.log(
-        //     "⏱ currentTime через 100мс:",
-        //     videoRef.current?.currentTime,
-        //   )
-        // }, 100)
-        // setTimeout(() => {
-        //   console.log(
-        //     "⏱ currentTime через 500мс:",
-        //     videoRef.current?.currentTime,
-        //   )
-        // }, 500)
+        // 👇 ПРОВЕРКА: есть ли данные для этой позиции?
+        // const canActuallyPlay =
+        //   isCurrentTimeBuffered(videoRef.current) &&
+        //   hasBufferHeadroom(videoRef.current, 2) // 2 секунды форы достаточно для старта
 
-        safePlay(videoRef.current)
+        if (checkIsReady(2)) {
+          safePlay(videoRef.current)
+        } else {
+          // 👇 Если данных нет — не дергаем play(), пусть сработает handleWaiting
+          console.log("⏳ onSocketPlay: данных нет, ждем буферизации...")
+        }
       } else {
         videoRef.current.currentTime = data.position
         videoRef.current.pause()
@@ -515,7 +521,7 @@ export function useCinemaHallSync({
 
     // ✅ Не спамим чаще раза в 3 секунды
     const now = Date.now()
-    if (now - lastBufferingEmitRef.current < 3000) {
+    if (now - lastBufferingEmitRef.current < 1500) {
       console.log("⏳ emitBuffering: throttle, пропускаем")
       return
     }
@@ -539,7 +545,7 @@ export function useCinemaHallSync({
 
     justSentReadyRef.current = true
     //обнуление 3 секундного интервала чтобы обойти защиту в emitBuffering
-    lastBufferingEmitRef.current = 0
+    // lastBufferingEmitRef.current = 0
 
     socket.emit(
       "cinema-hall:ready",
@@ -582,7 +588,10 @@ export function useCinemaHallSync({
 
         videoRef.current.currentTime = realTime
         if (hall.playing) {
-          safePlay(videoRef.current)
+          // const canPlay =
+          //   isCurrentTimeBuffered(videoRef.current) &&
+          //   hasBufferHeadroom(videoRef.current, 2)
+          if (checkIsReady(2)) safePlay(videoRef.current)
         } else {
           videoRef.current.pause()
         }
@@ -686,6 +695,7 @@ export function useCinemaHallSync({
       console.log("⚠️ onWaiting в грациозном периоде после ready — игнорируем")
       return
     }
+    console.log("handleWaiting сработал")
 
     if (!isActiveRef.current) return
     if (document.visibilityState === "hidden") return
@@ -721,15 +731,34 @@ export function useCinemaHallSync({
     })
 
     if (!isActiveRef.current) return
-    stopReadyCheck()
+    // stopReadyCheck()
     // if (isRemoteActionRef.current) return // это мы сами применили команду — не реагируем
     if (!isBufferingRef.current) return // не буферили — игнорируем
-    // isBufferingRef.current = false
-    // emitReady()
+
     // Сбрасываем ТОЛЬКО после подтверждения сервера
-    emitReady(() => {
-      isBufferingRef.current = false
-    })
+    // emitReady(() => {
+    //   isBufferingRef.current = false
+    // })
+    // const video = videoRef.current
+    // const torrent = torrentRef?.current
+    // if (!video) return
+
+    // // 👇 ПРОВЕРЯЕМ ГОТОВНОСТЬ ПРЯМО ЗДЕСЬ
+    // const isReady =
+    //   video.readyState >= 3 &&
+    //   isCurrentTimeBuffered(video) &&
+    //   hasBufferHeadroom(video, 5) &&
+    //   (torrent ? hasTorrentHeadroom(video, torrent, 5) : true)
+
+    if (checkIsReady()) {
+      // 🚀 Если готовы — отправляем ready СРАЗУ и останавливаем интервал
+      stopReadyCheck()
+      emitReady(() => {
+        isBufferingRef.current = false
+      })
+    }
+
+    // startReadyCheck()
   }
 
   return {
