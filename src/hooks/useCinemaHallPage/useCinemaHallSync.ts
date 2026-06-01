@@ -57,21 +57,63 @@ const hasBufferHeadroom = (
   return false
 }
 
-// 👇 2. Проверяет, скачал ли WebTorrent достаточно байтов файла для текущей секунды
+// // 👇 2. Проверяет, скачал ли WebTorrent достаточно байтов файла для текущей секунды
+// const hasTorrentHeadroom = (
+//   video: HTMLVideoElement,
+//   torrent: TorrentInstance, // или импортируй TorrentInstance из своих типов
+//   minSeconds = 5,
+//   marginBytes = 1 * 1024 * 1024, // 2MB запас на опережение
+// ): boolean => {
+//   if (!torrent || !video.duration || !isFinite(video.duration)) return false
+
+//   // На какой секунде мы + запас
+//   const targetSecond = Math.min(video.duration, video.currentTime + minSeconds)
+//   const progressRatio = targetSecond / video.duration
+//   const neededBytes = Math.floor(torrent.length * progressRatio) + marginBytes
+
+//   console.log("hasTorrentHeadroom", {
+//     currentTime: video.currentTime,
+//     neededBytes,
+//     downloaded: torrent.downloaded,
+//     ok: torrent.downloaded >= neededBytes,
+//   })
+
+//   return torrent.downloaded >= neededBytes
+// }
 const hasTorrentHeadroom = (
   video: HTMLVideoElement,
-  torrent: TorrentInstance, // или импортируй TorrentInstance из своих типов
+  torrent: TorrentInstance,
   minSeconds = 5,
-  marginBytes = 1 * 1024 * 1024, // 2MB запас на опережение
 ): boolean => {
   if (!torrent || !video.duration || !isFinite(video.duration)) return false
 
-  // На какой секунде мы + запас
+  // 1. На какой байт файла приходится целевая секунда + запас
   const targetSecond = Math.min(video.duration, video.currentTime + minSeconds)
-  const progressRatio = targetSecond / video.duration
-  const neededBytes = Math.floor(torrent.length * progressRatio) + marginBytes
+  const targetByte = Math.floor(
+    (targetSecond / video.duration) * torrent.length,
+  )
 
-  return torrent.downloaded >= neededBytes
+  // 2. Если есть доступ к кускам (pieces) — проверяем конкретный кусок
+  if (torrent.pieces && torrent.pieceLength) {
+    const pieceIndex = Math.floor(targetByte / torrent.pieceLength)
+    const piece = torrent.pieces[pieceIndex]
+
+    // Если нужный кусок уже загружен — всё ок!
+    if (piece && !piece.missing) {
+      console.log("Я могу играть")
+      return true
+    }
+  }
+  console.log("Я не могу  играть")
+
+  // 3. Фолбэк: если pieces недоступен, используем приблизительную эвристику
+  //    Допускаем, что для старта достаточно 10-20% от "нужного" прогресса
+  const progress = torrent.progress || 0
+  const neededProgress = targetByte / torrent.length
+
+  // Для старта: если есть хотя бы 15% от "нужного" — считаем, что можно играть
+  // (WebTorrent часто качает приоритетные куски первыми)
+  return progress >= neededProgress * 0.15
 }
 
 export function useCinemaHallSync({
@@ -125,19 +167,48 @@ export function useCinemaHallSync({
     isActiveRef.current = true
   }
 
-  //функция проверки готово ли видео
+  // Добавь вспомогательную функцию
+  const resetBufferingState = () => {
+    console.log("resetBufferingState")
+    stopReadyCheck()
+    isBufferingRef.current = false
+    lastBufferingEmitRef.current = 0
+    justSentReadyRef.current = false
+  }
+
   const checkIsReady = (minSeconds = 5): boolean => {
     const video = videoRef.current
     const torrent = torrentRef?.current
     if (!video) return false
 
-    return (
-      video.readyState >= 3 &&
-      isCurrentTimeBuffered(video) &&
-      hasBufferHeadroom(video, minSeconds) &&
-      (torrent ? hasTorrentHeadroom(video, torrent, minSeconds) : true)
-    )
+    const r1 = video.readyState >= 3
+    const r2 = isCurrentTimeBuffered(video)
+    const r3 = hasBufferHeadroom(video, minSeconds)
+    const r4 = torrent ? hasTorrentHeadroom(video, torrent, minSeconds) : true
+
+    console.log("checkIsReady", {
+      r1,
+      r2,
+      r3,
+      r4,
+      readyState: video.readyState,
+      currentTime: video.currentTime,
+    })
+    return r1 && r2 && r3 && r4
   }
+  // //функция проверки готово ли видео
+  // const checkIsReady = (minSeconds = 5): boolean => {
+  //   const video = videoRef.current
+  //   const torrent = torrentRef?.current
+  //   if (!video) return false
+
+  //   return (
+  //     video.readyState >= 3 &&
+  //     isCurrentTimeBuffered(video) &&
+  //     hasBufferHeadroom(video, minSeconds) &&
+  //     (torrent ? hasTorrentHeadroom(video, torrent, minSeconds) : true)
+  //   )
+  // }
 
   // 👇 Функция запуска проверки
   const startReadyCheck = () => {
@@ -281,14 +352,20 @@ export function useCinemaHallSync({
 
       const realTime =
         data.currentTime + (getServerNow() - data.playbackUpdatedAt) / 1000
+      const timeDiff = Math.abs(videoRef.current.currentTime - realTime)
 
-      isProgrammaticSeekRef.current = true
+      // Двигаем только если реально рассинхрон больше 1 секунды
+      if (!isBufferingRef.current && timeDiff > 1) {
+        isProgrammaticSeekRef.current = true
+        videoRef.current.currentTime = realTime
+      }
 
-      videoRef.current.currentTime = realTime
+      // const realTime =
+      //   data.currentTime + (getServerNow() - data.playbackUpdatedAt) / 1000
 
-      // const canActuallyPlay =
-      //   isCurrentTimeBuffered(videoRef.current) &&
-      //   hasBufferHeadroom(videoRef.current, 2) // 2 секунды форы достаточно для старта
+      // isProgrammaticSeekRef.current = true
+
+      // videoRef.current.currentTime = realTime
 
       if (checkIsReady(2)) {
         safePlay(videoRef.current)
@@ -322,6 +399,9 @@ export function useCinemaHallSync({
     }) => {
       dispatch(applyPause(data))
       if (!videoRef.current || !isActiveRef.current) return
+      if (!isBufferingRef.current) {
+        resetBufferingState()
+      }
       isProgrammaticSeekRef.current = true // 👈 Добавь
       // isRemoteActionRef.current = true
       // isCommandPendingRef.current = false // 🔓 Разблокируем после серверного ответа
@@ -336,7 +416,7 @@ export function useCinemaHallSync({
     }) => {
       dispatch(applySeek(data))
       if (!videoRef.current || !isActiveRef.current) return
-
+      resetBufferingState()
       isProgrammaticSeekRef.current = true // 👈 Добавь
       if (data.playing) {
         const realTime =
@@ -562,7 +642,7 @@ export function useCinemaHallSync({
     // 👇 Игнорируем onWaiting следующие 800мс (время на "раскачку" видео)
     setTimeout(() => {
       justSentReadyRef.current = false
-    }, 800)
+    }, 1500)
   }
 
   const emitSync = useCallback(() => {
