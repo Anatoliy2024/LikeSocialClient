@@ -41,16 +41,48 @@ const isCurrentTimeBuffered = (video: HTMLVideoElement): boolean => {
   }
   return false
 }
-// 👇 Проверяет, есть ли буфер хотя бы на N секунд вперёд от текущей позиции
+// // 👇 Проверяет, есть ли буфер хотя бы на N секунд вперёд от текущей позиции
+// const hasBufferHeadroom = (
+//   video: HTMLVideoElement,
+//   minSeconds = 5,
+// ): boolean => {
+//   const currentTime = video.currentTime
+//   for (let i = 0; i < video.buffered.length; i++) {
+//     const end = video.buffered.end(i)
+//     // Если конец любого буфера хотя бы на minSeconds впереди — ок
+//     if (end - currentTime >= minSeconds) {
+//       return true
+//     }
+//   }
+//   return false
+// }
+
 const hasBufferHeadroom = (
   video: HTMLVideoElement,
   minSeconds = 5,
 ): boolean => {
   const currentTime = video.currentTime
+
   for (let i = 0; i < video.buffered.length; i++) {
+    const start = video.buffered.start(i)
     const end = video.buffered.end(i)
-    // Если конец любого буфера хотя бы на minSeconds впереди — ок
-    if (end - currentTime >= minSeconds) {
+
+    // ✅ FIX 1: Проверяем, что текущее время ВНУТРИ этого диапазона
+    if (currentTime < start || currentTime > end) {
+      continue
+    }
+
+    const headroom = end - currentTime
+
+    // ✅ FIX 2: Основной строгий порог (защита от флаппинга)
+    if (headroom >= minSeconds) {
+      return true
+    }
+
+    // ✅ FIX 3: Грациозный фолбэк — если буфера мало, но видео «почти готово»
+    // Это предотвращает вечное ожидание на границах фрагментированного буфера
+    // Но не отключает защиту: если headroom < 0.5 — всё равно false
+    if (headroom >= 0.5 && video.readyState >= 3) {
       return true
     }
   }
