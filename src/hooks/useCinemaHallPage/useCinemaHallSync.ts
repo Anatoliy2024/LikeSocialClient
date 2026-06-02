@@ -213,7 +213,7 @@ export function useCinemaHallSync({
     // const torrent = torrentRef?.current
     if (!video) return false
 
-    const r1 = video.readyState >= 3
+    const r1 = video.readyState === 4
     const r2 = isCurrentTimeBuffered(video)
     const r3 = hasBufferHeadroom(video, minSeconds)
     // const r4 = torrent ? hasTorrentHeadroom(video, torrent, minSeconds) : true
@@ -226,7 +226,8 @@ export function useCinemaHallSync({
       readyState: video.readyState,
       currentTime: video.currentTime,
     })
-    return r1 && r2 && r3
+    return r1
+    // && r2 && r3
     //  && r4
   }
   // //функция проверки готово ли видео
