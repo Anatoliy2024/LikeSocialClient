@@ -39,13 +39,14 @@ export const useSocketCinemaHall = (
   groupId: string,
   activate: () => void,
   setTorrentStatus: Dispatch<SetStateAction<TorrentStatus>>,
+  setFailedTracker: Dispatch<SetStateAction<string | undefined>>,
   clientRef: RefObject<WebTorrentInstance | null>,
   torrentRef: RefObject<TorrentInstance | null>,
   torrentInfoHashRef: RefObject<string | null>,
   peerCheckRef: RefObject<ReturnType<typeof setInterval> | null>,
   lastLoggedProgress: RefObject<number>,
   setBufferProgress: Dispatch<SetStateAction<number>>,
-  setBufferingStatus: Dispatch<SetStateAction<boolean>>,
+  // setBufferingStatus: Dispatch<SetStateAction<boolean>>,
   videoRef: RefObject<HTMLVideoElement | null>,
   avatar?: string | null,
   username?: string | null,
@@ -94,7 +95,18 @@ export const useSocketCinemaHall = (
           )
         }
         setBufferProgress(percent)
-        setBufferingStatus(percent < 100)
+        if (percent < 100) {
+          setTorrentStatus("buffering")
+        } else {
+          setTorrentStatus("done")
+        }
+        // setBufferingStatus(percent < 100)
+      })
+      torrent.on("done", () => {
+        // console.log("✅ done сработал*********************************")
+        setBufferProgress(100)
+        // setBufferingStatus(false)
+        setTorrentStatus("done")
       })
 
       // @ts-ignore
@@ -103,6 +115,7 @@ export const useSocketCinemaHall = (
         console.log(
           `✅ СОЕДИНЕНИЕ УСТАНОВЛЕНО! Пир: ${addr}, тип: ${wire.type}, peerId: ${wire.peerId}`,
         )
+        setTorrentStatus("peer_search")
         if (peerCheckRef.current) {
           clearInterval(peerCheckRef.current)
         }
@@ -113,18 +126,36 @@ export const useSocketCinemaHall = (
         console.warn("❌ Нет пиров — addPeer не сработал")
       })
 
+      // torrent.on("warning", (err) => {
+      //   console.warn("⚠️", err)
+      //   if (peerCheckRef.current) {
+      //     clearInterval(peerCheckRef.current)
+      //   }
+      // })
+      // torrent.on("error", (err) => {
+      //   console.error("❌", err)
+      //   setTorrentStatus("error")
+      //   if (peerCheckRef.current) {
+      //     clearInterval(peerCheckRef.current)
+      //   }
+      // })
       torrent.on("warning", (err) => {
         console.warn("⚠️", err)
-        if (peerCheckRef.current) {
-          clearInterval(peerCheckRef.current)
+        // const msg = String(err?.message ?? err ?? "")
+        const msg = err instanceof Error ? err.message : String(err)
+        const failedUrl = TRACKERS.find((t) => msg.includes(t))
+        if (failedUrl) {
+          setFailedTracker(failedUrl)
+          setTorrentStatus("tracker_partial")
+          // если это был последний — проверим через секунду
         }
+        if (peerCheckRef.current) clearInterval(peerCheckRef.current)
       })
       torrent.on("error", (err) => {
         console.error("❌", err)
-        setTorrentStatus("error")
-        if (peerCheckRef.current) {
-          clearInterval(peerCheckRef.current)
-        }
+        // setTorrentStatus("error")
+        setTorrentStatus("tracker_failed")
+        if (peerCheckRef.current) clearInterval(peerCheckRef.current)
       })
 
       const startPlayer = () => {
@@ -152,7 +183,7 @@ export const useSocketCinemaHall = (
         if (videoFile?.streamTo) {
           try {
             videoFile?.streamTo(videoRef.current)
-            setTorrentStatus("ready")
+            // setTorrentStatus("done")
             onReady?.() // ✅ activate() вызывается здесь — видео уже имеет src
           } catch (e) {
             console.error("Stream error:", e)
@@ -176,7 +207,13 @@ export const useSocketCinemaHall = (
         })
       }
     },
-    [setTorrentStatus, setBufferProgress, setBufferingStatus, videoRef],
+    [
+      setTorrentStatus,
+      setBufferProgress,
+      // setBufferingStatus,
+      setFailedTracker,
+      videoRef,
+    ],
   )
 
   const connectMagnet = useCallback(
@@ -239,7 +276,7 @@ export const useSocketCinemaHall = (
         if (data.hall?.file?.magnet) {
           try {
             // setMagnetURI(data.hall?.file?.magnet)
-            setTorrentStatus("connecting")
+            setTorrentStatus("tracker_connecting")
 
             const client = await waitForClient(clientRef)
             // const client = await waitForClient(clientRef, ac.signal)

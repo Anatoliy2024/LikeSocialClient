@@ -8,7 +8,7 @@ import {
   WebTorrentInstance,
 } from "@/types/webtorrent.types"
 import { useSearchParams } from "next/navigation"
-import { ChangeEvent, useMemo, useRef, useState } from "react"
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react"
 import { useCinemaHallSync } from "./useCinemaHallSync"
 import { calculateSeedingDelay } from "@/utils/calculateSeedingDelay"
 import { TRACKERS } from "@/constants/webTorrentConfig"
@@ -31,7 +31,10 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
   const [isHashing, setIsHashing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [torrentStatus, setTorrentStatus] = useState<TorrentStatus>("idle")
-  const [bufferingStatus, setBufferingStatus] = useState<boolean>(false)
+  const [failedTracker, setFailedTracker] = useState<string | undefined>(
+    undefined,
+  )
+  // const [bufferingStatus, setBufferingStatus] = useState<boolean>(false)
   const [bufferProgress, setBufferProgress] = useState(0)
   const [isFilePrepared, setIsFilePrepared] = useState(false) // файл готов локально
 
@@ -103,13 +106,14 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
     groupId,
     activate,
     setTorrentStatus,
+    setFailedTracker,
     clientRef,
     torrentRef,
     torrentInfoHashRef,
     peerCheckRef,
     lastLoggedProgress,
     setBufferProgress,
-    setBufferingStatus,
+    // setBufferingStatus,
     videoRef,
     avatar,
     username,
@@ -230,7 +234,7 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
             blobUrlRef.current = blobUrl
             videoRef.current.src = blobUrl
             // videoRef.current.play().catch(() => {})
-            setTorrentStatus("ready")
+            setTorrentStatus("done")
           }
 
           // setupTorrentPlayer(torrentRef.current)
@@ -251,6 +255,12 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
     )
   }, [file, movieName, magnetURI, isFilePrepared, isSeedingActive, isHashing])
 
+  useEffect(() => {
+    if (torrentStatus !== "peer_search") return
+    const id = setTimeout(() => setTorrentStatus("peer_timeout"), 30_000)
+    return () => clearTimeout(id)
+  }, [torrentStatus])
+
   return {
     // 🎬 UI State (состояния интерфейса)
     cinemaHallName,
@@ -262,7 +272,8 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
     isSeedingActive,
     canCreateHall,
     torrentStatus,
-    bufferingStatus,
+    failedTracker,
+    // bufferingStatus,
     bufferProgress,
     playing,
     currentTime,
@@ -305,44 +316,4 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
     torrentRef,
     createHandle,
   }
-  // return {
-  //   cinemaHallName,
-  //   movieName,
-  //   setMovieName,
-  //   isDragging,
-  //   handleDragOver,
-  //   handleDragLeave,
-  //   handleDrop,
-  //   inputRef,
-  //   file,
-  //   isHashing,
-  //   isFilePrepared,
-  //   isSeedingActive,
-  //   handleInputChange,
-  //   canCreateHall,
-  //   createHandle,
-  //   videoRef,
-  //   blobUrlRef,
-  //   magnet,
-  //   handleNativePlay,
-  //   handleNativePause,
-  //   handleSeeked,
-  //   handleWaiting,
-  //   handleCanPlay,
-  //   handlePlayRequest,
-  //   handlePauseRequest,
-  //   handleSeekRequest,
-  //   playing,
-  //   currentTime,
-  //   groupId,
-  //   socket,
-  //   hostId,
-  //   userId,
-  //   roomUsers,
-  //   waitingForUsers,
-  //   torrentStatus,
-  //   bufferingStatus,
-  //   bufferProgress,
-  //   torrentRef,
-  // }
 }

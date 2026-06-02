@@ -23,7 +23,8 @@ export interface UseCinemaHallPageReturn {
   isSeedingActive: boolean
   canCreateHall: boolean
   torrentStatus: TorrentStatus
-  bufferingStatus: boolean
+  failedTracker: string | undefined
+  // bufferingStatus: boolean
   bufferProgress: number
   playing: boolean
   currentTime: number

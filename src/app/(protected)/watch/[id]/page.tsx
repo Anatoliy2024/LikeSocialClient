@@ -11,6 +11,7 @@ import { calculateSeedingDelay } from "@/utils/calculateSeedingDelay"
 import { UserIcon } from "@/assets/icons/userIcon"
 import { UserWaiting } from "@/assets/icons/userWaiting"
 import { useCinemaHallPage } from "@/hooks/useCinemaHallPage/useCinemaHallPage"
+import { TorrentStatusBar } from "@/components/TorrentStatusBar/TorrentStatusBar"
 
 export default function WatchPage() {
   const { id } = useParams() as { id: string }
@@ -25,7 +26,8 @@ export default function WatchPage() {
     isSeedingActive,
     canCreateHall,
     torrentStatus,
-    bufferingStatus,
+    failedTracker,
+    // bufferingStatus,
     bufferProgress,
     playing,
     currentTime,
@@ -243,14 +245,19 @@ export default function WatchPage() {
             </ul>
           </div>
         </div>
-        {torrentStatus === "ready" && <div>Файл готов к скачке...</div>}
-        {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>}
-        {bufferingStatus && bufferProgress !== 100 ? (
+        <TorrentStatusBar
+          status={torrentStatus}
+          bufferProgress={bufferProgress}
+          failedTracker={failedTracker}
+        />
+        {/* {torrentStatus === "ready" && <div>Файл готов к скачке...</div>} */}
+        {/* {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>} */}
+        {/* {bufferingStatus && bufferProgress !== 100 ? (
           <p>⏳ Видео загружено на {bufferProgress}%</p>
         ) : (
           <p>Загрузка завершилась</p>
-        )}
-        {torrentStatus === "error" && <p>❌ Ошибка подключения.</p>}
+        )} */}
+        {/* {torrentStatus === "error" && <p>❌ Ошибка подключения.</p>} */}
 
         <TorrentStatsPanel
           torrentRef={torrentRef}

@@ -1,0 +1,136 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 0.5px solid var(--color-border-tertiary);
+  font-size: 13px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.text {
+  font-weight: 500;
+}
+
+.sub {
+  font-size: 12px;
+}
+
+.progress {
+  flex: 1;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--color-border-tertiary);
+  overflow: hidden;
+  margin-left: 4px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 1px;
+  background: var(--color-text-info);
+  transition: width 0.3s;
+}
+
+.pct {
+  font-size: 12px;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* neutral */
+.neutral {
+  background: transparent;
+}
+.neutral .text {
+  color: var(--color-text-tertiary);
+}
+.neutral .sub {
+  color: var(--color-text-tertiary);
+}
+.dot_neutral {
+  background: var(--color-text-tertiary);
+  opacity: 0.4;
+}
+
+/* info */
+.info {
+  background: var(--color-background-info);
+  border-color: var(--color-border-info);
+}
+.info .text {
+  color: var(--color-text-info);
+}
+.info .sub {
+  color: var(--color-text-info);
+  opacity: 0.7;
+}
+.info .pct {
+  color: var(--color-text-info);
+}
+.dot_info {
+  border: 1.5px solid var(--color-text-info);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  background: transparent;
+  width: 8px;
+  height: 8px;
+}
+
+/* warn */
+.warn {
+  background: var(--color-background-warning);
+  border-color: var(--color-border-warning);
+}
+.warn .text {
+  color: var(--color-text-warning);
+}
+.warn .sub {
+  color: var(--color-text-warning);
+  opacity: 0.7;
+}
+.dot_warn {
+  background: var(--color-text-warning);
+}
+
+/* ok */
+.ok {
+  background: var(--color-background-success);
+  border-color: var(--color-border-success);
+}
+.ok .text {
+  color: var(--color-text-success);
+}
+.dot_ok {
+  background: var(--color-text-success);
+}
+
+/* err */
+.err {
+  background: var(--color-background-danger);
+  border-color: var(--color-border-danger);
+}
+.err .text {
+  color: var(--color-text-danger);
+}
+.err .sub {
+  color: var(--color-text-danger);
+  opacity: 0.7;
+}
+.dot_err {
+  background: var(--color-text-danger);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

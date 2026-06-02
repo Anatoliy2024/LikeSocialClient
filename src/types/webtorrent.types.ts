@@ -39,7 +39,18 @@ export interface WebTorrentConfig {
   webSeeds?: boolean
 }
 
-export type TorrentStatus = "idle" | "connecting" | "ready" | "error"
+// export type TorrentStatus = "idle" | "connecting" | "ready" | "error"
+
+export type TorrentStatus =
+  | "idle"
+  | "tracker_connecting" // пытаемся подключиться
+  | "tracker_partial" // один трекер упал, второй ещё живой
+  | "tracker_failed" // оба упали
+  | "error"
+  | "peer_search" // трекеры ок, ищем пиров
+  | "peer_timeout" // > 30с, пиров нет
+  | "buffering" // есть пиры, скачиваем
+  | "done" // всё скачано
 
 export interface AddTorrentOptions {
   announce?: string[]
