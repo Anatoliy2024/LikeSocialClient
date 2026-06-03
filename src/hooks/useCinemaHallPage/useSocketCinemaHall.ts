@@ -1,4 +1,4 @@
-import { TRACKERS, VIDEO_EXTENSIONS } from "@/constants/webTorrentConfig"
+import { VIDEO_EXTENSIONS } from "@/constants/webTorrentConfig"
 import {
   clearCinemaHall,
   getPeerId,
@@ -39,7 +39,7 @@ export const useSocketCinemaHall = (
   groupId: string,
   activate: () => void,
   setTorrentStatus: Dispatch<SetStateAction<TorrentStatus>>,
-  setFailedTracker: Dispatch<SetStateAction<string | undefined>>,
+  setFailedTrackers: Dispatch<SetStateAction<string[]>>,
   clientRef: RefObject<WebTorrentInstance | null>,
   torrentRef: RefObject<TorrentInstance | null>,
   torrentInfoHashRef: RefObject<string | null>,
@@ -48,6 +48,7 @@ export const useSocketCinemaHall = (
   setBufferProgress: Dispatch<SetStateAction<number>>,
   // setBufferingStatus: Dispatch<SetStateAction<boolean>>,
   videoRef: RefObject<HTMLVideoElement | null>,
+  trackers: string[],
   avatar?: string | null,
   username?: string | null,
 ) => {
@@ -116,6 +117,7 @@ export const useSocketCinemaHall = (
           `✅ СОЕДИНЕНИЕ УСТАНОВЛЕНО! Пир: ${addr}, тип: ${wire.type}, peerId: ${wire.peerId}`,
         )
         setTorrentStatus("peer_search")
+        setFailedTrackers([])
         if (peerCheckRef.current) {
           clearInterval(peerCheckRef.current)
         }
@@ -143,11 +145,22 @@ export const useSocketCinemaHall = (
         console.warn("⚠️", err)
         // const msg = String(err?.message ?? err ?? "")
         const msg = err instanceof Error ? err.message : String(err)
-        const failedUrl = TRACKERS.find((t) => msg.includes(t))
+        const failedUrl = trackers.find((t) => msg.includes(t))
         if (failedUrl) {
-          setFailedTracker(failedUrl)
-          setTorrentStatus("tracker_partial")
-          // если это был последний — проверим через секунду
+          setFailedTrackers((prev) => {
+            // Избегаем дубликатов
+            if (prev.includes(failedUrl)) return prev
+            const newFailed = [...prev, failedUrl]
+
+            // Если все трекеры упали
+            if (newFailed.length >= trackers.length) {
+              setTorrentStatus("tracker_failed")
+            } else {
+              setTorrentStatus("tracker_partial")
+            }
+
+            return newFailed
+          })
         }
         if (peerCheckRef.current) clearInterval(peerCheckRef.current)
       })
@@ -211,7 +224,7 @@ export const useSocketCinemaHall = (
       setTorrentStatus,
       setBufferProgress,
       // setBufferingStatus,
-      setFailedTracker,
+      setFailedTrackers,
       videoRef,
     ],
   )
@@ -245,7 +258,7 @@ export const useSocketCinemaHall = (
       }
 
       // 3. Добавляем новый
-      const torrent = client.add(magnet, { announce: TRACKERS })
+      const torrent = client.add(magnet, { announce: trackers })
 
       if (torrent.ready) {
         setupTorrentPlayer(torrent, existingPeerIds, onReady)
@@ -255,7 +268,7 @@ export const useSocketCinemaHall = (
         )
       }
     },
-    [setupTorrentPlayer],
+    [setupTorrentPlayer, trackers],
   )
 
   useEffect(() => {

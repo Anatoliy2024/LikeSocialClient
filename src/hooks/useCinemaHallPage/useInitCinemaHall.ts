@@ -1,15 +1,18 @@
 import { RefObject, useEffect } from "react"
 import { initWebTorrentWithSW } from "@/lib/webtorrent-sw"
 import { TorrentInstance, WebTorrentInstance } from "@/types/webtorrent.types"
-import { WEBTORRENT_CONFIG } from "@/constants/webTorrentConfig"
+import { ICE_SERVERS } from "@/constants/webTorrentConfig"
+// import { useTrackers } from './useTrackers'
+// import { WEBTORRENT_CONFIG } from "@/constants/webTorrentConfig"
 
 export const useInitCinemaHall = (
   clientRef: RefObject<WebTorrentInstance | null>,
   torrentRef: RefObject<TorrentInstance | null>,
-  peerCheckRef: RefObject<ReturnType<typeof setInterval> | null>,
+  // peerCheckRef: RefObject<ReturnType<typeof setInterval> | null>,
   abortControllerRef: RefObject<AbortController | null>,
   torrentInfoHashRef: RefObject<string | null>,
   blobUrlRef: RefObject<string | null>,
+  trackers: string[],
 ) => {
   useEffect(() => {
     let cancelled = false
@@ -81,6 +84,16 @@ export const useInitCinemaHall = (
         const WebTorrentModule =
           await import("webtorrent/dist/webtorrent.min.js")
         const WebTorrent = WebTorrentModule.default || WebTorrentModule
+
+        const WEBTORRENT_CONFIG = {
+          dht: false,
+          tracker: {
+            announce: trackers, // ← ДОБАВИТЬ ЭТУ СТРОКУ
+            rtcConfig: {
+              iceServers: ICE_SERVERS,
+            },
+          },
+        } as const
 
         const client = new WebTorrent(WEBTORRENT_CONFIG)
 

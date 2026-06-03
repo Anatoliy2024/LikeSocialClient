@@ -11,12 +11,13 @@ import { useSearchParams } from "next/navigation"
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react"
 import { useCinemaHallSync } from "./useCinemaHallSync"
 import { calculateSeedingDelay } from "@/utils/calculateSeedingDelay"
-import { TRACKERS } from "@/constants/webTorrentConfig"
+// import { TRACKERS } from "@/constants/webTorrentConfig"
 import { useInitCinemaHall } from "./useInitCinemaHall"
 import { useSocketCinemaHall } from "./useSocketCinemaHall"
 import { waitForClient } from "@/utils/waitForClient"
 import { UseCinemaHallPageReturn } from "@/types/useCinemaHallPage.types"
 import { useClockSync } from "./useClockSync"
+import { useTrackers } from "./useTrackers"
 
 export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
   const searchParams = useSearchParams()
@@ -31,9 +32,8 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
   const [isHashing, setIsHashing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [torrentStatus, setTorrentStatus] = useState<TorrentStatus>("idle")
-  const [failedTracker, setFailedTracker] = useState<string | undefined>(
-    undefined,
-  )
+  const [failedTrackers, setFailedTrackers] = useState<string[]>([])
+  // const [totalTrackers, setTotalTrackers] = useState(0)
   // const [bufferingStatus, setBufferingStatus] = useState<boolean>(false)
   const [bufferProgress, setBufferProgress] = useState(0)
   const [isFilePrepared, setIsFilePrepared] = useState(false) // файл готов локально
@@ -76,6 +76,8 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
   const username = useAppSelector((state) => state.auth.username)
   const avatar = useAppSelector((state) => state.auth.avatar)
 
+  const { trackers, totalTrackers } = useTrackers()
+
   useClockSync(socket)
 
   const {
@@ -93,10 +95,11 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
   useInitCinemaHall(
     clientRef,
     torrentRef,
-    peerCheckRef,
+    // peerCheckRef,
     abortControllerRef,
     torrentInfoHashRef,
     blobUrlRef,
+    trackers,
   )
 
   useSocketCinemaHall(
@@ -106,7 +109,7 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
     groupId,
     activate,
     setTorrentStatus,
-    setFailedTracker,
+    setFailedTrackers,
     clientRef,
     torrentRef,
     torrentInfoHashRef,
@@ -115,9 +118,15 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
     setBufferProgress,
     // setBufferingStatus,
     videoRef,
+    trackers,
     avatar,
     username,
   )
+
+  // При загрузке трекеров сохраняем их количество
+  // useEffect(() => {
+  //   setTotalTrackers(trackers.length)
+  // }, [trackers])
 
   const handleFile = async (f: File) => {
     if (!f.type.startsWith("video/")) return
@@ -141,7 +150,7 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
       }
 
       const torrent = client.seed(f, {
-        announce: TRACKERS,
+        announce: trackers,
       })
 
       torrentRef.current = torrent
@@ -272,7 +281,8 @@ export const useCinemaHallPage = (id: string): UseCinemaHallPageReturn => {
     isSeedingActive,
     canCreateHall,
     torrentStatus,
-    failedTracker,
+    failedTrackers,
+    totalTrackers,
     // bufferingStatus,
     bufferProgress,
     playing,

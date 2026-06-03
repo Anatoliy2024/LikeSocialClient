@@ -4,15 +4,22 @@ import style from "./TorrentStatusBar.module.scss"
 interface Props {
   status: TorrentStatus
   bufferProgress: number
-  failedTracker?: string
+  failedTrackers: string[] // массив вместо одного
+  totalTrackers: number
 }
 
 export function TorrentStatusBar({
   status,
   bufferProgress,
-  failedTracker,
+  failedTrackers,
+  totalTrackers,
 }: Props) {
-  const config = getConfig(status, bufferProgress, failedTracker)
+  const config = getConfig(
+    status,
+    bufferProgress,
+    failedTrackers,
+    totalTrackers,
+  )
   if (!config) return null
 
   return (
@@ -38,8 +45,12 @@ export function TorrentStatusBar({
 function getConfig(
   stage: TorrentStatus,
   progress: number,
-  failedTracker?: string,
+  failedTrackers: string[],
+  totalTrackers: number,
 ) {
+  const failedCount = failedTrackers.length
+  const workingCount = totalTrackers - failedCount
+
   switch (stage) {
     case "idle":
       return { variant: "neutral", text: "Ожидание", sub: "инициализация..." }
@@ -47,19 +58,19 @@ function getConfig(
       return {
         variant: "info",
         text: "Подключение к трекерам",
-        sub: "openwebtorrent.com, webtorrent.dev",
+        sub: `Проверяем ${totalTrackers} трекеров...`,
       }
     case "tracker_partial":
       return {
-        variant: "info",
-        text: "Подключение к трекерам",
-        sub: `${failedTracker} недоступен, пробуем второй...`,
+        variant: "warn",
+        text: "Проблемы с трекерами",
+        sub: `${failedCount}/${totalTrackers} недоступно, пробуем остальные...`,
       }
     case "tracker_failed":
       return {
         variant: "err",
-        text: "Трекеры недоступны",
-        sub: "оба сервера не отвечают",
+        text: "Все трекеры недоступны",
+        sub: `${totalTrackers}/${totalTrackers} серверов не отвечают`,
       }
     case "error":
       return {
@@ -68,7 +79,11 @@ function getConfig(
         sub: "Попробуйте позже",
       }
     case "peer_search":
-      return { variant: "info", text: "Поиск пиров", sub: "трекеры подключены" }
+      return {
+        variant: "info",
+        text: "Поиск пиров",
+        sub: `${workingCount} трекеров работает`,
+      }
     case "peer_timeout":
       return {
         variant: "warn",

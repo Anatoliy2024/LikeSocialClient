@@ -26,7 +26,8 @@ export default function WatchPage() {
     isSeedingActive,
     canCreateHall,
     torrentStatus,
-    failedTracker,
+    failedTrackers,
+    totalTrackers,
     // bufferingStatus,
     bufferProgress,
     playing,
@@ -248,7 +249,8 @@ export default function WatchPage() {
         <TorrentStatusBar
           status={torrentStatus}
           bufferProgress={bufferProgress}
-          failedTracker={failedTracker}
+          failedTrackers={failedTrackers}
+          totalTrackers={totalTrackers}
         />
         {/* {torrentStatus === "ready" && <div>Файл готов к скачке...</div>} */}
         {/* {torrentStatus === "connecting" && <p>🔍 Поиск пиров...</p>} */}
