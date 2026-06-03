@@ -28,3 +28,20 @@
 - Axios
 - JWT, Access / Refresh токены
 - REST API
+
+## Демонстрация интерфейса
+
+**Главная страница и оценки**
+![Главная страница](public/screenshots/feed.png)
+
+**Посты**
+![Пост](public/screenshots/post.png)
+
+<!-- **Совместный просмотр (Watch Party)**
+![Совместный просмотр](public/screenshots/watch-party.png) -->
+
+**Чат**
+![Чат](public/screenshots/chat.png)
+
+**Раздел "Хочу посмотреть"**
+![Хочу посмотреть](public/screenshots/watchlist.png)
