@@ -16,21 +16,23 @@ export function TorrentStatusBar({
 }: Props) {
   const config = getConfig(
     status,
-    bufferProgress,
+    // bufferProgress,
     failedTrackers,
     totalTrackers,
   )
   if (!config) return null
 
   return (
-    <div className={`${style.bar} ${style[config.variant]}`}>
-      <div className={`${style.dot} ${style[`dot_${config.variant}`]}`} />
+    <div className={`${style.torrentStatusBar} ${style[config.variant]}`}>
+      <div
+        className={`${style.torrentStatusBar__dot} ${style[`dot_${config.variant}`]}`}
+      />
       <span className={style.text}>{config.text}</span>
       {config.sub && <span className={style.sub}>{config.sub}</span>}
       {status === "buffering" && (
-        <div className={style.progress}>
+        <div className={style.torrentStatusBar__progress}>
           <div
-            className={style.progressFill}
+            className={style.torrentStatusBar__progressFill}
             style={{ width: `${bufferProgress}%` }}
           />
         </div>
@@ -44,7 +46,7 @@ export function TorrentStatusBar({
 
 function getConfig(
   stage: TorrentStatus,
-  progress: number,
+  // progress: number,
   failedTrackers: string[],
   totalTrackers: number,
 ) {
