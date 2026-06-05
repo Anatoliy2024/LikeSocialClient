@@ -20,16 +20,13 @@ import { compressImage } from "@/utils/compressImage"
 import { imageIdType } from "@/store/slices/userPostsSlice"
 import { useRouter } from "next/navigation"
 import { AllRatingKeys, POST_TYPES, PostTypeKey } from "@/constants/postTypes"
+import { DeleteMessageIcon } from "@/assets/icons/deleteMessageIcon"
 
 export type FormCreatePost = {
   title: string
   content: string
   roomId: string | null
   genres: string[]
-  // stars: number
-  // acting: number
-  // specialEffects: number
-  // story: number
   avatarFile: FileList | null
   avatar?: string
   imageId?: imageIdType | null
@@ -52,22 +49,37 @@ const PostForm = ({
 }) => {
   const [preview, setPreview] = useState<string | null>(null)
   const [postType, setPostType] = useState<PostTypeKey>("movie")
-  console.log("typePost", postType)
-  // const [loadingLocal, setIsLoadingLocal] = useState(false)
+  // Читаем черновик один раз
+  const DRAFT_KEY = roomId
+    ? `post-draft:room:${roomId}${initialData?._id ? `:${initialData._id}` : ""}`
+    : `post-draft:user${initialData?._id ? `:${initialData._id}` : ""}`
+
+  const savedDraft = (() => {
+    if (editMode) return null
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY)
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  })()
+  const [hasDraft, setHasDraft] = useState(!!savedDraft)
+  console.log("editMode", editMode)
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
     setValue,
+    reset,
   } = useForm<FormCreatePost>({
-    defaultValues: initialData || {},
+    defaultValues: savedDraft || initialData || {},
   })
   const dispatch = useAppDispatch()
   const router = useRouter()
-  // const { id } = useParams()
   const loading = useAppSelector((state: RootState) => state.userPost.loading)
-
+  console.log("hasDraft", hasDraft)
   const handleSave = async (dataForm: FormCreatePost) => {
     console.log("dataForm", dataForm)
     try {
@@ -86,21 +98,6 @@ const PostForm = ({
       if (initialData?._id) {
         formData.append("postId", initialData._id)
       }
-
-      // formData.append("ratings[stars]", dataForm.stars?.toString())
-      // formData.append("ratings[acting]", dataForm.acting?.toString())
-      // formData.append(
-      //   "ratings[specialEffects]",
-      //   dataForm.specialEffects?.toString(),
-      // )
-      // formData.append("ratings[story]", dataForm.story?.toString())
-
-      // Object.keys(POST_TYPES[postType].ratings).forEach((key) => {
-      //   const value = dataForm[key as keyof typeof dataForm]
-      //   if (value !== undefined && value !== null) {
-      //     formData.append(`ratings[${key}]`, value.toString())
-      //   }
-      // })
 
       Object.entries(POST_TYPES[postType].ratings).forEach(([key, config]) => {
         const value = dataForm[key as keyof typeof dataForm]
@@ -123,17 +120,14 @@ const PostForm = ({
       }
       if (dataForm?.imageId && !editMode) {
         formData.append("imageId", dataForm.imageId._id)
-        // formData.append("imageId.url", dataForm.imageId.url)
-        // formData.append("imageId.publicId", dataForm.imageId.publicId)
       }
 
       if (dataForm.avatarFile?.[0]) {
         const file = dataForm.avatarFile?.[0]
-        // setIsLoadingLocal(true)
+
         try {
           const compressedFile = await compressImage(file)
 
-          // setCompressedSize(compressedFile.size)
           console.log(
             `***********************************************До: ${(
               file.size / 1024
@@ -141,9 +135,7 @@ const PostForm = ({
               2,
             )} KB`,
           )
-          // await onUpload(compressedFile, { roomId })
-          // // await onUpload(file, context)
-          // handleCloseModal()
+
           formData.append("avatarFile", compressedFile)
         } catch (error) {
           console.error("Ошибка загрузки:", error)
@@ -154,28 +146,30 @@ const PostForm = ({
 
       if (isProfile) {
         if (!editMode) {
-          dispatch(createUserPostThunk(formData))
+          await dispatch(createUserPostThunk(formData)).unwrap()
           router.push(`/profile`, { scroll: false })
         } else {
           if (initialData?._id) {
             console.log("Редактирование поста в профиле", formData)
-            dispatch(updateUserPostThunk(formData))
+            await dispatch(updateUserPostThunk(formData)).unwrap()
           }
         }
       } else {
         console.log("isProfile", isProfile)
         console.log("formData", formData)
         if (!editMode) {
-          dispatch(createRoomPostThunk(formData))
+          await dispatch(createRoomPostThunk(formData)).unwrap()
           router.push(`/room/${roomId}`, { scroll: false })
         } else {
           if (initialData?._id) {
             console.log("Редактирование комнаты", formData)
-            dispatch(updateRoomPostThunk(formData))
+            await dispatch(updateRoomPostThunk(formData)).unwrap()
           }
         }
       }
 
+      localStorage.removeItem(DRAFT_KEY)
+      setHasDraft(false)
       hiddenBlock()
     } catch (err) {
       console.error("Ошибка публикации поста:", err)
@@ -201,6 +195,41 @@ const PostForm = ({
       return () => URL.revokeObjectURL(url)
     }
   }, [watch("avatarFile")])
+
+  // Автосохранение черновика
+  useEffect(() => {
+    if (editMode) return
+
+    const subscription = watch((values) => {
+      console.log("subscription", subscription)
+      try {
+        const { avatarFile, ...rest } = values
+
+        // Проверяем, есть ли хоть какие-то данные
+        const hasData = Object.values(rest).some((value) => {
+          if (Array.isArray(value)) return value.length > 0
+          if (typeof value === "string") return value.trim() !== ""
+          if (typeof value === "number") return value > 0
+          if (typeof value === "boolean") return false
+          return value !== null && value !== undefined
+        })
+        console.log("Object.values(rest)", Object.values(rest))
+        console.log("hasData", hasData)
+        if (hasData) {
+          // Сохраняем только если есть данные
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(rest))
+          setHasDraft(true)
+        } else {
+          // Если данных нет — удаляем черновик
+          localStorage.removeItem(DRAFT_KEY)
+          setHasDraft(false)
+        }
+      } catch (e) {
+        console.warn("Не удалось сохранить черновик:", e)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, editMode, DRAFT_KEY])
 
   useEffect(() => {
     if (
@@ -234,16 +263,43 @@ const PostForm = ({
     }
   }, [initialData])
 
+  const delDataForm = () => {
+    localStorage.removeItem(DRAFT_KEY)
+    setHasDraft(false)
+    // 1. Сбрасываем отдельные стейты
+    setPostType("movie")
+    setPreview(null)
+
+    // 2. Жестко сбрасываем все поля формы в пустые значения
+    reset({
+      title: "",
+      content: "",
+      roomId: null,
+      genres: [],
+      avatarFile: null,
+      imageId: null,
+    })
+  }
+
+  const contentRegister = register("content")
+
   return (
-    <div
-      className={style.wrapper}
-      // onClick={() => hiddenBlock()}
-    >
-      <div
-        className={style.container}
-        //  onClick={(e) => e.stopPropagation()}
-      >
+    <div className={style.wrapper}>
+      <div className={style.container}>
         <form onSubmit={handleSubmit(handleSave)} className={style.ratingForm}>
+          {!editMode && hasDraft && (
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm("Удалить сохранённый черновик?")) {
+                  delDataForm()
+                }
+              }}
+            >
+              <DeleteMessageIcon />
+              {/* Очистить черновик */}
+            </button>
+          )}
           <div>
             <label htmlFor="title">Заголовок:</label>
             <input
@@ -296,7 +352,7 @@ const PostForm = ({
                     type="checkbox"
                     value="drama"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Драма
                 </label>
                 <label>
@@ -304,7 +360,7 @@ const PostForm = ({
                     type="checkbox"
                     value="comedy"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Комедия
                 </label>
                 <label>
@@ -312,7 +368,7 @@ const PostForm = ({
                     type="checkbox"
                     value="action"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Боевик
                 </label>
                 <label>
@@ -320,7 +376,7 @@ const PostForm = ({
                     type="checkbox"
                     value="thriller"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Триллер
                 </label>
                 <label>
@@ -328,7 +384,7 @@ const PostForm = ({
                     type="checkbox"
                     value="fantasy"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Фэнтези
                 </label>
                 <label>
@@ -336,7 +392,7 @@ const PostForm = ({
                     type="checkbox"
                     value="sciFi"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Научная фантастика
                 </label>
                 <label>
@@ -344,7 +400,7 @@ const PostForm = ({
                     type="checkbox"
                     value="horror"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Ужасы
                 </label>
                 <label>
@@ -352,7 +408,7 @@ const PostForm = ({
                     type="checkbox"
                     value="romance"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Романтика
                 </label>
                 <label>
@@ -360,7 +416,7 @@ const PostForm = ({
                     type="checkbox"
                     value="adventure"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Приключения
                 </label>
                 <label>
@@ -368,7 +424,7 @@ const PostForm = ({
                     type="checkbox"
                     value="mystery"
                     {...register("genres")}
-                  />{" "}
+                  />
                   Детектив
                 </label>
               </div>
@@ -378,18 +434,16 @@ const PostForm = ({
           <div className={style.textareaBlock}>
             <label htmlFor="content">Описание:</label>
             <textarea
-              // id="content"
               {...register("content")}
               placeholder={"Введите описание"}
-              // ref={textareaRef}
               ref={(e) => {
-                register("content").ref(e) // связываем с react-hook-form
+                // register("content").ref(e) // связываем с react-hook-form
+                contentRegister.ref(e) // ✅ Используем тот же самый экземпляр
                 textareaRef.current = e // сохраняем в свой ref
               }}
               onInput={handleInput}
             />
             {errors.content && <p>{errors.content?.message as string}</p>}
-            {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
           </div>
           {Object.entries(POST_TYPES[postType].ratings).map(([key, value]) => (
             <div key={key}>
@@ -401,47 +455,18 @@ const PostForm = ({
               />
             </div>
           ))}
-          {/* <div>
-            <span>Звёзды:</span>
-            <StarRating<FormCreatePost, "stars">
-              name="stars"
-              setValue={setValue}
-              watch={watch}
-            />
-          </div>
-          <div>
-            <span>Актерская игра:</span>
-
-            <StarRating<FormCreatePost, "acting">
-              name="acting"
-              setValue={setValue}
-              watch={watch}
-            />
-          </div>
-
-          <div>
-            <span>Спецэффекты :</span>
-            <StarRating<FormCreatePost, "specialEffects">
-              name="specialEffects"
-              setValue={setValue}
-              watch={watch}
-            />
-          </div>
-
-          <div>
-            <span>Сюжет:</span>
-            <StarRating<FormCreatePost, "story">
-              name="story"
-              setValue={setValue}
-              watch={watch}
-            />
-          </div> */}
-
           <div className={style.buttonBlock}>
             <ButtonMenu type="submit" disabled={loading} loading={loading}>
               {!editMode ? "Опубликовать" : "Сохранить"}
             </ButtonMenu>
-            <ButtonMenu onClick={() => hiddenBlock()}>Отмена</ButtonMenu>
+            <ButtonMenu
+              onClick={() => {
+                delDataForm()
+                hiddenBlock()
+              }}
+            >
+              Отмена
+            </ButtonMenu>
           </div>
         </form>
       </div>
