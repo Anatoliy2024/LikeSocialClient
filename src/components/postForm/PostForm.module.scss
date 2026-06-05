@@ -1,4 +1,4 @@
-.wrapper {
+.postForm {
   position: fixed;
   top: 0;
   left: 0;
@@ -10,7 +10,7 @@
   align-items: center;
   z-index: 999;
 
-  .container {
+  &__container {
     padding: 20px;
     background: rgb(72, 31, 112);
     min-height: 60vh;
@@ -24,97 +24,103 @@
       min-width: 90vw;
       min-height: 80vh;
       margin: 10px;
-      // padding: 10px;
     }
     @media (max-width: 500px) {
       min-width: 100vw;
       min-height: 80vh;
       padding: 10px;
       margin: 0px;
+    }
+  }
 
-      // padding: 10px;
+  &__buttonReset {
+    padding: 5px;
+    border-radius: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 5px;
+    &:hover {
+      background: rgb(60, 62, 147);
+    }
+    &:active {
+      background: rgba(60, 61, 147, 0.452);
+    }
+  }
+  &__ratingForm {
+    & > div {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: 100%;
     }
 
-    // display: flex;
-    // align-items: center;
-    // justify-content: center;
-    // flex-direction: column;
-    .ratingForm {
-      // display: flex;
-      // flex-direction: column;
-      // align-items: center;
-      .titleBlock {
-        border: 1px solid rgb(149, 72, 191);
-        padding: 5px;
-        border-radius: 10px;
-        flex: 1;
-
-        // @media (max-width: 500px) {
-        //   max-width: 200px;
-        // }
-        // width: 100%;
-      }
-      .formImageBlock {
-        justify-content: center;
-        padding: 10px 0;
-        .customFileUpload {
-          display: inline-block;
-          padding: 10px;
-          cursor: pointer;
-          border-radius: 8px;
-          background-color: #4f46e5;
-          color: white;
-          // max-width: 10px;
-          // font-weight: bold;
-          transition: background-color 0.3s;
-          &:hover {
-            background-color: #3729ca;
-          }
-        }
-        // max-width: calc(100vw - 100px);
-
-        input {
-          display: none;
-          // max-width: calc(100% - 100px);
-        }
-        .preview {
-          width: 200px;
-          height: 200px;
-
-          border-radius: 50%;
-        }
-      }
-      & > div {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        max-width: 100%;
-      }
-      .buttonBlock {
-        justify-content: space-between;
-        padding: 0 10px;
-      }
-      .textareaBlock {
-        flex-direction: column;
-        align-items: start;
-      }
-      textarea {
-        border: 1px solid rgb(149, 72, 191);
-        padding: 5px;
-        border-radius: 10px;
-        width: 100%;
-        // height: 120px;
-        overflow: hidden;
-        resize: none;
-        transition: height 0.2s ease;
-      }
+    textarea {
+      border: 1px solid rgb(149, 72, 191);
+      padding: 5px;
+      border-radius: 10px;
+      width: 100%;
+      // height: 120px;
+      overflow: hidden;
+      resize: none;
+      transition: height 0.2s ease;
     }
-    // .ratingForm {
-    //   display: flex;
-    //   flex-direction: column;
-    //   gap: 10px;
-    //   font-size: 24px;
-    // }
+  }
+  &__titleBlockContainer {
+    padding-bottom: 10px;
+  }
+  &__titleBlock {
+    border: 1px solid rgb(149, 72, 191);
+    padding: 5px;
+    border-radius: 10px;
+    flex: 1;
+  }
+  &__typePostSelect {
+    select {
+      cursor: pointer;
+    }
+  }
+  &__formImageBlock {
+    justify-content: center;
+    padding: 10px 0;
+
+    // max-width: calc(100vw - 100px);
+
+    input {
+      display: none;
+      // max-width: calc(100% - 100px);
+    }
+  }
+
+  &__buttonBlock {
+    justify-content: space-between;
+    padding: 0 10px;
+  }
+  &__textareaBlock {
+    flex-direction: column;
+    align-items: start;
+  }
+  &__customFileUpload {
+    display: inline-block;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: #4f46e5;
+    color: white;
+    // max-width: 10px;
+    // font-weight: bold;
+    transition: background-color 0.3s;
+    &:hover {
+      background-color: #3729ca;
+    }
+  }
+  &__preview {
+    width: 200px;
+    height: 200px;
+
+    border-radius: 50%;
   }
 }

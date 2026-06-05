@@ -284,11 +284,15 @@ const PostForm = ({
   const contentRegister = register("content")
 
   return (
-    <div className={style.wrapper}>
-      <div className={style.container}>
-        <form onSubmit={handleSubmit(handleSave)} className={style.ratingForm}>
+    <div className={style.postForm}>
+      <div className={style.postForm__container}>
+        <form
+          onSubmit={handleSubmit(handleSave)}
+          className={style.postForm__ratingForm}
+        >
           {!editMode && hasDraft && (
             <button
+              className={style.postForm__buttonReset}
               type="button"
               onClick={() => {
                 if (confirm("Удалить сохранённый черновик?")) {
@@ -297,20 +301,22 @@ const PostForm = ({
               }}
             >
               <DeleteMessageIcon />
+              <span> clear post</span>
+
               {/* Очистить черновик */}
             </button>
           )}
-          <div>
+          <div className={style.postForm__titleBlockContainer}>
             <label htmlFor="title">Заголовок:</label>
             <input
-              className={style.titleBlock}
+              className={style.postForm__titleBlock}
               id="title"
               {...register("title", { required: "Заголовок обязателен" })}
               placeholder={"Введите заголовок"}
             />
             {errors.title && <p>{errors.title?.message as string}</p>}
           </div>
-          <div>
+          <div className={style.postForm__typePostSelect}>
             <select
               name="typePost"
               id="typePost"
@@ -324,17 +330,17 @@ const PostForm = ({
               ))}
             </select>
           </div>
-          <div className={style.formImageBlock}>
-            <label className={style.customFileUpload}>
+          <div className={style.postForm__formImageBlock}>
+            <label className={style.postForm__customFileUpload}>
               Загрузить аватарку
               <input type="file" accept="image/*" {...register("avatarFile")} />
             </label>
             {preview && (
-              <div className={style.preview}>
+              <div className={style.postForm__preview}>
                 <CloudinaryImage
                   src={preview}
                   alt="Предпросмотр аватара"
-                  className={style.preview}
+                  className={style.postForm__preview}
                   width={200}
                   height={200}
                 />
@@ -344,7 +350,7 @@ const PostForm = ({
           {(postType === "movie" ||
             postType === "episode" ||
             postType === "letsplay") && (
-            <div className={style.genresBlock}>
+            <div className={style.postForm__genresBlock}>
               <label>Жанры:</label>
               <div>
                 <label>
@@ -431,7 +437,7 @@ const PostForm = ({
             </div>
           )}
 
-          <div className={style.textareaBlock}>
+          <div className={style.postForm__textareaBlock}>
             <label htmlFor="content">Описание:</label>
             <textarea
               {...register("content")}
@@ -455,7 +461,7 @@ const PostForm = ({
               />
             </div>
           ))}
-          <div className={style.buttonBlock}>
+          <div className={style.postForm__buttonBlock}>
             <ButtonMenu type="submit" disabled={loading} loading={loading}>
               {!editMode ? "Опубликовать" : "Сохранить"}
             </ButtonMenu>
