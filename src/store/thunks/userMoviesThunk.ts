@@ -5,6 +5,7 @@ import axios from "axios"
 import { imageIdType, UserMovieType } from "../slices/userMoviesSlice"
 import { userMovieAPI } from "@/api/userMovieAPI"
 import { fileAPI } from "@/api/fileAPI"
+import { PostTypeKey } from "@/constants/postTypes"
 export type createUserMovieType = {
   title: string
   content: string
@@ -12,6 +13,7 @@ export type createUserMovieType = {
   avatarFile: FileList | null
   imageId?: imageIdType | null
   status?: string | null
+  postType: PostTypeKey
   // avatar?: string
   _id?: string
   // imagePost?: string

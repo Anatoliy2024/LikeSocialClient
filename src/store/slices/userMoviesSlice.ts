@@ -12,6 +12,7 @@ import {
   updateUserMovieThunk,
   uploadUserMovieAvatarThunk,
 } from "../thunks/userMoviesThunk"
+import { PostTypeKey } from "@/constants/postTypes"
 export type imageIdType = {
   _id: string
   url: string
@@ -23,7 +24,7 @@ export type UserMovieType = {
   title: string
   genres: string[]
   // avatar: string
-
+  postType?: PostTypeKey
   content?: string
   status: "wantToSee" | "watched"
   addedAt: Date
@@ -335,12 +336,15 @@ const userMoviesSlice = createSlice({
         console.log("updateUserMovie***", updateUserMovie)
         console.log("status***", status)
         if (status === "wantToSee") {
-          state.myMovies.wantToSee = state.myMovies.wantToSee.map((userMovie) =>
-            userMovie._id === updateUserMovie._id ? updateUserMovie : userMovie
+          state.myMovies.wantToSee = state.myMovies.wantToSee.map(
+            (userMovie) =>
+              userMovie._id === updateUserMovie._id
+                ? updateUserMovie
+                : userMovie,
           )
         } else {
           state.myMovies.watched = state.myMovies.watched.map((userMovie) =>
-            userMovie._id === updateUserMovie._id ? updateUserMovie : userMovie
+            userMovie._id === updateUserMovie._id ? updateUserMovie : userMovie,
           )
         }
 

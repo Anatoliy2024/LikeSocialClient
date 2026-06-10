@@ -20,6 +20,7 @@ import FormMovieWantToSee from "../FormMovieWantToSee/FormMovieWantToSee"
 import { Edit } from "@/assets/icons/edit"
 import PostForm, { FormCreatePost } from "@/components/postForm/PostForm"
 import { ModalLocation } from "../modalLocation/modalLocation"
+import { POST_TYPES, AllRatingKeys, PostTypeKey } from "@/constants/postTypes"
 export const ModalUserMovie = ({
   // handleCloseModalUserMovie,
   selectedMovie,
@@ -102,6 +103,7 @@ export const ModalUserMovie = ({
       // roomId: post.roomId || null,
       genres: movie.genres || [],
       status: movie.status || null,
+      postType: movie.postType || "movie",
       // stars: post.ratings?.stars || 0,
       // acting: post.ratings?.acting || 0,
       // specialEffects: post.ratings?.specialEffects || 0,
@@ -124,16 +126,25 @@ export const ModalUserMovie = ({
   }
 
   function adaptMoviePostToCreateForm(movie: UserMovieType): FormCreatePost {
+    const postType = (movie.postType || "movie") as PostTypeKey
+
+    // 1. Динамически создаем объект с нужными рейтингами для этого типа поста
+    const ratings: Partial<Record<AllRatingKeys, number>> = {}
+    Object.entries(POST_TYPES[postType].ratings).forEach(([key, config]) => {
+      // Берем минимальное значение из конфига (обычно 0) или просто 0
+      ratings[key as AllRatingKeys] = config.min ?? 0
+    })
     return {
       title: movie.title,
       content: "",
       roomId: location && location !== "profile" ? location : null,
       genres: movie.genres || [],
-      postType: "movie",
-      stars: 0,
-      acting: 0,
-      specialEffects: 0,
-      story: 0,
+      postType: postType,
+      ...ratings,
+      // stars: 0,
+      // acting: 0,
+      // specialEffects: 0,
+      // story: 0,
       avatarFile: null, // потому что файл ты не можешь "вернуть обратно" — он только при загрузке
       // avatar: post.imageId?.url || "",
       imageId: movie.imageId,

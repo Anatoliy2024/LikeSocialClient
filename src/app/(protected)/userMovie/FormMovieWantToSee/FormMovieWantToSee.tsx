@@ -11,6 +11,7 @@ import {
 import { compressImage } from "@/utils/compressImage"
 import { useEffect, useRef, useState } from "react"
 import { CloudinaryImage } from "@/components/CloudinaryImage/CloudinaryImage"
+import { POST_TYPES } from "@/constants/postTypes"
 // import { UserMovieType } from "@/store/slices/userMoviesSlice"
 
 export default function FormMovieWantToSee({
@@ -26,14 +27,26 @@ export default function FormMovieWantToSee({
 
   const dispatch = useAppDispatch()
 
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   watch,
+  //   formState: { errors },
+  // } = useForm<createUserMovieType>({
+  //   defaultValues: initialData || {},
+  // })
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<createUserMovieType>({
-    defaultValues: initialData || {},
+    defaultValues: {
+      postType: "movie", // ✅ Базовое значение
+      ...(initialData || {}),
+    },
   })
+  const postType = watch("postType") || "movie"
   const loading = useAppSelector((state: RootState) => state.userMovies.loading)
 
   const handleSave = async (dataForm: createUserMovieType) => {
@@ -45,6 +58,8 @@ export default function FormMovieWantToSee({
       if (dataForm.status) {
         formData.append("status", dataForm.status)
       }
+
+      formData.append("postType", dataForm.postType)
       // if (dataForm?.imageId) {
       //   formData.append("imageId", dataForm.imageId)
       // }
@@ -60,8 +75,8 @@ export default function FormMovieWantToSee({
             `***********************************************До: ${(
               file.size / 1024
             ).toFixed(2)} KB | После: ${(compressedFile.size / 1024).toFixed(
-              2
-            )} KB`
+              2,
+            )} KB`,
           )
           // await onUpload(compressedFile, { roomId })
           // // await onUpload(file, context)
@@ -92,7 +107,7 @@ export default function FormMovieWantToSee({
           updateUserMovieThunk({
             dataMovie: formData,
             userMovieId: dataForm._id,
-          })
+          }),
         )
 
         console.log("Edit mod")
@@ -157,17 +172,19 @@ export default function FormMovieWantToSee({
     handleInput()
   }, [watch("content")])
 
+  const contentRegister = register("content")
+
   return (
-    <div className={style.wrapper}>
-      <div className={style.containerScroll}>
-        <div className={style.container}>
+    <div className={style.formMovieWantToSee}>
+      <div className={style.formMovieWantToSee__containerScroll}>
+        <div className={style.formMovieWantToSee__container}>
           <h3>Want to Watch</h3>
           <div>
             <form
               onSubmit={handleSubmit(handleSave)}
-              className={style.ratingForm}
+              className={style.formMovieWantToSee__ratingForm}
             >
-              <div className={style.titleBlock}>
+              <div className={style.formMovieWantToSee__titleBlock}>
                 <label htmlFor="title">Заголовок:</label>
                 <input
                   id="title"
@@ -177,8 +194,20 @@ export default function FormMovieWantToSee({
                 {errors.title && <p>{errors.title?.message as string}</p>}
                 {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
               </div>
-              <div className={style.formImageBlock}>
-                <label className={style.customFileUpload}>
+              <div className={style.formMovieWantToSee__typePostSelect}>
+                <select
+                  id="typePost"
+                  {...register("postType")} // ✅ Магия react-hook-form
+                >
+                  {Object.entries(POST_TYPES).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={style.formMovieWantToSee__formImageBlock}>
+                <label className={style.formMovieWantToSee__customFileUpload}>
                   Загрузить аватарку
                   <input
                     type="file"
@@ -187,18 +216,107 @@ export default function FormMovieWantToSee({
                   />
                 </label>
                 {preview && (
-                  <div className={style.preview}>
+                  <div className={style.formMovieWantToSee__preview}>
                     <CloudinaryImage
                       src={preview}
                       alt="Предпросмотр аватара"
-                      className={style.preview}
+                      className={style.formMovieWantToSee__preview}
                       width={200}
                       height={200}
                     />
                   </div>
                 )}
               </div>
-              <div>
+              {(postType === "movie" ||
+                postType === "episode" ||
+                postType === "letsplay") && (
+                <div className={style.postForm__genresBlock}>
+                  <label>Жанры:</label>
+                  <div>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="drama"
+                        {...register("genres")}
+                      />
+                      Драма
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="comedy"
+                        {...register("genres")}
+                      />
+                      Комедия
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="action"
+                        {...register("genres")}
+                      />
+                      Боевик
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="thriller"
+                        {...register("genres")}
+                      />
+                      Триллер
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="fantasy"
+                        {...register("genres")}
+                      />
+                      Фэнтези
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="sciFi"
+                        {...register("genres")}
+                      />
+                      Научная фантастика
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="horror"
+                        {...register("genres")}
+                      />
+                      Ужасы
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="romance"
+                        {...register("genres")}
+                      />
+                      Романтика
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="adventure"
+                        {...register("genres")}
+                      />
+                      Приключения
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="mystery"
+                        {...register("genres")}
+                      />
+                      Детектив
+                    </label>
+                  </div>
+                </div>
+              )}
+              {/* <div>
                 <label>Жанры:</label>
                 <div>
                   <label>
@@ -282,23 +400,27 @@ export default function FormMovieWantToSee({
                     Детектив
                   </label>
                 </div>
-              </div>
-              <div className={style.textareaBlock}>
+              </div> */}
+              <div className={style.formMovieWantToSee__textareaBlock}>
                 <label htmlFor="content">Описание:</label>
                 <textarea
                   id="content"
-                  // {...register("content")}
+                  // ref={(e) => {
+                  //   register("content").ref(e) // связываем с react-hook-form
+                  //   textareaRef.current = e // сохраняем в свой ref
+                  // }}
                   ref={(e) => {
-                    register("content").ref(e) // связываем с react-hook-form
-                    textareaRef.current = e // сохраняем в свой ref
+                    contentRegister.ref(e) // ✅ Используем готовый экземпляр
+                    textareaRef.current = e
                   }}
+                  onInput={handleInput}
                   placeholder={"Введите описание"}
                 />
                 {errors.content && <p>{errors.content?.message as string}</p>}
                 {/* <div>Имя:{profileData.name && <div>{profileData.name}</div>}</div> */}
               </div>
 
-              <div className={style.buttonBlock}>
+              <div className={style.formMovieWantToSee__buttonBlock}>
                 {/* <ButtonMenu type="submit" disabled={loading} loading={loading}>
                 Опубликовать
               </ButtonMenu> */}

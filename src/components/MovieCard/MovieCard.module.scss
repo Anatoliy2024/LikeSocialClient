@@ -5,7 +5,7 @@
   overflow: hidden;
 }
 
-.card {
+.movieCard {
   background-color: #d9c0f4;
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -18,18 +18,19 @@
   justify-content: space-between;
   padding: 10px;
   max-width: 400px;
+  cursor: pointer;
   // justify-content: space-between;
   &:hover {
     transform: translateY(-4px);
   }
-  .imgBlock {
+  &__imgBlock {
     border-radius: 50%;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 180px;
-    min-height: 180px;
+    height: 180px;
     img {
       object-fit: cover;
       width: 100%;
@@ -37,86 +38,79 @@
     }
   }
 
-  .genresBlockContainer {
+  &__genresBlockContainer {
     display: flex;
     justify-content: center;
     // width: 100%;
     overflow: hidden;
     padding: 8px 0;
     // position: relative;
-    .genresBlockWindow {
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .genresBlockSlider {
-      display: flex;
-
-      gap: 12px;
-      // animation: scrollGenres 20s linear infinite;
-      width: max-content;
-    }
-
-    .genreItem {
-      flex: 0 0 auto;
-      padding: 6px 12px;
-      background-color: #f0f0f0;
-      border-radius: 20px;
-      font-size: 14px;
-      white-space: nowrap;
-      user-select: none;
-    }
+  }
+  &__genresBlockWindow {
+    width: 100%;
+    overflow: hidden;
   }
 
-  .content {
+  &__genreItem {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    font-size: 14px;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  &__content {
     padding: 1rem;
     display: flex;
     flex-direction: column;
 
     gap: 0.5rem;
     width: 100%;
-    height: 100%;
+    // height: 100%;
+    flex: 1;
     @media (max-width: 500px) {
       padding: 10px 0 0 0;
     }
-    .title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #111827;
-      max-width: 100%;
-      @include lineClamp(1);
-      text-align: center;
-      color: #6037e7;
-      // line-height: 1.7;
-    }
-
-    .description {
-      max-width: 100%;
-
-      border: 1px solid rgb(130, 93, 216);
-      border-radius: 20px;
-      padding: 10px;
-      // display: -webkit-box;
-      // -webkit-line-clamp: 3; /* 3 строки */
-      // -webkit-box-orient: vertical;
-
-      // line-clamp: 3;
-      // overflow: hidden;
-      @include lineClamp(3);
-
-      line-height: 1.7;
-      // font-size: 0.95rem;
-      // color: #4b5563;
-    }
+  }
+  &__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+    max-width: 100%;
+    @include lineClamp(1);
+    text-align: center;
+    color: #6037e7;
+    // line-height: 1.7;
   }
 
-  .status {
+  &__description {
+    max-width: 100%;
+
+    border: 1px solid rgb(130, 93, 216);
+    border-radius: 20px;
+    padding: 10px;
+    // display: -webkit-box;
+    // -webkit-line-clamp: 3; /* 3 строки */
+    // -webkit-box-orient: vertical;
+
+    // line-clamp: 3;
+    // overflow: hidden;
+    @include lineClamp(3);
+
+    line-height: 1.7;
+    // font-size: 0.95rem;
+    // color: #4b5563;
+  }
+
+  &__status {
     font-size: 0.85rem;
     font-weight: 500;
     color: #3b82f6;
   }
 
-  .date {
+  &__date {
     font-size: 0.75rem;
     color: #6b7280;
     margin-top: auto;
@@ -124,26 +118,24 @@
       color: #1a2231;
     }
   }
+  &__postType {
+    display: flex;
+    gap: 5px;
+    font-size: 1rem;
+    color: rgb(98, 57, 148);
+  }
+
+  &__genresBlockSlider {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+
+    &.movieCard__scroll {
+      // ← точка перед movieCard означает "этот же элемент"
+      animation: scrollBackAndForth 20s linear infinite alternate;
+    }
+  }
 }
-
-// .card .image {
-//   width: 100%;
-//   height: 180px;
-//   object-fit: cover;
-// }
-
-// // Ключевая анимация
-// @keyframes scrollGenres {
-//   0% {
-//     transform: translateX(5%);
-//   }
-//   50% {
-//     transform: translateX(-80%);
-//   }
-//   100% {
-//     transform: translateX(5%);
-//   }
-// }
 
 @keyframes scrollBackAndForth {
   0% {
@@ -155,8 +147,4 @@
   100% {
     transform: translateX(5%);
   }
-}
-
-.genresBlockSlider.scroll {
-  animation: scrollBackAndForth 20s linear infinite alternate;
 }

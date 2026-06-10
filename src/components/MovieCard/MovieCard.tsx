@@ -5,6 +5,7 @@ import style from "./MovieCard.module.scss"
 import { UserMovieType } from "@/store/slices/userMoviesSlice"
 import { translatorGenres } from "@/utils/translatorGenres"
 import { CloudinaryImage } from "../CloudinaryImage/CloudinaryImage"
+import { POST_TYPES } from "@/constants/postTypes"
 
 export type MovieCardProps = {
   movie: UserMovieType
@@ -20,37 +21,46 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
   useEffect(() => {
     if (containerRef.current && sliderRef.current) {
       setNeedsScroll(
-        sliderRef.current.scrollWidth > containerRef.current.offsetWidth
+        sliderRef.current.scrollWidth > containerRef.current.offsetWidth,
       )
     }
   }, [movie.genres])
 
   return (
     <>
-      <div className={style.card} onClick={onClick}>
-        <div className={style.imgBlock}>
+      <div className={style.movieCard} onClick={onClick}>
+        <div className={style.movieCard__imgBlock}>
           <CloudinaryImage
             src={movie.imageId?.url || "/images/monkey.jpg"}
             // src={movie.avatar}
             alt={movie.title}
-            className={style.image}
+            className={style.movieCard__image}
             height={600}
             width={600}
           />
         </div>
-        <div className={style.content}>
-          <h3 className={style.title}>{movie.title}</h3>
+        <div className={style.movieCard__content}>
+          <h3 className={style.movieCard__title}>{movie.title}</h3>
+          <div className={style.movieCard__postType}>
+            <span>Тип:</span>
+            <span>
+              {movie?.postType ? POST_TYPES[movie.postType].label : "Фильм"}
+            </span>
+          </div>
           {movie.genres?.length > 0 ? (
-            <div className={style.genresBlockContainer}>
-              <div className={style.genresBlockWindow} ref={containerRef}>
+            <div className={style.movieCard__genresBlockContainer}>
+              <div
+                className={style.movieCard__genresBlockWindow}
+                ref={containerRef}
+              >
                 <div
-                  className={`${style.genresBlockSlider} ${
-                    needsScroll ? style.scroll : ""
+                  className={`${style.movieCard__genresBlockSlider} ${
+                    needsScroll ? style.movieCard__scroll : ""
                   }`}
                   ref={sliderRef}
                 >
                   {movie.genres.map((genre, index) => (
-                    <div key={index} className={style.genreItem}>
+                    <div key={index} className={style.movieCard__genreItem}>
                       {translatorGenres(genre)}
                     </div>
                   ))}
@@ -59,13 +69,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
             </div>
           ) : null}
           {movie.content && (
-            <p className={style.description}>{movie.content}</p>
+            <p className={style.movieCard__description}>{movie.content}</p>
           )}
-          {/* <span className={style.status}>
-          {movie.status === "wantToSee" ? "Хочу посмотреть" : "Просмотрено"}
-        </span> */}
 
-          <div className={style.date}>
+          <div className={style.movieCard__date}>
             {movie?.watchedAt && (
               <div>
                 <span>watch: </span>

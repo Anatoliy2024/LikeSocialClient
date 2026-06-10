@@ -48,7 +48,8 @@ const PostForm = ({
   initialData?: Partial<FormCreatePost>
 }) => {
   const [preview, setPreview] = useState<string | null>(null)
-  const [postType, setPostType] = useState<PostTypeKey>("movie")
+
+  // const [postType, setPostType] = useState<PostTypeKey>("movie")
   // Читаем черновик один раз
   const DRAFT_KEY = roomId
     ? `post-draft:room:${roomId}${initialData?._id ? `:${initialData._id}` : ""}`
@@ -66,6 +67,16 @@ const PostForm = ({
   const [hasDraft, setHasDraft] = useState(!!savedDraft)
   console.log("editMode", editMode)
 
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors },
+  //   watch,
+  //   setValue,
+  //   reset,
+  // } = useForm<FormCreatePost>({
+  //   defaultValues: savedDraft || initialData || {},
+  // })
   const {
     register,
     handleSubmit,
@@ -74,8 +85,13 @@ const PostForm = ({
     setValue,
     reset,
   } = useForm<FormCreatePost>({
-    defaultValues: savedDraft || initialData || {},
+    defaultValues: {
+      postType: "movie", // 1. Базовое значение по умолчанию
+      ...(initialData || {}), // 2. Перекрываем тем, что пришло с бэка (если есть)
+      ...(savedDraft || {}), // 3. Сверху перекрываем черновиком (если он есть)
+    },
   })
+  const postType = watch("postType") || "movie"
   const dispatch = useAppDispatch()
   const router = useRouter()
   const loading = useAppSelector((state: RootState) => state.userPost.loading)
@@ -87,7 +103,8 @@ const PostForm = ({
 
       formData.append("title", dataForm.title)
       formData.append("content", dataForm.content)
-      formData.append("postType", postType)
+      formData.append("postType", dataForm.postType)
+      // formData.append("postType", postType)
 
       if (roomId) {
         formData.append("roomId", roomId)
@@ -99,19 +116,21 @@ const PostForm = ({
         formData.append("postId", initialData._id)
       }
 
-      Object.entries(POST_TYPES[postType].ratings).forEach(([key, config]) => {
-        const value = dataForm[key as keyof typeof dataForm]
+      Object.entries(POST_TYPES[dataForm.postType].ratings).forEach(
+        ([key, config]) => {
+          const value = dataForm[key as keyof typeof dataForm]
 
-        // Если значение есть — используем его, иначе — берём min из конфига (обычно 0)
-        const ratingValue =
-          value !== undefined && value !== null
-            ? Number(value)
-            : (config.min ?? 0)
+          // Если значение есть — используем его, иначе — берём min из конфига (обычно 0)
+          const ratingValue =
+            value !== undefined && value !== null
+              ? Number(value)
+              : (config.min ?? 0)
 
-        // Всегда добавляем в FormData, clamp 0-5 на всякий случай
-        const clamped = Math.max(0, Math.min(5, ratingValue))
-        formData.append(`ratings[${key}]`, clamped.toString())
-      })
+          // Всегда добавляем в FormData, clamp 0-5 на всякий случай
+          const clamped = Math.max(0, Math.min(5, ratingValue))
+          formData.append(`ratings[${key}]`, clamped.toString())
+        },
+      )
 
       if (dataForm.genres) {
         dataForm.genres?.forEach((genre) => {
@@ -196,31 +215,65 @@ const PostForm = ({
     }
   }, [watch("avatarFile")])
 
+  // // Автосохранение черновика
+  // useEffect(() => {
+  //   if (editMode) return
+
+  //   const subscription = watch((values) => {
+  //     console.log("subscription", subscription)
+  //     try {
+  //       const { avatarFile, ...rest } = values
+
+  //       // Проверяем, есть ли хоть какие-то данные
+  //       const hasData = Object.values(rest).some((value) => {
+  //         if (Array.isArray(value)) return value.length > 0
+  //         if (typeof value === "string") return value.trim() !== ""
+  //         if (typeof value === "number") return value > 0
+  //         if (typeof value === "boolean") return false
+  //         return value !== null && value !== undefined
+  //       })
+  //       console.log("Object.values(rest)", Object.values(rest))
+  //       console.log("hasData", hasData)
+  //       if (hasData) {
+  //         // Сохраняем только если есть данные
+  //         localStorage.setItem(DRAFT_KEY, JSON.stringify(rest))
+  //         setHasDraft(true)
+  //       } else {
+  //         // Если данных нет — удаляем черновик
+  //         localStorage.removeItem(DRAFT_KEY)
+  //         setHasDraft(false)
+  //       }
+  //     } catch (e) {
+  //       console.warn("Не удалось сохранить черновик:", e)
+  //     }
+  //   })
+  //   return () => subscription.unsubscribe()
+  // }, [watch, editMode, DRAFT_KEY])
   // Автосохранение черновика
   useEffect(() => {
     if (editMode) return
 
     const subscription = watch((values) => {
-      console.log("subscription", subscription)
       try {
-        const { avatarFile, ...rest } = values
+        // 1. Убираем файлы и служебные поля, которые не являются "вводом пользователя"
+        const { avatarFile, postType, roomId, _id, imageId, ...userInput } =
+          values
 
-        // Проверяем, есть ли хоть какие-то данные
-        const hasData = Object.values(rest).some((value) => {
+        // 2. Проверяем, ввел ли пользователь хоть что-то осмысленное
+        const hasData = Object.values(userInput).some((value) => {
           if (Array.isArray(value)) return value.length > 0
           if (typeof value === "string") return value.trim() !== ""
           if (typeof value === "number") return value > 0
           if (typeof value === "boolean") return false
           return value !== null && value !== undefined
         })
-        console.log("Object.values(rest)", Object.values(rest))
-        console.log("hasData", hasData)
+
         if (hasData) {
-          // Сохраняем только если есть данные
+          // Сохраняем ВЕСЬ rest (включая postType и roomId, чтобы не потерять контекст)
+          const { avatarFile, ...rest } = values
           localStorage.setItem(DRAFT_KEY, JSON.stringify(rest))
           setHasDraft(true)
         } else {
-          // Если данных нет — удаляем черновик
           localStorage.removeItem(DRAFT_KEY)
           setHasDraft(false)
         }
@@ -257,17 +310,17 @@ const PostForm = ({
     handleInput()
   }, [watch("content")])
 
-  useEffect(() => {
-    if (initialData?.postType) {
-      setPostType(initialData.postType)
-    }
-  }, [initialData])
+  // useEffect(() => {
+  //   if (initialData?.postType) {
+  //     setPostType(initialData.postType)
+  //   }
+  // }, [initialData])
 
   const delDataForm = () => {
     localStorage.removeItem(DRAFT_KEY)
     setHasDraft(false)
     // 1. Сбрасываем отдельные стейты
-    setPostType("movie")
+    // setPostType("movie")
     setPreview(null)
 
     // 2. Жестко сбрасываем все поля формы в пустые значения
@@ -278,6 +331,7 @@ const PostForm = ({
       genres: [],
       avatarFile: null,
       imageId: null,
+      postType: "movie",
     })
   }
 
@@ -318,6 +372,18 @@ const PostForm = ({
           </div>
           <div className={style.postForm__typePostSelect}>
             <select
+              id="typePost"
+              {...register("postType")} // ✅ Магия react-hook-form
+            >
+              {Object.entries(POST_TYPES).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* <div className={style.postForm__typePostSelect}>
+            <select
               name="typePost"
               id="typePost"
               onChange={(e) => setPostType(e.target.value as PostTypeKey)}
@@ -329,7 +395,7 @@ const PostForm = ({
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
           <div className={style.postForm__formImageBlock}>
             <label className={style.postForm__customFileUpload}>
               Загрузить аватарку
