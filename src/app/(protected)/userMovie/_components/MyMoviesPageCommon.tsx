@@ -31,7 +31,7 @@ type Props =
 const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
   const dispatch = useAppDispatch()
   const [activeTab, setActiveTab] = useState<"wantToSee" | "watched">(
-    "wantToSee"
+    "wantToSee",
   )
   const [isFormMovieWantToSee, setIsFormMovieWantToSee] = useState(false)
 
@@ -60,7 +60,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
           fetchUserMoviesThunk({
             status: activeTab === "wantToSee" ? "wantToSee" : "watched",
             page: pageFromUrl,
-          })
+          }),
         )
       } else {
         if (!userId) return
@@ -70,7 +70,7 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
             status: activeTab === "wantToSee" ? "wantToSee" : "watched",
             page: pageFromUrl,
             userId,
-          })
+          }),
         )
       }
     }
@@ -81,8 +81,8 @@ const MyMoviesPageCommon = ({ myMoviesPage = false, userId }: Props) => {
       ? publicMovies.wantToSee
       : publicMovies.watched
     : activeTab === "wantToSee"
-    ? myMovies.wantToSee
-    : myMovies.watched
+      ? myMovies.wantToSee
+      : myMovies.watched
   console.log("movie", movies)
 
   const movieId = searchParams?.get("movieId")

@@ -21,6 +21,7 @@ import { imageIdType } from "@/store/slices/userPostsSlice"
 import { useRouter } from "next/navigation"
 import { AllRatingKeys, POST_TYPES, PostTypeKey } from "@/constants/postTypes"
 import { DeleteMessageIcon } from "@/assets/icons/deleteMessageIcon"
+import SpinnerWindow from "../ui/spinner/SpinnerWindow"
 
 export type FormCreatePost = {
   title: string
@@ -67,16 +68,6 @@ const PostForm = ({
   const [hasDraft, setHasDraft] = useState(!!savedDraft)
   console.log("editMode", editMode)
 
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   formState: { errors },
-  //   watch,
-  //   setValue,
-  //   reset,
-  // } = useForm<FormCreatePost>({
-  //   defaultValues: savedDraft || initialData || {},
-  // })
   const {
     register,
     handleSubmit,
@@ -94,7 +85,11 @@ const PostForm = ({
   const postType = watch("postType") || "movie"
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const loading = useAppSelector((state: RootState) => state.userPost.loading)
+  const loadingUserPost = useAppSelector(
+    (state: RootState) => state.userPost.loading,
+  )
+  const loadingRoomPost = useAppSelector((state) => state.roomPost.loading)
+  const loading = loadingUserPost || loadingRoomPost
   console.log("hasDraft", hasDraft)
   const handleSave = async (dataForm: FormCreatePost) => {
     console.log("dataForm", dataForm)
@@ -215,40 +210,6 @@ const PostForm = ({
     }
   }, [watch("avatarFile")])
 
-  // // Автосохранение черновика
-  // useEffect(() => {
-  //   if (editMode) return
-
-  //   const subscription = watch((values) => {
-  //     console.log("subscription", subscription)
-  //     try {
-  //       const { avatarFile, ...rest } = values
-
-  //       // Проверяем, есть ли хоть какие-то данные
-  //       const hasData = Object.values(rest).some((value) => {
-  //         if (Array.isArray(value)) return value.length > 0
-  //         if (typeof value === "string") return value.trim() !== ""
-  //         if (typeof value === "number") return value > 0
-  //         if (typeof value === "boolean") return false
-  //         return value !== null && value !== undefined
-  //       })
-  //       console.log("Object.values(rest)", Object.values(rest))
-  //       console.log("hasData", hasData)
-  //       if (hasData) {
-  //         // Сохраняем только если есть данные
-  //         localStorage.setItem(DRAFT_KEY, JSON.stringify(rest))
-  //         setHasDraft(true)
-  //       } else {
-  //         // Если данных нет — удаляем черновик
-  //         localStorage.removeItem(DRAFT_KEY)
-  //         setHasDraft(false)
-  //       }
-  //     } catch (e) {
-  //       console.warn("Не удалось сохранить черновик:", e)
-  //     }
-  //   })
-  //   return () => subscription.unsubscribe()
-  // }, [watch, editMode, DRAFT_KEY])
   // Автосохранение черновика
   useEffect(() => {
     if (editMode) return
@@ -310,17 +271,9 @@ const PostForm = ({
     handleInput()
   }, [watch("content")])
 
-  // useEffect(() => {
-  //   if (initialData?.postType) {
-  //     setPostType(initialData.postType)
-  //   }
-  // }, [initialData])
-
   const delDataForm = () => {
     localStorage.removeItem(DRAFT_KEY)
     setHasDraft(false)
-    // 1. Сбрасываем отдельные стейты
-    // setPostType("movie")
     setPreview(null)
 
     // 2. Жестко сбрасываем все поля формы в пустые значения
@@ -338,211 +291,206 @@ const PostForm = ({
   const contentRegister = register("content")
 
   return (
-    <div className={style.postForm}>
-      <div className={style.postForm__container}>
-        <form
-          onSubmit={handleSubmit(handleSave)}
-          className={style.postForm__ratingForm}
-        >
-          {!editMode && hasDraft && (
-            <button
-              className={style.postForm__buttonReset}
-              type="button"
-              onClick={() => {
-                if (confirm("Удалить сохранённый черновик?")) {
-                  delDataForm()
-                }
-              }}
-            >
-              <DeleteMessageIcon />
-              <span> clear post</span>
+    <>
+      <div className={style.postForm}>
+        <div className={style.postForm__container}>
+          <form
+            onSubmit={handleSubmit(handleSave)}
+            className={style.postForm__ratingForm}
+          >
+            {!editMode && hasDraft && (
+              <button
+                className={style.postForm__buttonReset}
+                type="button"
+                onClick={() => {
+                  if (confirm("Удалить сохранённый черновик?")) {
+                    delDataForm()
+                  }
+                }}
+              >
+                <DeleteMessageIcon />
+                <span> clear post</span>
 
-              {/* Очистить черновик */}
-            </button>
-          )}
-          <div className={style.postForm__titleBlockContainer}>
-            <label htmlFor="title">Заголовок:</label>
-            <input
-              className={style.postForm__titleBlock}
-              id="title"
-              {...register("title", { required: "Заголовок обязателен" })}
-              placeholder={"Введите заголовок"}
-            />
-            {errors.title && <p>{errors.title?.message as string}</p>}
-          </div>
-          <div className={style.postForm__typePostSelect}>
-            <select
-              id="typePost"
-              {...register("postType")} // ✅ Магия react-hook-form
-            >
-              {Object.entries(POST_TYPES).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          {/* <div className={style.postForm__typePostSelect}>
-            <select
-              name="typePost"
-              id="typePost"
-              onChange={(e) => setPostType(e.target.value as PostTypeKey)}
-              value={postType}
-            >
-              {Object.entries(POST_TYPES).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.label}
-                </option>
-              ))}
-            </select>
-          </div> */}
-          <div className={style.postForm__formImageBlock}>
-            <label className={style.postForm__customFileUpload}>
-              Загрузить аватарку
-              <input type="file" accept="image/*" {...register("avatarFile")} />
-            </label>
-            {preview && (
-              <div className={style.postForm__preview}>
-                <CloudinaryImage
-                  src={preview}
-                  alt="Предпросмотр аватара"
-                  className={style.postForm__preview}
-                  width={200}
-                  height={200}
+                {/* Очистить черновик */}
+              </button>
+            )}
+            <div className={style.postForm__titleBlockContainer}>
+              <label htmlFor="title">Заголовок:</label>
+              <input
+                className={style.postForm__titleBlock}
+                id="title"
+                {...register("title", { required: "Заголовок обязателен" })}
+                placeholder={"Введите заголовок"}
+              />
+              {errors.title && <p>{errors.title?.message as string}</p>}
+            </div>
+            <div className={style.postForm__typePostSelect}>
+              <select
+                id="typePost"
+                {...register("postType")} // ✅ Магия react-hook-form
+              >
+                {Object.entries(POST_TYPES).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={style.postForm__formImageBlock}>
+              <label className={style.postForm__customFileUpload}>
+                Загрузить аватарку
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register("avatarFile")}
                 />
+              </label>
+              {preview && (
+                <div className={style.postForm__preview}>
+                  <CloudinaryImage
+                    src={preview}
+                    alt="Предпросмотр аватара"
+                    className={style.postForm__preview}
+                    width={200}
+                    height={200}
+                  />
+                </div>
+              )}
+            </div>
+            {(postType === "movie" ||
+              postType === "episode" ||
+              postType === "letsplay") && (
+              <div className={style.postForm__genresBlock}>
+                <label>Жанры:</label>
+                <div>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="drama"
+                      {...register("genres")}
+                    />
+                    Драма
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="comedy"
+                      {...register("genres")}
+                    />
+                    Комедия
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="action"
+                      {...register("genres")}
+                    />
+                    Боевик
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="thriller"
+                      {...register("genres")}
+                    />
+                    Триллер
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="fantasy"
+                      {...register("genres")}
+                    />
+                    Фэнтези
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="sciFi"
+                      {...register("genres")}
+                    />
+                    Научная фантастика
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="horror"
+                      {...register("genres")}
+                    />
+                    Ужасы
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="romance"
+                      {...register("genres")}
+                    />
+                    Романтика
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="adventure"
+                      {...register("genres")}
+                    />
+                    Приключения
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value="mystery"
+                      {...register("genres")}
+                    />
+                    Детектив
+                  </label>
+                </div>
               </div>
             )}
-          </div>
-          {(postType === "movie" ||
-            postType === "episode" ||
-            postType === "letsplay") && (
-            <div className={style.postForm__genresBlock}>
-              <label>Жанры:</label>
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="drama"
-                    {...register("genres")}
-                  />
-                  Драма
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="comedy"
-                    {...register("genres")}
-                  />
-                  Комедия
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="action"
-                    {...register("genres")}
-                  />
-                  Боевик
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="thriller"
-                    {...register("genres")}
-                  />
-                  Триллер
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="fantasy"
-                    {...register("genres")}
-                  />
-                  Фэнтези
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="sciFi"
-                    {...register("genres")}
-                  />
-                  Научная фантастика
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="horror"
-                    {...register("genres")}
-                  />
-                  Ужасы
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="romance"
-                    {...register("genres")}
-                  />
-                  Романтика
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="adventure"
-                    {...register("genres")}
-                  />
-                  Приключения
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    value="mystery"
-                    {...register("genres")}
-                  />
-                  Детектив
-                </label>
-              </div>
-            </div>
-          )}
 
-          <div className={style.postForm__textareaBlock}>
-            <label htmlFor="content">Описание:</label>
-            <textarea
-              {...register("content")}
-              placeholder={"Введите описание"}
-              ref={(e) => {
-                // register("content").ref(e) // связываем с react-hook-form
-                contentRegister.ref(e) // ✅ Используем тот же самый экземпляр
-                textareaRef.current = e // сохраняем в свой ref
-              }}
-              onInput={handleInput}
-            />
-            {errors.content && <p>{errors.content?.message as string}</p>}
-          </div>
-          {Object.entries(POST_TYPES[postType].ratings).map(([key, value]) => (
-            <div key={key}>
-              <span>{value.label}</span>
-              <StarRating<FormCreatePost>
-                name={key as Path<FormCreatePost>}
-                setValue={setValue}
-                watch={watch}
+            <div className={style.postForm__textareaBlock}>
+              <label htmlFor="content">Описание:</label>
+              <textarea
+                {...register("content")}
+                placeholder={"Введите описание"}
+                ref={(e) => {
+                  // register("content").ref(e) // связываем с react-hook-form
+                  contentRegister.ref(e) // ✅ Используем тот же самый экземпляр
+                  textareaRef.current = e // сохраняем в свой ref
+                }}
+                onInput={handleInput}
               />
+              {errors.content && <p>{errors.content?.message as string}</p>}
             </div>
-          ))}
-          <div className={style.postForm__buttonBlock}>
-            <ButtonMenu type="submit" disabled={loading} loading={loading}>
-              {!editMode ? "Опубликовать" : "Сохранить"}
-            </ButtonMenu>
-            <ButtonMenu
-              onClick={() => {
-                delDataForm()
-                hiddenBlock()
-              }}
-            >
-              Отмена
-            </ButtonMenu>
-          </div>
-        </form>
+            {Object.entries(POST_TYPES[postType].ratings).map(
+              ([key, value]) => (
+                <div key={key}>
+                  <span>{value.label}</span>
+                  <StarRating<FormCreatePost>
+                    name={key as Path<FormCreatePost>}
+                    setValue={setValue}
+                    watch={watch}
+                  />
+                </div>
+              ),
+            )}
+            <div className={style.postForm__buttonBlock}>
+              <ButtonMenu type="submit" disabled={loading} loading={loading}>
+                {!editMode ? "Опубликовать" : "Сохранить"}
+              </ButtonMenu>
+              <ButtonMenu
+                onClick={() => {
+                  delDataForm()
+                  hiddenBlock()
+                }}
+              >
+                Отмена
+              </ButtonMenu>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+      {loading && <SpinnerWindow />}
+    </>
   )
 }
 
